@@ -1,0 +1,1790 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.8.0_40" class="java.beans.XMLDecoder">
+ <object class="java.util.HashMap">
+  <void method="put">
+   <string>All Roots</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>Astrological Computer</string>
+    </void>
+    <void method="add">
+     <string>Audio Sequencer</string>
+    </void>
+    <void method="add">
+     <string>Ball</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle</string>
+    </void>
+    <void method="add">
+     <string>Bridge Machine</string>
+    </void>
+    <void method="add">
+     <string>Business</string>
+    </void>
+    <void method="add">
+     <string>Calculator</string>
+    </void>
+    <void method="add">
+     <string>Casino</string>
+    </void>
+    <void method="add">
+     <string>Casino * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Chess Machine</string>
+    </void>
+    <void method="add">
+     <string>Climbing</string>
+    </void>
+    <void method="add">
+     <string>Clock</string>
+    </void>
+    <void method="add">
+     <string>Development Computer</string>
+    </void>
+    <void method="add">
+     <string>Driving</string>
+    </void>
+    <void method="add">
+     <string>Educational Game</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical</string>
+    </void>
+    <void method="add">
+     <string>Electronic Game</string>
+    </void>
+    <void method="add">
+     <string>Fighter</string>
+    </void>
+    <void method="add">
+     <string>Game Console</string>
+    </void>
+    <void method="add">
+     <string>Handheld Child Computers</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game Console</string>
+    </void>
+    <void method="add">
+     <string>Home Computer</string>
+    </void>
+    <void method="add">
+     <string>Kit Computer</string>
+    </void>
+    <void method="add">
+     <string>Laptop / Notebook / Portable</string>
+    </void>
+    <void method="add">
+     <string>Maze</string>
+    </void>
+    <void method="add">
+     <string>Maze * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Microcomputer</string>
+    </void>
+    <void method="add">
+     <string>Misc.</string>
+    </void>
+    <void method="add">
+     <string>Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Multi-cart Board</string>
+    </void>
+    <void method="add">
+     <string>Multiplay</string>
+    </void>
+    <void method="add">
+	     <string>Not Classified</string>
+    </void>
+    <void method="add">
+     <string>Pinball</string>
+    </void>
+    <void method="add">
+     <string>Pinball * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Platform</string>
+    </void>
+    <void method="add">
+     <string>Pocket Device / Pad / PDA</string>
+    </void>
+    <void method="add">
+     <string>Punched Card Computer</string>
+    </void>
+    <void method="add">
+     <string>Puzzle</string>
+    </void>
+    <void method="add">
+     <string>Quiz</string>
+    </void>
+    <void method="add">
+     <string>Rhythm</string>
+    </void>
+    <void method="add">
+     <string>Shooter</string>
+    </void>
+    <void method="add">
+     <string>Single Board Computer</string>
+    </void>
+    <void method="add">
+     <string>Speech Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>Sports</string>
+    </void>
+    <void method="add">
+     <string>Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>System</string>
+    </void>
+    <void method="add">
+     <string>Tabletop</string>
+    </void>
+    <void method="add">
+     <string>Test ROM</string>
+    </void>
+    <void method="add">
+     <string>Training Board</string>
+    </void>
+    <void method="add">
+     <string>Utilities</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>Arcade Categories</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>Ball</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle / Breakout</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle / Breakout * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle / Pong</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle</string>
+    </void>
+    <void method="add">
+     <string>Casino</string>
+    </void>
+    <void method="add">
+     <string>Casino / Roulette</string>
+    </void>
+    <void method="add">
+     <string>Casino / Cards * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Casino / Cards</string>
+    </void>
+    <void method="add">
+     <string>Casino / Lottery</string>
+    </void>
+    <void method="add">
+     <string>Casino / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Casino / Reels</string>
+    </void>
+    <void method="add">
+     <string>Casino / Reels * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Casino / Racing</string>
+    </void>
+    <void method="add">
+     <string>Casino * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Climbing</string>
+    </void>
+    <void method="add">
+     <string>Driving</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race</string>
+    </void>
+    <void method="add">
+     <string>Driving / Plane</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race Track</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race Bike</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race 1st P Bike</string>
+    </void>
+    <void method="add">
+     <string>Driving / 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Driving / Boat</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race (chase view) Bike</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race (chase view)</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Redemption</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Reels</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Utilities</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Coin Pusher</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Pinball</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Fighter</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Vertical</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Versus</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Versus Co-op</string>
+    </void>
+    <void method="add">
+     <string>Fighter / 2.5D</string>
+    </void>
+    <void method="add">
+     <string>Fighter / 3D</string>
+    </void>
+    <void method="add">
+     <string>Fighter / 2D</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Field</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Versus * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Maze</string>
+    </void>
+    <void method="add">
+     <string>Maze / Driving</string>
+    </void>
+    <void method="add">
+     <string>Maze / Fighter</string>
+    </void>
+    <void method="add">
+     <string>Maze / Shooter Small</string>
+    </void>
+    <void method="add">
+     <string>Maze / Outline</string>
+    </void>
+    <void method="add">
+     <string>Maze / Shooter Large</string>
+    </void>
+    <void method="add">
+     <string>Maze / Surround</string>
+    </void>
+    <void method="add">
+     <string>Maze / Digging * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Maze / Digging</string>
+    </void>
+    <void method="add">
+     <string>Maze / Shooter Small * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Maze * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Misc.</string>
+    </void>
+    <void method="add">
+     <string>Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Multi-cart Board</string>
+    </void>
+    <void method="add">
+     <string>Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Compilation</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Compilation * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Mini-Games * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Mini-Games</string>
+    </void>
+    <void method="add">
+	     <string>Not Classified</string>
+    </void>
+    <void method="add">
+     <string>Pinball</string>
+    </void>
+    <void method="add">
+     <string>Pinball / Pachinko</string>
+    </void>
+    <void method="add">
+     <string>Pinball / Pachinko * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Pinball * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Platform</string>
+    </void>
+    <void method="add">
+     <string>Platform / Fighter</string>
+    </void>
+    <void method="add">
+     <string>Platform / Shooter</string>
+    </void>
+    <void method="add">
+     <string>Platform / Run Jump * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Platform / Run Jump</string>
+    </void>
+    <void method="add">
+     <string>Platform / Shooter Scrolling</string>
+    </void>
+    <void method="add">
+     <string>Platform / Fighter Scrolling</string>
+    </void>
+    <void method="add">
+     <string>Platform / Run Jump Scrolling</string>
+    </void>
+    <void method="add">
+     <string>Puzzle</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Match * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Cards * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Outline * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Drop * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Outline</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Drop</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Match</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Sliding * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Sliding</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Toss</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Maze</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Toss * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Cards</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Quiz</string>
+    </void>
+    <void method="add">
+     <string>Quiz / English</string>
+    </void>
+    <void method="add">
+     <string>Quiz / French</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Chinese</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Japanese * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Quiz / English - Music</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Spanish</string>
+    </void>
+    <void method="add">
+     <string>Quiz / German</string>
+    </void>
+    <void method="add">
+     <string>Quiz / English * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Japanese - Music</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Japanese</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Italian</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Korean</string>
+    </void>
+    <void method="add">
+     <string>Rhythm</string>
+    </void>
+    <void method="add">
+     <string>Rhythm / Dance</string>
+    </void>
+    <void method="add">
+     <string>Rhythm / Instruments</string>
+    </void>
+    <void method="add">
+     <string>Rhythm / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Shooter</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Diagonal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving Diagonal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Horizontal * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Field * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Versus</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Misc. Horizontal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Gallery * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Vertical</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / 3rd Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Gun</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Vertical * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying (chase view)</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Field</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving Vertical</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Gallery</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving (chase view)</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Walking</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Horizontal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving Horizontal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Command</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Misc. Vertical</string>
+    </void>
+    <void method="add">
+     <string>Sports</string>
+    </void>
+    <void method="add">
+     <string>Sports / Skateboarding</string>
+    </void>
+    <void method="add">
+     <string>Sports / Dodgeball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Track &amp; Field</string>
+    </void>
+    <void method="add">
+     <string>Sports / Swimming</string>
+    </void>
+    <void method="add">
+     <string>Sports / Wrestling</string>
+    </void>
+    <void method="add">
+     <string>Sports / SkyDiving</string>
+    </void>
+    <void method="add">
+     <string>Sports / Bowling</string>
+    </void>
+    <void method="add">
+     <string>Sports / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Sports / Horseshoes</string>
+    </void>
+    <void method="add">
+     <string>Sports / Boxing</string>
+    </void>
+    <void method="add">
+     <string>Sports / Soccer</string>
+    </void>
+    <void method="add">
+     <string>Sports / Sumo</string>
+    </void>
+    <void method="add">
+     <string>Sports / Skiing</string>
+    </void>
+    <void method="add">
+     <string>Sports / Shuffleboard</string>
+    </void>
+    <void method="add">
+     <string>Sports / Tennis</string>
+    </void>
+    <void method="add">
+     <string>Sports / Darts</string>
+    </void>
+    <void method="add">
+     <string>Sports / Bull Fighting</string>
+    </void>
+    <void method="add">
+     <string>Sports / Basketball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Pool</string>
+    </void>
+    <void method="add">
+     <string>Sports / Football</string>
+    </void>
+    <void method="add">
+     <string>Sports / Armwrestling</string>
+    </void>
+    <void method="add">
+     <string>Sports / Hang Gliding</string>
+    </void>
+    <void method="add">
+     <string>Sports / Golf</string>
+    </void>
+    <void method="add">
+     <string>Sports / Rugby Football</string>
+    </void>
+    <void method="add">
+     <string>Sports / Volleyball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Pool * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Sports / Handball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Ping Pong</string>
+    </void>
+    <void method="add">
+     <string>Sports / Fishing</string>
+    </void>
+    <void method="add">
+     <string>Sports / Baseball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Hockey</string>
+    </void>
+    <void method="add">
+     <string>Sports / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Sports / Horse Racing</string>
+    </void>
+    <void method="add">
+     <string>System</string>
+    </void>
+    <void method="add">
+     <string>System / Device</string>
+    </void>
+    <void method="add">
+     <string>System / BIOS</string>
+    </void>
+    <void method="add">
+     <string>Tabletop</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Cards</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Othello</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Othello * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Hanafuda</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Mahjong</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Shougi</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Hanafuda * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Mahjong * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Go</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Renju</string>
+    </void>
+    <void method="add">
+     <string>Utilities</string>
+    </void>
+    <void method="add">
+     <string>Utilities / Update</string>
+    </void>
+    <void method="add">
+     <string>Utilities / Test</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>System Roots</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>Astrological Computer</string>
+    </void>
+    <void method="add">
+     <string>Audio Sequencer</string>
+    </void>
+    <void method="add">
+     <string>Bridge Machine</string>
+    </void>
+    <void method="add">
+     <string>Business</string>
+    </void>
+    <void method="add">
+     <string>Calculator</string>
+    </void>
+    <void method="add">
+     <string>Chess Machine</string>
+    </void>
+    <void method="add">
+     <string>Clock</string>
+    </void>
+    <void method="add">
+     <string>Development Computer</string>
+    </void>
+    <void method="add">
+     <string>Educational Game</string>
+    </void>
+    <void method="add">
+     <string>Electronic Game</string>
+    </void>
+    <void method="add">
+     <string>Game Console</string>
+    </void>
+    <void method="add">
+     <string>Handheld Child Computers</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game Console</string>
+    </void>
+    <void method="add">
+     <string>Home Computer</string>
+    </void>
+    <void method="add">
+     <string>Kit Computer</string>
+    </void>
+    <void method="add">
+     <string>Laptop / Notebook / Portable</string>
+    </void>
+    <void method="add">
+     <string>Microcomputer</string>
+    </void>
+    <void method="add">
+     <string>Pocket Device / Pad / PDA</string>
+    </void>
+    <void method="add">
+     <string>Punched Card Computer</string>
+    </void>
+    <void method="add">
+     <string>Single Board Computer</string>
+    </void>
+    <void method="add">
+     <string>Speech Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>Test ROM</string>
+    </void>
+    <void method="add">
+     <string>Training Board</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>System Categories</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>3D Printer</string>
+    </void>
+    <void method="add">
+     <string>Astrological Computer</string>
+    </void>
+    <void method="add">
+     <string>Audio Sequencer</string>
+    </void>
+    <void method="add">
+     <string>Bridge Machine</string>
+    </void>
+    <void method="add">
+     <string>Business</string>
+    </void>
+    <void method="add">
+     <string>Business Computer / Terminal</string>
+    </void>
+    <void method="add">
+     <string>Calculator</string>
+    </void>
+    <void method="add">
+     <string>Calculator / Pocket Computer</string>
+    </void>
+    <void method="add">
+     <string>Cash Counter</string>
+    </void>
+    <void method="add">
+     <string>Chess Machine</string>
+    </void>
+    <void method="add">
+     <string>Clock</string>
+    </void>
+    <void method="add">
+     <string>Development Computer</string>
+    </void>
+    <void method="add">
+     <string>Document Processors</string>
+    </void>
+    <void method="add">
+     <string>Dot-Matrix Display</string>
+    </void>
+    <void method="add">
+     <string>Drum Machine</string>
+    </void>
+    <void method="add">
+     <string>EPROM Programmer</string>
+    </void>
+    <void method="add">
+     <string>Educational Game</string>
+    </void>
+    <void method="add">
+     <string>Electronic Game</string>
+    </void>
+    <void method="add">
+     <string>Game Console</string>
+    </void>
+    <void method="add">
+     <string>Graphic Tablet</string>
+    </void>
+    <void method="add">
+     <string>Handheld Child Computers</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game Console</string>
+    </void>
+    <void method="add">
+     <string>Home Computer</string>
+    </void>
+    <void method="add">
+     <string>In Circuit Emulator</string>
+    </void>
+    <void method="add">
+     <string>Kit Computer</string>
+    </void>
+    <void method="add">
+     <string>Laptop / Notebook / Portable</string>
+    </void>
+    <void method="add">
+     <string>Matrix Printer</string>
+    </void>
+    <void method="add">
+     <string>Microcomputer</string>
+    </void>
+    <void method="add">
+     <string>Network Processor</string>
+    </void>
+    <void method="add">
+     <string>Pocket Device / Pad / PDA</string>
+    </void>
+    <void method="add">
+     <string>Print Club</string>
+    </void>
+    <void method="add">
+     <string>Punched Card Computer</string>
+    </void>
+    <void method="add">
+     <string>Robot Control</string>
+    </void>
+    <void method="add">
+     <string>Satellite Receiver</string>
+    </void>
+    <void method="add">
+     <string>Single Board Computer</string>
+    </void>
+    <void method="add">
+     <string>Speech Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>Telephone</string>
+    </void>
+    <void method="add">
+     <string>Telephone / ComputerPhone</string>
+    </void>
+    <void method="add">
+     <string>Test ROM</string>
+    </void>
+    <void method="add">
+     <string>Training Board</string>
+    </void>
+    <void method="add">
+     <string>VTR Control</string>
+    </void>
+    <void method="add">
+     <string>Word-processing Machine</string>
+    </void>
+    <void method="add">
+     <string>Workstation</string>
+    </void>
+    <void method="add">
+     <string>Workstation / Server</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>Arcade Roots</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>Ball</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle</string>
+    </void>
+    <void method="add">
+     <string>Casino</string>
+    </void>
+    <void method="add">
+     <string>Casino * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Climbing</string>
+    </void>
+    <void method="add">
+     <string>Driving</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical</string>
+    </void>
+    <void method="add">
+     <string>Fighter</string>
+    </void>
+    <void method="add">
+     <string>Maze</string>
+    </void>
+    <void method="add">
+     <string>Maze * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Misc.</string>
+    </void>
+    <void method="add">
+     <string>Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Multi-cart Board</string>
+    </void>
+    <void method="add">
+     <string>Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Pinball</string>
+    </void>
+    <void method="add">
+     <string>Pinball * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Platform</string>
+    </void>
+    <void method="add">
+     <string>Puzzle</string>
+    </void>
+    <void method="add">
+     <string>Quiz</string>
+    </void>
+    <void method="add">
+     <string>Rhythm</string>
+    </void>
+    <void method="add">
+     <string>Shooter</string>
+    </void>
+    <void method="add">
+     <string>Sports</string>
+    </void>
+    <void method="add">
+     <string>System</string>
+    </void>
+    <void method="add">
+     <string>Tabletop</string>
+    </void>
+    <void method="add">
+     <string>Utilities</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>Arcade No Mature Categories</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>Ball</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle / Breakout</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle / Pong</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle</string>
+    </void>
+    <void method="add">
+     <string>Casino</string>
+    </void>
+    <void method="add">
+     <string>Casino / Roulette</string>
+    </void>
+    <void method="add">
+     <string>Casino / Cards</string>
+    </void>
+    <void method="add">
+     <string>Casino / Lottery</string>
+    </void>
+    <void method="add">
+     <string>Casino / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Casino / Reels</string>
+    </void>
+    <void method="add">
+     <string>Casino / Racing</string>
+    </void>
+    <void method="add">
+     <string>Climbing</string>
+    </void>
+    <void method="add">
+     <string>Driving</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race</string>
+    </void>
+    <void method="add">
+     <string>Driving / Plane</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race Track</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race Bike</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race 1st P Bike</string>
+    </void>
+    <void method="add">
+     <string>Driving / 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Driving / Boat</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race (chase view) Bike</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Driving / Race (chase view)</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Reels</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Utilities</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Coin Pusher</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Pinball</string>
+    </void>
+    <void method="add">
+     <string>Electromechanical / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Fighter</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Vertical</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Versus</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Versus Co-op</string>
+    </void>
+    <void method="add">
+     <string>Fighter / 2.5D</string>
+    </void>
+    <void method="add">
+     <string>Fighter / 3D</string>
+    </void>
+    <void method="add">
+     <string>Fighter / 2D</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Field</string>
+    </void>
+    <void method="add">
+     <string>Maze</string>
+    </void>
+    <void method="add">
+     <string>Maze / Driving</string>
+    </void>
+    <void method="add">
+     <string>Maze / Fighter</string>
+    </void>
+    <void method="add">
+     <string>Maze / Shooter Small</string>
+    </void>
+    <void method="add">
+     <string>Maze / Outline</string>
+    </void>
+    <void method="add">
+     <string>Maze / Shooter Large</string>
+    </void>
+    <void method="add">
+     <string>Maze / Surround</string>
+    </void>
+    <void method="add">
+     <string>Maze / Digging</string>
+    </void>
+    <void method="add">
+     <string>Misc.</string>
+    </void>
+    <void method="add">
+     <string>Multi-cart Board</string>
+    </void>
+    <void method="add">
+     <string>Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Compilation</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Mini-Games</string>
+    </void>
+    <void method="add">
+     <string>Pinball</string>
+    </void>
+    <void method="add">
+     <string>Pinball / Pachinko</string>
+    </void>
+    <void method="add">
+     <string>Platform</string>
+    </void>
+    <void method="add">
+     <string>Platform / Fighter</string>
+    </void>
+    <void method="add">
+     <string>Platform / Shooter</string>
+    </void>
+    <void method="add">
+     <string>Platform / Run Jump</string>
+    </void>
+    <void method="add">
+     <string>Platform / Shooter Scrolling</string>
+    </void>
+    <void method="add">
+     <string>Platform / Fighter Scrolling</string>
+    </void>
+    <void method="add">
+     <string>Platform / Run Jump Scrolling</string>
+    </void>
+    <void method="add">
+     <string>Puzzle</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Outline</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Drop</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Match</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Sliding</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Toss</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Maze</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Cards</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Quiz</string>
+    </void>
+    <void method="add">
+     <string>Quiz / English</string>
+    </void>
+    <void method="add">
+     <string>Quiz / French</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Chinese</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Music English</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Spanish</string>
+    </void>
+    <void method="add">
+     <string>Quiz / German</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Music Japanese</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Japanese</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Italian</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Korean</string>
+    </void>
+    <void method="add">
+     <string>Rhythm</string>
+    </void>
+    <void method="add">
+     <string>Rhythm / Dance</string>
+    </void>
+    <void method="add">
+     <string>Rhythm / Instruments</string>
+    </void>
+    <void method="add">
+     <string>Rhythm / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Shooter</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Diagonal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving Diagonal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Versus</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Misc. Horizontal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Vertical</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying 1st Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / 3rd Person</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Gun</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying (chase view)</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Field</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving Vertical</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Gallery</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving (chase view)</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Walking</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Horizontal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Driving Horizontal</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Command</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Misc. Vertical</string>
+    </void>
+    <void method="add">
+     <string>Sports</string>
+    </void>
+    <void method="add">
+     <string>Sports / Skateboarding</string>
+    </void>
+    <void method="add">
+     <string>Sports / Dodgeball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Track &amp; Field</string>
+    </void>
+    <void method="add">
+     <string>Sports / Swimming</string>
+    </void>
+    <void method="add">
+     <string>Sports / Wrestling</string>
+    </void>
+    <void method="add">
+     <string>Sports / SkyDiving</string>
+    </void>
+    <void method="add">
+     <string>Sports / Bowling</string>
+    </void>
+    <void method="add">
+     <string>Sports / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Sports / Horseshoes</string>
+    </void>
+    <void method="add">
+     <string>Sports / Boxing</string>
+    </void>
+    <void method="add">
+     <string>Sports / Soccer</string>
+    </void>
+    <void method="add">
+     <string>Sports / Sumo</string>
+    </void>
+    <void method="add">
+     <string>Sports / Skiing</string>
+    </void>
+    <void method="add">
+     <string>Sports / Shuffleboard</string>
+    </void>
+    <void method="add">
+     <string>Sports / Tennis</string>
+    </void>
+    <void method="add">
+     <string>Sports / Darts</string>
+    </void>
+    <void method="add">
+     <string>Sports / Bull Fighting</string>
+    </void>
+    <void method="add">
+     <string>Sports / Basketball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Pool</string>
+    </void>
+    <void method="add">
+     <string>Sports / Amer. Football</string>
+    </void>
+    <void method="add">
+     <string>Sports / Armwrestling</string>
+    </void>
+    <void method="add">
+     <string>Sports / Hang Gliding</string>
+    </void>
+    <void method="add">
+     <string>Sports / Golf</string>
+    </void>
+    <void method="add">
+     <string>Sports / Rugby Football</string>
+    </void>
+    <void method="add">
+     <string>Sports / Volleyball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Handball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Ping pong</string>
+    </void>
+    <void method="add">
+     <string>Sports / Fishing</string>
+    </void>
+    <void method="add">
+     <string>Sports / Baseball</string>
+    </void>
+    <void method="add">
+     <string>Sports / Hockey</string>
+    </void>
+    <void method="add">
+     <string>Sports / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Sports / Horse Racing</string>
+    </void>
+    <void method="add">
+     <string>System</string>
+    </void>
+    <void method="add">
+     <string>System / Device</string>
+    </void>
+    <void method="add">
+     <string>System / BIOS</string>
+    </void>
+    <void method="add">
+     <string>Tabletop</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Cards</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Othello</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Multiplay</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Hanafuda</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Misc.</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Mahjong</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Shougi</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Go</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Renju</string>
+    </void>
+    <void method="add">
+     <string>Utilities</string>
+    </void>
+    <void method="add">
+     <string>Utilities / Update</string>
+    </void>
+    <void method="add">
+     <string>Utilities / Test</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>All Mature Categories</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>Casino * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Casino / Cards * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Match * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Quiz / Japanese * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Horizontal * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Cards * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Field * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Outline * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Drop * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Othello * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Pinball * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Sliding * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Platform / Run Jump * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Maze * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Gallery * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Quiz / English * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Casino / Reels * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Hanafuda * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Shooter / Flying Vertical * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Ball &amp; Paddle / Breakout * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Sports / Pool * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Mahjong * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Maze / Digging * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Compilation * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Puzzle / Toss * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Multiplay / Mini-Games * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Tabletop / Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Maze / Shooter Small * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Fighter / Versus * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Pinball / Pachinko * Mature *</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>Mature Roots</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>Casino * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Maze * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Misc. * Mature *</string>
+    </void>
+    <void method="add">
+     <string>Pinball * Mature *</string>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <string>System No Mature Categories</string>
+   <object class="java.util.ArrayList">
+    <void method="add">
+     <string>3D Printer</string>
+    </void>
+    <void method="add">
+     <string>Astrological Computer</string>
+    </void>
+    <void method="add">
+     <string>Audio Sequencer</string>
+    </void>
+    <void method="add">
+     <string>Bridge Machine</string>
+    </void>
+    <void method="add">
+     <string>Business</string>
+    </void>
+    <void method="add">
+     <string>Business Computer / Terminal</string>
+    </void>
+    <void method="add">
+     <string>Calculator</string>
+    </void>
+    <void method="add">
+     <string>Calculator / Pocket Computer</string>
+    </void>
+    <void method="add">
+     <string>Cash Counter</string>
+    </void>
+    <void method="add">
+     <string>Chess Machine</string>
+    </void>
+    <void method="add">
+     <string>Clock</string>
+    </void>
+    <void method="add">
+     <string>Development Computer</string>
+    </void>
+    <void method="add">
+     <string>Document Processors</string>
+    </void>
+    <void method="add">
+     <string>Dot-Matrix Display</string>
+    </void>
+    <void method="add">
+     <string>Drum Machine</string>
+    </void>
+    <void method="add">
+     <string>EPROM Programmer</string>
+    </void>
+    <void method="add">
+     <string>Educational Game</string>
+    </void>
+    <void method="add">
+     <string>Electronic Game</string>
+    </void>
+    <void method="add">
+     <string>Game Console</string>
+    </void>
+    <void method="add">
+     <string>Graphic Tablet</string>
+    </void>
+    <void method="add">
+     <string>Handheld Child Computers</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game</string>
+    </void>
+    <void method="add">
+     <string>Handheld Game Console</string>
+    </void>
+    <void method="add">
+     <string>Home Computer</string>
+    </void>
+    <void method="add">
+     <string>In Circuit Emulator</string>
+    </void>
+    <void method="add">
+     <string>Kit Computer</string>
+    </void>
+    <void method="add">
+     <string>Laptop / Notebook / Portable</string>
+    </void>
+    <void method="add">
+     <string>Matrix Printer</string>
+    </void>
+    <void method="add">
+     <string>Microcomputer</string>
+    </void>
+    <void method="add">
+     <string>Network Processor</string>
+    </void>
+    <void method="add">
+     <string>Not Classified</string>
+    </void>
+    <void method="add">
+     <string>Pocket Device / Pad / PDA</string>
+    </void>
+    <void method="add">
+     <string>Print Club</string>
+    </void>
+    <void method="add">
+     <string>Punched Card Computer</string>
+    </void>
+    <void method="add">
+     <string>Robot Control</string>
+    </void>
+    <void method="add">
+     <string>Satellite Receiver</string>
+    </void>
+    <void method="add">
+     <string>Single Board Computer</string>
+    </void>
+    <void method="add">
+     <string>Speech Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>Synthesiser</string>
+    </void>
+    <void method="add">
+     <string>Telephone</string>
+    </void>
+    <void method="add">
+     <string>Telephone / ComputerPhone</string>
+    </void>
+    <void method="add">
+     <string>Test ROM</string>
+    </void>
+    <void method="add">
+     <string>Training Board</string>
+    </void>
+    <void method="add">
+     <string>VTR Control</string>
+    </void>
+    <void method="add">
+     <string>Word-processing Machine</string>
+    </void>
+    <void method="add">
+     <string>Workstation</string>
+    </void>
+    <void method="add">
+     <string>Workstation / Server</string>
+    </void>
+   </object>
+  </void>
+ </object>
+</java>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="LiquidLnF">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Jars/LiquidLnF.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

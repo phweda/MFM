@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/src">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="jgoodies-looks-2.6.0" level="project" />
+    <orderEntry type="library" name="JTattoo-1.6.10" level="project" />
+    <orderEntry type="library" name="seaglasslookandfeel-0.2" level="project" />
+    <orderEntry type="library" name="jgoodies-common-1.7.0" level="project" />
+    <orderEntry type="library" name="commons-io-2.3" level="project" />
+    <orderEntry type="library" name="EaSynthLookAndFeel" level="project" />
+    <orderEntry type="library" name="LiquidLnF" level="project" />
+    <orderEntry type="library" name="quaqua" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="swingx-all-1.6.4" level="project" />
+    <orderEntry type="library" name="jmf" level="project" />
+  </component>
+</module>

@@ -1,3 +1,16 @@
+# VSS
+*.scc
+
+# MFM
+bak/
+Lists/*
+Lists/favs.txt
+out/*
+!out/artifacts/MFM_jar/MFM.jar
+Resources/
+Settings/*
+!Settings/*.ini
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

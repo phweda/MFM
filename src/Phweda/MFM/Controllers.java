@@ -1,0 +1,434 @@
+/*
+ * MAME FILE MANAGER - MAME resources management tool
+ * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package Phweda.MFM;
+
+import Phweda.MFM.mame.Control;
+import Phweda.MFM.mame.Machine;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Stream;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: Phweda
+ * Date: 9/16/2015
+ * Time: 7:34 PM
+ */
+public class Controllers implements Serializable {
+
+    private static Controllers ourInstance = new Controllers();
+
+    private static TreeMap<Integer, TreeSet<String>> controlMachinesList;
+    private static TreeMap<Integer, Phweda.MFM.mame.Control> controls;
+
+    public static final String TYPE = "type";
+    public static final String WAYS = "ways";
+    public static final String WAYS2 = "ways2";
+    public static final String WAYS3 = "ways3";
+    public static final String BUTTONS = "buttons";
+
+    public static final String DIAL = "dial";
+    public static final String DOUBLEJOY = "doublejoy";
+    public static final String GAMBLING = "gambling";
+    public static final String HANAFUDA = "hanafuda";
+    public static final String JOY = "joy";
+    public static final String KEYBOARD = "keyboard";
+    public static final String KEYPAD = "keypad";
+    public static final String LIGHTGUN = "lightgun";
+    public static final String MAHJONG = "mahjong";
+    public static final String MOUSE = "mouse";
+    public static final String ONLY_BUTTONS = "only_buttons"; // This is the new value in MAME 173
+    public static final String PADDLE = "paddle";
+    public static final String PEDAL = "pedal";
+    public static final String POSITIONAL = "positional";
+    public static final String STICK = "stick";
+    public static final String TRACKBALL = "trackball";
+    public static final String TRIPLEJOY = "triplejoy";
+
+
+/*
+    private static TreeSet<String> joysticks = new TreeSet<String>(
+            Arrays.asList("All", "1", "2", "vertical2", "4","8", "3 (half4)", "5 (half8)" ));
+
+    private static TreeSet<String> doubleJoysticks = new TreeSet<String>(
+            Arrays.asList("All", "2", "vertical2", "4/2", "4", "8", "8/2" ));
+*/
+
+    private static TreeMap<String, String> controllerMAMEtoLabel;
+    private static TreeMap<String, String> controllerLabeltoMAME;
+
+    private static String[] joysticks = new String[]{"All", "1", "2", "vertical2", "4", "8", "3 (half4)", "5 (half8)"};
+    private static String[] doubleJoysticks = new String[]{"All", "2", "vertical2", "4/2", "4", "8", "8/2"};
+
+    private Controllers() {
+        // MAMEInfo calls to set these
+        controls = new TreeMap<Integer, Phweda.MFM.mame.Control>();
+        controlMachinesList = new TreeMap<Integer, TreeSet<String>>();
+
+        controllerMAMEtoLabel = new TreeMap<String, String>();
+        controllerLabeltoMAME = new TreeMap<String, String>();
+
+        populateLabels(MFM_Data.getInstance().getControllerLabelsFile());
+    }
+
+    /**
+     * Reads the MFM_Controller.ini file to create the Controls to common label name mapping
+     * @param file
+     */
+    private static void populateLabels(File file) {
+
+        try {
+            String delimiter = "=";
+            Stream<String> lines = Files.lines(file.toPath());
+            lines.filter(line -> line.contains(delimiter))
+                    .forEach(line -> {
+                        String key = line.split(delimiter)[0].trim();
+                        String value = line.split(delimiter)[1].trim();
+                        controllerMAMEtoLabel.putIfAbsent(key, value);
+                        controllerLabeltoMAME.putIfAbsent(value, key);
+                    });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Controllers getInstance() {
+        return ourInstance;
+    }
+
+    public final void addMachine(ArrayList<String> args, String game) {
+        add(getSignature(args), game);
+    }
+
+    public final void addMachine(String type, String game) {
+        add(getSignature(type), game);
+    }
+
+    /**
+     * Controllers name mapping MAME XML value are keys
+     *
+     * @return HashMap of common names or null if file not found
+     */
+    public static TreeMap<String, String> getControllerMAMEtoLabel() {
+        return controllerMAMEtoLabel;
+    }
+
+    /**
+     * Controllers name mapping MAME XML value are keys
+     *
+     * @return HashMap of common names or null if file not found
+     */
+    public static TreeSet<String> getMAMEControllerNames(TreeSet<String> commonLabels) {
+        TreeSet<String> labels = new TreeSet<String>();
+        for ( String label : commonLabels) {
+            labels.add(controllerLabeltoMAME.get(label));
+        }
+        return labels;
+    }
+
+    public static String getMAMEControllerLabelName(String mameName) {
+            return controllerMAMEtoLabel.get(mameName);
+    }
+
+    /**
+     * Controllers reverse name mapping Common names are keys
+     *
+     * @return HashMap of common names or null if file not found
+     */
+    public static TreeMap<String, String> getControllerLabeltoMAME() {
+        return controllerLabeltoMAME;
+    }
+
+    // fixme this is messy now. Maybe go back and fix in ParseAllMachinesInfo
+    // type ways ways2 ways3
+    final int getSignature(ArrayList<String> args) {
+        StringBuilder sb = new StringBuilder();
+        for (String arg : args) {
+            if (!arg.equals("null")) {
+                sb.append(arg);
+            }
+        }
+        int hash = sb.toString().hashCode();
+
+        // TODO fixme why do we get here with controls NULL!!!!
+        if (controls == null) {
+            controls = new TreeMap<Integer, Phweda.MFM.mame.Control>();
+        }
+        if (!controls.containsKey(hash)) {
+            Control control = new Phweda.MFM.mame.Control();
+            control.setType(args.get(0));
+            if(args.size() > 1){
+                control.setWays(args.get(1));
+            }
+
+            if(args.size() > 2){
+                control.setWays2(args.get(2));
+            }
+
+            if(args.size() > 3){
+                control.setWays3(args.get(3));
+            }
+            controls.put(hash, control);
+        }
+        //   System.out.println('`' + );
+        return hash;
+    }
+
+    public final void add(int signature, String game) {
+        // TODO fixme why do we get here with controlMachinesList NULL!!!!
+        if (controlMachinesList == null) {
+            controlMachinesList = new TreeMap<>();
+        }
+        if (controlMachinesList.containsKey(signature)) {
+            controlMachinesList.get(signature).add(game);
+        } else {
+            TreeSet<String> treeSet = new TreeSet<String>();
+            treeSet.add(game);
+            controlMachinesList.put(signature, treeSet);
+        }
+    }
+
+    // type ways ways2 ways3
+    private int getSignature(String type) {
+        int hash = type.hashCode();
+        if (!controls.containsKey(hash)) {
+            // System.out.println('`' + hash + "\tfor " + type);
+            if (MFM.isDebug()) {
+                MFM.logger.addToList('`' + hash + "\tfor " + type);
+            }
+            Control control = new Phweda.MFM.mame.Control();
+            control.setType(type);
+            controls.put(hash, control);
+        }
+        return hash;
+    }
+
+    static TreeMap<Integer, TreeSet<String>> getControlMachinesList() {
+        return controlMachinesList;
+    }
+
+    // NOTE not sure we need this TODO fixme are we just running in a circle?
+    static TreeMap<Integer, Control> getControls() {
+        return controls;
+    }
+
+    static void setControlMachinesList(TreeMap<Integer, TreeSet<String>> controlMachinesList) {
+        Controllers.controlMachinesList = controlMachinesList;
+    }
+
+    static void setControls(TreeMap<Integer, Phweda.MFM.mame.Control> controls) {
+        Controllers.controls = controls;
+    }
+
+
+    static ArrayList<String> getControllersList() {
+        TreeSet<String> list = new TreeSet<>();
+        for (Integer signature : controls.keySet()) {
+            list.add(controls.get(signature).getType());
+        }
+        return new ArrayList<String>(list);
+    }
+
+    public static String[] getJoysticks() {
+        return joysticks;
+    }
+
+    public static String[] getDoubleJoysticks() {
+        return doubleJoysticks;
+    }
+
+    public static boolean controlHasMachine(String control, String machine) {
+        return controlMachinesList.get(ourInstance.getSignature(control)).contains(machine);
+    }
+
+    final boolean signatureHasMachine(int signature, String machineName) {
+        if (!checkSignature(signature)) {
+            // except "doublejoy" -806141341
+            if (signature != -806141341) {
+                MFM.logger.addToList("Machine signature not found for: " + machineName + " - " + signature, true);
+            }
+            // JOptionPane.showMessageDialog(null, "ListBuilder failure try again");
+            return false;
+        }
+        return controlMachinesList.get(signature).contains(machineName);
+    }
+
+    final boolean signaturesHasMachine(TreeSet<Integer> signatures, String machineName) {
+        for (int signature : signatures) {
+            if (!checkSignature(signature)) {
+                // except "doublejoy" -806141341
+                if (signature != -806141341) {
+                    MFM.logger.addToList("Machine signature not found for: " + machineName + " - " + signature, true);
+                }
+                // JOptionPane.showMessageDialog(null, "ListBuilder failure try again");
+                continue;
+            }
+            if (controlMachinesList.get(signature).contains(machineName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean checkSignature(int signature) {
+        return controlMachinesList.keySet().contains(signature);
+    }
+
+    public static void dumpAllWaysControls() {
+        File controlGamesListFile = new File(MFM.MFM_LISTS_DIR + "controlsGames.csv");
+        File controlsFile = new File(MFM.MFM_LISTS_DIR + "controls.csv");
+        PrintWriter pwcontrolGamesList = null;
+        PrintWriter pwControls = null;
+
+        try {
+            pwcontrolGamesList = new PrintWriter(controlGamesListFile);
+            pwControls = new PrintWriter(controlsFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        pwControls.println("Signature,Type,WAYS,WAYS2,WAYS3,COUNT");
+        for (int signature : controls.keySet()) {
+            Phweda.MFM.mame.Control control = controls.get(signature);
+            pwControls.println(Integer.toString(signature) + ',' + control.getType() + ',' +
+                    control.getWays() + ',' + control.getWays2() + ',' + control.getWays3() + ','
+                    + controlMachinesList.get(signature).size());
+        }
+        pwControls.close();
+
+        pwcontrolGamesList.println("Signature,FileName,NAME,Manufacturer,Type,WAYS,WAYS2,WAYS3");
+        for (int signature : controlMachinesList.keySet()) {
+            Phweda.MFM.mame.Control control = controls.get(signature);
+            if (signature == -1771213723 || signature == -1134657068 || signature == -995842198
+                    || signature == -865288 || signature == 3083120 || signature == 104086693
+                    || signature == 106542458 || signature == 109764752 || signature == 503739367
+                    || signature == 730225098 || signature == 829995282 || signature == 991968362
+                    || signature == 1381039892
+                    ) {
+                continue;
+            }
+            Iterator<String> iter = controlMachinesList.get(signature).iterator();
+            String signatureString = Integer.toString(signature);
+            Map<String, Machine> machines = MAMEInfo.getMame().getMachineMap();
+            while (iter.hasNext()) {
+                String machine = iter.next();
+                pwcontrolGamesList.println(signatureString + ',' + machine + ",\"" +
+                        machines.get(machine).getDescription() + "\",\"" + machines.get(machine).getManufacturer() +
+                        "\"," + control.getType() + ',' + control.getWays() + ',' + control.getWays2() + ',' +
+                        control.getWays3());
+            }
+        }
+        pwcontrolGamesList.close();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+ /*   final class Control implements Serializable {
+        // Note examples from MAME -listxml
+        *//*
+        <machine name="tutankhm" sourcefile="tutankhm.c">
+                <control type="doublejoy" ways="4" ways2="2"/>
+
+            <machine name="x68kxvi" sourcefile="x68k.c" cloneof="x68000" romof="x68000">
+                <input players="2" buttons="10">
+                    <control type="triplejoy" ways="8" ways2="8" ways3="8"/>
+                    <control type="mouse" minimum="0" maximum="255" sensitivity="100"/>
+                    <control type="keyboard"/>
+
+        <machine name="vindctr2" sourcefile="gauntlet.c">
+                <input players="2" buttons="4" coins="4">
+                    <control type="doublejoy" ways="vertical2" ways2="vertical2"/>
+
+        *//*
+        private int signature; // Hash of the combined strings for uniqueness
+
+        private String type; // Equivalent of name for our purposes
+        private String ways = ""; // Must be string i.e. ways="vertical2"
+        private String ways2 = "";
+        private String ways3 = "";
+
+        Control(int signature, ArrayList<String> args) {
+            this.signature = signature;
+            type = args.get(0);
+
+            // We shouldn't need to check this one but just to be safe
+            if (args.size() > 1) {
+                ways = args.get(1);
+            }
+            if (args.size() > 2) {
+                ways2 = args.get(2);
+            }
+            if (args.size() > 3) {
+                ways3 = args.get(3);
+            }
+        }
+
+        Control(int signature, String type) {
+            this.signature = signature;
+            this.type = type;
+        }
+
+        public int getSignature() {
+            return signature;
+        }
+
+        public void setSignature(int signature) {
+            this.signature = signature;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getWays() {
+            return ways;
+        }
+
+        public void setWays(String ways) {
+            this.ways = ways;
+        }
+
+        public String getWays2() {
+            return ways2;
+        }
+
+        public void setWays2(String ways2) {
+            this.ways2 = ways2;
+        }
+
+        public String getWays3() {
+            return ways3;
+        }
+
+        public void setWays3(String ways3) {
+            this.ways3 = ways3;
+        }
+    }
+*/
+}
