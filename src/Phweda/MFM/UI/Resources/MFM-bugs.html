@@ -1,0 +1,120 @@
+<!--
+  ~ MAME FILE MANAGER - MAME resources management tool
+  ~ Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="CONTENT-TYPE" content="text/html; charset=windows-1252">
+    <title></title>
+    <meta name="CREATED" content="0;0">
+    <meta name="CHANGEDBY" content="phweda">
+    <meta name="CHANGED" content="20111229;1493589">
+</head>
+
+<body lang="en-US" dir="ltr" style="font-size: large;">
+<pre class="western">MFM - MAME File Manager
+Author Phweda from PleasureDome</pre>
+<pre class="western"> </pre>
+
+<p>Major <span style="color:#0000ff">TODOs</span> : <br>
+    Add Logging and Debugging code to support feedback from other users - <span
+            style="color:#0000ff">ONGOING</span> <br>
+    Install MAME and MFM on Ubuntu for testing - <span style="color:#0000ff">NOT
+STARTED</span> <br>
+    Add OS detection plus: switch for OS specific ? maybe file separator??- <span
+            style="color:#0000ff">NOT STARTED</span> <a><br>
+        Add ProgressBar popup for longer operations - Added in Statusbar for Populating
+        lists 0.3</a><br>
+    ?? Should we add capability to make multiple play locations i.e. local PC and
+    Arcade box?? - <span style="color:#0000ff">TBD</span> will determine based on
+    feedback<br>
+    Add automatic Save State? reopen last state?? - <span
+            style="color:#0000ff">COMPLETED 0.4 release. <br>
+</span>Add PlayList modify capability - <span style="color:#0000ff">NOT
+STARTED<br>
+</span>Add automatic generation of PlayList from Favorites.ini if it exists -
+    <span style="color:#0000ff">NOT STARTED<br>
+</span>Add Command builder panel - <span style="color:#0000ff">STARTED with 0.3
+release - Fully implemented 0.5</span><br>
+    <span style="color:#0000ff"></span>Enhance GUI functionality - <span
+            style="color:#0000ff">ONGOING</span> <br>
+    Enhance GUI Look &amp; Feel - <span style="color:#0000ff">ONGOING</span> <br>
+    Instrument code to gather performance information - <span
+            style="color:#0000ff">NOT STARTED</span> <br>
+    Select and use Profiling tool - <span style="color:#0000ff">NOT STARTED <br>
+</span>Add cleanup routine to delete no longer needed resources for my
+    Playlists - <span style="color:#0000ff">NOT STARTED<br>
+</span>?? Add automated test cases ?? - <span style="color:#0000ff">TBD time
+permitting</span><br>
+    Add Video capability functions <span style="color:#0000ff">STARTED 0.4 release
+- Fully implemented 0.5</span></p>
+<pre class="western"><span style="color:#0000ff"></span></pre>
+
+<p><span style="color:#ff0000">BUGS</span><span
+        style="color:#0000ff"></span><br>
+    0001 - Determine &amp; implement logic needed to find required ROMs outside the
+    Game's named rom zip/chd i.e. Galaga requires NAMCO51 &amp; NAMCO56 - <span
+            style="color:#ff0000">FIXED</span> needs robust TESTING<br>
+</p>
+
+<p>0002 - Load commands call not working. Failing to redirect MAME output to
+    file - <span style="color:#ff0000">FIXED</span><br>
+</p>
+
+<p>0003 - README very slow to load. Persist compiled version - <span
+        style="color:#ff0000">FIXED</span> rewrote the HTML<br>
+</p>
+
+<p>0004 - Fix layout for Create List Panel so button is always viewable no
+    matter what - <span style="color:#ff0000">FIXED</span></p>
+
+<p>0005 - Move logs to sub folder - <span style="color:#ff0000">FIXED</span></p>
+
+<p>0006 - Mouse wheel scrolling in Game View after sorting on any other column
+    still goes by Name order - <span style="color:#ff0000">FIXED</span></p>
+
+<p>0007 - Fix parsing of Catver.ini - <span
+        style="color:#ff0000">FIXED</span></p>
+
+<p>0008 - Fail in populating games that require ROMs from Grandparent or higher
+    Ancestors. Examples of those that fail are : polepos2a &amp; polepos2bi</p>
+
+<p>0009 - MAME process output to single file mixes error messages with standard
+    output.</p>
+
+<p>0010 - debug class cast exception in font resize hack</p>
+
+<p>0011 - MAME settings panel values do not populate if reopened on first run -
+    <span style="color:#ff0000">FIXED</span></p>
+
+<p>0012 - Fix Hotkeys HTML display - showing unintended header row and bad
+    column size</p>
+
+<p>0013 - HTML links in help files do not open into browser</p>
+
+<p>0014 - Commands dialog automatic populating of selected command from drop
+    down fails after drop down is edited</p>
+
+<p>0015 - F5 opens into MAME when there is no INP file </p>
+
+<p></p>
+
+<p><br>
+</p>
+</body>
+</html>

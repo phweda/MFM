@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -34,8 +34,7 @@ import java.util.HashMap;
  */
 public class MFMUI_Resources {
 
-    private static MFMUI_Resources ourInstance;
-
+    public static final String MFM_Icon_PNG = "MFM_Icon.png";
     // Help files
     static final String MFM_HTML = "MFM.html";
     static final String MFM_COPYRIGHT_HTML = "MFM Copyright.html";
@@ -49,10 +48,8 @@ public class MFMUI_Resources {
     static final String Arrow_PNG = "Arrow.png";
     static final String C_PNG = "C.png";
     static final String EX_PNG = "EX.png";
-    public static final String MFM_Icon_PNG = "MFM_Icon.png";
     static final String MFM_Image_PNG = "MFM_Image.png";
     static final String Minus_PNG = "Minus.png";
-
     static final String I_PNG = "i.png";
     static final String L_PNG = "L.png";
     static final String P_PNG = "P.png";
@@ -62,7 +59,6 @@ public class MFMUI_Resources {
     static final String VDUB = "vdub_32.png";
     static final String MAME_LOGO = "mame-logo.png";
     static final String MAME_LOGO_SMALL = "mame-logo-SM.png";
-
     private static final String BUTTON_CONTROL_IMG = "Button_control.png";
     private static final String DBL_JOYSTICK_CONTROL_IMG = "2Joystick_control.png";
     private static final String DIAL_CONTROL_IMG = "Dial_control.png";
@@ -79,7 +75,8 @@ public class MFMUI_Resources {
     private static final String POSITIONAL_CONTROL_IMG = "Positional_control.png";
     private static final String STICK_CONTROL_IMG = "Stick_control.png";
     private static final String TRACKBALL_CONTROL_IMG = "Trackball_control.png";
-
+    private static MFMUI_Resources ourInstance;
+    private static HashMap<String, URL> resourceURLs;
     private final String[] resourceNames = {
             MFM_HTML, MFM_COPYRIGHT_HTML, GNU_GPL_V3, USAGE, MFM_Bugs, HOTKEYS,
             A_PNG, Arrow_PNG, C_PNG, CHECKMARK_PNG, EX_PNG, MFM_Icon_PNG, MFM_Image_PNG, Minus_PNG,
@@ -90,8 +87,6 @@ public class MFMUI_Resources {
             JOYSTICK_CONTROL_IMG, Lightgun_CONTROL_IMG, PADDLE_CONTROL_IMG, PEDAL_CONTROL_IMG, POSITIONAL_CONTROL_IMG,
             STICK_CONTROL_IMG, TRACKBALL_CONTROL_IMG
     };
-
-    private static HashMap<String, URL> resourceURLs;
 
     private MFMUI_Resources() {
         resourceURLs = new HashMap<>(resourceNames.length + 10);

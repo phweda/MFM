@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,9 +20,15 @@ package Phweda.utils;
 
 import Phweda.MFM.MFM;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -40,6 +46,67 @@ public class ZipUtils {
 
     List<String> fileList = new ArrayList<String>();
     String sourceFolder;
+
+    /**
+     * Extracts and copies single file from ZIP
+     *
+     * @param zipFile    the source
+     * @param fileName   file to extract
+     * @param outputFile destination
+     * @throws IOException
+     */
+    public static boolean extractFile(Path zipFile, String fileName, Path outputFile) throws IOException {
+        // Wrap the file system in a try-with-resources statement
+        // to auto-close it when finished and prevent a memory leak
+        try (FileSystem fileSystem = FileSystems.newFileSystem(zipFile, null)) {
+            Path fileToExtract = fileSystem.getPath(fileName);
+            if (!Files.exists(fileToExtract)) { // LinkOption.NOFOLLOW_LINKS
+                if (MFM.isSystemDebug()) {
+                    System.out.println("Zip file not found is: " + fileToExtract);
+                }
+                return false;
+            }
+            if (MFM.isSystemDebug()) {
+                System.out.println("Zip file to extract is: " + fileToExtract);
+                System.out.println("Zip file extracting to: " + outputFile);
+            }
+            Files.copy(fileToExtract, outputFile, StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch (NoSuchFileException exc) {
+            exc.printStackTrace();
+            return false;
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return false;
+        }
+    }
+
+    private static TreeMap<String, String> getZipEntries(String zip) {
+        TreeMap<String, String> zipFileNames;
+        try (ZipFile zipFile = new ZipFile(zip)) {
+            Predicate<ZipEntry> isFile = ze -> !ze.isDirectory();
+
+            List<ZipEntry> zipEntries = zipFile.stream()
+                    .filter(isFile)
+                    .collect(Collectors.toList());
+
+            zipFileNames = new TreeMap<String, String>();
+            zipEntries.forEach(entry -> zipFileNames.put(
+                    entry.getName().substring(0, entry.getName().lastIndexOf('.')), entry.getName()));
+            return zipFileNames;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static TreeMap<String, TreeMap<String, String>> getZipEntryNames(HashMap<String, File> extrasZipFilesMap) {
+        final TreeMap<String, TreeMap<String, String>> zipEntries = new TreeMap<String, TreeMap<String, String>>();
+        extrasZipFilesMap.forEach((key, file) -> {
+            zipEntries.put(key, getZipEntries(file.getAbsolutePath()));
+        });
+        return zipEntries;
+    }
 
     /**
      * Zip it - recursive
@@ -113,67 +180,6 @@ public class ZipUtils {
      */
     private String generateZipEntry(String file) {
         return file.substring(sourceFolder.length() - 1, file.length());
-    }
-
-    /**
-     * Extracts and copies single file from ZIP
-     *
-     * @param zipFile    the source
-     * @param fileName   file to extract
-     * @param outputFile destination
-     * @throws IOException
-     */
-    public static boolean extractFile(Path zipFile, String fileName, Path outputFile) throws IOException {
-        // Wrap the file system in a try-with-resources statement
-        // to auto-close it when finished and prevent a memory leak
-        try (FileSystem fileSystem = FileSystems.newFileSystem(zipFile, null)) {
-            Path fileToExtract = fileSystem.getPath(fileName);
-            if (!Files.exists(fileToExtract)) { // LinkOption.NOFOLLOW_LINKS
-                if (MFM.isSystemDebug()) {
-                    System.out.println("Zip file not found is: " + fileToExtract);
-                }
-                return false;
-            }
-            if (MFM.isSystemDebug()) {
-                System.out.println("Zip file to extract is: " + fileToExtract);
-                System.out.println("Zip file extracting to: " + outputFile);
-            }
-            Files.copy(fileToExtract, outputFile, StandardCopyOption.REPLACE_EXISTING);
-            return true;
-        } catch (NoSuchFileException exc) {
-            exc.printStackTrace();
-            return false;
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            return false;
-        }
-    }
-
-    private static TreeMap<String, String> getZipEntries(String zip) {
-        TreeMap<String, String> zipFileNames;
-        try (ZipFile zipFile = new ZipFile(zip)) {
-            Predicate<ZipEntry> isFile = ze -> !ze.isDirectory();
-
-            List<ZipEntry> zipEntries = zipFile.stream()
-                    .filter(isFile)
-                    .collect(Collectors.toList());
-
-            zipFileNames = new TreeMap<String, String>();
-            zipEntries.forEach(entry -> zipFileNames.put(
-                    entry.getName().substring(0, entry.getName().lastIndexOf('.')), entry.getName()));
-            return zipFileNames;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static TreeMap<String, TreeMap<String, String>> getZipEntryNames(HashMap<String, File> extrasZipFilesMap) {
-        final TreeMap<String, TreeMap<String, String>> zipEntries = new TreeMap<String, TreeMap<String, String>>();
-        extrasZipFilesMap.forEach((key, file) -> {
-            zipEntries.put(key, getZipEntries(file.getAbsolutePath()));
-        });
-        return zipEntries;
     }
 
 

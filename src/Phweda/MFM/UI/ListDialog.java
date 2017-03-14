@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,38 +26,15 @@ package Phweda.MFM.UI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 class ListDialog extends JDialog implements ActionListener {
-    //    private static ListDialog dialog;
     private static String value = "";
     private JList<String> list;
     private JTextArea textArea;
-
-    /**
-     * Set up and show the dialog.  The first Component argument
-     * determines which frame the dialog depends on;
-     */
-/*
-    public static String showDialog(Frame frame, JTextArea textArea, String label,
-                                    String title, Object[] gameNames, String initialValue,
-                                    String longValue) {
-*/
-    public String showDialog() {
-        //    dialog = new ListDialog(frame, textArea, label, title, gameNames, initialValue, longValue);
-
-        // TODO for MFM so we can choose from MachineListTable also
-        this.setModalityType(ModalityType.MODELESS);
-
-        this.setVisible(true);
-        return value;
-    }
-
-    private void setValue(String newValue) {
-        value = newValue;
-        list.setSelectedValue(value, true);
-    }
 
     public ListDialog(Frame frame, JTextArea textArea, String labelText, String title,
                       Object[] data, String initialValue, String longValue) {
@@ -126,6 +103,30 @@ class ListDialog extends JDialog implements ActionListener {
         setValue(initialValue);
         pack();
         setLocationRelativeTo(frame);
+    }
+
+    /**
+     * Set up and show the dialog.  The first Component argument
+     * determines which frame the dialog depends on;
+     */
+/*
+    public static String showDialog(Frame frame, JTextArea textArea, String label,
+                                    String title, Object[] gameNames, String initialValue,
+                                    String longValue) {
+*/
+    public String showDialog() {
+        //    dialog = new ListDialog(frame, textArea, label, title, gameNames, initialValue, longValue);
+
+        // TODO for MFM so we can choose from MachineListTable also
+        this.setModalityType(ModalityType.MODELESS);
+
+        this.setVisible(true);
+        return value;
+    }
+
+    private void setValue(String newValue) {
+        value = newValue;
+        list.setSelectedValue(value, true);
     }
 
     //Handle clicks on the Add and Done buttons.

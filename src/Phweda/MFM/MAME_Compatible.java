@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -31,47 +31,6 @@ import org.w3c.dom.DocumentType;
 class MAME_Compatible {
 
     private static final Double DBL_172 = 0.172d; // last version before MAME DTD change 2016
-
-    static boolean versionNew(String version) {
-        String result = version.substring(version.indexOf('0'));
-        if (MFM.isSystemDebug()) {
-            System.out.println(result);
-        }
-        return Double.valueOf(result) > DBL_172 && compareDoctype();
-    }
-
-    private static boolean compareDoctype() {
-        Document dom = null;
-
-        Process process = null;
-        try {
-            // we use 9 since there are only a few of them arcade & MESS
-            process = MAMEexe.runListXML("9*");
-        } catch (MAMEexe.MAME_Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        try {
-            dom = XMLUtils.parseXmlFile(process.getInputStream());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        DocumentType doctype = dom.getDoctype();
-        if (doctype == null) {
-            System.out.println("DOCTYPE is null");
-            return false;
-        } else {
-            if (MAME_DTD.equalsIgnoreCase(doctype.getInternalSubset())) {
-                System.out.println("SUCCESS with DTD");
-                return true;
-            }
-            // System.out.println("DOCTYPE node:\n" + doctype.getInternalSubset());
-        }
-        return false;
-    }
-
     // From 177 -listxml
     private static final String MAME_DTD =
             "<!ELEMENT mame (machine+)>\n" +
@@ -214,6 +173,46 @@ class MAME_Compatible {
                     "<!ATTLIST softwarelist filter CDATA #IMPLIED>\n" +
                     "<!ELEMENT ramoption (#PCDATA)>\n" +
                     "<!ATTLIST ramoption default CDATA #IMPLIED>\n";
+
+    static boolean versionNew(String version) {
+        String result = version.substring(version.indexOf('0'));
+        if (MFM.isSystemDebug()) {
+            System.out.println(result);
+        }
+        return Double.valueOf(result) > DBL_172 && compareDoctype();
+    }
+
+    private static boolean compareDoctype() {
+        Document dom = null;
+
+        Process process = null;
+        try {
+            // we use 9 since there are only a few of them arcade & MESS
+            process = MAMEexe.runListXML("9*");
+        } catch (MAMEexe.MAME_Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        try {
+            dom = XMLUtils.parseXmlFile(process.getInputStream());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        DocumentType doctype = dom.getDoctype();
+        if (doctype == null) {
+            System.out.println("DOCTYPE is null");
+            return false;
+        } else {
+            if (MAME_DTD.equalsIgnoreCase(doctype.getInternalSubset())) {
+                System.out.println("SUCCESS with DTD");
+                return true;
+            }
+            // System.out.println("DOCTYPE node:\n" + doctype.getInternalSubset());
+        }
+        return false;
+    }
 
 /*      FROM 0.177
 DOCTYPE node:

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
 package Phweda.MFM.UI;
 
 import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMMachine;
 import Phweda.MFM.mame.Machine;
 
 import javax.swing.*;
@@ -37,8 +35,8 @@ import java.awt.event.MouseEvent;
  * Time: 4:06 PM
  */
 class MachineListTable extends JTable {
-    private static MachineListTable ourInstance;
     static int keyColumn = 0;
+    private static MachineListTable ourInstance;
     private static int fullNameColumn = 0;
 
     static {
@@ -80,12 +78,12 @@ class MachineListTable extends JTable {
         };
     }
 
-    public static MachineListTable getInstance() {
-        return ourInstance;
-    }
-
     private MachineListTable() {
         init();
+    }
+
+    public static MachineListTable getInstance() {
+        return ourInstance;
     }
 
     private void init() {
@@ -93,10 +91,6 @@ class MachineListTable extends JTable {
         this.setModel(machineListTableModel);
         machineListTableModel.addTableModelListener(this);
 
-        // DOes not work the way we want USE KeyBinding instead
-        //    this.addKeyListener(MFMController);
-        // NOTE why do we need to explicitly set  ACTION_COMMAND_KEY ??
-        // NOTE maybe we need to change MFMAction??
         MFMAction historyAction = new MFMAction("Show History", null);
         historyAction.putValue(Action.ACTION_COMMAND_KEY, "Show History");
         this.getInputMap().put(KeyStroke.getKeyStroke("F1"), "Show History");
@@ -153,7 +147,7 @@ class MachineListTable extends JTable {
         this.getInputMap().put(KeyStroke.getKeyStroke("F10"), MFMAction.ListBuilderAction);
         this.getActionMap().put(MFMAction.ListBuilderAction, ListBuilderAction);
 
-/*
+/*      // Legacy capability
         MFMAction EditVidAction = new MFMAction(MFMAction.CropAVIAction, null);
         VidAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.EditVideoAction);
         this.getInputMap().put(KeyStroke.getKeyStroke("F11"), MFMAction.EditVideoAction);
@@ -165,16 +159,13 @@ class MachineListTable extends JTable {
         this.getInputMap().put(KeyStroke.getKeyStroke("F12"), MFMAction.ConvertCommandAction);
         this.getActionMap().put(MFMAction.ConvertCommandAction, ConvertVideoAction);
 
-
         //    this.add(((JPopupMenu)new MFM_Components()));
         this.setRowHeight(25);
         this.setAutoCreateRowSorter(true);
         this.getRowSorter().toggleSortOrder(0);
 
-
         this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //    this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
 
         /*
          *

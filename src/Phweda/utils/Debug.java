@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,24 +21,21 @@ package Phweda.utils;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 @SuppressWarnings({"SameParameterValue"})
 public class Debug {
     // private static Debug ourInstance;
 
     private static boolean listBool = false;
-
-    private char separateChar = '*';
-    private String separateString = "********************************************************************************";
     private static PrintWriter writer;
     // TODO should switch this to a lightweight queue
     private static LinkedList<String> list = new LinkedList<String>();
-
     private static SimpleDateFormat sdateFormat = new SimpleDateFormat("d MMM HH:mm:ss.S");
+    private char separateChar = '*';
+    private String separateString = "********************************************************************************";
 
 /*
     public synchronized static Debug getInstance() {
@@ -148,7 +145,6 @@ public class Debug {
     public void setListBool(boolean listBool) {
         Debug.listBool = listBool;
     }
-
 
 }
 

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,10 @@
 
 package Phweda.MFM;
 
-import Phweda.MFM.mame.*;
+import Phweda.MFM.mame.DeviceRef;
+import Phweda.MFM.mame.Disk;
+import Phweda.MFM.mame.Machine;
+import Phweda.MFM.mame.Softwarelist;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
 import Phweda.utils.ZipUtils;
@@ -36,85 +39,26 @@ import java.util.*;
  */
 public class MAME_Resources {
 
+    public static final String EXTRAS = "extras";
+    public static final String ZIPEXTRAS = "zipextras";
     private static final String RESOURCECACHE = "RESOURCE_CACHE";
     private static final String EXTRASRESOURCECACHE = "EXTRAS_RESOURCE_CACHE";
     private static final String ZIPEXTRASRESOURCECACHE = "ZIP_EXTRAS_RESOURCE_CACHE";
-    public static final String EXTRAS = "extras";
-    public static final String ZIPEXTRAS = "zipextras";
-
+    private static final Map<String, Machine> machines = MAMEInfo.getMame().getMachineMap();
+    private static final FileUtils.MFMcacheResourceFiles cacheResourceFiles = new FileUtils.MFMcacheResourceFiles();
     private static MAME_Resources ourInstance = new MAME_Resources();
-
     private static TreeMap<String, Object> persistCaches;
     private static TreeMap<String, TreeMap<String, File>> roms_chdsCache;
     private static TreeMap<String, TreeMap<String, File>> extrasResourceCache;
     private static TreeMap<String, TreeMap<String, String>> zipExtrasResourceCache;
-
-    private static final Map<String, Machine> machines = MAMEInfo.getMame().getMachineMap();
-
     private static StringBuilder listResourceLog;
-
-    private static final FileUtils.MFMcacheResourceFiles cacheResourceFiles = new FileUtils.MFMcacheResourceFiles();
-
-    public static MAME_Resources getInstance() {
-        return ourInstance;
-    }
-
-    public final boolean hasCache() {
-        return roms_chdsCache != null && !roms_chdsCache.isEmpty();
-    }
 
     private MAME_Resources() {
         loadCaches();
     }
 
-    @SuppressWarnings("unchecked")
-    private void loadCaches() {
-        try {
-
-            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_RESOURCES_CACHE).exists()) {
-                persistCaches = (TreeMap<String, Object>)
-                        PersistUtils.loadAnObject(MFM.MFM_SETTINGS_DIR + MFM.MAME_RESOURCES_CACHE);
-
-                roms_chdsCache = (TreeMap<String, TreeMap<String, File>>) persistCaches.get(RESOURCECACHE);
-                extrasResourceCache = (TreeMap<String, TreeMap<String, File>>) persistCaches.get(EXTRASRESOURCECACHE);
-                zipExtrasResourceCache =
-                        (TreeMap<String, TreeMap<String, String>>) persistCaches.get(ZIPEXTRASRESOURCECACHE);
-            } else {
-                MFM.logger.addToList("NO RESOURCE CACHE found");
-                persistCaches = new TreeMap<String, Object>();
-                roms_chdsCache = new TreeMap<String, TreeMap<String, File>>();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveCache() {
-        PersistUtils.saveAnObject(persistCaches, MFM.MFM_SETTINGS_DIR + MFM.MAME_RESOURCES_CACHE);
-    }
-
-    public void scan() {
-        // roms_chdsCache = new TreeMap<String, TreeMap<String, File>>();
-        TreeMap<String, String> roots = MFMSettings.getResourceRoots();
-        for (String root : roots.keySet()) {
-            try {
-                if (root.equals(MFM_Constants.EXTRAS_FULL_SET_DIRECTORY)) {
-                    extrasResourceCache = cacheResourceFiles.cacheExtrasFiles(Paths.get(roots.get(root)));
-                    zipExtrasResourceCache = ZipUtils.getZipEntryNames(MFMSettings.getExtrasZipFilesMap());
-                    persistCaches.put(EXTRASRESOURCECACHE, extrasResourceCache);
-                    persistCaches.put(ZIPEXTRASRESOURCECACHE, zipExtrasResourceCache);
-                } else {
-                    roms_chdsCache.put(root, scanRoot(root, roots.get(root)));
-                    persistCaches.put(RESOURCECACHE, roms_chdsCache);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                // NOTE do not need?? could have some nullpointers? Linux??
-                // return;
-            }
-        }
-        saveCache();
-        logScanResults();
+    public static MAME_Resources getInstance() {
+        return ourInstance;
     }
 
     private static TreeMap<String, File> scanRoot(String key, String root) {
@@ -153,50 +97,6 @@ public class MAME_Resources {
         sb.append("\n");
 
         MFM.logger.addToList(sb.toString(), true);
-    }
-
-    /**
-     * TreeMap is:
-     * <p>
-     * "roms" -> ArrayList of rom files
-     * "chds" -> ArrayList of CHD files
-     * <p>
-     * "extras" -> TreeMap<String, ArrayList<File>> keys from MFMSettings.getFullSetExtrasDirectories()
-     * "artwork" ...
-     * "flyers"
-     * "icons"  ...
-     * "snap"
-     * ......
-     * "zipextras" -> TreeMap<String, TreeSet<String>> keys from MFMSettings.getExtrasZipFilesMap()
-     *
-     * @param listName name of the list
-     * @param list     set of Machine names
-     * @return TreeMap of list's resources
-     */
-    public TreeMap<String, Object> generateListResources(String listName, TreeSet<String> list) {
-        listResourceLog = new StringBuilder();
-        listResourceLog.append("Generating resource list for : ");
-        listResourceLog.append(listName);
-
-        try { // NOTE removed because SPLIT needs these too! 12/21/2016
-            // If Merged or Split Set add Ancestors to the list
-            if (!MFMSettings.isnonMerged()) {
-                // adds ancestors to this list
-                checkRomof(list);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        TreeMap<String, Object> resources = getResourcesMap();
-        try {
-            for (String machine : list) {
-                getMachineResources(machine, resources);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return resources;
     }
 
     private static TreeMap<String, Object> getResourcesMap() {
@@ -377,13 +277,12 @@ public class MAME_Resources {
                     ((TreeSet<File>) ((TreeMap<String, Object>) resources.get(EXTRAS)).get(key)).add(
                             extrasResourceCache.get(key).get(machineName));
                 } catch (Exception e) {
-                    if(e instanceof NullPointerException){
+                    if (e instanceof NullPointerException) {
                         String message = "Machine getExtrasFiles threw NullPointerException for : " + machineName +
                                 " - key was " + key;
                         System.out.print(message);
                         MFM.logger.out(message);
-                    } else
-                    {
+                    } else {
                         e.printStackTrace();
                     }
                 }
@@ -416,7 +315,6 @@ public class MAME_Resources {
         }
     }
 
-
     private static void loadRequiredResources(String machineName) {
         // Get the getMachine object and check for romof and device_ref
         // Find and move those
@@ -447,6 +345,104 @@ public class MAME_Resources {
                 }
             }
         }
+    }
+
+    public final boolean hasCache() {
+        return roms_chdsCache != null && !roms_chdsCache.isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadCaches() {
+        try {
+
+            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_RESOURCES_CACHE).exists()) {
+                persistCaches = (TreeMap<String, Object>)
+                        PersistUtils.loadAnObject(MFM.MFM_SETTINGS_DIR + MFM.MAME_RESOURCES_CACHE);
+
+                roms_chdsCache = (TreeMap<String, TreeMap<String, File>>) persistCaches.get(RESOURCECACHE);
+                extrasResourceCache = (TreeMap<String, TreeMap<String, File>>) persistCaches.get(EXTRASRESOURCECACHE);
+                zipExtrasResourceCache =
+                        (TreeMap<String, TreeMap<String, String>>) persistCaches.get(ZIPEXTRASRESOURCECACHE);
+            } else {
+                MFM.logger.addToList("NO RESOURCE CACHE found");
+                persistCaches = new TreeMap<String, Object>();
+                roms_chdsCache = new TreeMap<String, TreeMap<String, File>>();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveCache() {
+        PersistUtils.saveAnObject(persistCaches, MFM.MFM_SETTINGS_DIR + MFM.MAME_RESOURCES_CACHE);
+    }
+
+    public void scan() {
+        // roms_chdsCache = new TreeMap<String, TreeMap<String, File>>();
+        TreeMap<String, String> roots = MFMSettings.getResourceRoots();
+        for (String root : roots.keySet()) {
+            try {
+                if (root.equals(MFM_Constants.EXTRAS_FULL_SET_DIRECTORY)) {
+                    extrasResourceCache = cacheResourceFiles.cacheExtrasFiles(Paths.get(roots.get(root)));
+                    zipExtrasResourceCache = ZipUtils.getZipEntryNames(MFMSettings.getExtrasZipFilesMap());
+                    persistCaches.put(EXTRASRESOURCECACHE, extrasResourceCache);
+                    persistCaches.put(ZIPEXTRASRESOURCECACHE, zipExtrasResourceCache);
+                } else {
+                    roms_chdsCache.put(root, scanRoot(root, roots.get(root)));
+                    persistCaches.put(RESOURCECACHE, roms_chdsCache);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                // NOTE do not need?? could have some nullpointers? Linux??
+                // return;
+            }
+        }
+        saveCache();
+        logScanResults();
+    }
+
+    /**
+     * TreeMap is:
+     * <p>
+     * "roms" -> ArrayList of rom files
+     * "chds" -> ArrayList of CHD files
+     * <p>
+     * "extras" -> TreeMap<String, ArrayList<File>> keys from MFMSettings.getFullSetExtrasDirectories()
+     * "artwork" ...
+     * "flyers"
+     * "icons"  ...
+     * "snap"
+     * ......
+     * "zipextras" -> TreeMap<String, TreeSet<String>> keys from MFMSettings.getExtrasZipFilesMap()
+     *
+     * @param listName name of the list
+     * @param list     set of Machine names
+     * @return TreeMap of list's resources
+     */
+    public TreeMap<String, Object> generateListResources(String listName, TreeSet<String> list) {
+        listResourceLog = new StringBuilder();
+        listResourceLog.append("Generating resource list for : ");
+        listResourceLog.append(listName);
+
+        try { // NOTE removed because SPLIT needs these too! 12/21/2016
+            // If Merged or Split Set add Ancestors to the list
+            if (!MFMSettings.isnonMerged()) {
+                // adds ancestors to this list
+                checkRomof(list);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        TreeMap<String, Object> resources = getResourcesMap();
+        try {
+            for (String machine : list) {
+                getMachineResources(machine, resources);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resources;
     }
 
 }

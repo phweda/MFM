@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@ package Phweda.utils;
 import Phweda.MFM.MFM;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
 import java.util.Date;
 
 /*
@@ -31,10 +29,6 @@ import java.util.Date;
  * Date: Aug 19, 2003
  * Time: 8:36:38 PM
  *
- * Title:        $Workfile: $
- * getDescription:
- * @author <a href="mailto:pwdresume@yahoo.com">Philip W. Davis</a>
- * @version $Revision: $
  */
 
 public class MemoryMonitor implements Runnable {

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,37 +25,21 @@ package Phweda.utils;
  * Time: 12:19 PM
  */
 public class QuadState {
+    public static final String ALL = "All";
+    public final int all = 0;
     private final int first = 1;
     private final int second = 2;
     private final int third = 3;
-    public final int all = 0;
-
-    private int state;
-
-    public static final String ALL = "All";
     private final String firstName;
     private final String secondName;
     private final String thirdName;
+    private int state;
 
     public QuadState(String first, String second, String third, String state) {
         this.firstName = first;
         this.secondName = second;
         this.thirdName = third;
         setState(state);
-    }
-
-    public void setState(String stateIn) {
-        if (stateIn.equals(firstName)) {
-            state = first;
-        } else if (stateIn.equals(secondName)) {
-            state = second;
-        } else if (stateIn.equals(thirdName)) {
-            state = third;
-        } else if (stateIn.equals(ALL)) {
-            state = all;
-        } else {
-            // NOTE never get here!!!
-        }
     }
 
     public String getState() {
@@ -70,6 +54,20 @@ public class QuadState {
         }
         // NOTE Error condition.
         return null;
+    }
+
+    public void setState(String stateIn) {
+        if (stateIn.equals(firstName)) {
+            state = first;
+        } else if (stateIn.equals(secondName)) {
+            state = second;
+        } else if (stateIn.equals(thirdName)) {
+            state = third;
+        } else if (stateIn.equals(ALL)) {
+            state = all;
+        } else {
+            // NOTE never get here!!!
+        }
     }
 
 }

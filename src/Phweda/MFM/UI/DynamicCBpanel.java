@@ -1,7 +1,6 @@
-
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,14 +20,20 @@ package Phweda.MFM.UI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 9/19/2015
  * Time: 11:55 AM
+ */
+
+/**
+ * JPanel for dynamic lists of checkboxes
  */
 public class DynamicCBpanel extends JPanel {
 

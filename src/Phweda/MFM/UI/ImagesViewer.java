@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 package Phweda.MFM.UI;
 
 import Phweda.MFM.MFM;
-import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 
 import javax.imageio.ImageIO;
@@ -39,6 +38,11 @@ import java.util.ArrayList;
  * User: Phweda
  * Date: 4/2/2015
  * Time: 8:11 PM
+ */
+
+/**
+ * Provides scrolling through individual images from a list of images.<br>
+ * MFM can parse GIFs & AVIs
  */
 public class ImagesViewer extends JFrame {
 
@@ -213,7 +217,6 @@ public class ImagesViewer extends JFrame {
         labelFrameNumber.setText("Frame : " + (index + 1));
     }
 
-
     // Directory + filename + 'frame'# + .png
     private void saveImagetoFile() {
         try {
@@ -236,7 +239,5 @@ public class ImagesViewer extends JFrame {
             frames = null;
         }
     }
-
-
 }
 

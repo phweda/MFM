@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ package Phweda.MFM.UI;
 
 import Phweda.MFM.*;
 import Phweda.MFM.mame.Control;
-import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Device;
+import Phweda.MFM.mame.Machine;
 import Phweda.utils.*;
 
 import javax.swing.*;
@@ -35,7 +35,8 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -57,23 +58,14 @@ import static Phweda.MFM.UI.MFMUI_Setup.*;
  * Time: 5:11 AM
  */
 
-/*
+/**
+ *
  * GUI Controller
- *
- *
- *
  *
  */
 class MFMController extends ClickListener implements ListSelectionListener, ChangeListener, KeyListener {
-    // TODO clean this up since modes not longer matter 11/12/16
-    protected final String SETTINGS_Mode = "settings"; // Base settings
-    private final String PlayList_Mode = "playlist"; // Create, view and play games from playlists
-    // private final String CreateList_Mode = "creatlist";
-    private String currentMode = PlayList_Mode;
     static final DecimalFormat decimalFormater = new DecimalFormat("###,###");
-
     private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
     private static JFrame mainFrame;
     private static JTree folderTree;
     private static JTable machineListTable;
@@ -82,7 +74,50 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     private static JLabel currentListName;
     private static MFMInformationPanel infoPanel;
     private static StatusBar statusBar;
+    // TODO clean this up since modes not longer matter 11/12/16
+    protected final String SETTINGS_Mode = "settings"; // Base settings
+    private final String PlayList_Mode = "playlist"; // Create, view and play games from playlists
     private final JTextPane HTMLtextPane = new MFMHTMLTextPane();
+    // private final String CreateList_Mode = "creatlist";
+    private String currentMode = PlayList_Mode;
+
+    static void showListInfo(String listName) {
+        TreeSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
+        String output = decimalFormater.format(list.size());
+        currentListName.setText(listName + " - " + output);
+        currentListName.setName(listName);
+    }
+
+    public static JFrame getFrame() {
+        return mainFrame;
+    }
+
+    static JTable getMachineListTable() {
+        return machineListTable;
+    }
+
+    static MFMInformationPanel getInformationPanel() {
+        return infoPanel;
+    }
+
+    static void showInformation(String title, String text) {
+        if (text.isEmpty()) {
+            return;
+        }
+        MFMOptionPane optionPane = new MFMOptionPane(title, text, mainFrame, 0, 0);
+        optionPane.textArea.scrollRectToVisible(new Rectangle(0, 0, 50, 20));
+    }
+
+    static void setFontSize(Container container) {
+        if (MFMSettings.MFMFontSize() != null &&
+                !MFMSettings.MFMFontSize().equals(MFM_Constants.NORMAL)) {
+
+            int num = MFMSettings.MFMFontSize().equals(MFM_Constants.LARGE) ?
+                    MFM_Constants.LARGEINT : MFM_Constants.VERYLARGEINT;
+
+            SwingUtils.changeFont(container, MFM_Constants.FONTSIZEINT + num);
+        }
+    }
 
     /*
     * NOTE always call super when you override this method
@@ -192,13 +227,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         MFMSettings.MFMCurrentList(listName);
     }
 
-    static void showListInfo(String listName) {
-        TreeSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
-        String output = decimalFormater.format(list.size());
-        currentListName.setText(listName + " - " + output);
-        currentListName.setName(listName);
-    }
-
     void commandDialog() {
         CommandDialog.showCommands(mainFrame);
     }
@@ -250,18 +278,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
     }
 
-    public static JFrame getFrame() {
-        return mainFrame;
-    }
-
-    static JTable getMachineListTable() {
-        return machineListTable;
-    }
-
-    static MFMInformationPanel getInformationPanel() {
-        return infoPanel;
-    }
-
     void addtoList() {
         String machine = getSelectedMachine();
         MFMListActions.addtoList(machine);
@@ -302,10 +318,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 args = MAMECommands.playbackGame(gameName);
                 break;
             case MAMECommands.PLAYBACKtoAVI:
-                // NOTE problem as we are not SURE where the .inp is
-                //             if (FileUtils.fileExists(MFMSettings.MAMEexeDir(), gameName + ".inp")) {
                 args = MAMECommands.createAVIfromPlayback(gameName);
-                //             }
                 break;
             case MAMECommands.AVIWRITE:
                 args = MAMECommands.playGametoAVI(gameName);
@@ -323,7 +336,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             }
             Process mameProcess = MAMEexe.run(args, MFM.MAMEout);
         } catch (MAMEexe.MAME_Exception e) {
-            // System.out.println(e.getError());
             infoPanel.showMessage(gameName + " had errors");
             //        showInformation("MAME error", e.getError());
         }
@@ -350,7 +362,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 showHTML("GNU GPL V3", MFMUI_Resources.GNU_GPL_V3);
                 break;
         }
-
     }
 
     void showHistory() {
@@ -519,14 +530,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         } else {
             imagePanel.ImageReset();
         }
-    }
-
-    static void showInformation(String title, String text) {
-        if (text.isEmpty()) {
-            return;
-        }
-        MFMOptionPane optionPane = new MFMOptionPane(title, text, mainFrame, 0, 0);
-        optionPane.textArea.scrollRectToVisible(new Rectangle(0, 0, 50, 20));
     }
 
     private void showError(String text) {
@@ -711,7 +714,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
             showNextList(false);
         }
-
     }
 
     @Override
@@ -828,17 +830,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         // Note order must be last!
         loadState();
         update();
-    }
-
-    static void setFontSize(Container container) {
-        if (MFMSettings.MFMFontSize() != null &&
-                !MFMSettings.MFMFontSize().equals(MFM_Constants.NORMAL)) {
-
-            int num = MFMSettings.MFMFontSize().equals(MFM_Constants.LARGE) ?
-                    MFM_Constants.LARGEINT : MFM_Constants.VERYLARGEINT;
-
-            SwingUtils.changeFont(container, MFM_Constants.FONTSIZEINT + num);
-        }
     }
 
     private void loadState() {

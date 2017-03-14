@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 
 package Phweda.MFM.UI;
 
-import Phweda.MFM.MAMEexe;
 import Phweda.MFM.MAMEInfo;
+import Phweda.MFM.MAMEexe;
 import Phweda.MFM.MFM;
 import Phweda.utils.ClickListener;
 import Phweda.utils.PersistUtils;
@@ -33,7 +33,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
 /**
@@ -51,9 +52,6 @@ class CommandDialog extends JDialog {
     private static HashMap<String, String> myCommands;
 
     private static JTree commandTree;
-    // private static
-//    JList commands = new JList(MAMEInfo.Commands().keySet().toArray());
-//    JList commandDescriptions = new JList(MAMEInfo.Commands().values().toArray());
 
     private CommandDialog(Frame frame) {
         super(frame, MAMECOMMANDS);
@@ -63,6 +61,13 @@ class CommandDialog extends JDialog {
         setLocation(100, 100);
         this.setPreferredSize(new Dimension(frame.getSize().width - 600,
                 frame.getSize().height - 200));
+    }
+
+    //TODO add MESS
+    protected static void showCommands(Frame frame) {
+        CommandDialog cd = new CommandDialog(frame);
+        cd.pack();
+        cd.setVisible(true);
     }
 
     private void loadCommands() {
@@ -115,8 +120,6 @@ class CommandDialog extends JDialog {
 
         commandPanel.add(commandTextField);
 
-        // NOTE do we need an Action for Save?? It is self contained in this dialog
-//        JButton saveCommandButton = new JButton(new MFMAction("Save Command", null));
         JButton saveCommandButton = new JButton("Save");
         saveCommandButton.addActionListener(new ActionListener() {
             @Override
@@ -128,7 +131,6 @@ class CommandDialog extends JDialog {
             }
         });
 
-        //       JButton runCommandButton = new JButton(new MFMAction("Run Command", null));
         JButton runCommandButton = new JButton("Run Command");
         runCommandButton.addActionListener(new ActionListener() {
             @Override
@@ -209,11 +211,8 @@ class CommandDialog extends JDialog {
         commandTree.expandRow(0);
     }
 
-    //TODO add MESS
-    protected static void showCommands(Frame frame) {
-        CommandDialog cd = new CommandDialog(frame);
-        cd.pack();
-        cd.setVisible(true);
+    private void persistCommands() {
+        PersistUtils.saveAnObjectXML(myCommands, MFM.MFM_SETTINGS_DIR + MY_COMMANDS_XML);
     }
 
     private class CommandController extends ClickListener {
@@ -236,9 +235,5 @@ class CommandDialog extends JDialog {
             commandTextField.requestFocus();
 
         }
-    }
-
-    private void persistCommands() {
-        PersistUtils.saveAnObjectXML(myCommands, MFM.MFM_SETTINGS_DIR + MY_COMMANDS_XML);
     }
 }

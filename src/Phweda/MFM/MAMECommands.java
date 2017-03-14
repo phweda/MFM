@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -39,13 +39,10 @@ public class MAMECommands {
     public static final String SNAPSIZE = "-snapsize";
     public static final String PLAYBACKtoAVI = PLAYBACK + AVIWRITE;
 
-    //  public static final String  = "";
-
-    private static final String snapArgHorizontal = "960x720";
-    private static final String snapArgVertical = "540x720";
-
     //    private static final String snap1 = "-snapsize ";
     public static final String snap2 = "x720";
+    private static final String snapArgHorizontal = "960x720";
+    private static final String snapArgVertical = "540x720";
 
     /**
      * Record a Games input for later playback

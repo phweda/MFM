@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,19 +25,12 @@ package Phweda.MFM.UI;
  * Time: 3:37 PM
  */
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-
-import javax.swing.BorderFactory;
-import javax.swing.CellRendererPane;
-import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import javax.swing.JToolTip;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolTipUI;
+import java.awt.*;
 
 /**
  * Tooltip class that can wrap the tooltip text into multiple lines.
@@ -49,14 +42,12 @@ import javax.swing.plaf.basic.BasicToolTipUI;
  * https://github.com/ntamas/cl1/blob/master/src/java/uk/ac/rhul/cs/cl1/ui/JMultiLineToolTip.java
  */
 public class JMultiLineToolTip extends JToolTip {
-    /// The text of the tooltip
-    String text;
-
-    /// The component to which this tooltip is associated
-    JComponent component;
-
     /// The preferred fixed width of the tooltip
     protected int fixedWidth = 0;
+    /// The text of the tooltip
+    String text;
+    /// The component to which this tooltip is associated
+    JComponent component;
 
     public JMultiLineToolTip() {
         updateUI();
@@ -98,18 +89,15 @@ public class JMultiLineToolTip extends JToolTip {
 class MultiLineToolTipUI extends BasicToolTipUI {
     /// Shared instance of this UI class
     static MultiLineToolTipUI instance = new MultiLineToolTipUI();
-
+    /// The JTextArea used to render the multi-line tooltip
+    private static JTextArea textArea;
+    protected CellRendererPane rendererPane;
     /// The border used by the tooltip
     Border tooltipBorder = new CompoundBorder(
             BorderFactory.createLineBorder(Color.BLACK, 1),
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
     );
-
     JToolTip tip;
-    protected CellRendererPane rendererPane;
-
-    /// The JTextArea used to render the multi-line tooltip
-    private static JTextArea textArea;
 
     /// Returns the shared instance of this UI class
     public static ComponentUI createUI(JComponent c) {

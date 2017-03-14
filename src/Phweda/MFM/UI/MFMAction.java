@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,8 +33,46 @@ import java.awt.event.ActionEvent;
  * Time: 3:28 PM
  */
 public class MFMAction extends AbstractAction {
+    public static final String UpdateVersionAction = "updateVersion";
+    static final String ErrorLogAction = "Error Log";
+    static final String LogAction = "Log";
+    static final String GCLogAction = "GC Log";
+    static final String CleanLogsAction = "Clean Logs";
+    static final String PlaybacktoAVIAction = "Playback to AVI";
+    static final String PlayGametoAVIAction = "Play & Record to AVI";
+    static final String PlaybackGameAction = "Playback getMachine";
+    static final String MAME_OUTPUTAction = "MAME_OUTPUT";
+    static final String VDUBAction = "VDub";
+    static final String HandbrakeAction = "Handbrake";
+    static final String FFmpegAction = "FFmpeg";
+    static final String GIFImagesAction = "Extract GIF Images";
+    static final String AVIImagesAction = "Extract AVI Images";
+    static final String AddtoListAction = "Add to List";
+    static final String RemovefromListAction = "Remove from List";
+    static final String GOTOcloneofAction = "GOTO cloneof";
+    static final String EditVideoAction = "Edit Video";
+    static final String MAMECommandBuilderAction = "MAME Command Builder";
+    static final String ConvertCommandAction = "Convert Files";
+    static final String CropAVIAction = "Crop AVI";
+    static final String ListBuilderAction = "List Builder";
+    static final String PlayVideoAction = "Play Video";
+    static final String ShowControlsDevicesAction = "Show Controls & Devices";
+    static final String CopyResourcesAction = "Copy Resources";
+    static final String SaveResourcesAction = "Save Resources to File";
+    static final String ImportListCommand = "Import List";
+    static final String ZipLogsAction = "Zip Logs";
+    static final String PostToPastieAction = "Post Errors to Pastie";
+    static final String MAMEControlsDUMPAction = "DUMP WAYS Controls";
+    static final String SaveListDataAction = "Save List Data";
+    static final String ScanResourcesAction = "Scan Resources";
+    static final String SaveListtoFileAction = "Save List to File";
+    static final String ListtoDATAction = "Create List DAT";
+    static final String MAME_TREEAction = "Show MAME tree";
+    static final String MACHINE_TREEAction = "Show Machine tree";
+    static final String OpenFileAction = "Open File";
     private static MFMController controller = MFMUI_Setup.getController();
-
+    private final String ExitAction = "Exit";
+    private final String GameVideoInfoAction = "Machine Video Info";
     public MFMAction(String text, Icon icon) {
         super(text, icon);
     }
@@ -63,12 +101,6 @@ public class MFMAction extends AbstractAction {
                     // Get the Play List name from JMenuItem text
                     controller.changeList(((JMenuItem) e.getSource()).getText());
                     break;
-
-                /* TODO remove
-                case "Change List":
-                    // Get the Play List name from JMenuItem text
-                    controller.changeList(e.getActionCommand());
-                    break;*/
 
                 case "Run Machine":
                     if (MFMController.getMachineListTable().hasFocus()) {
@@ -310,53 +342,5 @@ public class MFMAction extends AbstractAction {
             exc.printStackTrace();
         }
     }
-
-    private final String ExitAction = "Exit";
-    static final String ErrorLogAction = "Error Log";
-    static final String LogAction = "Log";
-    static final String GCLogAction = "GC Log";
-    static final String CleanLogsAction = "Clean Logs";
-    static final String PlaybacktoAVIAction = "Playback to AVI";
-    static final String PlayGametoAVIAction = "Play & Record to AVI";
-    static final String PlaybackGameAction = "Playback getMachine";
-    static final String MAME_OUTPUTAction = "MAME_OUTPUT";
-    static final String VDUBAction = "VDub";
-    static final String HandbrakeAction = "Handbrake";
-    static final String FFmpegAction = "FFmpeg";
-    static final String GIFImagesAction = "Extract GIF Images";
-    static final String AVIImagesAction = "Extract AVI Images";
-    static final String AddtoListAction = "Add to List";
-    static final String RemovefromListAction = "Remove from List";
-    static final String GOTOcloneofAction = "GOTO cloneof";
-    private final String GameVideoInfoAction = "Machine Video Info";
-    static final String EditVideoAction = "Edit Video";
-    static final String MAMECommandBuilderAction = "MAME Command Builder";
-    static final String ConvertCommandAction = "Convert Files";
-    static final String CropAVIAction = "Crop AVI";
-    static final String ListBuilderAction = "List Builder";
-    static final String PlayVideoAction = "Play Video";
-    static final String ShowControlsDevicesAction = "Show Controls & Devices";
-
-    static final String CopyResourcesAction = "Copy Resources";
-    static final String SaveResourcesAction = "Save Resources to File";
-    static final String ImportListCommand = "Import List";
-    static final String ZipLogsAction = "Zip Logs";
-    static final String PostToPastieAction = "Post Errors to Pastie";
-    static final String MAMEControlsDUMPAction = "DUMP WAYS Controls";
-    static final String SaveListDataAction = "Save List Data";
-    static final String ScanResourcesAction = "Scan Resources";
-    static final String SaveListtoFileAction = "Save List to File";
-    static final String ListtoDATAction = "Create List DAT";
-    public static final String UpdateVersionAction = "updateVersion";
-    static final String MAME_TREEAction = "Show MAME tree";
-    static final String MACHINE_TREEAction = "Show Machine tree";
-    static final String OpenFileAction = "Open File";
-    /*
-    public static final String Action = "";
-    public static final String Action = "";
-    public static final String Action = "";
-*/
-
-
 }
 

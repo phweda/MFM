@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,20 +28,27 @@ import javafx.beans.property.StringProperty;
 
 import java.io.Serializable;
 
+/**
+ * Future class for/if move to JavaFX UI
+ */
 public class MachineFX implements Serializable {
+
+    private StringProperty name;
+    private StringProperty category;
+    private StringProperty description;
+    private StringProperty year;
+    private StringProperty manufacturer;
 
     public MachineFX(StringProperty name) {
         this.name = name;
     }
 
-    private StringProperty name;
+    public String getName() {
+        return nameProperty().get();
+    }
 
     public void setName(String value) {
         nameProperty().set(value);
-    }
-
-    public String getName() {
-        return nameProperty().get();
     }
 
     public StringProperty nameProperty() {
@@ -49,14 +56,12 @@ public class MachineFX implements Serializable {
         return name;
     }
 
-    private StringProperty category;
+    public String getCategory() {
+        return categoryProperty().get();
+    }
 
     public void setCategory(String value) {
         categoryProperty().set(value);
-    }
-
-    public String getCategory() {
-        return categoryProperty().get();
     }
 
     public StringProperty categoryProperty() {
@@ -64,14 +69,12 @@ public class MachineFX implements Serializable {
         return category;
     }
 
-    private StringProperty description;
+    public String getDescription() {
+        return descriptionProperty().get();
+    }
 
     public void setDescription(String value) {
         descriptionProperty().set(value);
-    }
-
-    public String getDescription() {
-        return descriptionProperty().get();
     }
 
     public StringProperty descriptionProperty() {
@@ -79,14 +82,12 @@ public class MachineFX implements Serializable {
         return description;
     }
 
-    private StringProperty year;
+    public String getYear() {
+        return yearProperty().get();
+    }
 
     public void setYear(String value) {
         yearProperty().set(value);
-    }
-
-    public String getYear() {
-        return yearProperty().get();
     }
 
     public StringProperty yearProperty() {
@@ -94,14 +95,12 @@ public class MachineFX implements Serializable {
         return year;
     }
 
-    private StringProperty manufacturer;
+    public String getManufacturer() {
+        return manufacturerProperty().get();
+    }
 
     public void setManufacturer(String value) {
         manufacturerProperty().set(value);
-    }
-
-    public String getManufacturer() {
-        return manufacturerProperty().get();
     }
 
     public StringProperty manufacturerProperty() {

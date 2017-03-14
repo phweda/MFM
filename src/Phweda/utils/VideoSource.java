@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,21 +18,15 @@
 
 package Phweda.utils;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.net.URL;
-import java.util.*;
-import javax.media.Buffer;
-import javax.media.ControllerEvent;
-import javax.media.ControllerListener;
-import javax.media.Manager;
-import javax.media.Player;
-import javax.media.PrefetchCompleteEvent;
-import javax.media.RealizeCompleteEvent;
+import javax.media.*;
 import javax.media.control.FrameGrabbingControl;
 import javax.media.control.FramePositioningControl;
 import javax.media.format.VideoFormat;
 import javax.media.util.BufferToImage;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.net.URL;
+import java.util.ArrayList;
 
 
 /**
@@ -80,6 +74,11 @@ public class VideoSource implements ControllerListener {
      */
     public int getState() {
         return _state;
+    }
+
+    // for setting the state internally
+    private void setState(int nextState) {
+        _state = nextState;
     }
 
     /*
@@ -176,12 +175,6 @@ public class VideoSource implements ControllerListener {
         } while (count > 0);
 
         return frames;
-    }
-
-
-    // for setting the state internally
-    private void setState(int nextState) {
-        _state = nextState;
     }
 
 }

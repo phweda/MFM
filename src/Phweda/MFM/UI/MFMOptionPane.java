@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@ import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -80,6 +77,9 @@ public class MFMOptionPane {
     }
 
     private class MFMOptionAction extends AbstractAction {
+        static final String SELECTALL = "Select All";
+        static final String COPY = "Copy";
+        static final String SAVETOFILE = "Save to File";
         private MFMOptionAction(String name) {
             super(name);
         }
@@ -106,13 +106,8 @@ public class MFMOptionPane {
 
                 }
             } catch (Exception exc) {
+                exc.printStackTrace();
             }
         }
-
-        static final String SELECTALL = "Select All";
-        static final String COPY = "Copy";
-        static final String SAVETOFILE = "Save to File";
-        //  static final String Copy = "Copy";
-        //  static final String Copy = "Copy";
     }
 }

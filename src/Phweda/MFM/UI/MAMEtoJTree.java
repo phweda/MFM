@@ -1,7 +1,6 @@
-
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -51,47 +50,15 @@ import java.util.List;
  */
 public class MAMEtoJTree extends JPanel {
 
+    protected static final String COPY = "Copy";
+    private static final int FRAME_WIDTH = MFM.screenSize.width / 5;
+    private static final int FRAME_HEIGHT = MFM.screenSize.height - 100;
     private static JTree jTree;
     private static Mame root;
     private static MAMEtoJTree ourInstance;
-
     private static MouseListener ml = null;
-
-    private static final int FRAME_WIDTH = MFM.screenSize.width / 5;
-    private static final int FRAME_HEIGHT = MFM.screenSize.height - 100;
-
     final String valueDivider = " \u00bb ";
     final String machineDivider = " \u00A8 ";
-    protected static final String COPY = "Copy";
-
-    public static MAMEtoJTree getInstance() {
-        if (ourInstance == null) {
-            ourInstance = new MAMEtoJTree();
-        }
-        return ourInstance;
-    }
-
-    JTree getMAMEjTree() {
-        return jTree;
-    }
-
-    DefaultMutableTreeNode getMachineNode(String machineName) {
-        if (machineName == null || machineName.isEmpty()) {
-            return null;
-        }
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) jTree.getModel().getRoot();
-        Enumeration<DefaultMutableTreeNode> children = root.children();
-        while (children.hasMoreElements()) {
-            DefaultMutableTreeNode node = children.nextElement();
-
-            String nodeString = node.getUserObject().toString();
-            String nodeMachine = nodeString.substring(nodeString.lastIndexOf(' ') + 1, nodeString.length());
-            if (nodeMachine.equals(machineName)) {
-                return node;
-            }
-        }
-        return null;
-    }
 
     private MAMEtoJTree() {
         if (root == null) {
@@ -151,6 +118,148 @@ public class MAMEtoJTree extends JPanel {
         // Dumps Mame data without any whitespace - determine true data size
         // dataDump(top,"MAME_tree_data.txt");
     }
+
+    public static MAMEtoJTree getInstance() {
+        if (ourInstance == null) {
+            ourInstance = new MAMEtoJTree();
+        }
+        return ourInstance;
+    }
+
+    private static void exit() {
+        System.out.println("MAMEtoJTree exit");
+        System.exit(0);
+    }
+
+    /**
+     * main to test this class
+     */
+    public static void main(String[] args) {
+
+        JFrame frame = new JFrame("Objects to JTree");
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension dim = toolkit.getScreenSize();
+        int screenHeight = dim.height;
+        int screenWidth = dim.width;
+
+        frame.setBounds((screenWidth - FRAME_WIDTH) / 2,
+                (screenHeight - FRAME_HEIGHT) / 2, FRAME_WIDTH, FRAME_HEIGHT);
+
+        frame.setBackground(Color.lightGray);
+        frame.getContentPane().setLayout(new BorderLayout());
+        WindowListener wndCloser = new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                exit();
+            }
+        };
+        frame.addWindowListener(wndCloser);
+
+        try {
+            root = JAXB();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame, ex.getMessage(), "Exception",
+                    JOptionPane.WARNING_MESSAGE);
+
+            ex.printStackTrace();
+            exit();
+        }
+
+        frame.getContentPane().add(new MAMEtoJTree(), BorderLayout.CENTER);
+        frame.validate();
+        frame.setVisible(true);
+    }
+
+    /**
+     * This is simply to provide MAME input to test this class
+     */
+    private static Mame JAXB() throws JAXBException, MAMEexe.MAME_Exception {
+        Mame mame = null;
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(Phweda.MFM.mame.Mame.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            // hard code path to mame exe
+            MAMEexe.setBaseArgs("E:\\Test\\177\\mame64.exe");
+            ArrayList<String> args = new ArrayList<String>(Arrays.asList("-listxml", "*"));
+            Process process = MAMEexe.run(args);
+            InputStream inputStream = process.getInputStream();
+            mame = (Mame) jaxbUnmarshaller.unmarshal(inputStream);
+
+            System.out.println("Machines" + mame.getMachine().size());
+        } catch (JAXBException | MAMEexe.MAME_Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return mame;
+    }
+
+    JTree getMAMEjTree() {
+        return jTree;
+    }
+
+    DefaultMutableTreeNode getMachineNode(String machineName) {
+        if (machineName == null || machineName.isEmpty()) {
+            return null;
+        }
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) jTree.getModel().getRoot();
+        Enumeration<DefaultMutableTreeNode> children = root.children();
+        while (children.hasMoreElements()) {
+            DefaultMutableTreeNode node = children.nextElement();
+
+            String nodeString = node.getUserObject().toString();
+            String nodeMachine = nodeString.substring(nodeString.lastIndexOf(' ') + 1, nodeString.length());
+            if (nodeMachine.equals(machineName)) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param machine
+     * @return
+     * @XmlElement(required = true)
+     * protected String description;
+     * protected String year;
+     * protected String manufacturer;
+     * protected List<Biosset> biosset;
+     * protected List<Rom> rom;
+     * protected List<Disk> disk;
+     * @XmlElement(name = "device_ref")
+     * protected List<DeviceRef> deviceRef;
+     * protected List<Sample> sample;
+     * protected List<Chip> chip;
+     * protected List<Display> display;
+     * protected Sound sound;
+     * protected Input input;
+     * protected List<Dipswitch> dipswitch;
+     * protected List<Configuration> configuration;
+     * protected List<Port> port;
+     * protected List<Adjuster> adjuster;
+     * protected Driver driver;
+     * protected List<Device> device;
+     * protected List<Slot> slot;
+     * protected List<Softwarelist> softwarelist;
+     * protected List<Ramoption> ramoption;
+     * @XmlAttribute(name = "name", required = true)
+     * protected String name;
+     * @XmlAttribute(name = "sourcefile")
+     * protected String sourcefile;
+     * @XmlAttribute(name = "isbios")
+     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String isbios;
+     * @XmlAttribute(name = "isdevice")
+     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String isdevice;
+     * @XmlAttribute(name = "ismechanical")
+     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String ismechanical;
+     * @XmlAttribute(name = "runnable")
+     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String runnable;
+     * @XmlAttribute(name = "cloneof")
+     * protected String cloneof;
+     * @XmlAttribute(name = "romof")
+     * protected String romof;
+     * @XmlAttribute(name = "sampleof")
+     * protected String sampleof;
+     */
 
     protected void copytoClipboard(String nodeValue) {
         nodeValue = nodeValue.contains(valueDivider) ?
@@ -220,52 +329,6 @@ public class MAMEtoJTree extends JPanel {
         }
         return dmtNode;
     }
-
-    /**
-     * @param machine
-     * @return
-     * @XmlElement(required = true)
-     * protected String description;
-     * protected String year;
-     * protected String manufacturer;
-     * protected List<Biosset> biosset;
-     * protected List<Rom> rom;
-     * protected List<Disk> disk;
-     * @XmlElement(name = "device_ref")
-     * protected List<DeviceRef> deviceRef;
-     * protected List<Sample> sample;
-     * protected List<Chip> chip;
-     * protected List<Display> display;
-     * protected Sound sound;
-     * protected Input input;
-     * protected List<Dipswitch> dipswitch;
-     * protected List<Configuration> configuration;
-     * protected List<Port> port;
-     * protected List<Adjuster> adjuster;
-     * protected Driver driver;
-     * protected List<Device> device;
-     * protected List<Slot> slot;
-     * protected List<Softwarelist> softwarelist;
-     * protected List<Ramoption> ramoption;
-     * @XmlAttribute(name = "name", required = true)
-     * protected String name;
-     * @XmlAttribute(name = "sourcefile")
-     * protected String sourcefile;
-     * @XmlAttribute(name = "isbios")
-     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String isbios;
-     * @XmlAttribute(name = "isdevice")
-     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String isdevice;
-     * @XmlAttribute(name = "ismechanical")
-     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String ismechanical;
-     * @XmlAttribute(name = "runnable")
-     * @XmlJavaTypeAdapter(CollapsedStringAdapter.class) protected String runnable;
-     * @XmlAttribute(name = "cloneof")
-     * protected String cloneof;
-     * @XmlAttribute(name = "romof")
-     * protected String romof;
-     * @XmlAttribute(name = "sampleof")
-     * protected String sampleof;
-     */
 
     /**
      * NOTE we do a lot of checking even for required Attrs. This is to try and cover previous XML versions
@@ -1027,73 +1090,6 @@ public class MAMEtoJTree extends JPanel {
         }
 
         return dmtNode;
-    }
-
-    private static void exit() {
-        System.out.println("MAMEtoJTree exit");
-        System.exit(0);
-    }
-
-    /**
-     * main to test this class
-     */
-    public static void main(String[] args) {
-
-        JFrame frame = new JFrame("Objects to JTree");
-
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Dimension dim = toolkit.getScreenSize();
-        int screenHeight = dim.height;
-        int screenWidth = dim.width;
-
-        frame.setBounds((screenWidth - FRAME_WIDTH) / 2,
-                (screenHeight - FRAME_HEIGHT) / 2, FRAME_WIDTH, FRAME_HEIGHT);
-
-        frame.setBackground(Color.lightGray);
-        frame.getContentPane().setLayout(new BorderLayout());
-        WindowListener wndCloser = new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                exit();
-            }
-        };
-        frame.addWindowListener(wndCloser);
-
-        try {
-            root = JAXB();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, ex.getMessage(), "Exception",
-                    JOptionPane.WARNING_MESSAGE);
-
-            ex.printStackTrace();
-            exit();
-        }
-
-        frame.getContentPane().add(new MAMEtoJTree(), BorderLayout.CENTER);
-        frame.validate();
-        frame.setVisible(true);
-    }
-
-    /**
-     * This is simply to provide MAME input to test this class
-     */
-    private static Mame JAXB() throws JAXBException, MAMEexe.MAME_Exception {
-        Mame mame = null;
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Phweda.MFM.mame.Mame.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            // hard code path to mame exe
-            MAMEexe.setBaseArgs("E:\\Test\\177\\mame64.exe");
-            ArrayList<String> args = new ArrayList<String>(Arrays.asList("-listxml", "*"));
-            Process process = MAMEexe.run(args);
-            InputStream inputStream = process.getInputStream();
-            mame = (Mame) jaxbUnmarshaller.unmarshal(inputStream);
-
-            System.out.println("Machines" + mame.getMachine().size());
-        } catch (JAXBException | MAMEexe.MAME_Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-        return mame;
     }
 
 }

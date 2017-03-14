@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -33,15 +33,75 @@ import static Phweda.MFM.MFMListBuilder.*;
  * Time: 9:35 PM
  */
 class MFMListGenerator {
+    // TODO fixme reduce this to only the Arcade exclusions since we now have Systems Categories
+    private static final List<String> vidsExcludeCategoriesList =
+            Arrays.asList(
+                    "3D Printer", "Arcade BIOS", "Astrological Computer", "Audio Sequencer",
+                    "Bridge Machine", "Business Computer / Terminal", "Calculator / Pocket Computer", "Cash Counter",
+                    "Casino", "Casino / Cards", "Casino / Lottery", "Casino / Cards * Mature *",
+                    "Casino * Mature *", "Casino / Multiplay", "Casino / Racing", "Casino / Reels",
+                    "Casino / Reels * Mature *", "Casino / Roulette", "Chess Machine", "Clock",
+                    "Development Computer", "Devices", "Document Processors", "Dot-Matrix Display", "Drum Machine",
+                    "EPROM Programmer", "Electromechanical / Coin pusher",
+                    "Educational Game", "Electronic Game", "Electromechanical / Misc.", "Electromechanical / Pinball",
+                    "Electromechanical / Reels", "Electromechanical / Utilities", "Game Console",
+                    "Handheld Child Computers", "", "Handheld Console", "Home Computer",
+                    "In Circuit Emulator", "Kit Computer", "Laptop / Notebook / Portable",
+                    "Matrix Printer", "Microcomputer", "Multi-cart Board", "Network Processor",
+                    "Not Classified", "Pocket Device / Pad / PDA", "Print Club", "Punched Card Computer",
+                    "Quiz / Music English", "Quiz / Chinese", "Quiz / English", "Quiz / English * Mature *",
+                    "Quiz / French", "Quiz / German", "Quiz / Italian", "Quiz / Japanese",
+                    "Quiz / Japanese * Mature *", "Quiz / Music Japanese", "Quiz / Korean", "Quiz / Spanish",
+                    "Robot Control", "Satellite Receiver", "Single Board Computer", "Speech Synthesiser",
+                    "Synthesiser", "System / BIOS", "System / Device", "Telephone / ComputerPhone",
+                    "Tabletop / Cards", "Tabletop / Go", "Tabletop / Hanafuda",
+                    "Tabletop / Hanafuda * Mature *", "Tabletop / Mahjong", "Tabletop / Mahjong * Mature *",
+                    "Tabletop / Misc.", "Tabletop / Misc. * Mature *", "Tabletop / Multiplay", "Tabletop / Othello",
+                    "Tabletop / Othello * Mature *", "Tabletop / Renju", "Test ROM",
+                    "Training Board", "Utilities / Test", "Utilities / Update",
+                    "VTR Control", "Word-processing Machine", "Workstation / Server"
+            );
     private static MFMListGenerator ourInstance = new MFMListGenerator();
+    private static TreeMap<String, TreeSet<String>> languagesListMap;
+
+    private MFMListGenerator() {
+    }
 
     public static MFMListGenerator getInstance() {
         return ourInstance;
     }
 
-    private static TreeMap<String, TreeSet<String>> languagesListMap;
+    private static TreeMap<String, TreeSet<String>> loadLanguagesINI() {
+        try {
+            if (MFM.isDebug()) {
+                MFM.logger.addToList("In loadLanguagesINI");
+            }
+            TreeMap<String, TreeSet<String>> languagesMap = new TreeMap<String, TreeSet<String>>();
+            new ParseFolderINIs(MFMSettings.getLanguageINI(), languagesMap).processFile();
+            // if not all then remove non-playable machines
+            if (!MFM.isProcessAll()) {
+                filterLanguagesMap(languagesMap);
+            }
+            MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesMap);
+            return languagesMap;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-    private MFMListGenerator() {
+    private static void filterLanguagesMap(TreeMap<String, TreeSet<String>> languagesMap) {
+        // remove any non-playable machines
+        languagesMap.forEach((key, set) ->
+                set.removeIf(machineName -> !allList.contains(machineName))
+        );
+        // Remove any empty lists
+        languagesMap.entrySet().removeIf(set -> set.getValue().isEmpty());
+    }
+
+    private static boolean needsVID(Machine machine) {
+        String category = machine.getCategory();
+        return !vidsExcludeCategoriesList.contains(category);
     }
 
     HashMap<String, TreeSet<String>> generateMFMLists() {
@@ -202,67 +262,5 @@ class MFMListGenerator {
             }
         }
         return languagesListMap;
-    }
-
-    private static TreeMap<String, TreeSet<String>> loadLanguagesINI() {
-        try {
-            if (MFM.isDebug()) {
-                MFM.logger.addToList("In loadLanguagesINI");
-            }
-            TreeMap<String, TreeSet<String>> languagesMap = new TreeMap<String, TreeSet<String>>();
-            new ParseFolderINIs(MFMSettings.getLanguageINI(), languagesMap).processFile();
-            // if not all then remove non-playable machines
-            if (!MFM.isProcessAll()) {
-                filterLanguagesMap(languagesMap);
-            }
-            MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesMap);
-            return languagesMap;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private static void filterLanguagesMap(TreeMap<String, TreeSet<String>> languagesMap) {
-        // remove any non-playable machines
-        languagesMap.forEach((key, set) ->
-                set.removeIf(machineName -> !allList.contains(machineName))
-        );
-        // Remove any empty lists
-        languagesMap.entrySet().removeIf(set -> set.getValue().isEmpty());
-    }
-
-    // TODO fixme reduce this to only the Arcade exclusions since we now have Systems Categories
-    private static final List<String> vidsExcludeCategoriesList =
-            Arrays.asList(
-                    "3D Printer", "Arcade BIOS", "Astrological Computer", "Audio Sequencer",
-                    "Bridge Machine", "Business Computer / Terminal", "Calculator / Pocket Computer", "Cash Counter",
-                    "Casino", "Casino / Cards", "Casino / Lottery", "Casino / Cards * Mature *",
-                    "Casino * Mature *", "Casino / Multiplay", "Casino / Racing", "Casino / Reels",
-                    "Casino / Reels * Mature *", "Casino / Roulette", "Chess Machine", "Clock",
-                    "Development Computer", "Devices", "Document Processors", "Dot-Matrix Display", "Drum Machine",
-                    "EPROM Programmer", "Electromechanical / Coin pusher",
-                    "Educational Game", "Electronic Game", "Electromechanical / Misc.", "Electromechanical / Pinball",
-                    "Electromechanical / Reels", "Electromechanical / Utilities", "Game Console",
-                    "Handheld Child Computers", "", "Handheld Console", "Home Computer",
-                    "In Circuit Emulator", "Kit Computer", "Laptop / Notebook / Portable",
-                    "Matrix Printer", "Microcomputer", "Multi-cart Board", "Network Processor",
-                    "Not Classified", "Pocket Device / Pad / PDA", "Print Club", "Punched Card Computer",
-                    "Quiz / Music English", "Quiz / Chinese", "Quiz / English", "Quiz / English * Mature *",
-                    "Quiz / French", "Quiz / German", "Quiz / Italian", "Quiz / Japanese",
-                    "Quiz / Japanese * Mature *", "Quiz / Music Japanese", "Quiz / Korean", "Quiz / Spanish",
-                    "Robot Control", "Satellite Receiver", "Single Board Computer", "Speech Synthesiser",
-                    "Synthesiser", "System / BIOS", "System / Device", "Telephone / ComputerPhone",
-                    "Tabletop / Cards", "Tabletop / Go", "Tabletop / Hanafuda",
-                    "Tabletop / Hanafuda * Mature *", "Tabletop / Mahjong", "Tabletop / Mahjong * Mature *",
-                    "Tabletop / Misc.", "Tabletop / Misc. * Mature *", "Tabletop / Multiplay", "Tabletop / Othello",
-                    "Tabletop / Othello * Mature *", "Tabletop / Renju", "Test ROM",
-                    "Training Board", "Utilities / Test", "Utilities / Update",
-                    "VTR Control", "Word-processing Machine", "Workstation / Server"
-            );
-
-    private static boolean needsVID(Machine machine) {
-        String category = machine.getCategory();
-        return !vidsExcludeCategoriesList.contains(category);
     }
 }

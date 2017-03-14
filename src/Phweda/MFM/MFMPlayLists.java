@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,17 +18,14 @@
 
 package Phweda.MFM;
 
-import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.utils.PersistUtils;
-
-import javax.swing.*;
-
-import static Phweda.MFM.MFMListBuilder.*;
 
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+
+import static Phweda.MFM.MFMListBuilder.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,10 +34,10 @@ import java.util.*;
  * Time: 1:40 PM
  */
 
-/*
-* A list of Playlists
-*
-*
+/**
+ *
+ * A list of Playlists
+ *
  */
 public class MFMPlayLists implements Serializable {
     private static MFMPlayLists playlists;

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,16 @@
 
 package Phweda.MFM;
 
-import Phweda.MFM.UI.*;
-import Phweda.utils.*;
+import Phweda.MFM.UI.MFMBusyPainter;
+import Phweda.MFM.UI.MFMUI;
+import Phweda.MFM.UI.MFMUI_Resources;
+import Phweda.MFM.UI.MFM_SettingsPanel;
+import Phweda.utils.Debug;
+import Phweda.utils.FileUtils;
+import Phweda.utils.MemoryMonitor;
+import Phweda.utils.SwingUtils;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.icon.EmptyIcon;
-import org.jdesktop.swingx.painter.BusyPainter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,8 +35,10 @@ import java.awt.geom.Ellipse2D;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static Phweda.MFM.UI.MFMUI_Resources.MFM_Icon_PNG;
@@ -54,35 +61,30 @@ public class MFM {
     public static final String MFM_LOGS_DIR;
     public static final String MFM_FOLDERS_DIR;
     public static final String MFM_CATEGORY_DIR;
-
-    static final String MFM_SETTINGS_FILE = "MFM_SETTINGS.xml";
     public static final String MFM_CACHE_SER = "MFM_cache.ser";
     public static final String MFM_MAME_FILE = "MFM_MAME.xml";
     public static final String MFM_CACHE_XML = "MFM_cache.xml";
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
-    static final String MFM_CATEGORY_DATA_FILE = "CategoryListsMap.xml";
-    static final String MAME_RESOURCES_CACHE = "Resources_cache.ser";
-    static final String MAME_CONTROLLERS = "MAME_Controllers.ini";
-    static final String MAME_FOLDER_NAMES_FILE = "MAME_folders.ini";
-
     // Update these with each release
     public static final String VERSION = "Version 0.8.5";
     public static final String BUILD = "BUILD 0.8.103";
     public static final String RELEASE_DATE = "Released : March 2017";
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION + "  :  " + MFM.BUILD;
-
     public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     public static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
     public static final int time;
+    static final String MFM_SETTINGS_FILE = "MFM_SETTINGS.xml";
+    static final String MFM_CATEGORY_DATA_FILE = "CategoryListsMap.xml";
+    static final String MAME_RESOURCES_CACHE = "Resources_cache.ser";
+    static final String MAME_CONTROLLERS = "MAME_Controllers.ini";
+    static final String MAME_FOLDER_NAMES_FILE = "MAME_folders.ini";
     private static final String OS_version = System.getProperty("os.name");
-    public static String TEMP_DIR = System.getProperty("java.io.tmpdir");
-
     private static final String m = "-m"; // Memory Monitor
     private static final String doDebug = "-d"; // Debug
     private static final String list = "-list"; // UI flag for List only view
     private static final String allMachines = "-all"; // Parse and cache all Machines -- include not Playable
     private static final String system = "-s"; // System Out Debug
-
+    public static String TEMP_DIR = System.getProperty("java.io.tmpdir");
     public static Debug logger;
     public static File Log;
     public static File ErrorLog;
@@ -133,38 +135,37 @@ public class MFM {
         // Location of MFM distribution /Category/ root category files
         MFM_CATEGORY_DIR = MFM_DIR + MFM_Constants.CATEGORY + FileUtils.DIRECTORY_SEPARATOR;
 
-        // fixme better name
-        boolean directoriesNotOK = false;
+        boolean MFMnoDirectories = false;
         File settingsDIR = new File(MFM_SETTINGS_DIR);
         if (!settingsDIR.exists()) {
-            directoriesNotOK = directoriesNotOK & !settingsDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !settingsDIR.mkdir();
         }
 
         File JarsDIR = new File(MFM_JARS_DIR);
         if (!JarsDIR.exists()) {
-            directoriesNotOK = directoriesNotOK & !JarsDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !JarsDIR.mkdir();
         }
 
         File logsDIR = new File(MFM_LOGS_DIR);
         if (!logsDIR.exists()) {
-            directoriesNotOK = directoriesNotOK & !logsDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !logsDIR.mkdir();
         }
 
         File listDIR = new File(MFM_LISTS_DIR);
         if (!listDIR.exists()) {
-            directoriesNotOK = directoriesNotOK & !listDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !listDIR.mkdir();
         }
 
         if (TEMP_DIR == null) {
             TEMP_DIR = MFM_DIR + FileUtils.DIRECTORY_SEPARATOR + "temp" + FileUtils.DIRECTORY_SEPARATOR;
             File tempDir = new File(TEMP_DIR);
             if (!tempDir.exists()) {
-                directoriesNotOK = directoriesNotOK & !tempDir.mkdir();
+                MFMnoDirectories = MFMnoDirectories & !tempDir.mkdir();
             }
 
         }
 
-        if (directoriesNotOK) {
+        if (MFMnoDirectories) {
             System.out.println("MFM FATAL error cannot find or create MFM directories");
             System.exit(8);
         }
@@ -178,7 +179,6 @@ public class MFM {
             ErrorLog = new File(MFM_LOGS_DIR + "MFM_ERRout-" + time + ".txt");
 
             logger = new Debug(new FileOutputStream(Log));
-            // System.setOut(new PrintStream(new FileOutputStream(new File(MFM_LOGS_DIR + "MFM_STDout-" + time + ".txt"))));
             System.setErr(new PrintStream(new FileOutputStream(ErrorLog)));
             MAMEout = new File(MFM_LOGS_DIR + "MAME_OUT-" + time + ".txt");
             FFmpegout = new File(MFM_LOGS_DIR + "FFmpeg_OUT-" + time + ".txt");
@@ -197,8 +197,8 @@ public class MFM {
 
     public static void main(String[] args) {
         /*
-      Command line switches
-     */
+          Command line switches
+        */
         List<String> switches = Arrays.asList(args);
 
         logger.out("MFM starting");
@@ -255,7 +255,6 @@ public class MFM {
         for (String arg : arguments) {
             logger.addToList(arg);
             if (arg.startsWith("-Xloggc:")) {
-                //  System.out.println(arg.substring(arg.indexOf(':') + 1));
                 GCLog = new File(arg.substring(arg.indexOf(':') + 1));
             }
         }
@@ -315,7 +314,6 @@ public class MFM {
             }
         };
         loadMameResources.start();
-
         MFMUI.main(null);
     }
 
@@ -372,7 +370,7 @@ public class MFM {
         return settingsFrame;
     }
 
-    // TODO move this and pass in the display message
+    // TODO move this
     public static void showBusy(boolean start, boolean task) { // task false is empty startup. task true is loading data
 
         progressRunning = start;
@@ -404,6 +402,7 @@ public class MFM {
         }
     }
 
+    // TODO move this along with above
     private static JXBusyLabel createComplexBusyLabel() {
         JXBusyLabel label = new JXBusyLabel(new Dimension(325, 150));
         // default is 100
@@ -431,17 +430,17 @@ public class MFM {
         return label;
     }
 
-
-    protected void finalize() throws Throwable {
-        super.finalize();
-        //    logger.addToList("MFM Finalize complete.", true);
-    }
-
+    // TODO move this
     public static String formatMillis(long nanos) {
         return String.format("%02d:%02d:%02d.%03d", TimeUnit.NANOSECONDS.toHours(nanos),
                 TimeUnit.NANOSECONDS.toMinutes(nanos) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.NANOSECONDS.toSeconds(nanos) % TimeUnit.MINUTES.toSeconds(1),
                 TimeUnit.NANOSECONDS.toMillis(nanos) % TimeUnit.SECONDS.toMillis(1));
+    }
+
+    protected void finalize() throws Throwable {
+        super.finalize();
+        //    logger.addToList("MFM Finalize complete.", true);
     }
 
 }

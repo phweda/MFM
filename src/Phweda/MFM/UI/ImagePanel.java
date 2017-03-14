@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,22 +26,14 @@ package Phweda.MFM.UI;
  * Minor modifications by phweda
  */
 
-import Phweda.MFM.MFM;
-
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Insets;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.SwingConstants;
 
 class ImagePanel extends JComponent implements SwingConstants, Printable {
     private Image image;
@@ -125,30 +117,6 @@ class ImagePanel extends JComponent implements SwingConstants, Printable {
             throw new IllegalArgumentException(
                     "Invalid Horizontal Alignment: " + horizontalAlignment);
     }
-
-/*
-
-    */
-/*  fixme ?? could this cause oversizing of the ExtrasTabbedPane?? No we never get here
-    *   NOTE this was fixed in the weighting of the splitpane components
-    * *//*
-
-    @Override
-    public Dimension getPreferredSize() {
-        if (image == null) {
-            if (MFM.isDebug()) {
-                // MFM.logger.addToList("ImagePanel: 120" + super.getPreferredSize().toString());
-            }
-            return super.getPreferredSize();
-        } else {
-            if (MFM.isDebug()) {
-                // MFM.logger.addToList("ImagePanel: 125" + image.getWidth(this) + " : " + image.getHeight(this));
-            }
-            return new Dimension(image.getWidth(this), image.getHeight(this));
-        }
-    }
-
-*/
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,18 +19,20 @@
 package Phweda.MFM;
 
 import Phweda.MFM.UI.MAMEtoJTree;
+import Phweda.MFM.Utils.ParseCommandList;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
 import Phweda.MFM.mame.ParseAllMachinesInfo;
-import Phweda.MFM.Utils.ParseCommandList;
-import Phweda.utils.*;
+import Phweda.utils.FileUtils;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InvalidClassException;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import static java.lang.Thread.sleep;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 
 /**
@@ -41,10 +43,10 @@ import static javax.swing.JOptionPane.YES_NO_OPTION;
  */
 public class MAMEInfo // We'll just do the individual objects  ** implements Serializable
 {
+    public static final String MAME_INI = "mame.ini";
     private static final String MachineObjectMap = "Machines";
     private static final String MAME = "MAME";
     private static final String RUNNABLE_MACHINES = "RunnableMachines";
-
     private static final String MACHINELIST = "MachineList";
     private static final String COMMANDS_FILENAME = "Commands";
     private static final String INIFILES = "INIfiles";
@@ -55,14 +57,11 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     private static final String CONTROLLERSMACHINES = "ControllerMachines";
     private static final String ALLROOTS = "CategoryRoots";
     private static final String ARCADEROOTS = "ArcadeCategoryRoots";
-
-    public static final String MAME_INI = "mame.ini";
-
     private static final String MAME_VERSION = "MAME Version";
     private static final String NUM_BUTTONS = "Max_buttons";
     private static final String NUM_PLAYERS = "Max players";
     private static final String RUNNABLE = "Runnable";
-
+    private static final MAMEtoJTree mameJTreePanel;
     private static String version;  // From -listxml
     //    private static TreeMap machineList; // extracted From allMachinesObjectMap
     private static int runnable;
@@ -70,10 +69,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     private static ArrayList<String> allCategories;  // From catver_full.ini or catver.ini
     private static HashMap<String, ArrayList<String>> categoryMachines; // From catver_full.ini or catver.ini
     private static TreeMap<String, ArrayList<String>> categoryHierarchy; // MFM generated for root allCategories
-
     private static Controllers controllers;
-    private static final MAMEtoJTree mameJTreePanel;
-
     // Decided to just pre-populate these should really do a doublecheck
     private static String[] numButtons = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"};
     // Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"));
@@ -125,121 +121,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     *
     *
     */
-
-    public MAMEInfo() {
-        if (MFM.isDebug() && allCategories != null) {
-            MFM.logger.addToList("Total categories is : " + allCategories.size());
-        }
-    }
-
-    static TreeSet<String> getAllCategories() {
-        return new TreeSet<String>(allCategories);
-    }
-
-    public static String getVersion() {
-        // return MFMSettings.getDataVersion();
-        // fixme move call should not be in MFMSettings
-        return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
-    }
-
-    public static double getVersionDouble() {
-        String str = MFMSettings.getDataVersion().replaceAll("[^\\d.]", "");
-        return Double.parseDouble(str);
-    }
-
-    public static void setVersion(String version) {
-        MFMSettings.setDataVersion(MFMSettings.trimMAMEVersion(version));
-    }
-
-    public static Integer[] getNumPlayers() {
-        return numPlayers.toArray(new Integer[numPlayers.size()]);
-    }
-
-    // Future when we read live
-    public static void setNumPlayers(TreeSet<Integer> set) {
-        numPlayers = set;
-    }
-
-    // Future when we read live
-    public static void setNumButtons(String[] buttons) {
-        numButtons = buttons;
-    }
-
-    public static String[] getNumButtons() {
-        return numButtons;
-    }
-
-/*
-    public static TreeMap getMachineList() {
-        return machineList;
-    }
-
-    public static void setMachineList(TreeMap gameListMap) {
-        MAMEInfo.machineList = gameListMap;
-    }
-*/
-
-    public static HashMap Commands() {
-        return MAMEInfo.commands;
-    }
-
-    public static void Commands(HashMap<String, HashMap<String, String>> commands) {
-        MAMEInfo.commands = commands;
-    }
-
-    /*   public static Map<String, Machine> getAllMachinesInfo() {
-           return allMachinesObjectMap;
-       }
-    */
-    public static Mame getMame() {
-        return mame;
-    }
-
-    public static TreeSet<String> getRunnableMachines() {
-        return runnableMachines;
-    }
-
-    public static void setRunnable(int runnableIn) {
-        runnable = runnableIn;
-    }
-
-    public static String getRunnable() {
-        return new DecimalFormat("###,###").format(runnable);
-    }
-
-    public static HashMap<String, ArrayList<String>> getCategoryMachines() {
-        return categoryMachines;
-    }
-
-/*
-    public static ArrayList<String> getArcadeCategoryRoots() {
-        return arcadeCategoryRoots;
-    }
-
-    public static ArrayList<String> getAllCategoryRoots() {
-        return categoryRoots;
-    }
-*/
-
-    public static Controllers getControllers() {
-        return controllers;
-    }
-
-    static TreeMap<String, ArrayList<String>> getCategoryHierarchy() {
-        return categoryHierarchy;
-    }
-
-    public static Machine getMachine(String machineName) {
-        return mame.getMachineMap().get(machineName);
-    }
-
-    public static HashMap<String, Map> getINIfiles() {
-        return INIfiles;
-    }
-
-    public static MAMEtoJTree getMameJTreePanel() {
-        return mameJTreePanel;
-    }
 
     /*
          * Load persisted objects or if not available generate from MAME
@@ -380,6 +261,121 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         mameJTreePanel = MAMEtoJTree.getInstance();
     }
 
+    public MAMEInfo() {
+        if (MFM.isDebug() && allCategories != null) {
+            MFM.logger.addToList("Total categories is : " + allCategories.size());
+        }
+    }
+
+    static TreeSet<String> getAllCategories() {
+        return new TreeSet<String>(allCategories);
+    }
+
+    public static String getVersion() {
+        // return MFMSettings.getDataVersion();
+        // fixme move call should not be in MFMSettings
+        return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
+    }
+
+    public static void setVersion(String version) {
+        MFMSettings.setDataVersion(MFMSettings.trimMAMEVersion(version));
+    }
+
+    public static double getVersionDouble() {
+        String str = MFMSettings.getDataVersion().replaceAll("[^\\d.]", "");
+        return Double.parseDouble(str);
+    }
+
+    public static Integer[] getNumPlayers() {
+        return numPlayers.toArray(new Integer[numPlayers.size()]);
+    }
+
+    // Future when we read live
+    public static void setNumPlayers(TreeSet<Integer> set) {
+        numPlayers = set;
+    }
+
+    public static String[] getNumButtons() {
+        return numButtons;
+    }
+
+/*
+    public static TreeMap getMachineList() {
+        return machineList;
+    }
+
+    public static void setMachineList(TreeMap gameListMap) {
+        MAMEInfo.machineList = gameListMap;
+    }
+*/
+
+    // Future when we read live
+    public static void setNumButtons(String[] buttons) {
+        numButtons = buttons;
+    }
+
+    public static HashMap Commands() {
+        return MAMEInfo.commands;
+    }
+
+    public static void Commands(HashMap<String, HashMap<String, String>> commands) {
+        MAMEInfo.commands = commands;
+    }
+
+    /*   public static Map<String, Machine> getAllMachinesInfo() {
+           return allMachinesObjectMap;
+       }
+    */
+    public static Mame getMame() {
+        return mame;
+    }
+
+    public static TreeSet<String> getRunnableMachines() {
+        return runnableMachines;
+    }
+
+    public static String getRunnable() {
+        return new DecimalFormat("###,###").format(runnable);
+    }
+
+    public static void setRunnable(int runnableIn) {
+        runnable = runnableIn;
+    }
+
+/*
+    public static ArrayList<String> getArcadeCategoryRoots() {
+        return arcadeCategoryRoots;
+    }
+
+    public static ArrayList<String> getAllCategoryRoots() {
+        return categoryRoots;
+    }
+*/
+
+    public static HashMap<String, ArrayList<String>> getCategoryMachines() {
+        return categoryMachines;
+    }
+
+    public static Controllers getControllers() {
+        return controllers;
+    }
+
+    static TreeMap<String, ArrayList<String>> getCategoryHierarchy() {
+        return categoryHierarchy;
+    }
+
+    public static Machine getMachine(String machineName) {
+        return mame.getMachineMap().get(machineName);
+    }
+
+    public static HashMap<String, Map> getINIfiles() {
+        return INIfiles;
+    }
+
+    public static MAMEtoJTree getMameJTreePanel() {
+        return mameJTreePanel;
+    }
+
     private static void createCatHierarchy(ArrayList<String> categories) {
         if (MFM.isDebug()) {
             MFM.logger.addToList("Categories count is : " + categories.size());
@@ -423,7 +419,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             // Quit if it is not a directory
             if (folder.isDirectory()) {
                 files = new HashSet<File>(Arrays.asList(folder.listFiles(FileUtils.iniFilenameFilter)));
-                if(MFM.isSystemDebug()){
+                if (MFM.isSystemDebug()) {
                     System.out.println("Folders files are : " + files.toString());
                 }
                 INIfiles = ParseAllMachinesInfo.INIfiles(files);

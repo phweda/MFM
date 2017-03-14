@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -191,7 +191,7 @@ public class ParseAllMachinesInfo {
             Element machineNode = (Element) machineNodes.item(i);
             // Ensure there are children
             if (machineNode.hasChildNodes()) {
-                String bios = machineNode.getAttribute(MFMMachine.ISBIOS);
+                String bios = machineNode.getAttribute(Machine.ISBIOS);
                 /* if playable */
                 Element driver = (Element) machineNode.getElementsByTagName(DRIVER).item(0);
                 if (driver != null) {
@@ -225,7 +225,7 @@ public class ParseAllMachinesInfo {
         String machineName = machineElement.getAttribute(Machine.NAME);
         machine.setName(machineName);
 
-        Element driverEL = (Element) machineElement.getElementsByTagName(MFMMachine.DRIVER).item(0);
+        Element driverEL = (Element) machineElement.getElementsByTagName(Machine.DRIVER).item(0);
         Driver driver = new Driver();
         driver.setStatus(status);
         if (driverEL != null) {

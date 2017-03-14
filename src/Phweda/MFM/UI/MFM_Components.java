@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,78 +25,49 @@ package Phweda.MFM.UI;
  * Time: 1:16 PM
  */
 
-import Phweda.MFM.*;
+import Phweda.MFM.MAMEInfo;
+import Phweda.MFM.MFMListBuilder;
+import Phweda.MFM.MFMSettings;
 import Phweda.utils.ClockPanel;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Build UI components
  * Major refactor 9/30/2016 moved Menubar creation to separate class MFM_Menubar
  */
 public class MFM_Components {
+    private static final JScrollPane leftTreeScrollPane = new JScrollPane();
+    static MFMUI_Resources resources = MFMUI_Resources.getInstance();
     private static MFMController MFMController;
-
     private static JPopupMenu MFMPopupMenu;
     private static JPanel MFMListPanel;
     private static JTabbedPane ExtrasTabbedPane;
     private static JTable machineListTable;
     private static JScrollPane MFMFolderTreePane;
-
     private static JMenuBar menuBar;
     private static StatusBar statusBar;
     private static JLabel currentListName;
     private static MFMInformationPanel infoPanel;
     private static JPanel fillPanel;
-    private JTree tree;
-    private static final JScrollPane leftTreeScrollPane = new JScrollPane();
-
-
     private static String[][] data;
-
-    static MFMUI_Resources resources = MFMUI_Resources.getInstance();
+    private JTree tree;
 
     MFM_Components(MFMController controller) {
         MFMController = controller;
         createUIComponents();
     }
 
-    Component createStatusBar(int width) {
-        statusBar = new StatusBar();
-        ClockPanel clock = new ClockPanel();
-        clock.start();
-
-        JLabel versionJL = new JLabel(MFMSettings.getMAMEVersion() + "   :   DATA " + MAMEInfo.getVersion(),
-                SwingConstants.CENTER);
-        currentListName = new JLabel(MFMListBuilder.ALL,
-                getResources().getImageIcon(MFMUI_Resources.UPARROW_PNG), SwingConstants.LEFT);
-        infoPanel = new MFMInformationPanel();
-        infoPanel.showMessage("Main View");
-        JLabel workingJL = new JLabel("Runnable " + MAMEInfo.getRunnable(), SwingConstants.CENTER);
-        statusBar.setZones(new String[]{"Version", "currentListName", "Information", "Working", "Clock"},
-                new JComponent[]{versionJL, currentListName, infoPanel, workingJL, clock},
-                new String[]{"20%", "24%", "*", "12%", "6%"});
-        statusBar.setPreferredSize(new Dimension(width, 35));
-        return statusBar;
-    }
-
     public static MFMInformationPanel InfoPanel() {
         return infoPanel;
-    }
-
-    JTable getMachineListTable() {
-        return machineListTable;
-    }
-
-    JTabbedPane ExtrasTabbedPane() {
-        return ExtrasTabbedPane;
     }
 
     static JPopupMenu MFMPopupMenu() {
@@ -138,6 +109,49 @@ public class MFM_Components {
         return treeButton;
     }
 
+    static StatusBar StatusBar() {
+        return statusBar;
+    }
+
+    static JPanel getFillPanel() {
+        return fillPanel;
+    }
+
+    public static JPanel getMFMListPanel() {
+        return MFMListPanel;
+    }
+
+    protected static MFMUI_Resources getResources() {
+        return resources;
+    }
+
+    Component createStatusBar(int width) {
+        statusBar = new StatusBar();
+        ClockPanel clock = new ClockPanel();
+        clock.start();
+
+        JLabel versionJL = new JLabel(MFMSettings.getMAMEVersion() + "   :   DATA " + MAMEInfo.getVersion(),
+                SwingConstants.CENTER);
+        currentListName = new JLabel(MFMListBuilder.ALL,
+                getResources().getImageIcon(MFMUI_Resources.UPARROW_PNG), SwingConstants.LEFT);
+        infoPanel = new MFMInformationPanel();
+        infoPanel.showMessage("Main View");
+        JLabel workingJL = new JLabel("Runnable " + MAMEInfo.getRunnable(), SwingConstants.CENTER);
+        statusBar.setZones(new String[]{"Version", "currentListName", "Information", "Working", "Clock"},
+                new JComponent[]{versionJL, currentListName, infoPanel, workingJL, clock},
+                new String[]{"20%", "24%", "*", "12%", "6%"});
+        statusBar.setPreferredSize(new Dimension(width, 35));
+        return statusBar;
+    }
+
+    JTable getMachineListTable() {
+        return machineListTable;
+    }
+
+    JTabbedPane ExtrasTabbedPane() {
+        return ExtrasTabbedPane;
+    }
+
     JTree getTree() {
         return tree;
     }
@@ -148,10 +162,6 @@ public class MFM_Components {
 
     JMenuBar getMenuBar() {
         return menuBar;
-    }
-
-    static StatusBar StatusBar() {
-        return statusBar;
     }
 
     void updateListMenu() {
@@ -187,7 +197,7 @@ public class MFM_Components {
         root = new DefaultMutableTreeNode("INIfiles");
         tree = new JTree(root);
 
-        // TODO maybe we should simplify/explicate by having our own object - see ParseAllGamesInfo too
+        // TODO maybe we should simplify/explicate by having our own object - see ParseAllMachinesInfo too
         for (Object ini : INIfiles.keySet()) {
             DefaultMutableTreeNode folderNode = new DefaultMutableTreeNode(ini);
             Map categories = INIfiles.get(ini);
@@ -279,14 +289,6 @@ public class MFM_Components {
         return videoOps;
     }
 
-    static JPanel getFillPanel() {
-        return fillPanel;
-    }
-
-    public static JPanel getMFMListPanel() {
-        return MFMListPanel;
-    }
-
     //  NOTE replaced by ListBuilder
     private void createListChooserPanel() {
 
@@ -304,9 +306,5 @@ public class MFM_Components {
         MFMListPanel.setMaximumSize(new Dimension(250, 1100));
 
         MFMListPanel.validate();
-    }
-
-    protected static MFMUI_Resources getResources() {
-        return resources;
     }
 }

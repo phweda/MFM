@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,32 +30,18 @@ package Phweda.utils;
  */
 public class TriState {
 
+    public static final String BOTH = "all";
     private static final int first = 0;
     private static final int second = 1;
     private static final int both = 2;
-
-    private int state;
-
-    public static final String BOTH = "all";
     private final String firstName;
     private final String secondName;
+    private int state;
 
     public TriState(String first, String second, String state) {
         this.firstName = first;
         this.secondName = second;
         setState(state);
-    }
-
-    public void setState(String stateIn) {
-        if (stateIn.equals(firstName)) {
-            state = first;
-        } else if (stateIn.equals(secondName)) {
-            state = second;
-        } else if (stateIn.equals(BOTH)) {
-            state = both;
-        } else {
-            // NOTE never get here!!!
-        }
     }
 
     public String getState() {
@@ -68,5 +54,17 @@ public class TriState {
         }
         // NOTE Error condition.
         return "ERROR";
+    }
+
+    public void setState(String stateIn) {
+        if (stateIn.equals(firstName)) {
+            state = first;
+        } else if (stateIn.equals(secondName)) {
+            state = second;
+        } else if (stateIn.equals(BOTH)) {
+            state = both;
+        } else {
+            // NOTE never get here!!!
+        }
     }
 }

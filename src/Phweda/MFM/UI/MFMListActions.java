@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -126,13 +126,6 @@ class MFMListActions {
 
     static void ListtoFile() {
         Object[] data = MFMPlayLists.getInstance().PlayListNames();
-
-/*
-        @SuppressWarnings("MagicConstant")
-        final String list = (String) JOptionPane.showInputDialog(
-                mainFrame, "Select list to Save",
-                "Save", JOptionPane.OK_CANCEL_OPTION, null, data, data[0]);
-*/
         final String listName = pickList(true, "Select list to Save");
 
         if (listName != null) {
@@ -156,7 +149,6 @@ class MFMListActions {
                 FileUtils.openTextFileFromOS(Paths.get(listFile.getAbsolutePath()));
             }
 */
-
         }
     }
 

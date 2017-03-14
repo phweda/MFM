@@ -1,0 +1,98 @@
+<!--
+  ~ MAME FILE MANAGER - MAME resources management tool
+  ~ Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License
+  ~     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="CONTENT-TYPE" content="text/html; charset=windows-1252">
+    <title></title>
+    <meta name="CREATED" content="0;0">
+    <meta name="CHANGEDBY" content="phweda">
+    <meta name="CHANGED" content="20111229;1493589">
+</head>
+
+<body lang="en-US" dir="ltr" style="font-size: large;">
+<pre class="western">MFM - MAME File Manager
+Author Phweda from PleasureDome</pre>
+
+<p><span style="font-weight:bold;">Original intent :</span> <br>
+    Create a simple program with a GUI for creating playlist(s) and extracting a
+    play set of MAME Roms, CHDs and Extras to another location from complete or
+    larger sets.</p>
+<pre class="western"></pre>
+
+<p><span style="font-weight:bold;">Added : </span><br>
+    Basic Front end capabilities to; view and create play lists, view game
+    information, launch MAME games, run MAME commands <br>
+    GUI layout based upon MAMEUI http://www.mameui.info/ - loved it but as the
+    number of MAME games in 2011 has exploded MAMEUI has become very slow for me</p>
+<pre class="western"></pre>
+
+<p><span style="font-weight:bold;">Goals :</span> <br>
+    Keep as generic and flexible as reasonably possible. <br>
+    Usable on both Windows and Linux as seamlessly as possible. <br>
+    Decoupled from MAME to minimize code changes based on MAME changes while
+    exposing as much MAME functionality as possible. <br>
+    Support importing/using multiple 'list' types IE CatVer.ini, MAMEUI favorites
+    etc. <br>
+    Optimize performance for regular usage at the expense of initial setup and
+    loading of large information sets such as listing of complete MAME Game List
+    and Game information.</p>
+<pre class="western"> </pre>
+
+<p><span style="font-weight:bold;">Requirements :</span> <br>
+    You have Java 1.7 JRE installed. <br>
+    You have MAME installed, configured and operating correctly. <br>
+    You have a basic understanding of how MAME works. <br>
+    Your ROMs and CHDs are correct for your version of MAME.</p>
+<pre class="western"><br></pre>
+
+<p><span style="font-weight:bold;">MFM will not :</span> <br>
+    Audit or manage ROMs in any way except for the intended copying a subset of
+    PLAYABLE games to a different location. See <a
+            href="http://mamedev.emulab.it/clrmamepro/">clrmamepro</a> to scan and rebuild
+    your sets. </p>
+<pre class="western"><span style="font-style: italic;">Bugs and TODOs in file MFM-bugs.html</span>
+</pre>
+
+<p><span style="font-weight:bold;">Coding NOTES :</span></p>
+
+<p><br>
+    RECOMMENDED JVM Options for testing</p>
+
+<p>-XX:+UseConcMarkSweepGC -Xloggc:./Logs/MFM_GC_log.txt -Xms64m -Xmx256m <br>
+    <br>
+    Logging <br>
+    ********** Look for information and expected Exceptions here ************* <br>
+    - MFM_Debug_log(6 digits).txt <br>
+    <br>
+    ********** Look for unexpected Exceptions here ************* <br>
+    - MFM_ERRout_log(6 digits).txt <br>
+    <br>
+    - MFM_GC_log.txt REQUIRES -Xloggc:./Logs/MFM_GC_log.txt JVM Option </p>
+
+<p></p>
+
+<p><span style="font-weight:bold;">Inconsistencies </span><br>
+    - some are deliberate (practice new or different methodologies) <br>
+    - some are usage of very old code not updated <br>
+    - Or I just messed up<br>
+    <br>
+</p>
+</body>
+</html>

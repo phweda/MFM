@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,25 +18,7 @@
 
 package Phweda.MFM.UI;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.LayoutManager2;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -44,6 +26,10 @@ import javax.swing.plaf.UIResource;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.View;
 import javax.swing.text.html.HTMLDocument;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 /**
  * StatusBar. <BR>A status bar is made of multiple zones. A zone can be any
@@ -167,46 +153,10 @@ class PercentLayout implements LayoutManager2 {
      * Useful constant to layout the components vertically (from left to right).
      */
     public final static int VERTICAL = 1;
-
-    static class Constraint {
-        protected Object value;
-
-        private Constraint(Object value) {
-            this.value = value;
-        }
-    }
-
-    static class NumberConstraint extends Constraint {
-        public NumberConstraint(int d) {
-            this(new Integer(d));
-        }
-
-        public NumberConstraint(Integer d) {
-            super(d);
-        }
-
-        public int intValue() {
-            return ((Integer) value).intValue();
-        }
-    }
-
-    static class PercentConstraint extends Constraint {
-        public PercentConstraint(float d) {
-            super(new Float(d));
-        }
-
-        public float floatValue() {
-            return ((Float) value).floatValue();
-        }
-    }
-
     private final static Constraint REMAINING_SPACE = new Constraint("*");
-
     private final static Constraint PREFERRED_SIZE = new Constraint("");
-
     private int orientation;
     private int gap;
-
     private Hashtable m_ComponentToConstraint;
 
     /**
@@ -215,16 +165,11 @@ class PercentLayout implements LayoutManager2 {
     public PercentLayout() {
         this(HORIZONTAL, 0);
     }
-
     public PercentLayout(int orientation, int gap) {
         setOrientation(orientation);
         this.gap = gap;
 
         m_ComponentToConstraint = new Hashtable();
-    }
-
-    public void setGap(int gap) {
-        this.gap = gap;
     }
 
     /**
@@ -235,11 +180,8 @@ class PercentLayout implements LayoutManager2 {
         return gap;
     }
 
-    public void setOrientation(int orientation) {
-        if (orientation != HORIZONTAL && orientation != VERTICAL) {
-            throw new IllegalArgumentException("Orientation must be one of HORIZONTAL or VERTICAL");
-        }
-        this.orientation = orientation;
+    public void setGap(int gap) {
+        this.gap = gap;
     }
 
     /**
@@ -248,6 +190,13 @@ class PercentLayout implements LayoutManager2 {
      */
     public int getOrientation() {
         return orientation;
+    }
+
+    public void setOrientation(int orientation) {
+        if (orientation != HORIZONTAL && orientation != VERTICAL) {
+            throw new IllegalArgumentException("Orientation must be one of HORIZONTAL or VERTICAL");
+        }
+        this.orientation = orientation;
     }
 
     public Constraint getConstraint(Component component) {
@@ -487,8 +436,39 @@ class PercentLayout implements LayoutManager2 {
         }
     }
 
-}
+    static class Constraint {
+        protected Object value;
 
+        private Constraint(Object value) {
+            this.value = value;
+        }
+    }
+
+    static class NumberConstraint extends Constraint {
+        public NumberConstraint(int d) {
+            this(new Integer(d));
+        }
+
+        public NumberConstraint(Integer d) {
+            super(d);
+        }
+
+        public int intValue() {
+            return ((Integer) value).intValue();
+        }
+    }
+
+    static class PercentConstraint extends Constraint {
+        public PercentConstraint(float d) {
+            super(new Float(d));
+        }
+
+        public float floatValue() {
+            return ((Float) value).floatValue();
+        }
+    }
+
+}
 
 /**
  * LookAndFeelTweaks. <br>

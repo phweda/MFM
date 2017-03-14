@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import static java.lang.Thread.sleep;
  * Time: 9:16 PM
  */
 public class MFMProgressBar extends JProgressBar implements Runnable {
-    public MFMProgressBar() {
+    MFMProgressBar() {
         super(0, 100);
         //    this.setString(title);
         this.setBackground(Color.black);
@@ -39,7 +39,7 @@ public class MFMProgressBar extends JProgressBar implements Runnable {
         this.setIndeterminate(true);
     }
 
-    public void increment(int newValue) {
+    void increment(int newValue) {
         this.setIndeterminate(false);
         this.setValue(newValue);
         repaint();

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package Phweda.MFM;
 
-/**
+/*
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 11/24/2014
@@ -51,29 +51,46 @@ import java.util.stream.Collectors;
  * would build a list of all playable noclone games starting with b
  */
 public final class MFMListBuilder {
-    static Map<String, Machine> allMachines;
-    static TreeSet<String> runnableList;
-    private static TreeSet<String> allCategoriesList;
-    private static TreeMap<String, ArrayList<String>> categoryHierarchy;
-
-    private static ArrayList<String> allCategoryRoots;
-    private static ArrayList<String> arcadeCategoryRoots;
-    private static ArrayList<String> systemCategoryRoots;
-    private static ArrayList<String> matureCategoryRoots;
-
-    private static ArrayList<String> noMatureCategoryRoots;
-    private static ArrayList<String> arcadeNoMatureCategoryRoots;
-    private static ArrayList<String> systemNoMatureCategoryRoots;
-
-    private static ArrayList<String> allMatureCategories;
-    private static ArrayList<String> noMatureCategories;
-    static ArrayList<String> arcadeCategories;
-    private static ArrayList<String> arcadeNoMatureCategories;
-    static ArrayList<String> systemCategories;
-    private static ArrayList<String> systemNoMatureCategories;
+    public static final String ALL = "ALL";
+    public static final String RUNNABLE = "RUNNABLE";
+    public static final String NO_IMPERFECT = "NOIMPERFECT";
+    public static final String PD_VIDS = "PD VIDs";
+    public static final String CLONE = "CLONE";
+    public static final String NO_CLONE = "NOCLONE";
+    public static final String VERTICAL = "VERTICAL";
+    public static final String HORIZONTAL = "HORIZONTAL";
+    public static final String SIMULTANEOUS = "SIMULTANEOUS";
+    public static final String COCKTAIL = "COCKTAIL";
+    public static final String ARCADE = "ARCADE";
+    public static final String SYSTEMS = "SYSTEMS(MESS)";
+    public static final String LANGUAGES = "languages";
+    public static final String RASTER = "RASTER";
+    public static final String VECTOR = "VECTOR";
+    public static final String LCD = "LCD";
+    public static final String UNKNOWN = "UNKNOWN";
 
     // TODO fixme bad design!!!
-
+    static final String ALL_LANGUAGES = "All Languages";
+    static final String BIOS = "BIOS";
+    static final String IMPERFECT = "IMPERFECT";
+    static final String CHD = "CHD";
+    static final String ALL_DISPLAY_TYPES = "All Displays";
+    static final String CATEGORIES = "CATEGORIES";
+    static final String CATEGORY_LISTS_HASHMAP = "Category Lists HashMap";
+    static final String ARCADE_CATEGORY_ROOTS = "Arcade Roots";
+    static final String SYSTEM_CATEGORY_ROOTS = "System Roots";
+    static final String MATURE_CATEGORY_ROOTS = "Mature Roots";
+    static final String ALL_CATEGORY_ROOTS = "All Roots";
+    static final String ALL_MATURE_CATEGORIES = "All Mature Categories";
+    static final String ARCADE_CATEGORIES = "Arcade Categories";
+    static final String SYSTEM_CATEGORIES = "System Categories";
+    static final String ARCADE_NOMATURE_CATEGORIES = "Arcade No Mature Categories";
+    static final String SYSTEM_NOMATURE_CATEGORIES = "System No Mature Categories";
+    private static final MFMPlayLists playLists;
+    static Map<String, Machine> allMachines;
+    static TreeSet<String> runnableList;
+    static ArrayList<String> arcadeCategories;
+    static ArrayList<String> systemCategories;
     static TreeSet<String> allList = new TreeSet<String>();
     static TreeSet<String> biosList = new TreeSet<String>();
     static TreeSet<String> devicesList = new TreeSet<String>();
@@ -88,54 +105,25 @@ public final class MFMListBuilder {
     static TreeSet<String> arcadeList = new TreeSet<String>();
     static TreeSet<String> systemList = new TreeSet<String>();
     static TreeSet<String> CHDList = new TreeSet<String>();
-
     static TreeSet<String> rasterDisplayList = new TreeSet<String>();
     static TreeSet<String> vectorDisplayList = new TreeSet<String>();
     static TreeSet<String> lcdDisplayList = new TreeSet<String>();
-
     static TreeSet<String> categoriesWithMachineList = new TreeSet<String>();
-
     static TreeMap<String, TreeSet<String>> languagesListsMap;
-
+    private static TreeSet<String> allCategoriesList;
+    private static TreeMap<String, ArrayList<String>> categoryHierarchy;
+    private static ArrayList<String> allCategoryRoots;
+    private static ArrayList<String> arcadeCategoryRoots;
+    private static ArrayList<String> systemCategoryRoots;
+    private static ArrayList<String> matureCategoryRoots;
+    private static ArrayList<String> noMatureCategoryRoots;
+    private static ArrayList<String> arcadeNoMatureCategoryRoots;
+    private static ArrayList<String> systemNoMatureCategoryRoots;
+    private static ArrayList<String> allMatureCategories;
+    private static ArrayList<String> noMatureCategories;
+    private static ArrayList<String> arcadeNoMatureCategories;
+    private static ArrayList<String> systemNoMatureCategories;
     private static HashMap<String, TreeSet<String>> lists;
-
-    private static final MFMPlayLists playLists;
-
-    public static final String ALL = "ALL";
-    static final String ALL_LANGUAGES = "All Languages";
-    static final String BIOS = "BIOS";
-    public static final String RUNNABLE = "RUNNABLE";
-    static final String IMPERFECT = "IMPERFECT";
-    public static final String NO_IMPERFECT = "NOIMPERFECT";
-    public static final String PD_VIDS = "PD VIDs";
-    public static final String CLONE = "CLONE";
-    public static final String NO_CLONE = "NOCLONE";
-    public static final String VERTICAL = "VERTICAL";
-    public static final String HORIZONTAL = "HORIZONTAL";
-    public static final String SIMULTANEOUS = "SIMULTANEOUS";
-    public static final String COCKTAIL = "COCKTAIL";
-    public static final String ARCADE = "ARCADE";
-    public static final String SYSTEMS = "SYSTEMS(MESS)";
-    static final String CHD = "CHD";
-    public static final String LANGUAGES = "languages";
-
-    static final String ALL_DISPLAY_TYPES = "All Displays";
-    public static final String RASTER = "RASTER";
-    public static final String VECTOR = "VECTOR";
-    public static final String LCD = "LCD";
-    public static final String UNKNOWN = "UNKNOWN";
-
-    static final String CATEGORIES = "CATEGORIES";
-    static final String CATEGORY_LISTS_HASHMAP = "Category Lists HashMap";
-    static final String ARCADE_CATEGORY_ROOTS = "Arcade Roots";
-    static final String SYSTEM_CATEGORY_ROOTS = "System Roots";
-    static final String MATURE_CATEGORY_ROOTS = "Mature Roots";
-    static final String ALL_CATEGORY_ROOTS = "All Roots";
-    static final String ALL_MATURE_CATEGORIES = "All Mature Categories";
-    static final String ARCADE_CATEGORIES = "Arcade Categories";
-    static final String SYSTEM_CATEGORIES = "System Categories";
-    static final String ARCADE_NOMATURE_CATEGORIES = "Arcade No Mature Categories";
-    static final String SYSTEM_NOMATURE_CATEGORIES = "System No Mature Categories";
 
     static {
         try {
@@ -509,40 +497,135 @@ public final class MFMListBuilder {
 
     public static final class Builder {
 
-        private static final Builder builder = new Builder();
-
-        private static final String ALL = "All";
-
         public static final QuadState orientation = new QuadState(VERTICAL, HORIZONTAL, COCKTAIL, QuadState.ALL);
         public static final QuadState displayType = new QuadState(RASTER, VECTOR, LCD, ALL_DISPLAY_TYPES);
         public static final TriState MAME = new TriState(ARCADE, SYSTEMS, TriState.BOTH);
+        private static final Builder builder = new Builder();
+        private static final String ALL = "All";
+        private static final int million = 1000000;
+        private static final String DIAL = "dial";
+        private static final String DOUBLEJOY = "doublejoy";
+        private static final String GAMBLING = "gambling";
+        private static final String HANAFUDA = "hanafuda";
+        private static final String JOY = "joy";
+        private static final String KEYBOARD = "keyboard";
+        private static final String KEYPAD = "keypad";
+        private static final String LIGHTGUN = "lightgun";
+        private static final String MAHJONG = "mahjong";
+        private static final String MOUSE = "mouse";
+        private static final String PADDLE = "paddle";
+        private static final String PEDAL = "pedal";
+        // positional ????
+        private static final String STICK = "stick";
+        private static final String TRACKBALL = "trackball";
+        private static final String TRIPLEJOY = "triplejoy";
+        private static final TreeSet<String> pedalControls = new TreeSet<String>(Arrays.asList(new String[]{
+                DIAL, DOUBLEJOY, GAMBLING, HANAFUDA, JOY, KEYBOARD, KEYPAD, LIGHTGUN, MAHJONG, MOUSE,
+                PADDLE, STICK, TRACKBALL, TRIPLEJOY
+        }));
+        private static final TreeSet<String> paddleControls = new TreeSet<String>(Arrays.asList(new String[]{
+                DIAL
+        }));
+        private static final TreeSet<String> dialControls = new TreeSet<String>(Arrays.asList(new String[]{
+                PADDLE
+        }));
+        private static final TreeSet<String> hanafudaControls = new TreeSet<String>(Arrays.asList(new String[]{
+                KEYBOARD
+        }));
+        private static final TreeSet<String> keypadControls = new TreeSet<String>(Arrays.asList(new String[]{
+                KEYBOARD
+        }));
+        private static final TreeSet<String> lightgunControls = new TreeSet<String>(Arrays.asList(new String[]{
+                MOUSE
+        }));
+        private static final TreeSet<String> mouseControls = new TreeSet<String>(Arrays.asList(new String[]{
+                TRACKBALL
+        }));
+        private static final TreeSet<String> trackballControls = new TreeSet<String>(Arrays.asList(new String[]{
+                MOUSE
+        }));
+        private static final int JOY1 = 3268317;
+        private static final int JOY2 = 3268318;
+        private static final int JOY3_half4 = -1238305841;
+        private static final int JOY5_half8 = -558247347;
+        private static final int JOY4 = 3268320;
+        private static final int JOYVERTICAL2 = -482411992;
+        private static final int JOY8 = 3268324;
+        private static final int DOUBLEJOY2_2 = -1607713821;
+        private static final int DOUBLEJOY4_2 = -1607713759;
+        private static final int DOUBLEJOY4_4 = -1607713757;
+        private static final int DOUBLEJOY8_2 = -1607713635;
+        private static final int DOUBLEJOY8_8 = -1607713629;
+        private static final int DOUBLEJOY5_half8 = 1993708739;
+        private static final int DOUBLEJOYV2_V2 = -410698973;
+        //  3268318
+        private static final TreeSet<Integer> joy2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                3268317
+        }));
+        //  -1238305841
+        private static final TreeSet<Integer> joy3_half4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                3268317
+        }));
+        //  -558247347
+        private static final TreeSet<Integer> joy5_half8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                3268317
+        }));
+        //  3268320
+        private static final TreeSet<Integer> joy4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                3268317, 3268318, -1238305841, -558247347, -482411992
+        }));
+        //  3268324
+        private static final TreeSet<Integer> joy8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                3268317, 3268318, 3268320, -1238305841, -558247347, -482411992
+        }));
+        //  -482411992
+        private static final TreeSet<Integer> joyvertical2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                3268317
+        }));
+        //  -1607713629
+        private static final TreeSet<Integer> doublejoy8_8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                -1607713821, -1607713759, -410698973, 1993708739, -1607713757
+        }));
+        //  -1607713759
+        private static final TreeSet<Integer> doublejoy4_2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
 
+        }));
+        //  -1607713757
+        private static final TreeSet<Integer> doublejoy4_4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+                -1607713821, -1607713759, -410698973, 1993708739
+        }));
+        //  -410698973
+        private static final TreeSet<Integer> doublejoyvertical2_vertical2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+
+        }));
+        //  1993708739
+        private static final TreeSet<Integer> doublejoy5_half8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+
+        }));
         public static int buttons = 0;
         public static boolean orLessButtons = true;
-        private static final int million = 1000000;
-
         public static int players = 1;
         public static boolean orLessPlayers = true;
-
-        static boolean noMature = true;
         public static boolean noClones = false;
-        static boolean noImperfect = false;
         public static boolean simultaneousOnly = false;
-
+        static boolean noMature = true;
+        static boolean noImperfect = false;
         static boolean waysSelected = false;
         static boolean exactMatch = false;
+        static String language = null;
         private static String ways = ALL;
         private static String ways2 = ALL;
-
         String machineWays = null;
         String machineWays2 = null;
         String machineWays2A = null;
         String machineWays2B = null;
         private int joySignature;
         private int doublejoySignature;
+        //private static final String DIAL = "dial";
 
-        static String language = null;
 
+        //============================================================================================
+        //                              Controls Compatibility
         private TreeSet<String> categories;
         private TreeSet<String> controls;
 
@@ -551,6 +634,123 @@ public final class MFMListBuilder {
 
         public static Builder getInstance() {
             return builder;
+        }
+
+        // TODO convert ListBuilderUI to use these
+        public static int getPlayers() {
+            return players;
+        }
+
+        public static void setPlayers(int players) {
+            Builder.players = players;
+        }
+
+        public static int getButtons() {
+            return buttons;
+        }
+
+        public static void setButtons(String buttons) {
+            // specials case where 9 means 9 or more
+            if (buttons.equals("9+")) {
+                // Arbitrary ridiculously high value
+                Builder.buttons = million;
+                return;
+            }
+            Builder.buttons = Integer.parseInt(buttons);
+        }
+
+        //============================================================================================
+        //                              Control Signature Compatibility
+
+        /*
+                    -1607713821	doublejoy	2	2
+                    -1607713759	doublejoy	4	2
+                    -1607713757	doublejoy	4	4
+                    -1607713635	doublejoy	8	2
+                    -1607713629	doublejoy	8	8
+                    -1238305841	joy	3 (half4)
+                    -558247347	joy	5 (half8)
+                    -482411992	joy	vertical2
+                    -410698973	doublejoy	vertical2	vertical2
+                    3268317	joy	1
+                    3268318	joy	2
+                    3268320	joy	4
+                    3268324	joy	8
+                    1993708739	doublejoy	5 (half8)	5 (half8)
+         */
+
+        public static boolean isNoMature() {
+            return noMature;
+        }
+
+        public static void setNoMature(boolean noMature) {
+            Builder.noMature = noMature;
+        }
+
+        public static boolean isOrLessButtons() {
+            return orLessButtons;
+        }
+
+        public static void setOrLessButtons(boolean orLessButtons) {
+            Builder.orLessButtons = orLessButtons;
+        }
+
+        public static boolean isOrLessPlayers() {
+            return orLessPlayers;
+        }
+
+        public static void setOrLessPlayers(boolean orLessPlayers) {
+            Builder.orLessPlayers = orLessPlayers;
+        }
+
+        public static boolean isNoClones() {
+            return noClones;
+        }
+
+        public static void setNoClones(boolean noClones) {
+            Builder.noClones = noClones;
+        }
+
+        public static boolean isNoImperfect() {
+            return noImperfect;
+        }
+
+        public static void setNoImperfect(boolean noImperfect) {
+            Builder.noImperfect = noImperfect;
+        }
+
+        public static boolean isSimultaneousOnly() {
+            return simultaneousOnly;
+        }
+
+        public static void setSimultaneousOnly(boolean simultaneousOnly) {
+            Builder.simultaneousOnly = simultaneousOnly;
+        }
+
+        public static void setWays(String ways) {
+            Builder.ways = ways;
+            if (!waysSelected && !ways.equals(ALL)) {
+                waysSelected = true;
+            } else if (waysSelected && ways.equals(ALL) && ways2.equals(ALL)) {
+                waysSelected = false;
+            }
+        }
+
+        public static void setWays2(String ways2) {
+            Builder.ways2 = ways2;
+            if (!waysSelected && !ways2.equals(ALL)) {
+                waysSelected = true;
+            } else if (waysSelected && ways.equals(ALL) && ways2.equals(ALL)) {
+                waysSelected = false;
+            }
+        }
+
+        public static void setExactMatch(boolean exactMatchIn) {
+            exactMatch = exactMatchIn;
+        }
+
+        public static void setLanguage(String languageIn) {
+            language = languageIn;
         }
 
         public final TreeSet<String> generateList() {
@@ -657,9 +857,9 @@ public final class MFMListBuilder {
                 baseList.retainAll(tempList);
             }
 
-        //    TreeSet<String> selectedControls = new TreeSet<String>(this.controls);
+            //    TreeSet<String> selectedControls = new TreeSet<String>(this.controls);
             TreeSet<String> expandedControls = expandControls(this.controls);
-            if(MFM.isSystemDebug()){
+            if (MFM.isSystemDebug()) {
                 System.out.println("Expanded Controls are : " + expandedControls);
             }
 
@@ -728,12 +928,11 @@ public final class MFMListBuilder {
             return true;
         }
 
-
         // TODO change for Gauntlet logic Done needs testing
         // If simultaneous is selected ignore Players settings
         private boolean checkButtonsPlayers(int machineButtons, int machinePlayers) {
 
-            /** NOTE agreement with Obi for Games where the number of Players for Simultaneous
+            /** NOTE agreement with Obiwantje for Games where the number of Players for Simultaneous
              *  is different than the number of Players. So we just ignore number of Players
              */
             if (simultaneousOnly) {
@@ -778,104 +977,6 @@ public final class MFMListBuilder {
 
         public void setControls(TreeSet<String> controls) {
             this.controls = controls;
-        }
-
-
-        // TODO convert ListBuilderUI to use these
-        public static int getPlayers() {
-            return players;
-        }
-
-        public static void setPlayers(int players) {
-            Builder.players = players;
-        }
-
-        public static int getButtons() {
-            return buttons;
-        }
-
-        public static void setButtons(String buttons) {
-            // specials case where 9 means 9 or more
-            if ( buttons.equals("9+")) {
-                // Arbitrary ridiculously high value
-                Builder.buttons = million;
-                return;
-            }
-            Builder.buttons = Integer.parseInt(buttons);
-        }
-
-        public static boolean isNoMature() {
-            return noMature;
-        }
-
-        public static void setNoMature(boolean noMature) {
-            Builder.noMature = noMature;
-        }
-
-        public static boolean isOrLessButtons() {
-            return orLessButtons;
-        }
-
-        public static void setOrLessButtons(boolean orLessButtons) {
-            Builder.orLessButtons = orLessButtons;
-        }
-
-        public static boolean isOrLessPlayers() {
-            return orLessPlayers;
-        }
-
-        public static void setOrLessPlayers(boolean orLessPlayers) {
-            Builder.orLessPlayers = orLessPlayers;
-        }
-
-        public static boolean isNoClones() {
-            return noClones;
-        }
-
-        public static void setNoClones(boolean noClones) {
-            Builder.noClones = noClones;
-        }
-
-        public static boolean isNoImperfect() {
-            return noImperfect;
-        }
-
-        public static void setNoImperfect(boolean noImperfect) {
-            Builder.noImperfect = noImperfect;
-        }
-
-        public static boolean isSimultaneousOnly() {
-            return simultaneousOnly;
-        }
-
-        public static void setSimultaneousOnly(boolean simultaneousOnly) {
-            Builder.simultaneousOnly = simultaneousOnly;
-        }
-
-        public static void setWays(String ways) {
-            Builder.ways = ways;
-            if (!waysSelected && !ways.equals(ALL)) {
-                waysSelected = true;
-            } else if (waysSelected && ways.equals(ALL) && ways2.equals(ALL)) {
-                waysSelected = false;
-            }
-        }
-
-        public static void setWays2(String ways2) {
-            Builder.ways2 = ways2;
-            if (!waysSelected && !ways2.equals(ALL)) {
-                waysSelected = true;
-            } else if (waysSelected && ways.equals(ALL) && ways2.equals(ALL)) {
-                waysSelected = false;
-            }
-        }
-
-        public static void setExactMatch(boolean exactMatchIn) {
-            exactMatch = exactMatchIn;
-        }
-
-        public static void setLanguage(String languageIn) {
-            language = languageIn;
         }
 
         // Take selected Categories and expand roots
@@ -989,151 +1090,5 @@ public final class MFMListBuilder {
             }
             return expandedControls;
         }
-
-        private static final String DIAL = "dial";
-        private static final String DOUBLEJOY = "doublejoy";
-        private static final String GAMBLING = "gambling";
-        private static final String HANAFUDA = "hanafuda";
-        private static final String JOY = "joy";
-        private static final String KEYBOARD = "keyboard";
-        private static final String KEYPAD = "keypad";
-        private static final String LIGHTGUN = "lightgun";
-        private static final String MAHJONG = "mahjong";
-        private static final String MOUSE = "mouse";
-        private static final String PADDLE = "paddle";
-        private static final String PEDAL = "pedal";
-        // positional ????
-        private static final String STICK = "stick";
-        private static final String TRACKBALL = "trackball";
-        private static final String TRIPLEJOY = "triplejoy";
-        //private static final String DIAL = "dial";
-
-
-        //============================================================================================
-        //                              Controls Compatibility
-
-        private static final TreeSet<String> pedalControls = new TreeSet<String>(Arrays.asList(new String[]{
-                DIAL, DOUBLEJOY, GAMBLING, HANAFUDA, JOY, KEYBOARD, KEYPAD, LIGHTGUN, MAHJONG, MOUSE,
-                PADDLE, STICK, TRACKBALL, TRIPLEJOY
-        }));
-
-        private static final TreeSet<String> paddleControls = new TreeSet<String>(Arrays.asList(new String[]{
-                DIAL
-        }));
-
-        private static final TreeSet<String> dialControls = new TreeSet<String>(Arrays.asList(new String[]{
-                PADDLE
-        }));
-
-        private static final TreeSet<String> hanafudaControls = new TreeSet<String>(Arrays.asList(new String[]{
-                KEYBOARD
-        }));
-
-        private static final TreeSet<String> keypadControls = new TreeSet<String>(Arrays.asList(new String[]{
-                KEYBOARD
-        }));
-
-        private static final TreeSet<String> lightgunControls = new TreeSet<String>(Arrays.asList(new String[]{
-                MOUSE
-        }));
-
-        private static final TreeSet<String> mouseControls = new TreeSet<String>(Arrays.asList(new String[]{
-                TRACKBALL
-        }));
-
-        private static final TreeSet<String> trackballControls = new TreeSet<String>(Arrays.asList(new String[]{
-                MOUSE
-        }));
-
-        //============================================================================================
-        //                              Control Signature Compatibility
-
-        /*
-                    -1607713821	doublejoy	2	2
-                    -1607713759	doublejoy	4	2
-                    -1607713757	doublejoy	4	4
-                    -1607713635	doublejoy	8	2
-                    -1607713629	doublejoy	8	8
-                    -1238305841	joy	3 (half4)
-                    -558247347	joy	5 (half8)
-                    -482411992	joy	vertical2
-                    -410698973	doublejoy	vertical2	vertical2
-                    3268317	joy	1
-                    3268318	joy	2
-                    3268320	joy	4
-                    3268324	joy	8
-                    1993708739	doublejoy	5 (half8)	5 (half8)
-         */
-
-        private static final int JOY1 = 3268317;
-        private static final int JOY2 = 3268318;
-        private static final int JOY3_half4 = -1238305841;
-        private static final int JOY5_half8 = -558247347;
-        private static final int JOY4 = 3268320;
-        private static final int JOYVERTICAL2 = -482411992;
-        private static final int JOY8 = 3268324;
-
-        private static final int DOUBLEJOY2_2 = -1607713821;
-        private static final int DOUBLEJOY4_2 = -1607713759;
-        private static final int DOUBLEJOY4_4 = -1607713757;
-        private static final int DOUBLEJOY8_2 = -1607713635;
-        private static final int DOUBLEJOY8_8 = -1607713629;
-        private static final int DOUBLEJOY5_half8 = 1993708739;
-        private static final int DOUBLEJOYV2_V2 = -410698973;
-
-        //  3268318
-        private static final TreeSet<Integer> joy2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
-
-        //  -1238305841
-        private static final TreeSet<Integer> joy3_half4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
-
-        //  -558247347
-        private static final TreeSet<Integer> joy5_half8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
-
-        //  3268320
-        private static final TreeSet<Integer> joy4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317, 3268318, -1238305841, -558247347, -482411992
-        }));
-
-        //  3268324
-        private static final TreeSet<Integer> joy8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317, 3268318, 3268320, -1238305841, -558247347, -482411992
-        }));
-
-        //  -482411992
-        private static final TreeSet<Integer> joyvertical2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
-
-        //  -1607713629
-        private static final TreeSet<Integer> doublejoy8_8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                -1607713821, -1607713759, -410698973, 1993708739, -1607713757
-        }));
-
-        //  -1607713759
-        private static final TreeSet<Integer> doublejoy4_2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-
-        }));
-
-        //  -1607713757
-        private static final TreeSet<Integer> doublejoy4_4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                -1607713821, -1607713759, -410698973, 1993708739
-        }));
-
-        //  -410698973
-        private static final TreeSet<Integer> doublejoyvertical2_vertical2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-
-        }));
-
-        //  1993708739
-        private static final TreeSet<Integer> doublejoy5_half8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-
-        }));
     }
 }

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,21 +25,22 @@
 package Phweda.MFM.UI;
 
 /**
- *
  * original code found here
  * http://stackoverflow.com/questions/21847411/java-swing-need-a-good-quality-developed-jtree-with-checkboxes
- *
- *
- *
- *
+ * <p>
+ * <p>
+ * <p>
+ * <p>
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 9/28/2015
  * Time: 10:39 AM
  */
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
+import javax.swing.tree.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.EventListener;
@@ -47,141 +48,15 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JTree;
-import javax.swing.event.EventListenerList;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeSelectionModel;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
 class JCheckBoxTree extends JTree {
 
     private static final long serialVersionUID = -4194122328392241790L;
 
     private JCheckBoxTree selfPointer = this;
-
-    // Defining data structure that will enable to fast check-indicate the state of each node
-    // It totally replaces the "selection" mechanism of the JTree
-    private class CheckedNode {
-        boolean isSelected;
-        boolean hasChildren;
-        boolean allChildrenSelected;
-
-        CheckedNode(boolean isSelected_, boolean hasChildren_, boolean allChildrenSelected_) {
-            isSelected = isSelected_;
-            hasChildren = hasChildren_;
-            allChildrenSelected = allChildrenSelected_;
-        }
-    }
-
     private HashMap<TreePath, CheckedNode> nodesCheckingState;
     private HashSet<TreePath> checkedPaths = new HashSet<TreePath>();
-
     // Defining a new event type for the checking mechanism and preparing event-handling mechanism
     private EventListenerList listenerList = new EventListenerList();
-
-    private class CheckChangeEvent extends EventObject {
-        private static final long serialVersionUID = -8100230309044193368L;
-
-        CheckChangeEvent(Object source) {
-            super(source);
-        }
-    }
-
-    interface CheckChangeEventListener extends EventListener {
-        void checkStateChanged(CheckChangeEvent event);
-    }
-
-    public void addCheckChangeEventListener(CheckChangeEventListener listener) {
-        listenerList.add(CheckChangeEventListener.class, listener);
-    }
-
-    public void removeCheckChangeEventListener(CheckChangeEventListener listener) {
-        listenerList.remove(CheckChangeEventListener.class, listener);
-    }
-
-    private void fireCheckChangeEvent(CheckChangeEvent evt) {
-        Object[] listeners = listenerList.getListenerList();
-        for (int i = 0; i < listeners.length; i++) {
-            if (listeners[i] == CheckChangeEventListener.class) {
-                ((CheckChangeEventListener) listeners[i + 1]).checkStateChanged(evt);
-            }
-        }
-    }
-
-    // Override
-    public void setModel(TreeModel newModel) {
-        super.setModel(newModel);
-        resetCheckingState();
-    }
-
-    // New method that returns only the checked paths (totally ignores original "selection" mechanism)
-    public TreePath[] getCheckedPaths() {
-        return checkedPaths.toArray(new TreePath[checkedPaths.size()]);
-    }
-
-    // Returns true in case that the node is selected, has children but not all of them are selected
-    public boolean isSelectedPartially(TreePath path) {
-        CheckedNode cn = nodesCheckingState.get(path);
-        return cn.isSelected && cn.hasChildren && !cn.allChildrenSelected;
-    }
-
-    private void resetCheckingState() {
-        nodesCheckingState = new HashMap<TreePath, CheckedNode>();
-        checkedPaths = new HashSet<TreePath>();
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
-        if (node == null) {
-            return;
-        }
-        addSubtreeToCheckingStateTracking(node);
-    }
-
-    // Creating data structure of the current model for the checking mechanism
-    private void addSubtreeToCheckingStateTracking(DefaultMutableTreeNode node) {
-        TreeNode[] path = node.getPath();
-        TreePath tp = new TreePath(path);
-        CheckedNode cn = new CheckedNode(false, node.getChildCount() > 0, false);
-        nodesCheckingState.put(tp, cn);
-        for (int i = 0; i < node.getChildCount(); i++) {
-            addSubtreeToCheckingStateTracking((DefaultMutableTreeNode) tp.pathByAddingChild(node.getChildAt(i)).getLastPathComponent());
-        }
-    }
-
-    // Overriding cell renderer by a class that ignores the original "selection" mechanism
-    // It decides how to show the nodes due to the checking-mechanism
-    private class CheckBoxCellRenderer extends JPanel implements TreeCellRenderer {
-        private static final long serialVersionUID = -7341833835878991719L;
-        JCheckBox checkBox;
-
-        CheckBoxCellRenderer() {
-            super();
-            this.setLayout(new BorderLayout());
-            checkBox = new JCheckBox();
-            add(checkBox, BorderLayout.CENTER);
-            setOpaque(false);
-        }
-
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                      boolean selected, boolean expanded, boolean leaf, int row,
-                                                      boolean hasFocus) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            Object obj = node.getUserObject();
-            TreePath tp = new TreePath(node.getPath());
-            CheckedNode cn = nodesCheckingState.get(tp);
-            if (cn == null) {
-                return this;
-            }
-            checkBox.setSelected(cn.isSelected);
-            checkBox.setText(obj.toString());
-            checkBox.setOpaque(cn.isSelected && cn.hasChildren && !cn.allChildrenSelected);
-            return this;
-        }
-    }
 
     JCheckBoxTree(DefaultMutableTreeNode root) {
         super(root);
@@ -239,6 +114,61 @@ class JCheckBoxTree extends JTree {
         this.setSelectionModel(dtsm);
     }
 
+    public void addCheckChangeEventListener(CheckChangeEventListener listener) {
+        listenerList.add(CheckChangeEventListener.class, listener);
+    }
+
+    public void removeCheckChangeEventListener(CheckChangeEventListener listener) {
+        listenerList.remove(CheckChangeEventListener.class, listener);
+    }
+
+    private void fireCheckChangeEvent(CheckChangeEvent evt) {
+        Object[] listeners = listenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i++) {
+            if (listeners[i] == CheckChangeEventListener.class) {
+                ((CheckChangeEventListener) listeners[i + 1]).checkStateChanged(evt);
+            }
+        }
+    }
+
+    // Override
+    public void setModel(TreeModel newModel) {
+        super.setModel(newModel);
+        resetCheckingState();
+    }
+
+    // New method that returns only the checked paths (totally ignores original "selection" mechanism)
+    public TreePath[] getCheckedPaths() {
+        return checkedPaths.toArray(new TreePath[checkedPaths.size()]);
+    }
+
+    // Returns true in case that the node is selected, has children but not all of them are selected
+    public boolean isSelectedPartially(TreePath path) {
+        CheckedNode cn = nodesCheckingState.get(path);
+        return cn.isSelected && cn.hasChildren && !cn.allChildrenSelected;
+    }
+
+    private void resetCheckingState() {
+        nodesCheckingState = new HashMap<TreePath, CheckedNode>();
+        checkedPaths = new HashSet<TreePath>();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
+        if (node == null) {
+            return;
+        }
+        addSubtreeToCheckingStateTracking(node);
+    }
+
+    // Creating data structure of the current model for the checking mechanism
+    private void addSubtreeToCheckingStateTracking(DefaultMutableTreeNode node) {
+        TreeNode[] path = node.getPath();
+        TreePath tp = new TreePath(path);
+        CheckedNode cn = new CheckedNode(false, node.getChildCount() > 0, false);
+        nodesCheckingState.put(tp, cn);
+        for (int i = 0; i < node.getChildCount(); i++) {
+            addSubtreeToCheckingStateTracking((DefaultMutableTreeNode) tp.pathByAddingChild(node.getChildAt(i)).getLastPathComponent());
+        }
+    }
+
     // When a node is checked/unchecked, updating the states of the predecessors
     private void updatePredecessorsWithCheckMode(TreePath tp, boolean check) {
         TreePath parentPath = tp.getParentPath();
@@ -285,6 +215,64 @@ class JCheckBoxTree extends JTree {
             checkedPaths.add(tp);
         } else {
             checkedPaths.remove(tp);
+        }
+    }
+
+    interface CheckChangeEventListener extends EventListener {
+        void checkStateChanged(CheckChangeEvent event);
+    }
+
+    // Defining data structure that will enable to fast check-indicate the state of each node
+    // It totally replaces the "selection" mechanism of the JTree
+    private class CheckedNode {
+        boolean isSelected;
+        boolean hasChildren;
+        boolean allChildrenSelected;
+
+        CheckedNode(boolean isSelected_, boolean hasChildren_, boolean allChildrenSelected_) {
+            isSelected = isSelected_;
+            hasChildren = hasChildren_;
+            allChildrenSelected = allChildrenSelected_;
+        }
+    }
+
+    private class CheckChangeEvent extends EventObject {
+        private static final long serialVersionUID = -8100230309044193368L;
+
+        CheckChangeEvent(Object source) {
+            super(source);
+        }
+    }
+
+    // Overriding cell renderer by a class that ignores the original "selection" mechanism
+    // It decides how to show the nodes due to the checking-mechanism
+    private class CheckBoxCellRenderer extends JPanel implements TreeCellRenderer {
+        private static final long serialVersionUID = -7341833835878991719L;
+        JCheckBox checkBox;
+
+        CheckBoxCellRenderer() {
+            super();
+            this.setLayout(new BorderLayout());
+            checkBox = new JCheckBox();
+            add(checkBox, BorderLayout.CENTER);
+            setOpaque(false);
+        }
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                                                      boolean selected, boolean expanded, boolean leaf, int row,
+                                                      boolean hasFocus) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            Object obj = node.getUserObject();
+            TreePath tp = new TreePath(node.getPath());
+            CheckedNode cn = nodesCheckingState.get(tp);
+            if (cn == null) {
+                return this;
+            }
+            checkBox.setSelected(cn.isSelected);
+            checkBox.setText(obj.toString());
+            checkBox.setOpaque(cn.isSelected && cn.hasChildren && !cn.allChildrenSelected);
+            return this;
         }
     }
 

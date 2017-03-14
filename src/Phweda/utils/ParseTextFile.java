@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,9 +21,6 @@ package Phweda.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -35,9 +32,14 @@ import java.util.Scanner;
  */
 public class ParseTextFile {
 
-    private File file = null;
+    // fixme Fix these do not work as expected!!!
+    protected static final String ALPHANUM_REGEX = "^[a-zA-Z0-9]";
+    protected static final String NUM_REGEX = "^[0-9]";
+    protected static final String ALPHA_REGEX = "^[a-zA-Z]";
     protected Scanner scanner;
     protected Map map;
+    private File file = null;
+
 
     /**
      * Constructor.
@@ -47,6 +49,10 @@ public class ParseTextFile {
     public ParseTextFile(String fileName, Map mapIn) {
         file = new File(fileName);
         map = mapIn;
+    }
+
+    protected static void log(Object object) {
+        System.out.println(String.valueOf(object));
     }
 
     /**   */
@@ -87,21 +93,10 @@ public class ParseTextFile {
         //no need to call scanner.close(), since the source is a String
     }
 
-
-    protected static void log(Object object) {
-        System.out.println(String.valueOf(object));
-    }
-
     private String quote(String text) {
         String QUOTE = "'";
         return QUOTE + text + QUOTE;
     }
-
-
-    // fixme Fix these do not work as expected!!!
-    protected static final String ALPHANUM_REGEX = "^[a-zA-Z0-9]";
-    protected static final String NUM_REGEX = "^[0-9]";
-    protected static final String ALPHA_REGEX = "^[a-zA-Z]";
 
 }
 

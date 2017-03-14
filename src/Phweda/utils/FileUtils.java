@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,8 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
-import static java.nio.file.FileVisitResult.*;
+import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.FileVisitResult.TERMINATE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
@@ -101,6 +102,7 @@ public class FileUtils {
     // TODO really is not needed
     public static FilenameFilter VideoFilenameFilter = new FilenameFilter() {
         HashMap<String, String> tempMap = new HashMap<String, String>();
+        private final Map<String, String> VIDEO_EXT = Collections.unmodifiableMap(tempMap);
 
         {
             tempMap.put(".avi", ".avi");
@@ -114,10 +116,8 @@ public class FileUtils {
             //    tempMap.put(".", ".");
         }
 
-        private final Map<String, String> VIDEO_EXT = Collections.unmodifiableMap(tempMap);
-
         public boolean accept(File file, String name) {
-            if(!name.contains(".")){
+            if (!name.contains(".")) {
                 return false;
             }
             return VIDEO_EXT.containsKey(name.toLowerCase().substring(name.lastIndexOf('.')));
@@ -331,11 +331,10 @@ public class FileUtils {
 
     public static class MFMcacheResourceFiles extends SimpleFileVisitor<Path> {
 
-        static TreeMap<String, File> cache;
-        static TreeMap<String, TreeMap<String, File>> extrasCache;
         static final TreeSet<String> extrasDirectories = new TreeSet<String>(
                 Arrays.asList(MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
-
+        static TreeMap<String, File> cache;
+        static TreeMap<String, TreeMap<String, File>> extrasCache;
         static boolean directoryOnly = false;
         static boolean extras = false;
         static boolean SLCHDs = false;
@@ -494,7 +493,6 @@ public class FileUtils {
 
     }
 
-
     /*
      * TODO convert to singleton??
      *
@@ -567,7 +565,6 @@ public class FileUtils {
                 }
 
         */
-
 
         // TODO Do not need?? See outerclass FileUtils
         public static boolean exists() {

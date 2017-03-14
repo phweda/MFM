@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,9 @@ import Phweda.utils.FileUtils;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 
 /**
@@ -36,6 +38,9 @@ import java.io.File;
  */
 public final class MFM_SettingsPanel extends JPanel {
 
+    private static final Font font = new Font("Arial", Font.BOLD, 16);
+    private static final Dimension size = new Dimension(1024, 768);
+    private static JFrame frame;
     private JFileChooser fileChooser = new JFileChooser();
     private SettingsController controller = new SettingsController();
     private JTextField MAMEExePath = new JTextField();
@@ -48,14 +53,7 @@ public final class MFM_SettingsPanel extends JPanel {
     private JTextField MAMEPlayPath = new JTextField();
     private JTextField VDubPath = new JTextField();
     private JTextField FFmpegPath = new JTextField();
-
     private JCheckBox nonmergedCB = new JCheckBox("MAME ROMs NON-MERGED?");
-
-    private static final Font font = new Font("Arial", Font.BOLD, 16);
-
-    private static final Dimension size = new Dimension(1024, 768);
-
-    private static JFrame frame;
 
     private MFM_SettingsPanel() {
 
@@ -67,6 +65,27 @@ public final class MFM_SettingsPanel extends JPanel {
             e.printStackTrace();
         }
         this.setBackground(MFMUI.getMFMSettingsBGcolor());
+    }
+
+    public static void showSettingsPanel(JFrame frameIn) {
+        frame = frameIn;
+        frame.setContentPane(new MFM_SettingsPanel());
+        setComponentsFont(frame.getComponents());
+        frame.setLocation(MFM.screenCenterPoint.x - size.width / 2, MFM.screenCenterPoint.y - size.height / 2);
+        frame.pack();
+        frame.setVisible(true);
+        //    frame.setAlwaysOnTop(true);
+    }
+
+    private static void setComponentsFont(Component[] comp) {
+        for (Component aComp : comp) {
+            if (aComp instanceof Container) setComponentsFont(((Container) aComp).getComponents());
+            try {
+                aComp.setFont(font);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }//do nothing
+        }
     }
 
     private void createPanel() {
@@ -191,15 +210,6 @@ public final class MFM_SettingsPanel extends JPanel {
                     MFMSettings.SoftwareListCHDsFullSetDir(SoftwareListCHDsPath.getText());
                     MFMSettings.nonMerged(nonmergedCB.isSelected());
 
-/*
-                    MFMSettings.VDubexe(VDubPath.getText());
-                    MFMSettings.FFMPEGexe(FFmpegPath.getText());
-
-                    if (FFmpegPath.getText().length() > 2) {
-                        MFMSettings.FFmpegEXEdir(FFmpegPath.getText().substring(0,
-                                FFmpegPath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
-                    }
-*/
 //*************************************************************************************************
                     frame.setVisible(false);
                     frame.dispose();
@@ -210,7 +220,7 @@ public final class MFM_SettingsPanel extends JPanel {
                     MFMSettings.isLoaded(true);
                     MFMSettings.getInstance().updateDirectoriesResourceFiles();
                     // fixme is this correct place and sequence? 12/25/16
-                    if(!MFM.isFirstRun()){
+                    if (!MFM.isFirstRun()) {
                         MAMEInfo.loadINIs();
                     }
 
@@ -292,12 +302,7 @@ public final class MFM_SettingsPanel extends JPanel {
 
         this.add(MAMEVIDSlabel);
         this.add(MAMEVidsPath);
-/*
-        this.add(label7);
-        this.add(VDubPath);
-        this.add(label8);
-        this.add(FFmpegPath);
-*/
+
         // NOTE HAck to trick GridLayout - should really do another layout manager
         this.add(new JLabel());
         JPanel buttonPanel = new JPanel();
@@ -324,14 +329,6 @@ public final class MFM_SettingsPanel extends JPanel {
             SoftwareListRomsPath.setText(MFMSettings.SoftwareListRomsFullSetDir());
             SoftwareListCHDsPath.setText(MFMSettings.SoftwareListCHDsFullSetDir());
             nonmergedCB.setSelected(MFMSettings.isnonMerged());
-/*
-            if (MFMSettings.VDubexe() != null) {
-                VDubPath.setText(MFMSettings.VDubexe());
-            }
-            if (MFMSettings.FFMPEGexe() != null) {
-                FFmpegPath.setText( MFMSettings.FFMPEGexe());
-            }
-*/
         }
     }
 
@@ -399,27 +396,4 @@ public final class MFM_SettingsPanel extends JPanel {
             }
         }
     }
-
-    public static void showSettingsPanel(JFrame frameIn) {
-        frame = frameIn;
-        frame.setContentPane(new MFM_SettingsPanel());
-        setComponentsFont(frame.getComponents());
-        frame.setLocation(MFM.screenCenterPoint.x - size.width / 2, MFM.screenCenterPoint.y - size.height / 2);
-        frame.pack();
-        frame.setVisible(true);
-        //    frame.setAlwaysOnTop(true);
-    }
-
-    private static void setComponentsFont(Component[] comp) {
-        for (Component aComp : comp) {
-            if (aComp instanceof Container) setComponentsFont(((Container) aComp).getComponents());
-            try {
-                aComp.setFont(font);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }//do nothing
-        }
-    }
-
-
 }

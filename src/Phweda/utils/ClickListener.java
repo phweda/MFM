@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,9 +18,12 @@
 
 package Phweda.utils;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public abstract class ClickListener extends MouseAdapter implements ActionListener {
     private final static int clickInterval = 500;
@@ -39,39 +42,6 @@ public abstract class ClickListener extends MouseAdapter implements ActionListen
         }
         timer = new Timer(delay, this);
     }
-
-    /*
-     * NOTE always call super when you override this method
-     *      to ensure double click behavior
-     *
-     */
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        lastEvent = e;
-        if (timer.isRunning() && !e.isConsumed() && e.getClickCount() > 1) {
-            doubleClick(lastEvent);
-            timer.stop();
-        } else {
-            timer.restart();
-        }
-    }
-
-
-    /*
-     * NOTE always call super when you override this method
-     *      to ensure double click behavior
-     *
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        timer.stop();
-        singleClick(lastEvent);
-    }
-
-    public abstract void singleClick(MouseEvent e);
-
-    public abstract void doubleClick(MouseEvent e);
-
 
     // For testing and validation
     public static void main(String[] args) {
@@ -93,5 +63,36 @@ public abstract class ClickListener extends MouseAdapter implements ActionListen
         frame.pack();
         frame.setVisible(true);
     }
+
+    /*
+     * NOTE always call super when you override this method
+     *      to ensure double click behavior
+     *
+     */
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        lastEvent = e;
+        if (timer.isRunning() && !e.isConsumed() && e.getClickCount() > 1) {
+            doubleClick(lastEvent);
+            timer.stop();
+        } else {
+            timer.restart();
+        }
+    }
+
+    /*
+     * NOTE always call super when you override this method
+     *      to ensure double click behavior
+     *
+     */
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        timer.stop();
+        singleClick(lastEvent);
+    }
+
+    public abstract void singleClick(MouseEvent e);
+
+    public abstract void doubleClick(MouseEvent e);
 
 }

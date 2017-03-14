@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -43,6 +43,53 @@ public final class MFM_Constants {
 
     public static final String EXTRAS_FULL_SET_DIRECTORY = "ExtrasFullSetDir";
     public static final String PLAYSET_ROOT_DIRECTORY = "PlaySetRootDir";
+    // MFM external resource files - catver and nplayers included with MFM package
+    public static final String CATVER_FULL_INI_FILENAME = "catver_full.ini";
+    public static final String CATVER_INI_FILENAME = "catver.ini";
+    public static final String NPLAYERS_INI_FILENAME = "nplayers.ini";
+    public static final String LANGUAGES_INI_FILENAME = "languages.ini";
+    public static final String MAME_FOLDER_DIRECTORY = "MAMEFoldersDir";
+    public static final String MAME_VIDS_DIRECTORY = "MAMEVidsDirectory";
+    public static final String VIRTUALDUB_EXE = "VirtualDub exe";
+    public static final String FFMPEG_EXE = "ffmpeg exe";
+    public static final String FFMPEG_EXE_DIRECTORY = "FFMPEGexeDir";
+    public static final String FFmpeg_INPUT_FOLDER = "FFmpeg Input Folder";
+    public static final String FFmpeg_OUTPUT_FOLDER = "FFmpeg Output Folder";
+    public static final String FFmpeg_MoveAVIto_Folder = "FFmpeg Move AVI to Folder";
+    public static final String MFM_SETTINGS = "MFM Settings";
+    public static final String NONMERGED = "Non-Merged";
+    public static final String FFmpeg_SETTINGS = "FFmpeg Settings";
+    public static final String COMPATIBLE = "compatible";
+    public static final String DATA_VERSION = "Data version";
+    public static final String NEW_LIST = "-NEW-";
+    public static final char[] alphanum = new char[]{
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+            'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y', 'z'
+    };
+    public static final String PDF_EXT = ".pdf";
+    public static final String PNG_EXT = ".png";
+    public static final String FLV_EXT = ".flv";
+    public static final String MANUALS = "manuals";
+    public static final String VERYLARGE = "Very Large";
+    public static final String LARGE = "Large";
+    public static final String NORMAL = "Normal";
+    public static final int VERYLARGEINT = 8;
+    public static final int LARGEINT = 4;
+    public static final int NORMALINT = 0;
+    public static final int FONTSIZEINT = 12;
+    public static final String LANGUAGESLISTS = "Languages Lists";
+    public static final String MAME_FOLDER_SNAPS = "snaps";
+    public static final String ROMS = "roms";
+/*
+            MAME FOLDERS as of 10/1/2016
+artwork, artwork preview, bkground, bosses, cabdevs, cabinets, chds, covers_SL, cpanel, ctrlr, devices, ends, flyers,
+folders, gameover, howto, icons, ini, logo, manuals, manuals_SL, marquees, pcb, roms, samples, scores, select, snap,
+snap_SL, snaps, Software Lists, titles, titles_SL, versus, video, videosnaps
+
+ */
+    public static final String CHDS = "chds";
     static final String FULL_SET_DIRECTORIES_MAP = "FullSetDirectories MAP";
     static final String PLAY_SET_DIRECTORIES_MAP = "PlaySetDirectories";
     static final String HISTORY_DAT_FILE = "HistoryDATFILENAME";
@@ -52,34 +99,25 @@ public final class MFM_Constants {
     static final String CATVER_INI_FILE = "CatverINI";
     static final String NPLAYERS_INI_FILE = "NplayersINI";
     static final String LANGUAGES_INI_FILE = "LanguagesINI";
-
-    // MFM external resource files - catver and nplayers included with MFM package
-    public static final String CATVER_FULL_INI_FILENAME = "catver_full.ini";
-    public static final String CATVER_INI_FILENAME = "catver.ini";
-    public static final String NPLAYERS_INI_FILENAME = "nplayers.ini";
-    public static final String LANGUAGES_INI_FILENAME = "languages.ini";
     static final String HISTORY_DAT_FILENAME = "history.dat";
     static final String MAMEINFO_DAT_FILENAME = "mameinfo.dat";
     static final String MESSINFO_DAT_FILENAME = "messinfo.dat";
     static final String SYSINFO_DAT_FILENAME = "sysinfo.dat";
     static final String EXTRAS_ZIPS = "Extras Zip Files";
-
-    public static final String MAME_FOLDER_DIRECTORY = "MAMEFoldersDir";
-    public static final String MAME_VIDS_DIRECTORY = "MAMEVidsDirectory";
-    public static final String VIRTUALDUB_EXE = "VirtualDub exe";
-    public static final String FFMPEG_EXE = "ffmpeg exe";
-    public static final String FFMPEG_EXE_DIRECTORY = "FFMPEGexeDir";
-    public static final String FFmpeg_INPUT_FOLDER = "FFmpeg Input Folder";
-    public static final String FFmpeg_OUTPUT_FOLDER = "FFmpeg Output Folder";
-    public static final String FFmpeg_MoveAVIto_Folder = "FFmpeg Move AVI to Folder";
-
-    public static final String MFM_SETTINGS = "MFM Settings";
-    public static final String NONMERGED = "Non-Merged";
-    public static final String FFmpeg_SETTINGS = "FFmpeg Settings";
-    public static final String COMPATIBLE = "compatible";
-    public static final String DATA_VERSION = "Data version";
-    public static final String NEW_LIST = "-NEW-";
-
+    static final String VIDEOS = "vids";
+    static final String FONTSIZE = "fontSize";
+    static final String CURRENTLIST = "currentList";
+    static final String LOOKANDFEEL = "lookAndFeel";
+    static final String SELECTEDTAB = "Selected Tab";
+    static final String FOLDERS = "folders";
+    static final String CATEGORY = "Category";
+    static final String SETTINGS = "Settings";
+    static final String RESOURCES = "Resources";
+    static final String JARS = "Jars";
+    static final String LISTS = "Lists";
+    static final String LOGS = "Logs";
+    static final String COMMANDS = "Commands";
+    static final String ARTWORK = "artwork";
     private static final ArrayList<String> folderNames = new ArrayList<String>(Arrays.asList(new String[]{
             "artwork", "artwork preview", "bkground", "bosses",
             "cabdevs", "cabinets", "chds", "covers_SL", "cpanel", "ctrlr", "devices", "ends",
@@ -87,14 +125,6 @@ public final class MFM_Constants {
             "icons", "ini", "logo", "manuals", "manuals_SL", "marquees",
             "pcb", "roms", "samples", "scores", "select", "snap", "snap_SL", "snaps",
             "Software Lists", "titles", "titles_SL", "versus", "video", "videosnaps"}));
-/*
-            MAME FOLDERS as of 10/1/2016
-artwork, artwork preview, bkground, bosses, cabdevs, cabinets, chds, covers_SL, cpanel, ctrlr, devices, ends, flyers,
-folders, gameover, howto, icons, ini, logo, manuals, manuals_SL, marquees, pcb, roms, samples, scores, select, snap,
-snap_SL, snaps, Software Lists, titles, titles_SL, versus, video, videosnaps
-
- */
-
     // TODO now this is dynamic should move WHERE?
     public static String[] MAME_FOLDER_NAMES_ARRAY;
 
@@ -111,48 +141,4 @@ snap_SL, snaps, Software Lists, titles, titles_SL, versus, video, videosnaps
             MAME_FOLDER_NAMES_ARRAY = (String[]) folderNames.toArray();
         }
     }
-
-    public static final char[] alphanum = new char[]{
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-            'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-            'u', 'v', 'w', 'x', 'y', 'z'
-    };
-
-    public static final String PDF_EXT = ".pdf";
-    public static final String PNG_EXT = ".png";
-    public static final String FLV_EXT = ".flv";
-
-    public static final String MANUALS = "manuals";
-    static final String VIDEOS = "vids";
-    static final String FONTSIZE = "fontSize";
-    static final String CURRENTLIST = "currentList";
-    static final String LOOKANDFEEL = "lookAndFeel";
-
-    public static final String VERYLARGE = "Very Large";
-    public static final String LARGE = "Large";
-    public static final String NORMAL = "Normal";
-
-    public static final int VERYLARGEINT = 8;
-    public static final int LARGEINT = 4;
-    public static final int NORMALINT = 0;
-    public static final int FONTSIZEINT = 12;
-
-    static final String SELECTEDTAB = "Selected Tab";
-
-    static final String FOLDERS = "folders";
-    static final String CATEGORY = "Category";
-    static final String SETTINGS = "Settings";
-    static final String RESOURCES = "Resources";
-    static final String JARS = "Jars";
-    static final String LISTS = "Lists";
-    public static final String LANGUAGESLISTS = "Languages Lists";
-    static final String LOGS = "Logs";
-    static final String COMMANDS = "Commands";
-    public static final String MAME_FOLDER_SNAPS = "snaps";
-
-    public static final String ROMS = "roms";
-    public static final String CHDS = "chds";
-    static final String ARTWORK = "artwork";
-
 }

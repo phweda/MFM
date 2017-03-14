@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -40,17 +40,14 @@ import java.io.File;
  */
 class FFMPEG_Panel extends JPanel {
 
+    private static JDialog dialog = null;
     private JFileChooser fileChooser = new JFileChooser();
     private SettingsController controller = new SettingsController();
-
     private JTextField FFmpegEXE = new JTextField();
     private JTextField FFmpegInputFolder = new JTextField();
     private JTextField FFmpegOutputFolder = new JTextField();
     private JTextField FFmpegMoveAVItoFolder = new JTextField();
-
     private Font font = new Font("Arial", Font.BOLD, 16);
-    private static JDialog dialog = null;
-
     private JButton runCommandButton;
 
     FFMPEG_Panel() {
@@ -180,6 +177,26 @@ class FFMPEG_Panel extends JPanel {
         );
     }
 
+    final void showSettingsPanel(JFrame frame) {
+        dialog = new JDialog(frame, true);
+        dialog.setContentPane(new FFMPEG_Panel());
+        dialog.pack();
+        dialog.setLocation(250, 250);
+        dialog.setVisible(true);
+    }
+
+    // fixme why did I do this here??
+    private void setComponentsFont(Component[] comp) {
+        for (Component aComp : comp) {
+            if (aComp instanceof Container) setComponentsFont(((Container) aComp).getComponents());
+            try {
+                aComp.setFont(font);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private class SettingsController extends ClickListener {
 
         @Override
@@ -218,26 +235,6 @@ class FFMPEG_Panel extends JPanel {
                     path = file.getAbsolutePath();
                     FFmpegMoveAVItoFolder.setText(path);
                     break;
-            }
-        }
-    }
-
-    final void showSettingsPanel(JFrame frame) {
-        dialog = new JDialog(frame, true);
-        dialog.setContentPane(new FFMPEG_Panel());
-        dialog.pack();
-        dialog.setLocation(250, 250);
-        dialog.setVisible(true);
-    }
-
-    // fixme why did I do this here??
-    private void setComponentsFont(Component[] comp) {
-        for (Component aComp : comp) {
-            if (aComp instanceof Container) setComponentsFont(((Container) aComp).getComponents());
-            try {
-                aComp.setFont(font);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }

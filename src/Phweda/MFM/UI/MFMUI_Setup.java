@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -35,17 +35,13 @@ import static Phweda.MFM.UI.MFMUI_Resources.MFM_Icon_PNG;
  * Time: 2:27 PM
  */
 public class MFMUI_Setup {
+    private static final ImageIcon mfmIcon = MFMUI_Resources.getInstance().getImageIcon(MFM_Icon_PNG);
+    static MFM_Components comps;
     private static MFMUI_Setup ourInstance = new MFMUI_Setup();
-
     private static JFrame frame;
     private static MFMController controller = new MFMController();
-    static MFM_Components comps;
-
     private static JSplitPane MFMmainPane;
     private static JSplitPane MFMGamePane;
-
-    private static final ImageIcon mfmIcon = MFMUI_Resources.getInstance().getImageIcon(MFM_Icon_PNG);
-
     private static MFMInformationPanel progress = new MFMInformationPanel();
     // Here for race condition where lists sizes were not present when ListBuilder is opened
     private MFMListBuilder listBuilder = null;
@@ -58,12 +54,35 @@ public class MFMUI_Setup {
         return ourInstance;
     }
 
-
     private static JFrame getBaseFrame() {
         frame = new JFrame();
         frame.setTitle(MFM.MFM_TITLE);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         return frame;
+    }
+
+    static MFMController getController() {
+        return controller;
+    }
+
+    static MFM_Components getComps() {
+        return comps;
+    }
+
+    static ImageIcon getMFMIcon() {
+        return mfmIcon;
+    }
+
+    static JPanel getFillPanel() {
+        return MFM_Components.getFillPanel();
+    }
+
+    public static void updateMenuBar(String newListName) {
+        comps.updateListMenu();
+        frame.pack();
+        if (!newListName.isEmpty()) {
+            controller.changeList(newListName);
+        }
     }
 
     public JFrame getFrame() {
@@ -153,30 +172,6 @@ public class MFMUI_Setup {
         MFMGamePane.setResizeWeight(.65);
 
         MFMmainPane.setRightComponent(MFMGamePane);
-    }
-
-    static MFMController getController() {
-        return controller;
-    }
-
-    static MFM_Components getComps() {
-        return comps;
-    }
-
-    static ImageIcon getMFMIcon(){
-        return mfmIcon;
-    }
-
-    static JPanel getFillPanel() {
-        return MFM_Components.getFillPanel();
-    }
-
-    public static void updateMenuBar(String newListName) {
-        comps.updateListMenu();
-        frame.pack();
-        if (!newListName.isEmpty()) {
-            controller.changeList(newListName);
-        }
     }
 
     static class MFMWindow extends WindowAdapter {

@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,19 +32,10 @@ import java.util.Arrays;
  * Time: 1:33 PM
  */
 public class MAMEexe {
-    // private static String[] args;
-    private static ArrayList<String> args = new ArrayList<String>();
-
-    private static Process process = null;
     static MAME_Output MAMEout = new MAME_Output();
+    private static ArrayList<String> args = new ArrayList<String>();
+    private static Process process = null;
     private static String directory = "";
-    // private static File MAME_log = new File(MFM.MFM_LOGS_DIR + "MAME_Output.txt");
-
-    /* Ensure args has been initialized */
-    static {
-        // NOTE added 9/20/2016 decouple remove MFMSettings call & class rename
-        // setBaseArgs();
-    }
 
     public static void setBaseArgs(String MAMEexe) {
         // Clear previous
@@ -155,7 +146,10 @@ public class MAMEexe {
         args.add(machine);
     }
 
-
+    /**
+     * Failed attempt at sending key events to Mame exe
+     * @param pb
+     */
     private static void sendKeyboard(Process pb) {
         try {
             // Robot robot = new Robot();
@@ -178,7 +172,6 @@ public class MAMEexe {
         }
 */
 
-
             OutputStream out = pb.getOutputStream();
 
             out.write(KeyEvent.VK_RIGHT);
@@ -190,16 +183,15 @@ public class MAMEexe {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 
     private static class MAME_Output {
+        String args;
         private BufferedInputStream bis;
         private ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
         private byte[] separator = new byte[]{'\n', '\t', 0x2a, 0x2a, 0x2a, 0x2a};
         private boolean error = false;
-        String args;
 
         void setInput(InputStream inputStream, String argsIn) throws MAME_Exception {
             if (inputStream == null) {

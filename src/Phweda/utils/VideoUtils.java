@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,12 +21,8 @@ package Phweda.utils;
 import Phweda.MFM.MFM;
 import Phweda.MFM.MFMSettings;
 import Phweda.MFM.UI.ImagesViewer;
-import Phweda.MFM.UI.MFM_SettingsPanel;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
-
-
-// import javax.media.format.VideoFormat;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -36,6 +32,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
+// import javax.media.format.VideoFormat;
 
 /**
  * Created by IntelliJ IDEA.

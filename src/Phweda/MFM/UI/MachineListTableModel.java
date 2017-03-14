@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,15 +18,15 @@
 
 package Phweda.MFM.UI;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMMachine;
 import Phweda.MFM.MAMEInfo;
+import Phweda.MFM.MFM;
 import Phweda.MFM.mame.Machine;
-
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 import java.util.stream.IntStream;
 
 /**
@@ -46,10 +46,6 @@ class MachineListTableModel extends AbstractTableModel {
 
     private String[] list;
 
-/*
-    private Object[][] data = new Object[][]{{Machine.DESCRIPTION, "Machine", "Manufacturer", "Year",
-            "Category", "Status", "Cloneof"}};
-*/
     /* How wide for each column? Not worth the extra time to calculate each time
       *   "Machine", "Category", "Year", "Manufacturer", "Status", "Cloneof"
       *    16(13)               6                         12        16
@@ -63,10 +59,6 @@ class MachineListTableModel extends AbstractTableModel {
 
     /* TODO Hide and show columns */
     private void loadMachineList(TreeSet<String> list) {
-/*
-        TableSwingWorker tsw = new TableSwingWorker(this, list);
-        tsw.execute();
-*/
         this.list = list.toArray(new String[list.size()]);
         fireTableDataChanged();
     }
@@ -83,20 +75,6 @@ class MachineListTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
-    /*
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            if (data == null || rowIndex < 0) {
-                return "No DATA!";
-            }
-            // fixme debug this we get this condition with single entry lists
-            // 11/12/16 think it is fixed by list updating refactor
-            if (rowIndex + 1 > data.size()) {
-                return "No DATA!";
-            }
-            return data.get(rowIndex)[columnIndex];
-        }
-    */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (list == null || rowIndex < 0) {
@@ -174,7 +152,7 @@ class MachineListTableModel extends AbstractTableModel {
             if (MFM.isSystemDebug()) {
                 System.out.println("Start list populating");
             }
-            // parallelStream untested for performance but suspect for 10K order lists may improve performance
+            // NOTE parallelStream untested for performance but suspect for 10K order lists may improve performance
             list.parallelStream()
                     .forEach(machineName ->
                     {

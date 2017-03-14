@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package Phweda.MFM.UI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,5 +56,4 @@ public class MFMCategoryTree {
             root.add(catNode);
         }
     }
-
 }

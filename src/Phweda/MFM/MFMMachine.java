@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ import java.util.TreeSet;
  * Time: 2:27 PM
  */
 
-/*
+/**
+ * Legacy class replaced by Machine class
+ *
  * NOTE this class follows the Java Beans Spec to enable saving object as XML
  * NOTE that Serialization does not require this
  */
@@ -348,17 +350,17 @@ public class MFMMachine implements Serializable {
         return history;
     }
 
+    public void setHistory(String history) {
+        if (history != null) {
+            this.history = history.length() > 2 ? history.trim() : history;
+        }
+    }
+
     public String getTruncatedHistory() {
         if (history.contains("- TECHNICAL")) {
             return history.substring(0, history.indexOf("- TECHNICAL")).trim();
         }
         return history;
-    }
-
-    public void setHistory(String history) {
-        if (history != null) {
-            this.history = history.length() > 2 ? history.trim() : history;
-        }
     }
 
     public String getROMof() {

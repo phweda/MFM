@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -329,6 +329,120 @@ public class MFMSettings {
         return playSetDirectories;
     }
 
+    public static void isLoaded(boolean bool) {
+        loaded = bool;
+    }
+
+    public static boolean isHascatverini() {
+        return hascatverini;
+    }
+
+    public static void setHascatverini(boolean hascatverini) {
+        MFMSettings.hascatverini = hascatverini;
+    }
+
+    /*
+    * We require these folders to exist. Create them if missing
+    */
+    private static void mkDirs() {
+        String[] folders = MFM_Constants.MAME_FOLDER_NAMES_ARRAY;
+
+        for (String folderName : folders) {
+            // If it is null create it unless it is ini - that are optional
+            if (playSetDirectories.get(folderName) == null || !folderName.equals("ini")) {
+                if (folderName.equals("roms") || folderName.equals("chds")) {
+                    File newDir = new File(getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folderName);
+                    if (!newDir.exists()) {
+                        boolean success = newDir.mkdir();
+                        if (!success) {
+                            MFM.logger.addToList("FAILED to create directory: " + newDir.getAbsolutePath());
+                        }
+                    }
+                    playSetDirectories.put(folderName, newDir.getAbsolutePath());
+                } else if (!folderName.equals("ini") && fullSetExtrasDirectories.containsKey(folderName)) {
+                    File newDir = new File(getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folderName);
+                    if (!newDir.exists()) {
+                        boolean success = newDir.mkdir();
+                        if (!success) {
+                            MFM.logger.addToList("FAILED to create directory: " + newDir.getAbsolutePath());
+                        }
+                    }
+                    playSetDirectories.put(folderName, newDir.getAbsolutePath());
+                }
+            }
+        }
+    }
+
+    public static String getMESSInfoDAT() {
+        return (String) mfmSettings.get(MFM_Constants.MESSINFO_DAT_FILE);
+    }
+
+    private static void setMESSInfoDAT(String MESSInfoDAT) {
+        mfmSettings.put(MFM_Constants.MESSINFO_DAT_FILE, MESSInfoDAT);
+    }
+
+    public static String getSYSInfoDAT() {
+        return (String) mfmSettings.get(MFM_Constants.SYSINFO_DAT_FILE);
+    }
+
+    private static void setSYSInfoDAT(String SYSInfoDAT) {
+        mfmSettings.put(MFM_Constants.SYSINFO_DAT_FILE, SYSInfoDAT);
+    }
+
+    public static String getnPlayerINI() {
+        return (String) mfmSettings.get(MFM_Constants.NPLAYERS_INI_FILE);
+    }
+
+    private static void setnPlayerINI(String nPlayerINI) {
+        mfmSettings.put(MFM_Constants.NPLAYERS_INI_FILE, nPlayerINI);
+    }
+
+    static String getLanguageINI() {
+        return (String) mfmSettings.get(MFM_Constants.LANGUAGES_INI_FILE);
+    }
+
+    private static String setLanguageINI(String languagesINI) {
+        return (String) mfmSettings.put(MFM_Constants.LANGUAGES_INI_FILE, languagesINI);
+    }
+
+    public static String getFFmpegMoveAVItoFolder() {
+        return (String) mfmSettings.get(MFM_Constants.FFmpeg_MoveAVIto_Folder);
+    }
+
+    public static void setFFmpegMoveAVItoFolder(String folder) {
+        mfmSettings.put(MFM_Constants.FFmpeg_MoveAVIto_Folder, folder);
+    }
+
+    static HashMap<String, String> getFullSetExtrasDirectories() {
+        return fullSetExtrasDirectories;
+    }
+
+    public static HashMap<String, String> getPlaySetDirectories() {
+        return playSetDirectories;
+    }
+
+    public static String getMAMEVersion() {
+        return (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
+    }
+
+    public static String trimMAMEVersion(String version) {
+        return version.contains("(") ? version.substring(0, version.indexOf('(')).trim() : version.trim();
+    }
+
+    static String getDataVersion() {
+        return (String) mfmSettings.get(MFM_Constants.DATA_VERSION);
+    }
+
+    static void setDataVersion(String dataVersion) {
+        mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
+        // Can be transiently set during parse operation
+        ms.persistMySettings();
+    }
+
+    public static boolean isFullXMLcompatible() {
+        return (boolean) mfmSettings.get(MFM_Constants.COMPATIBLE);
+    }
+
     public void persistMySettings() {
         if (exeChanged) {
             // Set MAME exe for running
@@ -340,18 +454,6 @@ public class MFMSettings {
             exeChanged = false;
         }
         MFM_Data.getInstance().setObject(MFM_Constants.MFM_SETTINGS, mfmSettings);
-    }
-
-    public static void isLoaded(boolean bool) {
-        loaded = bool;
-    }
-
-    public static boolean isHascatverini() {
-        return hascatverini;
-    }
-
-    public static void setHascatverini(boolean hascatverini) {
-        MFMSettings.hascatverini = hascatverini;
     }
 
     public boolean isLoaded() {
@@ -498,90 +600,6 @@ public class MFMSettings {
         return map;
     }
 
-    /*
-    * We require these folders to exist. Create them if missing
-    */
-    private static void mkDirs() {
-        String[] folders = MFM_Constants.MAME_FOLDER_NAMES_ARRAY;
-
-        for (String folderName : folders) {
-            // If it is null create it unless it is ini - that are optional
-            if (playSetDirectories.get(folderName) == null || !folderName.equals("ini")) {
-                if (folderName.equals("roms") || folderName.equals("chds")) {
-                    File newDir = new File(getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folderName);
-                    if (!newDir.exists()) {
-                        boolean success = newDir.mkdir();
-                        if (!success) {
-                            MFM.logger.addToList("FAILED to create directory: " + newDir.getAbsolutePath());
-                        }
-                    }
-                    playSetDirectories.put(folderName, newDir.getAbsolutePath());
-                } else if (!folderName.equals("ini") && fullSetExtrasDirectories.containsKey(folderName)) {
-                    File newDir = new File(getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folderName);
-                    if (!newDir.exists()) {
-                        boolean success = newDir.mkdir();
-                        if (!success) {
-                            MFM.logger.addToList("FAILED to create directory: " + newDir.getAbsolutePath());
-                        }
-                    }
-                    playSetDirectories.put(folderName, newDir.getAbsolutePath());
-                }
-            }
-        }
-    }
-
-    public static String getMESSInfoDAT() {
-        return (String) mfmSettings.get(MFM_Constants.MESSINFO_DAT_FILE);
-    }
-
-    private static void setMESSInfoDAT(String MESSInfoDAT) {
-        mfmSettings.put(MFM_Constants.MESSINFO_DAT_FILE, MESSInfoDAT);
-    }
-
-    public static String getSYSInfoDAT() {
-        return (String) mfmSettings.get(MFM_Constants.SYSINFO_DAT_FILE);
-    }
-
-    private static void setSYSInfoDAT(String SYSInfoDAT) {
-        mfmSettings.put(MFM_Constants.SYSINFO_DAT_FILE, SYSInfoDAT);
-    }
-
-    public static String getnPlayerINI() {
-        return (String) mfmSettings.get(MFM_Constants.NPLAYERS_INI_FILE);
-    }
-
-    private static void setnPlayerINI(String nPlayerINI) {
-        mfmSettings.put(MFM_Constants.NPLAYERS_INI_FILE, nPlayerINI);
-    }
-
-    static String getLanguageINI() {
-        return (String) mfmSettings.get(MFM_Constants.LANGUAGES_INI_FILE);
-    }
-
-    private static String setLanguageINI(String languagesINI) {
-        return (String) mfmSettings.put(MFM_Constants.LANGUAGES_INI_FILE, languagesINI);
-    }
-
-    public static void setFFmpegMoveAVItoFolder(String folder) {
-        mfmSettings.put(MFM_Constants.FFmpeg_MoveAVIto_Folder, folder);
-    }
-
-    public static String getFFmpegMoveAVItoFolder() {
-        return (String) mfmSettings.get(MFM_Constants.FFmpeg_MoveAVIto_Folder);
-    }
-
-    static HashMap<String, String> getFullSetExtrasDirectories() {
-        return fullSetExtrasDirectories;
-    }
-
-    public static HashMap<String, String> getPlaySetDirectories() {
-        return playSetDirectories;
-    }
-
-    public static String getMAMEVersion() {
-        return (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
-    }
-
     private void setMAMEVersion() {
         Process process = null;
         try {
@@ -608,24 +626,6 @@ public class MFMSettings {
         // Throw event to update UI
         final MFMAction updateVersion = new MFMAction(MFMAction.UpdateVersionAction, null);
         updateVersion.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "updateVersion"));
-    }
-
-    public static String trimMAMEVersion(String version) {
-        return version.contains("(") ? version.substring(0, version.indexOf('(')).trim() : version.trim();
-    }
-
-    static void setDataVersion(String dataVersion) {
-        mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
-        // Can be transiently set during parse operation
-        ms.persistMySettings();
-    }
-
-    static String getDataVersion() {
-        return (String) mfmSettings.get(MFM_Constants.DATA_VERSION);
-    }
-
-    public static boolean isFullXMLcompatible() {
-        return (boolean) mfmSettings.get(MFM_Constants.COMPATIBLE);
     }
 
     /**

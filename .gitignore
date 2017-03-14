@@ -2,12 +2,13 @@
 *.scc
 
 # MFM
+.~lock*
 bak/
 Lists/*
-Lists/favs.txt
+!Lists/favs.txt
+Logs
 out/*
 !out/artifacts/MFM_jar/MFM.jar
-Resources/
 Settings/*
 !Settings/*.ini
 

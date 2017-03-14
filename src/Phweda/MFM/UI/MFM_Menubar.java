@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import java.awt.event.KeyEvent;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import static Phweda.MFM.UI.MFM_Components.*;
+import static Phweda.MFM.UI.MFM_Components.getResources;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,23 +46,22 @@ class MFM_Menubar {
     private MFMAction mfmActionShowList = new MFMAction("Show List", null);
     private MFMAction mfmActionListBuilder = new MFMAction(MFMAction.ListBuilderAction, null);
 
-    public static MFM_Menubar getInstance() {
-        return ourInstance;
+    private MFM_Menubar() {
     }
 
-    private MFM_Menubar() {
+    public static MFM_Menubar getInstance() {
+        return ourInstance;
     }
 
     static JMenuBar getJMenubar() {
         return ourInstance.createMenuBar();
     }
 
-
     private JMenuBar createMenuBar() {
         JMenuBar MenuBar = new JMenuBar();
         MenuBar.add(createMFMmenu());
         MenuBar.add(createLogsmenu());
-        // MenuBar.add(createCommandmenu());
+        // MenuBar.add(createCommandmenu()); // Legacy capability
         MenuBar.add(createVideomenu());
         // MenuBar.add(createDatamenu());
         MenuBar.add(createResourcesmenu());
@@ -71,7 +70,6 @@ class MFM_Menubar {
         MenuBar.add(createHelpmenu());
 
         MenuBar.setBorder(new BevelBorder(BevelBorder.RAISED));
-
         return MenuBar;
     }
 
@@ -89,7 +87,6 @@ class MFM_Menubar {
         MFMAction MFMZipLogs = new MFMAction(MFMAction.ZipLogsAction, null);
         MFMAction MFMPostToPastie = new MFMAction(MFMAction.PostToPastieAction, null);
         MFMAction MAMEControlsDUMP = new MFMAction(MFMAction.MAMEControlsDUMPAction, null);
-
 
         MFMAction MFMCleanLogs = new MFMAction(MFMAction.CleanLogsAction, null);
 
@@ -175,10 +172,7 @@ class MFM_Menubar {
     private JMenu createListmenu() {
         JMenu listMenu = new JMenu("List");
         listMenu.setMnemonic(KeyEvent.VK_L);
-/*
-        MFMAction PopulateList = new MFMAction(MFMAction.CopyResourcesAction,
-                getResources().getImageIcon(getResources().P_PNG));
-*/
+
         MFMAction ImportList = new MFMAction(MFMAction.ImportListCommand,
                 getResources().getImageIcon(MFMUI_Resources.I_PNG));
         MFMAction RemoveList = new MFMAction("Remove List", null);
@@ -404,6 +398,4 @@ class MFM_Menubar {
 
         return helpMenu;
     }
-
-
 }

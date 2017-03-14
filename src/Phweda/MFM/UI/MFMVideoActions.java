@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -59,8 +59,8 @@ class MFMVideoActions {
         }
 
         // Quit if it is not a directory
-        if ((VIDsfolder == null || !VIDsfolder.isDirectory()) &&
-                (snapFolder == null || !snapFolder.isDirectory())) {
+        if ((!VIDsfolder.exists() || !VIDsfolder.isDirectory()) &&
+                (!snapFolder.exists() || !snapFolder.isDirectory())) {
             showInformation("Video INIfiles", "No snap or videos folder found check your MFM and MAME settings ");
             return;
         }
@@ -93,7 +93,6 @@ class MFMVideoActions {
             showInformation(gameName, "No video found for " + gameName);
         }
     }
-
 
     static void runFFmpeg() {
         try {
@@ -205,7 +204,5 @@ class MFMVideoActions {
         };
         Thread videoOps = new Thread(sw);
         videoOps.start();
-        // TODO confirm disposal of the videoOps thread
     }
-
 }

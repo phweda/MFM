@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -20,10 +20,6 @@ package Phweda.MFM.UI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import static java.lang.Thread.sleep;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,16 +28,15 @@ import static java.lang.Thread.sleep;
  * Time: 2:44 AM
  */
 public class MFMInformationPanel extends JPanel {
-    private static JLabel message = new JLabel();
     private static final String MESSAGE = "message";
-    private static JProgressBar progressBar = new MFMProgressBar();
     private static final String PROGRESS = "progress";
-
+    private static JLabel message = new JLabel();
+    private static JProgressBar progressBar = new MFMProgressBar();
     private static JPanel progressPanel = new JPanel();
     boolean running = false;
     Timer timer;
 
-    public MFMInformationPanel() {
+    MFMInformationPanel() {
         super();
         //    progressBar.setPreferredSize(new Dimension(400, 75));
         progressPanel.add(progressBar);
@@ -54,7 +49,7 @@ public class MFMInformationPanel extends JPanel {
         this.setPreferredSize(new Dimension(350, 100));
     }
 
-    public void showProgress(String title) {
+    void showProgress(String title) {
         // TODO why are these show calls failing to work properly??
         //   ((CardLayout) this.getLayout()).show(this, PROGRESS);
         ((CardLayout) this.getLayout()).last(this);
@@ -85,7 +80,7 @@ public class MFMInformationPanel extends JPanel {
     }
 
 
-    void runProgress() {
+    private void runProgress() {
         //   JOptionPane.showMessageDialog(null, "We are in runProgress()");
         progressBar.setIndeterminate(true);
         progressBar.setStringPainted(true);
@@ -130,6 +125,4 @@ public class MFMInformationPanel extends JPanel {
             timer.start();
     }
 */
-
-
 }

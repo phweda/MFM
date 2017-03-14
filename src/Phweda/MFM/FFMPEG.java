@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2016.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -36,22 +36,6 @@ import java.util.Arrays;
  */
 public class FFMPEG {
 
-    private static FFMPEG ourInstance;
-    private static ArrayList<String> args;
-    private static Process process = null;
-    static FFMPEG_Output FFMPEGout = new FFMPEG_Output();
-
-    private static String FFMPEGexe;
-    private static File inputFolder;
-    private static File outputFolder;
-    private static File moveAVItoFolder;
-
-
-    /*  COMMAND LINE
-         ffmpeg.exe -i <fileIn>.avi -c:v libx264 -aspect 3:4 -preset veryslow
-         -qp 0 -c:a libfdk_aac -cutoff 20000 -y <fileOut>.mp4
-    */
-
     /*
     0 is EXE, 2 is AVI file name, 6 is Aspect Ratio value, 16 is output file name
      */
@@ -59,8 +43,6 @@ public class FFMPEG {
             "libx264", "-aspect", "4:3", "-preset", "veryslow", "-qp", "0",
             "-c:a", "libfdk_aac", "-cutoff", "20000", "-y", ""
     };
-
-
     /*
     FFmpeg CROP COMMAND LINE
     ffmpeg -i <fileIn>.avi -c:a copy -c:v rawvideo -pix_fmt bgr24 -filter:v "crop=524:978:0:0" -y <fileOut>.avi
@@ -68,6 +50,20 @@ public class FFMPEG {
     private static final String[] baseCropArgs = new String[]{"", "-i", "", "-c:a",
             "copy", "-c:v", "rawvideo", "-pix_fmt", "bgr24", "-filter:v", "", "-y", ""
     };
+    static FFMPEG_Output FFMPEGout = new FFMPEG_Output();
+    private static FFMPEG ourInstance;
+    private static ArrayList<String> args;
+    private static Process process = null;
+    private static String FFMPEGexe;
+    private static File inputFolder;
+
+
+    /*  COMMAND LINE
+         ffmpeg.exe -i <fileIn>.avi -c:v libx264 -aspect 3:4 -preset veryslow
+         -qp 0 -c:a libfdk_aac -cutoff 20000 -y <fileOut>.mp4
+    */
+    private static File outputFolder;
+    private static File moveAVItoFolder;
 
 
     /* Ensure args has been initialized */
@@ -96,6 +92,54 @@ public class FFMPEG {
 
     private static void setOutputFolder(File outputFolder) {
         FFMPEG.outputFolder = outputFolder;
+    }
+
+    /**
+     * Load FFmpeg EXE and input/output folders for conversion
+     */
+    private static void refreshSettings() {
+        FFMPEGexe = MFMSettings.FFMPEGexe();
+        args.set(0, FFMPEGexe);
+
+        inputFolder = new File(MFMSettings.FFmpegInputFolder());
+        outputFolder = new File(MFMSettings.FFmpegOutputFolder());
+
+        String moveAVItoFolderPath = MFMSettings.getFFmpegMoveAVItoFolder();
+        if (moveAVItoFolderPath != null && !moveAVItoFolderPath.isEmpty()) {
+            moveAVItoFolder = new File(moveAVItoFolderPath);
+        }
+    }
+
+    private static Process run(Object output) throws FFMPEG_Exception {
+
+        ProcessBuilder pb = new ProcessBuilder(args);
+        if (output != null) if (output instanceof File) {
+            try {
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter((File) output, true)));
+                pw.println("*************************************************");
+                pw.println(pb.command().toString());
+                // Must flush or close otherwise output will be blocked by the PB
+                pw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            pb.redirectOutput(ProcessBuilder.Redirect.appendTo((File) output));
+            pb.redirectError(ProcessBuilder.Redirect.appendTo((File) output));
+        }
+        try {
+            MFM.logger.addToList(pb.command().toString(), true);
+            pb.directory(new File(MFMSettings.FFmpegEXEdir()));
+            process = pb.start();
+            if (output == null) {
+                // TODO what about capturing Standard outputstream??
+                FFMPEGout.setInput(process.getErrorStream(), pb.command().toString());
+            }
+        } catch (IOException exc) {
+            exc.printStackTrace();
+
+        }
+        return process;
     }
 
     /**
@@ -220,60 +264,12 @@ public class FFMPEG {
         return sb.toString();
     }
 
-    /**
-     * Load FFmpeg EXE and input/output folders for conversion
-     */
-    private static void refreshSettings() {
-        FFMPEGexe = MFMSettings.FFMPEGexe();
-        args.set(0, FFMPEGexe);
-
-        inputFolder = new File(MFMSettings.FFmpegInputFolder());
-        outputFolder = new File(MFMSettings.FFmpegOutputFolder());
-
-        String moveAVItoFolderPath = MFMSettings.getFFmpegMoveAVItoFolder();
-        if (moveAVItoFolderPath != null && !moveAVItoFolderPath.isEmpty()) {
-            moveAVItoFolder = new File(moveAVItoFolderPath);
-        }
-    }
-
-    private static Process run(Object output) throws FFMPEG_Exception {
-
-        ProcessBuilder pb = new ProcessBuilder(args);
-        if (output != null) if (output instanceof File) {
-            try {
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter((File) output, true)));
-                pw.println("*************************************************");
-                pw.println(pb.command().toString());
-                // Must flush or close otherwise output will be blocked by the PB
-                pw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            pb.redirectOutput(ProcessBuilder.Redirect.appendTo((File) output));
-            pb.redirectError(ProcessBuilder.Redirect.appendTo((File) output));
-        }
-        try {
-            MFM.logger.addToList(pb.command().toString(), true);
-            pb.directory(new File(MFMSettings.FFmpegEXEdir()));
-            process = pb.start();
-            if (output == null) {
-                // TODO what about capturing Standard outputstream??
-                FFMPEGout.setInput(process.getErrorStream(), pb.command().toString());
-            }
-        } catch (IOException exc) {
-            exc.printStackTrace();
-
-        }
-        return process;
-    }
-
     private static class FFMPEG_Output {
+        String args;
         private BufferedInputStream bis;
         private ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
         private byte[] separator = new byte[]{'\n', '\t', 0x2a, 0x2a, 0x2a, 0x2a};
         private boolean error = false;
-        String args;
 
         void setInput(InputStream inputStream, String argsIn) throws FFMPEG_Exception {
             if (inputStream == null) {
