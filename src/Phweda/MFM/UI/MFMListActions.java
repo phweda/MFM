@@ -82,16 +82,27 @@ class MFMListActions {
                 .toArray(Object[]::new);
 
         JComboBox jcb = new JComboBox(objs);
-        JOptionPane.showMessageDialog(mainFrame, jcb);
+
+        // Hack so we can position Dialog where mouse is. Do not want to subclass JOptionPane
+        JFrame frame = new JFrame();
+        frame.setSize(0,0);
+        frame.setLocation(mainFrame.getMousePosition());
+        frame.setVisible(true); // frame must be visible
+
+        // now prompt for the list
+        JOptionPane.showMessageDialog(frame, jcb);
+        frame.dispose();  // get rid of it
 
         String listName = jcb.getSelectedItem().toString();
         if (listName.equals(MFM_Constants.NEW_LIST)) {
             String newName = JOptionPane.showInputDialog(null, "Enter List Name");
+            if (newName == null || newName.isEmpty()) {
+                return;
+            }
             MFMPlayLists.getInstance().createPlayList(newName, new String[]{machine});
             MFMUI_Setup.updateMenuBar(newName);
             return;
         }
-
         playLists.addGameToPlayList(listName, machine);
     }
 
