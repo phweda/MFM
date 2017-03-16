@@ -45,6 +45,7 @@ public class MFMPlayLists implements Serializable {
     private TreeMap<String, TreeSet<String>> languagesLists = null;
     private TreeMap<String, TreeSet<String>> myPlayListsTree = null;
     private ArrayList<String> allListsNames;
+    private ArrayList<String> myListsNames;
 
     private TreeSet<String> allMachineNames = null;
     private TreeSet<String> biosMachineNames = null;
@@ -77,6 +78,7 @@ public class MFMPlayLists implements Serializable {
         allListsNames = new ArrayList<>(MFMplsTree.keySet());
         allListsNames.addAll(myPlayListsTree.keySet());
         allListsNames.addAll(languagesLists.keySet());
+        myListsNames = new ArrayList(myPlayListsTree.keySet());
     }
 
     public static MFMPlayLists getInstance() {
@@ -159,6 +161,7 @@ public class MFMPlayLists implements Serializable {
         return new TreeSet<>(allListsNames);
     }
 
+    // TODO remove??
     public Object[] getPopulatableLists() {
         Set<String> populateNames = getAllPlayListNames();
         populateNames.removeAll(doNotPopulateList);
@@ -179,9 +182,22 @@ public class MFMPlayLists implements Serializable {
         return allListsNames.get(index);
     }
 
+    public String getNextMyListName(String currentName, boolean next) {
+        int index = myListsNames.indexOf(currentName);
+        if (next) {
+            if (++index == myListsNames.size()) {
+                index = 0;
+            }
+        } else {
+            if (--index == -1) {
+                index = myListsNames.size() - 1;
+            }
+        }
+        return myListsNames.get(index);
+    }
+
     public Object[] myPlayListNames() {
-        ArrayList lists = new ArrayList(myPlayListsTree.keySet());
-        return lists.toArray();
+        return myListsNames.toArray();
     }
 
     public TreeSet<String> getPlayList(String name) {

@@ -708,12 +708,21 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-            showNextList(true);
+            showNextList( true, true);
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-            showNextList(false);
+            showNextList( true,false);
         }
+
+        if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & KeyEvent.ALT_MASK) != 0)) {
+            showNextList( false, true);
+        }
+
+        if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & KeyEvent.ALT_MASK) != 0)) {
+            showNextList( false, false);
+        }
+
     }
 
     @Override
@@ -721,8 +730,12 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     }
 
-    private void showNextList(boolean next) {
-        changeList(MFMPlayLists.getInstance().getNextListName(currentListName.getName(), next));
+    private void showNextList(boolean all, boolean next) {
+        if(all){
+            changeList(MFMPlayLists.getInstance().getNextListName(currentListName.getName(), next));
+        } else {
+            changeList(MFMPlayLists.getInstance().getNextMyListName(currentListName.getName(), next));
+        }
     }
 
     void zipLogs() {
