@@ -53,19 +53,21 @@ public class MAMEexe {
         args.add(exe);
     }
 
-    private static Process run(Object output) throws MAME_Exception {
+    private static Process run(Object output, boolean logging) throws MAME_Exception {
 
         ProcessBuilder pb = new ProcessBuilder(args);
         if (output != null)
             if (output instanceof File) {
-                try {
-                    PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter((File) output, true)));
-                    pw.println("*************************************************");
-                    pw.println(pb.command().toString());
-                    // Must flush or close otherwise output will be blocked by the PB
-                    pw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (logging) {
+                    try {
+                        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter((File) output, true)));
+                        pw.println("*************************************************");
+                        pw.println(pb.command().toString());
+                        // Must flush or close otherwise output will be blocked by the PB
+                        pw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 pb.redirectOutput(ProcessBuilder.Redirect.appendTo((File) output));
@@ -91,14 +93,26 @@ public class MAMEexe {
 
     public static Process run(ArrayList<String> args, File output) throws MAME_Exception {
         setArgs(args);
-        return run(output);
+        return run(output, true);
     }
 
+    /**
+     *
+     * @param args process arguments
+     * @param output fiel to pipe process output to
+     * @param logging to allow for not extraneous MFM output
+     * @return
+     * @throws MAME_Exception
+     */
+    public static Process run(ArrayList<String> args, File output, boolean logging) throws MAME_Exception {
+        setArgs(args);
+        return run(output, logging);
+    }
 
     // NOTE hack to ensure we do NOT redirect process stream
     public static Process run(ArrayList<String> args) throws MAME_Exception {
         setArgs(args);
-        return run((Object) "NOPE");
+        return run((Object) "NOPE", false);
     }
 
     /**
@@ -110,7 +124,7 @@ public class MAMEexe {
      */
     public static Process run(String arg) throws MAME_Exception {
         setArgs(arg);
-        return run((File) null);
+        return run((File) null, true);
     }
 
     /**
@@ -118,7 +132,7 @@ public class MAMEexe {
      */
     public static Process run(String[] args) throws MAME_Exception {
         setArgs(args);
-        return run(MFM.MAMEout);
+        return run(MFM.MAMEout, true);
     }
 
     public static void createConfig() throws MAME_Exception {
