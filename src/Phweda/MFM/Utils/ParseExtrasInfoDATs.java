@@ -47,13 +47,17 @@ public class ParseExtrasInfoDATs extends ParseTextFile {
         while (!line.startsWith("$info") && scanner.hasNext()) {
             line = scanner.nextLine();
         }
+
         // $info line has one game
         String game = line.substring(6, line.length());
 
+        // NOTE March 2017 end of messinfo.dat has changed we can get here on EOF
         /* Find next line starting with $mame & GOTO next line */
-        do {
-            line = scanner.nextLine();
-        } while (!line.startsWith("$mame") && scanner.hasNext());
+        if (scanner.hasNext()) {
+            do {
+                line = scanner.nextLine();
+            } while (!line.startsWith("$mame") && scanner.hasNext());
+        }
 
         /* Are we at EOF? */
         if (!scanner.hasNext()) {
