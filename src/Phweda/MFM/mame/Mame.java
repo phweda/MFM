@@ -67,9 +67,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "mame")
 public class Mame implements Serializable {
 
-    private static final long serialVersionUID = -7853056278807754359L;
+    private static final long serialVersionUID = -2353256163229379894L;
 
-    @XmlElement(required = true)
+    @XmlElements({
+            @XmlElement(name="machine", type=Machine.class),
+            @XmlElement(name="game", type=Machine.class)
+    })
     protected Set<Machine> machine;
     @XmlAttribute(name = "build")
     protected String build;
