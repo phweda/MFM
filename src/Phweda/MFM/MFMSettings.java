@@ -433,7 +433,7 @@ public class MFMSettings {
         return (String) mfmSettings.get(MFM_Constants.DATA_VERSION);
     }
 
-    static void setDataVersion(String dataVersion) {
+    public static void setDataVersion(String dataVersion) {
         mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
         // Can be transiently set during parse operation
         ms.persistMySettings();
@@ -449,7 +449,7 @@ public class MFMSettings {
             MAMEexe.setBaseArgs(MFMSettings.fullMAMEexePath());
 
             // get EXE version
-            setMAMEVersion();
+            setMAMEexeVersion();
             checkFullXMLCompatible();
             exeChanged = false;
         }
@@ -600,28 +600,13 @@ public class MFMSettings {
         return map;
     }
 
-    private void setMAMEVersion() {
-        Process process = null;
-        try {
-            process = MAMEexe.run("-help");
-        } catch (MAMEexe.MAME_Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            java.util.Scanner s = new java.util.Scanner(process.getInputStream()).useDelimiter("\\A");  //   process.getInputStream());
-            String output = s.next();
+    private void setMAMEexeVersion() {
+        // Seems newer MAME has the (build date) and older do not
+        String MAMEVersion = trimMAMEVersion(MAMEexe.getMAMEexeVersion());
+        mfmSettings.put(MFM_Constants.MAME_EXE_VERSION, MAMEVersion);
 
-            // Seems newer MAME has the (build date) and older do not
-            String MAMEVersion = trimMAMEVersion(output);
-
-            mfmSettings.put(MFM_Constants.MAME_EXE_VERSION, MAMEVersion);
-
-            if (MFM.isSystemDebug()) {
-                System.out.println(MAMEVersion);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
+        if (MFM.isSystemDebug()) {
+            System.out.println(MAMEVersion);
         }
         // Throw event to update UI
         final MFMAction updateVersion = new MFMAction(MFMAction.UpdateVersionAction, null);
@@ -631,6 +616,8 @@ public class MFMSettings {
     /**
      * Parse version to split on 172/173 - -listxml changed there and with going to full XML import
      * we need to differentiate for method of data extraction and access
+     *
+     * @deprecated 0.85 no longer needed
      */
     private void checkFullXMLCompatible() {
         fullXMLcompatible = MAME_Compatible.versionNew(getMAMEVersion());

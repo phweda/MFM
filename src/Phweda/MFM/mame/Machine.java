@@ -145,7 +145,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "machine")
 public class Machine implements Serializable {
 
-    private static final long serialVersionUID = 1771200835349120764L;
+    private static final long serialVersionUID = -3641131840728993150L;
+
 
     //========================= MFM ===================================
 

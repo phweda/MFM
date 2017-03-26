@@ -148,8 +148,16 @@ class MFMListGenerator {
                     continue;
                 }
 
-                if (!machine.getDriver().getStatus().equalsIgnoreCase(IMPERFECT)) {
-                    noImpefectList.add(machineName);
+                // For 0.85 release needed since older Mame versions' BIOS Machines did not have a driver
+                if (machine.getDriver() != null) {
+                    if (!machine.getDriver().getStatus().equalsIgnoreCase(IMPERFECT)) {
+                        noImpefectList.add(machineName);
+                    }
+
+                    // If the cocktail attr exists
+                    if (machine.getDriver().getCocktail() != null && !machine.getDriver().getCocktail().isEmpty()) {
+                        cocktailList.add(machineName);
+                    }
                 }
 
                 if (!machine.getIsVertical().isEmpty() && machine.getIsVertical().equalsIgnoreCase(Machine.VERTICAL)) {
@@ -157,11 +165,6 @@ class MFMListGenerator {
                 } else if (!machine.getIsVertical().isEmpty() &&
                         machine.getIsVertical().equalsIgnoreCase(Machine.HORIZONTAL)) {
                     horizontalList.add(machineName);
-                }
-
-                // If the cocktail attr exists
-                if (machine.getDriver().getCocktail() != null && !machine.getDriver().getCocktail().isEmpty()) {
-                    cocktailList.add(machineName);
                 }
 
                 if (machine.isSupportsSimultaneous()) {

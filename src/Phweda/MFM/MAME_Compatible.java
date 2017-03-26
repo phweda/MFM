@@ -28,9 +28,17 @@ import org.w3c.dom.DocumentType;
  * Date: 10/3/2016
  * Time: 11:42 AM
  */
+
+/**
+ * Differentiate older different Mame XML versions for optional parsing for older Mame versions
+ *
+ * @deprecated 0.85 no longer needed mFM now supports all Mame -listxml DTD versions
+ */
 class MAME_Compatible {
 
     private static final Double DBL_172 = 0.172d; // last version before MAME DTD change 2016
+    private static final Double DBL_162 = 0.162d; // first version after MAME DTD change Game -> Machine
+
     // From 177 -listxml
     private static final String MAME_DTD =
             "<!ELEMENT mame (machine+)>\n" +
@@ -179,7 +187,12 @@ class MAME_Compatible {
         if (MFM.isSystemDebug()) {
             System.out.println(result);
         }
-        return Double.valueOf(result) > DBL_172 && compareDoctype();
+        // Here's the meat
+        return Double.valueOf(result) >= DBL_162; // Confirmed viable 3/24/2017
+        // return Double.valueOf(result) >= DBL_172 && compareDoctype(); // Original guaranteed to work with JAXB
+
+        // Testing older versions
+        //   return true;
     }
 
     private static boolean compareDoctype() {

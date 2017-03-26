@@ -19,24 +19,24 @@
 package Phweda.MFM.mame;
 
 import Phweda.MFM.*;
-
-import static Phweda.MFM.mame.Machine.*;
-
 import Phweda.MFM.Utils.ParseFolderINIs;
-import Phweda.utils.*;
-
-import com.sun.org.apache.xerces.internal.dom.DeferredElementImpl;
+import Phweda.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static Phweda.MFM.MFMSettings.trimMAMEVersion;
+import static Phweda.MFM.mame.Machine.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -69,6 +69,13 @@ public class ParseAllMachinesInfo {
         if (MFMSettings.isFullXMLcompatible()) {
             // allMachinesInfo = loadAllMachinesInfoJAXB();
             mame = loadAllMachinesInfoJAXB();
+            // Set data version here. 0.85 change to handle older Mame versions
+            if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
+                MFMSettings.setDataVersion(mame.getBuild());
+            } else {
+                MFMSettings.setDataVersion(trimMAMEVersion(MAMEexe.getMAMEexeVersion()));
+            }
+
             if (!MFM.isProcessAll()) {
                 removeNotRunnable();
             }
@@ -106,6 +113,7 @@ public class ParseAllMachinesInfo {
      * Retained for versions prior to MAME 173 which is the last change in MAME DTD
      *
      * @return Map of all Machines
+     * @deprecated 0.85 release handles all Mame versions with -listxml (from o.70)
      */
     private static void loadAllMachinesInfoDOM(Set<String> prefixes) {
         machineList = new ArrayList<String>();
@@ -422,12 +430,13 @@ public class ParseAllMachinesInfo {
         }
 
         System.out.println(machineName);
-        // Is it runnable
-        if (machine.getIsdevice().equals(Machine.YES)) {
-            // skip it is a Device
-        } else if ((machine.getDriver().getStatus().equals(GOOD) || machine.getDriver().getStatus().equals(IMPERFECT))
+        // Is it runnable?  skip if it is a Device
+        // With 0.85 MFM release we now go back to very old Mame versions where Driver was not present(BIOSes) -
+        // just assume those are runnable
+        if ((!machine.getIsdevice().equals(Machine.YES) && (machine.getDriver() == null ||
+                machine.getDriver().getStatus().equals(GOOD) || machine.getDriver().getStatus().equals(IMPERFECT))
                 // Not bios or no bios value ""
-                && (machine.getIsbios().equals(NO) || machine.getIsbios().isEmpty())) {
+                && (machine.getIsbios().equals(NO) || machine.getIsbios().isEmpty()))) {
             runnable.add(machineName);
         }
     }

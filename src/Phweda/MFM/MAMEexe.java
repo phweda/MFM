@@ -97,9 +97,8 @@ public class MAMEexe {
     }
 
     /**
-     *
-     * @param args process arguments
-     * @param output fiel to pipe process output to
+     * @param args    process arguments
+     * @param output  fiel to pipe process output to
      * @param logging to allow for not extraneous MFM output
      * @return
      * @throws MAME_Exception
@@ -160,8 +159,27 @@ public class MAMEexe {
         args.add(machine);
     }
 
+    public static String getMAMEexeVersion(){
+        Process process = null;
+        String output;
+        try {
+            process = MAMEexe.run("-help");
+        } catch (MAMEexe.MAME_Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            java.util.Scanner s = new java.util.Scanner(process.getInputStream()).useDelimiter("\\A");  //   process.getInputStream());
+            output = s.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+        return output;
+    }
+
     /**
      * Failed attempt at sending key events to Mame exe
+     *
      * @param pb
      */
     private static void sendKeyboard(Process pb) {

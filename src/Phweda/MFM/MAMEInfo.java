@@ -271,15 +271,22 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return new TreeSet<String>(allCategories);
     }
 
+    /**
+     * Mame Exe version
+     *
+     * @return MFMUser's exe version
+     */
     public static String getVersion() {
-        // return MFMSettings.getDataVersion();
-        // fixme move call should not be in MFMSettings
-        return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
+        // Bug with this older Mame versions do not have the build Attribute
+        //    return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
+        return MFMSettings.getDataVersion();
     }
 
+/*  Unused probably never needed
     public static void setVersion(String version) {
         MFMSettings.setDataVersion(MFMSettings.trimMAMEVersion(version));
     }
+*/
 
     public static double getVersionDouble() {
         String str = MFMSettings.getDataVersion().replaceAll("[^\\d.]", "");
