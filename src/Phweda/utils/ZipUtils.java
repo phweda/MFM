@@ -72,9 +72,6 @@ public class ZipUtils {
             }
             Files.copy(fileToExtract, outputFile, StandardCopyOption.REPLACE_EXISTING);
             return true;
-        } catch (NoSuchFileException exc) {
-            exc.printStackTrace();
-            return false;
         } catch (Exception exc) {
             exc.printStackTrace();
             return false;
@@ -109,7 +106,7 @@ public class ZipUtils {
     }
 
     /**
-     * Zip it - recursive
+     * Zip it
      *
      * @param zipFile      output ZIP file location
      * @param filesToZip   file or folder to zip
@@ -119,7 +116,7 @@ public class ZipUtils {
         this.sourceFolder = sourceFolder + File.separator;
         generateFileList(filesToZip);
 
-        byte[] buffer = new byte[1048576]; // 8192
+        byte[] buffer = new byte[1048576]; // 2^20
 
         try {
             FileOutputStream fos = new FileOutputStream(zipFile);
