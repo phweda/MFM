@@ -43,27 +43,36 @@ import static javax.swing.JOptionPane.YES_NO_OPTION;
  */
 public class MAMEInfo // We'll just do the individual objects  ** implements Serializable
 {
-    public static final String MAME_INI = "mame.ini";
-    private static final String MachineObjectMap = "Machines";
-    private static final String MAME = "MAME";
     private static final String RUNNABLE_MACHINES = "RunnableMachines";
     private static final String MACHINELIST = "MachineList";
-    private static final String COMMANDS_FILENAME = "Commands";
     private static final String INIFILES = "INIfiles";
     private static final String CATEGORIES = "Categories";
     private static final String CATEGORYMACHINES = "CategoryMachines";
     private static final String CATEGORYHIERARCHY = "CategoryHierarchy";
     private static final String CONTROLLERS = "Controllers";
     private static final String CONTROLLERSMACHINES = "ControllerMachines";
+
+    // TODO figure out if we now need this and start to eliminate static calls 3/30/2017
+    private static final ParseAllMachinesInfo PAMI = new ParseAllMachinesInfo();
+
+/*  fixme remove after testing
+    public static final String MAME_INI = "mame.ini";
+    private static final String MachineObjectMap = "Machines";
+    private static final String MAME = "MAME";
+
+    private static final String COMMANDS_FILENAME = "Commands";
+
     private static final String ALLROOTS = "CategoryRoots";
     private static final String ARCADEROOTS = "ArcadeCategoryRoots";
     private static final String MAME_VERSION = "MAME Version";
     private static final String NUM_BUTTONS = "Max_buttons";
     private static final String NUM_PLAYERS = "Max players";
     private static final String RUNNABLE = "Runnable";
-    private static final MAMEtoJTree mameJTreePanel;
+
     private static String version;  // From -listxml
-    //    private static TreeMap machineList; // extracted From allMachinesObjectMap
+
+*/
+    private static final MAMEtoJTree mameJTreePanel;
     private static int runnable;
     private static HashMap<String, HashMap<String, String>> commands; // From -showusage
     private static ArrayList<String> allCategories;  // From catver_full.ini or catver.ini
@@ -128,7 +137,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
          */
     static {
         try {
-            mame = MFM_Data.getInstance().getMame();
+            mame = loadMame();
             INIfiles = (HashMap<String, Map>) MFM_Data.getInstance().getStaticData(INIFILES);
             if (mame != null) {
                 runnableMachines = (TreeSet<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
@@ -148,21 +157,9 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
 
         } catch (Exception exc) {
             if (MFM.isDebug()) {
-                MFM.logger.addToList("Exception loading MachineObjectMap : " + exc.getClass().getCanonicalName());
+                MFM.logger.addToList("Exception loading Mame and data objects : " + exc.getClass().getCanonicalName());
             }
-            if (exc instanceof InvalidClassException) {
-                if (exc.getMessage().contains("Phweda.MFM.Machine")) {
-                    int answer = JOptionPane.showConfirmDialog(null, "Detected an old version of MFM cache file" +
-                                    "\nMFM will reparse MAME information please be patient",
-                            "Reload MAME Information",
-                            YES_NO_OPTION);
-                    if (answer == JOptionPane.NO_OPTION) {
-                        MFM.logger.separateLine();
-                        MFM.logger.addToList("User chose to exit on an upgrade MAME reload.");
-                        System.exit(2);
-                    }
-                }
-            }
+            // Removed for 0.85 no longer needed
         }
 
         // Note if it is still null could also be we changed Machine/Game class
@@ -173,16 +170,9 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             // NOTE now switched where we do catver and nplayers 10/14/15
             loadINIs();
             // NOTE order makes a difference!!
-            mame = ParseAllMachinesInfo.loadAllMachinesInfo();
+            mame = generateMame();
+            getParsedData();
 
-            runnableMachines = ParseAllMachinesInfo.getRunnable();
-
-            allCategories = ParseAllMachinesInfo.getCategoriesList();
-            if (allCategories != null && !allCategories.isEmpty()) {
-                createCatHierarchy(allCategories);
-            }
-            categoryMachines = ParseAllMachinesInfo.getCategoryGamesList();
-            controllers = ParseAllMachinesInfo.getControllers();
 
             if (mame != null) {
                 // Persist it
@@ -214,10 +204,60 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             loadINIs();
         }
 
-        /*
-         * Get MAME Command list and descriptions
-         * >mame64 -showusage
-         */
+        loadCommands();
+
+        if (runnableMachines != null) {
+            setRunnable(runnableMachines.size());
+        } else {
+            setRunnable(mame.getMachineMap().size());
+        }
+
+        mameJTreePanel = MAMEtoJTree.getInstance();
+    }
+
+    public MAMEInfo() {
+        if (MFM.isDebug() && allCategories != null) {
+            MFM.logger.addToList("Total categories is : " + allCategories.size());
+        }
+    }
+
+    /**
+     * Load the Mame data set from file
+     * @return Mame data set
+     */
+    public static Mame loadMame(){
+        return MFM_Data.getInstance().getMame();
+    }
+
+    /**
+     * Parse the currently set Mame executable
+     * @see Phweda.MFM.MAMEexe
+     * @return Mame XML
+     */
+    public static Mame generateMame(){
+        return ParseAllMachinesInfo.loadAllMachinesInfo();
+    }
+
+    /**
+     * TODO further refactor needed this is messy
+     * Extract parsed Runnable list, Categories info, Controllers
+     *
+     */
+    public static void getParsedData(){
+        runnableMachines = ParseAllMachinesInfo.getRunnable();
+        allCategories = ParseAllMachinesInfo.getCategoriesList();
+        if (allCategories != null && !allCategories.isEmpty()) {
+            createCatHierarchy(allCategories);
+        }
+        categoryMachines = ParseAllMachinesInfo.getCategoryGamesList();
+        controllers = ParseAllMachinesInfo.getControllers();
+    }
+
+    /**
+     * Get MAME Command list and descriptions
+     * >mame64 -showusage
+     */
+    static void loadCommands(){
         commands = (HashMap<String, HashMap<String, String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.COMMANDS);
 
         if (commands == null || commands.isEmpty()) {
@@ -251,20 +291,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             }
             showusageFile.delete();
         }
-
-        if (runnableMachines != null) {
-            setRunnable(runnableMachines.size());
-        } else {
-            setRunnable(mame.getMachineMap().size());
-        }
-
-        mameJTreePanel = MAMEtoJTree.getInstance();
-    }
-
-    public MAMEInfo() {
-        if (MFM.isDebug() && allCategories != null) {
-            MFM.logger.addToList("Total categories is : " + allCategories.size());
-        }
     }
 
     static TreeSet<String> getAllCategories() {
@@ -272,21 +298,15 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     }
 
     /**
-     * Mame Exe version
+     * Mame Data Set version
      *
-     * @return MFMUser's exe version
+     * @return MFM Data Set version
      */
     public static String getVersion() {
         // Bug with this older Mame versions do not have the build Attribute
         //    return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
         return MFMSettings.getDataVersion();
     }
-
-/*  Unused probably never needed
-    public static void setVersion(String version) {
-        MFMSettings.setDataVersion(MFMSettings.trimMAMEVersion(version));
-    }
-*/
 
     public static double getVersionDouble() {
         String str = MFMSettings.getDataVersion().replaceAll("[^\\d.]", "");
@@ -306,7 +326,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return numButtons;
     }
 
-/*
+/*  TODO
     public static TreeMap getMachineList() {
         return machineList;
     }
@@ -329,10 +349,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         MAMEInfo.commands = commands;
     }
 
-    /*   public static Map<String, Machine> getAllMachinesInfo() {
-           return allMachinesObjectMap;
-       }
-    */
     public static Mame getMame() {
         return mame;
     }
@@ -348,16 +364,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     public static void setRunnable(int runnableIn) {
         runnable = runnableIn;
     }
-
-/*
-    public static ArrayList<String> getArcadeCategoryRoots() {
-        return arcadeCategoryRoots;
-    }
-
-    public static ArrayList<String> getAllCategoryRoots() {
-        return categoryRoots;
-    }
-*/
 
     public static HashMap<String, ArrayList<String>> getCategoryMachines() {
         return categoryMachines;
