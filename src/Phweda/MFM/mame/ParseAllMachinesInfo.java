@@ -133,8 +133,7 @@ public class ParseAllMachinesInfo {
     }
 
     private static Mame loadAllMachinesInfoJAXB() {
-        Mame mame = loadAllMAME();
-        return mame;
+        return loadAllMAME();
     }
 
     private static Mame loadAllMAME() {
