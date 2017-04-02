@@ -1,6 +1,4 @@
 # MFM
-Initial Github upload Mame File Manager
-
 MFM - MAME File Manager
 
 Desktop application for creating lists and extracting play sets of MAME Roms, CHDs and Extras to another location from complete or larger sets.
