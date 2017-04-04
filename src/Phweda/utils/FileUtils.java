@@ -20,6 +20,7 @@ package Phweda.utils;
 
 import Phweda.MFM.MFM;
 import Phweda.MFM.MFM_Constants;
+import Phweda.MFM.MFM_Data;
 
 import java.awt.*;
 import java.io.*;
@@ -48,13 +49,6 @@ public class FileUtils {
     /* Used to limit search depth. 20 should be more than sufficient*/
     private static final int maxDepth = 25;
     public static int MaxDepth = maxDepth;
-
-    // This filter only returns MFM_cache.ser files
-    public static FilenameFilter MFM_cacheFilenameFilter = new FilenameFilter() {
-        public boolean accept(File file, String name) {
-            return name.contains(MFM.MFM_CACHE_SER);
-        }
-    };
 
     // This filter only returns directories
     public static FilenameFilter directoryFilenameFilter = new FilenameFilter() {
@@ -150,8 +144,7 @@ public class FileUtils {
             e.printStackTrace(MFM.logger.Writer());
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-        }
+        } 
         return fileContents.toString();
     }
 
@@ -253,7 +246,6 @@ public class FileUtils {
         try {
             File file1 = file.toFile();
             if (file1.exists()) {
-                if (MFM.isDebug()) MFM.logger.addToList("Opening file from OS path is: " + file1.getAbsolutePath());
                 if (Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
                     if (desktop.isSupported(Desktop.Action.EDIT)) {
@@ -261,11 +253,11 @@ public class FileUtils {
                     }
 
                 } else {
-                    if (MFM.isDebug()) MFM.logger.addToList("Awt Desktop is not supported!");
+                    System.err.println("Awt Desktop is not supported!");
                 }
 
             } else {
-                if (MFM.isDebug()) MFM.logger.addToList("File does not exist!");
+                System.err.println("File does not exist!");
             }
 
         } catch (Exception ex) {
@@ -273,28 +265,21 @@ public class FileUtils {
         }
     }
 
-
     // TODO Maybe we need to throw an Exception to propagate message to the user?
     // Or change this to boolean??
     public static void openFileFromOS(Path file) {
         try {
-
             File file1 = file.toFile();
             if (file1.exists()) {
-                if (MFM.isDebug()) MFM.logger.addToList("Opening file from OS path is: " + file1.getAbsolutePath());
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().open(file1);
                 } else {
-                    // TODO Change to logging
-                    if (MFM.isDebug()) MFM.logger.addToList("Awt Desktop is not supported!");
+                    System.err.println("Awt Desktop is not supported!");
                 }
 
             } else {
-
-                // TODO Change to logging
-                if (MFM.isDebug()) MFM.logger.addToList("File does not exist!");
+                System.err.println("File does not exist!");
             }
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -305,12 +290,8 @@ public class FileUtils {
 
         private boolean find(String path, String fileName) throws IOException {
             File testFile = new File(path);
-            //Files.walkFileTree(Paths.get(directory),null,maxDepth,new MFM_FindFile(fileName));
-            // System.out.println(testFile.getName());
-
             // TODO can we simplify the logic? We're testing isDirectory() twice!!
             if (!testFile.isDirectory() && testFile.getName().equalsIgnoreCase(fileName)) {
-                //    System.out.println(testFile.getName());
                 exists = true;
                 return exists;
             } else if (testFile.isDirectory()) {
@@ -417,15 +398,12 @@ public class FileUtils {
                 if (SLCHDs) {
                     key = directory.getName() + ':' + directory.getParentFile().getName();
                 } else {
-                    // NOTE removed to stop overwriting cache entry where CHD foldername == CHD name e.g. Area51.chd
-                    // key = directory.getName();
                     return CONTINUE;
                 }
                 cache.put(key, directory);
             } else if (!extras) {
                 MFM.logger.addToList("FileUtils 363: " + dir + " does not exist.");
             }
-            //    System.out.format("Directory: %s%n", dir);
             return CONTINUE;
         }
 
@@ -437,18 +415,10 @@ public class FileUtils {
                         extrasCache.put(name, new TreeMap<String, File>());
                     }
                 }
-                // causes a problem with videosnaps
-            /*    // Could be softwarelist folder in 'snaps'
-                else if (file.getAbsolutePath().contains(MFM_Constants.MAME_FOLDER_SNAPS)) {
-                    extrasCache.get(MFM_Constants.MAME_FOLDER_SNAPS).put(file.getName(), file);
-                }*/
             } else {
                 String fileName = file.getName();
                 if (fileName.endsWith(".zip") &&
                         extrasDirectories.contains(fileName.substring(0, fileName.lastIndexOf('.')))) {
-                    if (MFM.isSystemDebug()) {
-                        System.out.println(fileName);
-                    }
                     return;
                 }
 
@@ -471,7 +441,6 @@ public class FileUtils {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        // System.out.println(folderName + FileUtils.DIRECTORY_SEPARATOR + file.getName());
                         return;
                     }
                 }
@@ -486,7 +455,6 @@ public class FileUtils {
          */
         private String extrasKey(File file) {
             String path = file.getAbsolutePath();
-
 
             return null;
         }

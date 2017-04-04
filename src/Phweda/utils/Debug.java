@@ -27,8 +27,6 @@ import java.util.LinkedList;
 
 @SuppressWarnings({"SameParameterValue"})
 public class Debug {
-    // private static Debug ourInstance;
-
     private static boolean listBool = false;
     private static PrintWriter writer;
     // TODO should switch this to a lightweight queue
@@ -36,20 +34,7 @@ public class Debug {
     private static SimpleDateFormat sdateFormat = new SimpleDateFormat("d MMM HH:mm:ss.S");
     private char separateChar = '*';
     private String separateString = "********************************************************************************";
-
-/*
-    public synchronized static Debug getInstance() {
-        if (ourInstance == null) {
-            ourInstance = new Debug();
-        }
-        return ourInstance;
-    }
-
-
-    private Debug() {
-        init();
-    }
-*/
+    private OutputStream outputStream = System.out;
 
     public Debug() {
         this(System.out, true);
@@ -59,7 +44,7 @@ public class Debug {
         this(outputStream, true);
     }
 
-    public Debug(OutputStream outputStream, boolean flush) {
+    private Debug(OutputStream outputStream, boolean flush) {
         this.setOutput(outputStream, flush);
     }
 
@@ -139,7 +124,12 @@ public class Debug {
     }
 
     public void setOutput(OutputStream outputStream, boolean flush) {
+        this.outputStream = outputStream;
         writer = new PrintWriter(outputStream, flush);
+    }
+
+    public OutputStream getOutputStream() {
+        return this.outputStream;
     }
 
     public void setListBool(boolean listBool) {

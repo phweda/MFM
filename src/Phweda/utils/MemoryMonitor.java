@@ -18,8 +18,8 @@
 
 package Phweda.utils;
 
-import Phweda.MFM.MFM;
-
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Date;
 
@@ -31,14 +31,22 @@ import java.util.Date;
  *
  */
 
+/**
+ * Outputs the current RAM usage to the Outputstream
+ * Usage:
+ * MemoryMonitor mm = new MemoryMonitor(10000, System.out);
+ * Thread mmThread = new Thread(mm);
+ * mmThread.start();
+ */
 public class MemoryMonitor implements Runnable {
 
     private static int millis;
+    private static PrintWriter printWriter;
 
-    public MemoryMonitor(int millis) {
+    public MemoryMonitor(int millis, OutputStream outputStream) {
         MemoryMonitor.millis = millis;
+        printWriter = new PrintWriter(outputStream);
     }
-
 
     /**
      * When an object implementing interface <code>Runnable</code> is used
@@ -61,9 +69,6 @@ public class MemoryMonitor implements Runnable {
         //noinspection InfiniteLoopStatement
         while (true) {
 
-            //    now = new GregorianCalendar().getTime();
-            //    time = sdateFormat.format(now);
-
             long freeMemory = Runtime.getRuntime().freeMemory();
             long totalMemory = Runtime.getRuntime().totalMemory();
             long usedMemory = totalMemory - freeMemory;
@@ -76,13 +81,23 @@ public class MemoryMonitor implements Runnable {
 
             DecimalFormat format = new DecimalFormat("###,###,###,###,###.##");
 
-            MFM.logger.out("\n---------------------------------------------------------------------------\r\n" +
-                    "freeMemory  is : " + format.format(freeMemory) + " bytes & " + format.format(freeMemoryMB) + " MB\r\n" +
-                    "totalMemory is : " + format.format(totalMemory) + " bytes & " + format.format(totalMemoryMB) + " MB\r\n" +
-                    "usedMemory  is : " + format.format(usedMemory) + " bytes & " + format.format
-                    (usedMemoryMB) + " MB\r\n" +
-                    "***************************************************************************\n");
+            printWriter.append("\n---------------------------------------------------------------------------\r\n");
+            printWriter.append("freeMemory  is : ");
+            printWriter.append(format.format(freeMemory));
+            printWriter.append(" bytes & ");
+            printWriter.append(format.format(freeMemoryMB) + " MB\r\n");
+            printWriter.append("totalMemory is : ");
+            printWriter.append(format.format(totalMemory));
+            printWriter.append(" bytes & ");
+            printWriter.append(format.format(totalMemoryMB));
+            printWriter.append(" MB\r\n");
+            printWriter.append("usedMemory  is : ");
+            printWriter.append(format.format(usedMemory));
+            printWriter.append(" bytes & ");
+            printWriter.append(format.format(usedMemoryMB) + " MB\r\n");
+            printWriter.append("***************************************************************************\n");
 
+            printWriter.flush();
             try {
                 Thread.sleep(millis);
             } catch (InterruptedException e) {
