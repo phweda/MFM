@@ -55,15 +55,13 @@ public class MFM {
 
     public static final String MFM_DIR;
     public static final String MFM_SETTINGS_DIR;
+    public static final String MFM_DATA_DIR;
     public static final String MFM_RESOURCES;
     public static final String MFM_JARS_DIR;
     public static final String MFM_LISTS_DIR;
     public static final String MFM_LOGS_DIR;
     public static final String MFM_FOLDERS_DIR;
     public static final String MFM_CATEGORY_DIR;
-    public static final String MFM_CACHE_SER = "MFM_cache.ser";
-    public static final String MFM_MAME_FILE = "MFM_MAME.xml";
-    public static final String MFM_CACHE_XML = "MFM_cache.xml";
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
     public static final String VERSION = "Version 0.8.5";
@@ -122,6 +120,8 @@ public class MFM {
         MFM_DIR = path + FileUtils.DIRECTORY_SEPARATOR;
         // Folder we create on the local file system
         MFM_SETTINGS_DIR = MFM_DIR + MFM_Constants.SETTINGS + FileUtils.DIRECTORY_SEPARATOR;
+        // Folder we create on the local file system for Data Sets
+        MFM_DATA_DIR = MFM_DIR + MFM_Constants.DATA + FileUtils.DIRECTORY_SEPARATOR;
         // Resources are all within the MFM.jar file
         MFM_RESOURCES = FileUtils.DIRECTORY_SEPARATOR + MFM_Constants.RESOURCES + FileUtils.DIRECTORY_SEPARATOR;
         // Added LnF Jars are placed here
@@ -217,7 +217,7 @@ public class MFM {
         if (switches.contains(m)) {
             logger.out("Running with Memory Monitor.");
             // 10 minutes in milliseconds
-            MemoryMonitor mm = new MemoryMonitor(600000);
+            MemoryMonitor mm = new MemoryMonitor(600000, logger.getOutputStream());
             Thread mmThread = new Thread(mm);
             mmThread.start();
         }
@@ -269,7 +269,7 @@ public class MFM {
             MS = MFMSettings.getInstance();
             MAMEInfo MI = null;
             if (MS.isLoaded()) {
-                while (!MFM_Data.isLoaded()) {
+                while (!MFM_Data.getInstance().isLoaded()) {
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
