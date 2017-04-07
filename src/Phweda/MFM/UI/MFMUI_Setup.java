@@ -57,7 +57,7 @@ public class MFMUI_Setup {
     private static JFrame getBaseFrame() {
         frame = new JFrame();
         frame.setTitle(MFM.MFM_TITLE);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         return frame;
     }
 
@@ -98,7 +98,7 @@ public class MFMUI_Setup {
 
         // FIXME: 10/17/2016 where should this be
         if (MFM_Data.getInstance().isStaticChanged()) {
-            MFM_Data.persistStaticData();
+            MFM_Data.getInstance().persistStaticData();
         }
 
         comps = new MFM_Components(controller);
@@ -177,9 +177,11 @@ public class MFMUI_Setup {
     static class MFMWindow extends WindowAdapter {
         @Override
         public void windowClosing(WindowEvent e) {
-            MFMSettings.getInstance().persistMySettings();
+            // fixme No longer needed?? 4/7/2017
+            //    MFMSettings.getInstance().persistMySettings();
             super.windowClosing(e);
             MFM.logger.addToList("MFM Closing on frame closing command", true);
+            MFM.exit();
         }
     }
 }

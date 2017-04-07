@@ -320,11 +320,10 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case ExitAction:
-                    // NOTE duplicates MFMUI$MFMWindow windowClosing TODO Combine these how?
-                    // TODO make this safer
                     MFM.logger.addToList("MFM Closing on user command", true);
+                    // fixme is this needed anymore? 4/7/2017
                     MFMPlayLists.getInstance().persistPlayLists();
-                    System.exit(0);
+                    MFM.exit();
                     break;
 
                 // NOTE this is a quick Hack for Look and Feel Settings
