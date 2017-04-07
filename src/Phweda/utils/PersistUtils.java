@@ -40,6 +40,10 @@ import javax.xml.transform.stream.StreamResult;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,8 +67,6 @@ public class PersistUtils {
 
     public static Object loadAnObject(String path) throws IOException {
         try {
-            // DEBUG
-            System.out.println("PersistUtils.loadAnObjectPATH is  : " + path);
             FileInputStream fis = new FileInputStream(path);
             ObjectInputStream ois = new ObjectInputStream(fis);
             Object obj = ois.readObject();
@@ -79,8 +81,39 @@ public class PersistUtils {
         return null;
     }
 
-    public static void saveAnObjectXML(Object obj, String path) {
+    public static void saveAnObjecttoZip(Object obj, String zipPath, String fileName) {
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath))) {
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            zos.putNextEntry(zipEntry);
 
+            ObjectOutputStream oos = new ObjectOutputStream(zos);
+            oos.writeObject(obj);
+            oos.flush();
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Object loadAnObjectFromZip(String zipPath, String fileName) throws IOException {
+        try {
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            ZipFile zipFile = new ZipFile(zipPath);
+
+            ObjectInputStream ois = new ObjectInputStream(zipFile.getInputStream(zipEntry));
+            Object obj = ois.readObject();
+            ois.close();
+            return obj;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void saveAnObjectXML(Object obj, String path) {
         try {
             // Serialize object into XML
             XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
@@ -105,9 +138,6 @@ public class PersistUtils {
     }
 
     public static Object retrieveJAXB(String path, Class _class) {
-        if (MFM.isSystemDebug()) {
-            System.out.println("In retrieveJAXB");
-        }
         Object obj = null;
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(_class);
@@ -132,6 +162,38 @@ public class PersistUtils {
         } catch (JAXBException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void saveJAXBtoZip(Object obj, String zipPath, String fileName, Class _class) {
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath))){
+            JAXBContext jaxbContext = JAXBContext.newInstance(_class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            // output optimized not readable
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+
+            ZipEntry ze1 = new ZipEntry(fileName);
+            zos.putNextEntry(ze1);
+
+            jaxbMarshaller.marshal(obj, zos);
+        } catch (JAXBException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Object retrieveJAXBfromZip(String zipPath, String fileName, Class _class) {
+        Object obj = null;
+        try {
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            ZipFile zipFile = new ZipFile(zipPath);
+
+            JAXBContext jaxbContext = JAXBContext.newInstance(_class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+            obj = jaxbUnmarshaller.unmarshal(zipFile.getInputStream(zipEntry));
+        } catch (JAXBException | IOException e) {
+            e.printStackTrace();
+        }
+        return obj;
     }
 
     public static void saveXMLDoctoFile(Document doc, DocumentType documentType, String path)
