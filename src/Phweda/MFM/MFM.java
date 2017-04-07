@@ -65,8 +65,8 @@ public class MFM {
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
     public static final String VERSION = "Version 0.8.5";
-    public static final String BUILD = "BUILD 0.8.104";
-    public static final String RELEASE_DATE = "Released : April 2017";
+    public static final String BUILD = "BUILD 0.8.103";
+    public static final String RELEASE_DATE = "Released : March 2017";
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION + "  :  " + MFM.BUILD;
     public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     public static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
@@ -138,22 +138,22 @@ public class MFM {
         boolean MFMnoDirectories = false;
         File settingsDIR = new File(MFM_SETTINGS_DIR);
         if (!settingsDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !settingsDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !settingsDIR.mkdir();
         }
 
         File JarsDIR = new File(MFM_JARS_DIR);
         if (!JarsDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !JarsDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !JarsDIR.mkdir();
         }
 
         File logsDIR = new File(MFM_LOGS_DIR);
         if (!logsDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !logsDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !logsDIR.mkdir();
         }
 
         File listDIR = new File(MFM_LISTS_DIR);
         if (!listDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !listDIR.mkdir();
+            MFMnoDirectories = MFMnoDirectories & !listDIR.mkdir();
         }
 
         if (TEMP_DIR == null) {
@@ -162,6 +162,7 @@ public class MFM {
             if (!tempDir.exists()) {
                 MFMnoDirectories = MFMnoDirectories & !tempDir.mkdir();
             }
+
         }
 
         if (MFMnoDirectories) {
@@ -437,15 +438,9 @@ public class MFM {
                 TimeUnit.NANOSECONDS.toMillis(nanos) % TimeUnit.SECONDS.toMillis(1));
     }
 
-
-    public static void exit(){
-        // Wait for final exit while data is writing to disk
-        while(MFM_Data.getInstance().isPersisting()){}
-        System.exit(0);
-    }
-
     protected void finalize() throws Throwable {
         super.finalize();
+        //    logger.addToList("MFM Finalize complete.", true);
     }
 
 }
