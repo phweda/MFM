@@ -131,10 +131,6 @@ public class MFMUI_Setup {
         }
 
         frame.pack();
-
-        if (MFM.isProgressRunning()) {
-            MFM.showBusy(false, false);
-        }
         return frame;
     }
 

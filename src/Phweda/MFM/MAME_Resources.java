@@ -259,20 +259,6 @@ public class MAME_Resources {
         for (String key : extrasResourceCache.keySet()) {
             if (extrasResourceCache.get(key).containsKey(machineName)) {
                 try {
-
-                    /*
-                    005\
-                    depthch\
-                    invaders\
-                    qbert\
-                    zaxxon\
-
-                    java.lang.NullPointerException
-	at Phweda.MFM.MAME_Resources.getExtrasFiles(MAME_Resources.java:363)
-	at Phweda.MFM.MAME_Resources.getMachineResources(MAME_Resources.java:272)
-	at Phweda.MFM.MAME_Resources.generateListResources(MAME_Resources.java:194)
-                    */
-
                     // inner cast to get Extras TreeMap of outer cast of Arraylist of files
                     ((TreeSet<File>) ((TreeMap<String, Object>) resources.get(EXTRAS)).get(key)).add(
                             extrasResourceCache.get(key).get(machineName));

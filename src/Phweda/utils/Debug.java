@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"SameParameterValue"})
 public class Debug {
@@ -136,5 +137,12 @@ public class Debug {
         Debug.listBool = listBool;
     }
 
+    // Best place in MFM code to put this
+    public static String formatMillis(long nanos) {
+        return String.format("%02d:%02d:%02d.%03d", TimeUnit.NANOSECONDS.toHours(nanos),
+                TimeUnit.NANOSECONDS.toMinutes(nanos) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.NANOSECONDS.toSeconds(nanos) % TimeUnit.MINUTES.toSeconds(1),
+                TimeUnit.NANOSECONDS.toMillis(nanos) % TimeUnit.SECONDS.toMillis(1));
+    }
 }
 

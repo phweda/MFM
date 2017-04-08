@@ -18,30 +18,17 @@
 
 package Phweda.MFM;
 
-import Phweda.MFM.UI.MFMBusyPainter;
 import Phweda.MFM.UI.MFMUI;
-import Phweda.MFM.UI.MFMUI_Resources;
-import Phweda.MFM.UI.MFM_SettingsPanel;
 import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 import Phweda.utils.MemoryMonitor;
 import Phweda.utils.SwingUtils;
-import org.jdesktop.swingx.JXBusyLabel;
-import org.jdesktop.swingx.icon.EmptyIcon;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static Phweda.MFM.UI.MFMUI_Resources.MFM_Icon_PNG;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,24 +40,23 @@ public class MFM {
 
     public static final String APPLICATION_NAME = "MAME File Manager";
 
-    public static final String MFM_DIR;
-    public static final String MFM_SETTINGS_DIR;
-    public static final String MFM_DATA_DIR;
-    public static final String MFM_RESOURCES;
-    public static final String MFM_JARS_DIR;
-    public static final String MFM_LISTS_DIR;
-    public static final String MFM_LOGS_DIR;
-    public static final String MFM_FOLDERS_DIR;
-    public static final String MFM_CATEGORY_DIR;
+    public static String MFM_DIR;
+    public static String MFM_SETTINGS_DIR;
+    public static String MFM_DATA_DIR;
+    public static String MFM_RESOURCES;
+    public static String MFM_JARS_DIR;
+    public static String MFM_LISTS_DIR;
+    public static String MFM_LOGS_DIR;
+    public static String MFM_FOLDERS_DIR;
+    public static String MFM_CATEGORY_DIR;
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
     public static final String VERSION = "Version 0.8.5";
-    public static final String BUILD = "BUILD 0.8.104";
+    public static final String BUILD = "BUILD 0.8.105";
     public static final String RELEASE_DATE = "Released : April 2017";
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION + "  :  " + MFM.BUILD;
-    public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    public static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
-    public static final int time;
+
+    public static int logNumber;
     static final String MFM_SETTINGS_FILE = "MFM_SETTINGS.xml";
     static final String MFM_CATEGORY_DATA_FILE = "CategoryListsMap.xml";
     static final String MAME_RESOURCES_CACHE = "Resources_cache.ser";
@@ -97,12 +83,7 @@ public class MFM {
     private static boolean processAll = false;
     private static boolean debug = false;
     private static boolean firstRun = false;
-    private static boolean progressRunning = false;
     private static boolean systemoutDebug = false;
-
-    private static JFrame settingsFrame;
-    private static JDialog busyDialog = new JDialog(settingsFrame, MFM_TITLE);
-    private static Thread busyThread = null;
 
     static {
         File dir = new File(".");
@@ -111,80 +92,13 @@ public class MFM {
             path = dir.getCanonicalPath();
         } catch (IOException e) {
             e.printStackTrace();
-
             System.out.println("MFM FATAL error failed to detect run directory");
             System.exit(7);
         }
 
-        // Path we are executing in
-        MFM_DIR = path + FileUtils.DIRECTORY_SEPARATOR;
-        // Folder we create on the local file system
-        MFM_SETTINGS_DIR = MFM_DIR + MFM_Constants.SETTINGS + FileUtils.DIRECTORY_SEPARATOR;
-        // Folder we create on the local file system for Data Sets
-        MFM_DATA_DIR = MFM_DIR + MFM_Constants.DATA + FileUtils.DIRECTORY_SEPARATOR;
-        // Resources are all within the MFM.jar file
-        MFM_RESOURCES = FileUtils.DIRECTORY_SEPARATOR + MFM_Constants.RESOURCES + FileUtils.DIRECTORY_SEPARATOR;
-        // Added LnF Jars are placed here
-        MFM_JARS_DIR = MFM_DIR + MFM_Constants.JARS + FileUtils.DIRECTORY_SEPARATOR;
-        // Lists output files are placed here
-        MFM_LISTS_DIR = MFM_DIR + MFM_Constants.LISTS + FileUtils.DIRECTORY_SEPARATOR;
-        // Log files are placed here
-        MFM_LOGS_DIR = MFM_DIR + MFM_Constants.LOGS + FileUtils.DIRECTORY_SEPARATOR;
-        // Location of MFM distribution /folders/catver_full.ini
-        MFM_FOLDERS_DIR = MFM_DIR + MFM_Constants.FOLDERS + FileUtils.DIRECTORY_SEPARATOR;
-        // Location of MFM distribution /Category/ root category files
-        MFM_CATEGORY_DIR = MFM_DIR + MFM_Constants.CATEGORY + FileUtils.DIRECTORY_SEPARATOR;
+        setPathsandDirectories(path);
 
-        boolean MFMnoDirectories = false;
-        File settingsDIR = new File(MFM_SETTINGS_DIR);
-        if (!settingsDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !settingsDIR.mkdir();
-        }
-
-        File JarsDIR = new File(MFM_JARS_DIR);
-        if (!JarsDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !JarsDIR.mkdir();
-        }
-
-        File logsDIR = new File(MFM_LOGS_DIR);
-        if (!logsDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !logsDIR.mkdir();
-        }
-
-        File listDIR = new File(MFM_LISTS_DIR);
-        if (!listDIR.exists()) {
-            MFMnoDirectories = MFMnoDirectories | !listDIR.mkdir();
-        }
-
-        if (TEMP_DIR == null) {
-            TEMP_DIR = MFM_DIR + FileUtils.DIRECTORY_SEPARATOR + "temp" + FileUtils.DIRECTORY_SEPARATOR;
-            File tempDir = new File(TEMP_DIR);
-            if (!tempDir.exists()) {
-                MFMnoDirectories = MFMnoDirectories & !tempDir.mkdir();
-            }
-        }
-
-        if (MFMnoDirectories) {
-            System.out.println("MFM FATAL error cannot find or create MFM directories");
-            System.exit(8);
-        }
-
-        int timeNow = (int) System.currentTimeMillis();
-        // Gives us a 6 digit descending, over time, number
-        time = timeNow >> 12;
-
-        try {
-            Log = new File(MFM_LOGS_DIR + "MFM_Debug_log-" + time + ".txt");
-            ErrorLog = new File(MFM_LOGS_DIR + "MFM_ERRout-" + time + ".txt");
-
-            logger = new Debug(new FileOutputStream(Log));
-            System.setErr(new PrintStream(new FileOutputStream(ErrorLog)));
-            MAMEout = new File(MFM_LOGS_DIR + "MAME_OUT-" + time + ".txt");
-            FFmpegout = new File(MFM_LOGS_DIR + "FFmpeg_OUT-" + time + ".txt");
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        createLogs();
 
         try {
             logger.addToList("MFM is running in : " + path, true);
@@ -195,11 +109,60 @@ public class MFM {
     }
 
     public static void main(String[] args) {
+        loadSwitches(Arrays.asList(args));
+        logEnvironment();
+        // Add LookandFeels
+        add3rdPartyLFs();
+        // Get settings and Mame Information
+        loadSettingsandInfo();
+
+        // Start the GUI
+        MFMUI.main(null);
+
+        // End progress Dialog here - needs testing
+        if (MFMUI.isProgressRunning()) {
+            MFMUI.showBusy(false, false);
+        }
+    }
+
+    private static void loadSettingsandInfo(){
+        try {
+            MS = MFMSettings.getInstance();
+            MAMEInfo MI = null;
+            if (MS.isLoaded()) {
+                while (!MFM_Data.getInstance().isLoaded()) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                MI = new MAMEInfo();
+            } else {
+                setFirstRun(true); // fixme no loner needed?
+                // first run must acquire base settings before continuing
+                MFMUI.getSettings();
+            }
+
+            while (!MS.isLoaded()) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (MI == null) {
+                MI = new MAMEInfo();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadSwitches(List switches){
         /*
           Command line switches
         */
-        List<String> switches = Arrays.asList(args);
-
         logger.out("MFM starting");
         logger.out("MFM switches are: " + switches);
 
@@ -230,6 +193,9 @@ public class MFM {
             logger.out("Running in system out debug mode.");
             systemoutDebug = true;
         }
+    }
+
+    private static void logEnvironment(){
         logger.out("Temp dir is " + TEMP_DIR);
 
         // Get the VM arguments and log
@@ -258,62 +224,83 @@ public class MFM {
             }
         }
         logger.separateLine();
+    }
 
-        if (systemoutDebug) {
-            System.out.println("Main 01");
+    private static void setPathsandDirectories(String path){
+        // Path we are executing in
+        MFM_DIR = path + FileUtils.DIRECTORY_SEPARATOR;
+        // Folder we create on the local file system
+        MFM_SETTINGS_DIR = MFM_DIR + MFM_Constants.SETTINGS + FileUtils.DIRECTORY_SEPARATOR;
+        // Folder we create on the local file system for Data Sets
+        MFM_DATA_DIR = MFM_DIR + MFM_Constants.DATA + FileUtils.DIRECTORY_SEPARATOR;
+        // Resources are all within the MFM.jar file
+        MFM_RESOURCES = FileUtils.DIRECTORY_SEPARATOR + MFM_Constants.RESOURCES + FileUtils.DIRECTORY_SEPARATOR;
+        // Added LnF Jars are placed here
+        MFM_JARS_DIR = MFM_DIR + MFM_Constants.JARS + FileUtils.DIRECTORY_SEPARATOR;
+        // Lists output files are placed here
+        MFM_LISTS_DIR = MFM_DIR + MFM_Constants.LISTS + FileUtils.DIRECTORY_SEPARATOR;
+        // Log files are placed here
+        MFM_LOGS_DIR = MFM_DIR + MFM_Constants.LOGS + FileUtils.DIRECTORY_SEPARATOR;
+        // Location of MFM distribution /folders/catver_full.ini
+        MFM_FOLDERS_DIR = MFM_DIR + MFM_Constants.FOLDERS + FileUtils.DIRECTORY_SEPARATOR;
+        // Location of MFM distribution /Category/ root category files
+        MFM_CATEGORY_DIR = MFM_DIR + MFM_Constants.CATEGORY + FileUtils.DIRECTORY_SEPARATOR;
+
+        boolean MFMnoDirectories = false;
+        File settingsDIR = new File(MFM_SETTINGS_DIR);
+        if (!settingsDIR.exists()) {
+            MFMnoDirectories = MFMnoDirectories | !settingsDIR.mkdir();
         }
-        try {
-            // Add L&Fs
-            add3rdPartyLFs();
-            MS = MFMSettings.getInstance();
-            MAMEInfo MI = null;
-            if (MS.isLoaded()) {
-                while (!MFM_Data.getInstance().isLoaded()) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                MI = new MAMEInfo();
-            } else {
-                setFirstRun(true);
-                showBusy(false, false); // this is messy logic
-                // first run must acquire base settings before continuing
-                getSettings();
-            }
 
-            // TODO better way to wait?? Can we now eliminate since we distribute data .ser??
-            while (!MS.isLoaded()) {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        File dataDIR = new File(MFM_DATA_DIR);
+        if (!dataDIR.exists()) {
+            MFMnoDirectories = MFMnoDirectories | !dataDIR.mkdir();
+        }
+
+        File JarsDIR = new File(MFM_JARS_DIR);
+        if (!JarsDIR.exists()) {
+            MFMnoDirectories = MFMnoDirectories | !JarsDIR.mkdir();
+        }
+
+        File logsDIR = new File(MFM_LOGS_DIR);
+        if (!logsDIR.exists()) {
+            MFMnoDirectories = MFMnoDirectories | !logsDIR.mkdir();
+        }
+
+        File listDIR = new File(MFM_LISTS_DIR);
+        if (!listDIR.exists()) {
+            MFMnoDirectories = MFMnoDirectories | !listDIR.mkdir();
+        }
+
+        if (TEMP_DIR == null) {
+            TEMP_DIR = MFM_DIR + FileUtils.DIRECTORY_SEPARATOR + "temp" + FileUtils.DIRECTORY_SEPARATOR;
+            File tempDir = new File(TEMP_DIR);
+            if (!tempDir.exists()) {
+                MFMnoDirectories = MFMnoDirectories & !tempDir.mkdir();
             }
-            if (MI == null) {
-                MI = new MAMEInfo();
-            }
-        } catch (Exception e) {
+        }
+
+        if (MFMnoDirectories) {
+            System.out.println("MFM FATAL error cannot find or create MFM directories");
+            System.exit(8);
+        }
+    }
+
+    private static void createLogs(){
+        int timeNow = (int) System.currentTimeMillis();
+        // Gives us a 6 digit descending, over time, number
+        logNumber = timeNow >> 12;
+        try {
+            Log = new File(MFM_LOGS_DIR + "MFM_Debug_log-" + logNumber + ".txt");
+            ErrorLog = new File(MFM_LOGS_DIR + "MFM_ERRout-" + logNumber + ".txt");
+
+            logger = new Debug(new FileOutputStream(Log));
+            System.setErr(new PrintStream(new FileOutputStream(ErrorLog)));
+            MAMEout = new File(MFM_LOGS_DIR + "MAME_OUT-" + logNumber + ".txt");
+            FFmpegout = new File(MFM_LOGS_DIR + "FFmpeg_OUT-" + logNumber + ".txt");
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        Thread loadMameResources = new Thread() {
-            @Override
-            public void run() {
-                long millis = System.currentTimeMillis();
-                if (MFM.isSystemDebug()) {
-                    System.out.println("\nMAME Resources load starting: " + new Date(millis));
-                }
-                MAME_Resources.getInstance(); // load and initialize
-                if (MFM.isSystemDebug()) {
-                    System.out.println("MAME Resources load took: " +
-                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - millis));
-                }
-            }
-        };
-        loadMameResources.start();
-        MFMUI.main(null);
     }
 
     public static MFMSettings getMFMSettings() {
@@ -330,10 +317,6 @@ public class MFM {
 
     public static boolean isProcessAll() {
         return processAll;
-    }
-
-    public static boolean isProgressRunning() {
-        return progressRunning;
     }
 
     public static boolean isSystemDebug() {
@@ -353,90 +336,6 @@ public class MFM {
             SwingUtils.load3rdPartyLFs(MFM_JARS_DIR);
         }
     }
-
-    public static JFrame getSettings() {
-        MFM_SettingsPanel.showSettingsPanel(getSettingsFrame());
-        return settingsFrame;
-    }
-
-    private static JFrame getSettingsFrame() {
-        if (settingsFrame != null) {
-            settingsFrame.dispose();
-        }
-        settingsFrame = new JFrame("MFM Settings");
-        settingsFrame.setIconImage(MFMUI_Resources.getInstance().getImageIcon(MFM_Icon_PNG).getImage());
-
-        return settingsFrame;
-    }
-
-    // TODO move this
-    public static void showBusy(boolean start, boolean task) { // task false is empty startup. task true is loading data
-
-        progressRunning = start;
-        if (start) {
-            busyThread = new Thread() {
-                @Override
-                public void run() {
-                    busyDialog.setLocation(screenCenterPoint.x - 150, screenCenterPoint.y - 50);
-                    JXBusyLabel busyLabel = createComplexBusyLabel();
-                    if (task) {
-                        busyLabel.setText("<HTML>DATA<br>LOADING</HTML>");
-                        busyLabel.setToolTipText("MFM Data Loading");
-                    } else {
-                        busyLabel.setText("<HTML>Parsing<br>MAME data</HTML>");
-                        busyLabel.setToolTipText("Parsing MAME Data");
-                    }
-
-                    busyDialog.add(busyLabel);
-                    busyLabel.setBusy(true);
-                    busyDialog.pack();
-                    busyDialog.setVisible(true);
-                }
-            };
-            busyThread.start();
-        } else {
-            busyDialog.dispose();
-            busyDialog.setVisible(false);
-            busyThread.interrupt();
-        }
-    }
-
-    // TODO move this along with above
-    private static JXBusyLabel createComplexBusyLabel() {
-        JXBusyLabel label = new JXBusyLabel(new Dimension(325, 150));
-        // default is 100
-        label.setDelay(100);
-        /*
-        BusyPainter painter = new BusyPainter(
-                new Rectangle2D.Float(0.0f, 0.0f, 8.0f, 8.0f),
-                new Rectangle2D.Float(20.5f, 20.5f, 75.0f, 75.0f));
-*/
-        MFMBusyPainter painter = new MFMBusyPainter(
-                new Ellipse2D.Double(0.0d, 0.0d, 15.0d, 15.0d),
-                new Ellipse2D.Double(10.0d, 10.0d, 125.0d, 125.0d));
-
-        painter.setTrailLength(64);
-        painter.setPoints(192);
-        painter.setFrame(-1);
-        painter.setBaseColor(MFMUI.getMFMcolor());
-        painter.setHighlightColor(Color.orange);
-
-        label.setPreferredSize(new Dimension(325, 150));
-        label.setMinimumSize(new Dimension(325, 150));
-        label.setIcon(new EmptyIcon(150, 150));
-        label.setBusyPainter(painter);
-        label.setFont(new Font(label.getFont().getName(), Font.BOLD, 24));
-        return label;
-    }
-
-    // TODO move this
-    public static String formatMillis(long nanos) {
-        return String.format("%02d:%02d:%02d.%03d", TimeUnit.NANOSECONDS.toHours(nanos),
-                TimeUnit.NANOSECONDS.toMinutes(nanos) % TimeUnit.HOURS.toMinutes(1),
-                TimeUnit.NANOSECONDS.toSeconds(nanos) % TimeUnit.MINUTES.toSeconds(1),
-                TimeUnit.NANOSECONDS.toMillis(nanos) % TimeUnit.SECONDS.toMillis(1));
-    }
-
 
     public static void exit(){
         // Wait for final exit while data is writing to disk

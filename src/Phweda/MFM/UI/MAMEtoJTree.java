@@ -50,9 +50,9 @@ import java.util.List;
  */
 public class MAMEtoJTree extends JPanel {
 
-    protected static final String COPY = "Copy";
-    private static final int FRAME_WIDTH = MFM.screenSize.width / 5;
-    private static final int FRAME_HEIGHT = MFM.screenSize.height - 100;
+    static final String COPY = "Copy";
+    private static final int FRAME_WIDTH = MFMUI.screenSize.width / 5;
+    private static final int FRAME_HEIGHT = MFMUI.screenSize.height - 100;
     private static JTree jTree;
     private static Mame root;
     private static MAMEtoJTree ourInstance;
@@ -65,7 +65,7 @@ public class MAMEtoJTree extends JPanel {
             root = MAMEInfo.getMame();
         }
         this.setPreferredSize(new Dimension(FRAME_WIDTH - 10, FRAME_HEIGHT - 20));
-        // Take an Object and convert it to a Tree model for the JTree
+
         DefaultMutableTreeNode top = createTreeNode(root);
         DefaultTreeModel dtModel = new DefaultTreeModel(top);
 
@@ -115,7 +115,7 @@ public class MAMEtoJTree extends JPanel {
                 }
         );
         add(jScroll);
-        // Dumps Mame data without any whitespace - determine true data size
+        // Dumps Mame data without any whitespace or tags - determine true data size
         // dataDump(top,"MAME_tree_data.txt");
     }
 

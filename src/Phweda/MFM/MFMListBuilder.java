@@ -25,6 +25,7 @@ package Phweda.MFM;
  * Time: 2:47 PM
  */
 
+import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Machine;
@@ -467,10 +468,10 @@ public final class MFMListBuilder {
         JDialog dialog = new JDialog(frame, "Lists Difference");
         dialog.getContentPane().add(scrollPane);
         dialog.setMinimumSize(new Dimension(300, 200));
-        dialog.setPreferredSize(new Dimension(400, (int) MFM.screenSize.getHeight() / 2));
-        dialog.setMaximumSize(new Dimension(400, (int) MFM.screenSize.getHeight() / 2));
+        dialog.setPreferredSize(new Dimension(400, (int) MFMUI.screenSize.getHeight() / 2));
+        dialog.setMaximumSize(new Dimension(400, (int) MFMUI.screenSize.getHeight() / 2));
 
-        dialog.setLocation(MFM.screenSize.width / 2 - 150, MFM.screenSize.height / 2 - 100);
+        dialog.setLocation(MFMUI.screenSize.width / 2 - 150, MFMUI.screenSize.height / 2 - 100);
         dialog.pack();
         dialog.setVisible(true);
     }

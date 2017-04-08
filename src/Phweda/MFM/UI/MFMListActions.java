@@ -22,6 +22,7 @@ import Phweda.MFM.*;
 import Phweda.MFM.Utils.MFMFileOps;
 import Phweda.MFM.Utils.MFM_DATmaker;
 import Phweda.MFM.datafile.Datafile;
+import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
 
@@ -302,7 +303,7 @@ class MFMListActions {
                 }
                 long estimatedTime = (System.nanoTime() - startTime);
                 // System.out.println("Estimated time long is : " + estimatedTime);
-                MFM.logger.addToList(action + " completed in " + MFM.formatMillis(estimatedTime) +
+                MFM.logger.addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
                         FileUtils.NEWLINE, true);
             }
         };
@@ -335,7 +336,7 @@ class MFMListActions {
                 infoPanel.updateUI();
                 long estimatedTime = (System.nanoTime() - startTime);
                 //    System.out.println("Estimated time long is : " + estimatedTime);
-                MFM.logger.addToList(action + " completed in " + MFM.formatMillis(estimatedTime) +
+                MFM.logger.addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
                         FileUtils.NEWLINE, true);
             }
         };

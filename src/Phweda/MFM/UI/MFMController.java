@@ -620,7 +620,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void showSettings() {
-        MFM_SettingsPanel.showSettingsPanel(MFM.getSettings());
+        MFM_SettingsPanel.showSettingsPanel(MFMUI.getSettings());
     }
 
     private void update() {
@@ -743,7 +743,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         sb.append(MFM.MFM_DIR);
         sb.append(FileUtils.DIRECTORY_SEPARATOR);
         sb.append("MFM_Logs_");
-        sb.append(MFM.time);
+        sb.append(MFM.logNumber);
         sb.append(".zip");
 
         ZipUtils zipUtils = new ZipUtils();
