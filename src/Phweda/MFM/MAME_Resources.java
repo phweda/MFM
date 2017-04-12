@@ -37,6 +37,11 @@ import java.util.*;
  * Date: 3/2/2016
  * Time: 6:31 PM
  */
+
+/**
+ * MAME_Resources detects and stores the ROMs CHDs and Extras files from the User's entered sets
+ *
+ */
 public class MAME_Resources {
 
     public static final String EXTRAS = "extras";

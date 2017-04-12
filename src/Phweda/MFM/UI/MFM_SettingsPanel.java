@@ -71,7 +71,7 @@ public final class MFM_SettingsPanel extends JPanel {
         frame = frameIn;
         frame.setContentPane(new MFM_SettingsPanel());
         setComponentsFont(frame.getComponents());
-        frame.setLocation(MFM.screenCenterPoint.x - size.width / 2, MFM.screenCenterPoint.y - size.height / 2);
+        frame.setLocation(MFMUI.screenCenterPoint.x - size.width / 2, MFMUI.screenCenterPoint.y - size.height / 2);
         frame.pack();
         frame.setVisible(true);
         //    frame.setAlwaysOnTop(true);
@@ -182,8 +182,8 @@ public final class MFM_SettingsPanel extends JPanel {
                         return;
                     }
 
-                    File MFMcache = new File(MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_SER);
-                    if (!MFMcache.exists() && (mameexe.length() < 6)) {
+
+                    if (!MFM_Data.getInstance().isLoaded() && (mameexe.length() < 6)) {
                         JOptionPane.showMessageDialog(frame,
                                 "MFM Data not detected MAME.exe must be entered.");
                         return;

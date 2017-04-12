@@ -28,6 +28,7 @@ package Phweda.MFM.UI;
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MFMListBuilder;
 import Phweda.MFM.MFMSettings;
+import Phweda.MFM.MFM_Data;
 import Phweda.utils.ClockPanel;
 
 import javax.swing.*;
@@ -130,8 +131,8 @@ public class MFM_Components {
         ClockPanel clock = new ClockPanel();
         clock.start();
 
-        JLabel versionJL = new JLabel(MFMSettings.getMAMEVersion() + "   :   DATA " + MAMEInfo.getVersion(),
-                SwingConstants.CENTER);
+        JLabel versionJL = new JLabel(MFMSettings.getMAMEVersion() + "   :   DATA " +
+                MFM_Data.getInstance().getDataVersion(), SwingConstants.CENTER);
         currentListName = new JLabel(MFMListBuilder.ALL,
                 getResources().getImageIcon(MFMUI_Resources.UPARROW_PNG), SwingConstants.LEFT);
         infoPanel = new MFMInformationPanel();

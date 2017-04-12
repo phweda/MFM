@@ -82,13 +82,13 @@ public final class MFM_Constants {
     public static final String LANGUAGESLISTS = "Languages Lists";
     public static final String MAME_FOLDER_SNAPS = "snaps";
     public static final String ROMS = "roms";
-/*
-            MAME FOLDERS as of 10/1/2016
-artwork, artwork preview, bkground, bosses, cabdevs, cabinets, chds, covers_SL, cpanel, ctrlr, devices, ends, flyers,
-folders, gameover, howto, icons, ini, logo, manuals, manuals_SL, marquees, pcb, roms, samples, scores, select, snap,
-snap_SL, snaps, Software Lists, titles, titles_SL, versus, video, videosnaps
+    /*
+                MAME FOLDERS as of 10/1/2016
+    artwork, artwork preview, bkground, bosses, cabdevs, cabinets, chds, covers_SL, cpanel, ctrlr, devices, ends, flyers,
+    folders, gameover, howto, icons, ini, logo, manuals, manuals_SL, marquees, pcb, roms, samples, scores, select, snap,
+    snap_SL, snaps, Software Lists, titles, titles_SL, versus, video, videosnaps
 
- */
+     */
     public static final String CHDS = "chds";
     static final String FULL_SET_DIRECTORIES_MAP = "FullSetDirectories MAP";
     static final String PLAY_SET_DIRECTORIES_MAP = "PlaySetDirectories";
@@ -112,6 +112,7 @@ snap_SL, snaps, Software Lists, titles, titles_SL, versus, video, videosnaps
     static final String FOLDERS = "folders";
     static final String CATEGORY = "Category";
     static final String SETTINGS = "Settings";
+    static final String DATA = "Data";
     static final String RESOURCES = "Resources";
     static final String JARS = "Jars";
     static final String LISTS = "Lists";
