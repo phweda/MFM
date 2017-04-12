@@ -18,7 +18,6 @@
 
 package Phweda.utils;
 
-import Phweda.MFM.MFM;
 import Phweda.MFM.datafile.Datafile;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -42,7 +41,6 @@ import java.beans.XMLEncoder;
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -81,15 +79,18 @@ public class PersistUtils {
         return null;
     }
 
-    public static void saveAnObjecttoZip(Object obj, String zipPath, String fileName) {
-        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath))) {
+    /**
+     * DO NOT close outputstream so other files may be added to zip from the caller
+     * @param obj
+     * @param zipOutputStream
+     * @param fileName
+     */
+    public static void saveAnObjecttoZip(Object obj, ZipOutputStream zipOutputStream, String fileName) {
+        try {
             ZipEntry zipEntry = new ZipEntry(fileName);
-            zos.putNextEntry(zipEntry);
-
-            ObjectOutputStream oos = new ObjectOutputStream(zos);
+            zipOutputStream.putNextEntry(zipEntry);
+            ObjectOutputStream oos = new ObjectOutputStream(zipOutputStream);
             oos.writeObject(obj);
-            oos.flush();
-            oos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -164,17 +165,24 @@ public class PersistUtils {
         }
     }
 
-    public static void saveJAXBtoZip(Object obj, String zipPath, String fileName, Class _class) {
-        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath))){
+    /**
+     * DO NOT close outputstream so other files may be added to zip from the caller
+     * @param obj
+     * @param zipOutputStream
+     * @param fileName
+     * @param _class
+     */
+    public static void saveJAXBtoZip(Object obj, ZipOutputStream zipOutputStream, String fileName, Class _class) {
+        try {
             JAXBContext jaxbContext = JAXBContext.newInstance(_class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             // output optimized not readable
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 
-            ZipEntry ze1 = new ZipEntry(fileName);
-            zos.putNextEntry(ze1);
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            zipOutputStream.putNextEntry(zipEntry);
 
-            jaxbMarshaller.marshal(obj, zos);
+            jaxbMarshaller.marshal(obj, zipOutputStream);
         } catch (JAXBException | IOException e) {
             e.printStackTrace();
         }
