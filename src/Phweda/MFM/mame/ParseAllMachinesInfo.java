@@ -66,33 +66,26 @@ public class ParseAllMachinesInfo {
      **/
 
     public static Mame loadAllMachinesInfo() {
-        if (MFMSettings.isFullXMLcompatible()) {
-            // allMachinesInfo = loadAllMachinesInfoJAXB();
-            mame = loadAllMachinesInfoJAXB();
-            // Set data version here. 0.85 change to handle older Mame versions
-            if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
-                MFMSettings.setDataVersion(mame.getBuild());
-            } else {
-                MFMSettings.setDataVersion(trimMAMEVersion(MAMEexe.getMAMEexeVersion()));
-            }
+        // Note as of 0.85 we handle all Mame -listxml versions the same
 
-            if (!MFM.isProcessAll()) {
-                removeNotRunnable();
-            }
-            for (Machine machine : mame.getMachineMap().values()) {
-                addNonMAMEinfo(machine, machine.getName());
-                findControls(machine);
-            }
+        mame = loadAllMachinesInfoJAXB();
+        // Set data version here. 0.85 change to handle older Mame versions
+        if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
+            MFMSettings.setDataVersion(mame.getBuild());
         } else {
-            Set<String> prefixes = null;
-            try {
-                prefixes = getGamesPrefixes();
-            } catch (IOException e) {
-                e.printStackTrace(MFM.logger.Writer());
-                // prefixes = new TreeSet<String>(); // doesn't make sense
-            }
-            loadAllMachinesInfoDOM(prefixes);
+            String version = trimMAMEVersion(MAMEexe.getMAMEexeVersion());
+            MFMSettings.setDataVersion(version);
+            mame.setBuild(version);
         }
+
+        if (!MFM.isProcessAll()) {
+            removeNotRunnable();
+        }
+        for (Machine machine : mame.getMachineMap().values()) {
+            addNonMAMEinfo(machine, machine.getName());
+            findControls(machine);
+        }
+
 
         // TODO where to put this?
         findCategories();
@@ -139,16 +132,11 @@ public class ParseAllMachinesInfo {
     private static Mame loadAllMAME() {
         Mame mame = null;
         try {
-            // xmlStreamWriter.setDefaultNamespace("")
             JAXBContext jaxbContext = JAXBContext.newInstance(Mame.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            // disable validation - no public schema and we are going to try and handle older MAME xml versions
-            // Changed package-info
-            // jaxbUnmarshaller.setSchema(null);
             Process process = MAMEexe.run("-listxml");
             InputStream inputStream = process.getInputStream();
             mame = (Mame) jaxbUnmarshaller.unmarshal(inputStream);
-
         } catch (JAXBException | MAMEexe.MAME_Exception e) {
             e.printStackTrace();
         }
