@@ -98,7 +98,7 @@ public class MFMUI_Setup {
 
         // FIXME: 10/17/2016 where should this be
         if (MFM_Data.getInstance().isStaticChanged()) {
-            MFM_Data.getInstance().persistStaticData();
+            MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, MFM.isProcessAll());
         }
 
         comps = new MFM_Components(controller);
@@ -108,7 +108,7 @@ public class MFMUI_Setup {
         frame.setIconImage(mfmIcon.getImage());
         frame.setResizable(true);
 
-        String fontSize = MFMSettings.MFMFontSize();
+        String fontSize = MFMSettings.getInstance().MFMFontSize();
         switch (fontSize) {
             case MFM_Constants.NORMAL:
                 MFMmainPane.setDividerLocation(220);

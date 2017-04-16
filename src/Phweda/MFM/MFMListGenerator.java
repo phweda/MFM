@@ -77,7 +77,7 @@ class MFMListGenerator {
                 MFM.logger.addToList("In loadLanguagesINI");
             }
             TreeMap<String, TreeSet<String>> languagesMap = new TreeMap<String, TreeSet<String>>();
-            new ParseFolderINIs(MFMSettings.getLanguageINI(), languagesMap).processFile();
+            new ParseFolderINIs(MFMSettings.getInstance().getLanguageINI(), languagesMap).processFile();
             // if not all then remove non-playable machines
             if (!MFM.isProcessAll()) {
                 filterLanguagesMap(languagesMap);

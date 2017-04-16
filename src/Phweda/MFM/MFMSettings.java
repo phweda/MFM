@@ -75,7 +75,7 @@ public class MFMSettings {
         return ms;
     }
 
-    static TreeMap<String, String> getResourceRoots() {
+    TreeMap<String, String> getResourceRoots() {
         TreeMap<String, String> roots = new TreeMap<String, String>();
 
         if (mfmSettings.get(MFM_Constants.ROMS_FULL_SET_DIRECTORY) != null) {
@@ -110,161 +110,161 @@ public class MFMSettings {
         return roots;
     }
 
-    public static String getPlaySetDir() {
+    public String getPlaySetDir() {
         return (String) mfmSettings.get(MFM_Constants.PLAYSET_ROOT_DIRECTORY);
     }
 
-    public static void setPlaySetDir(String playSetDir) {
+    public void setPlaySetDir(String playSetDir) {
         mfmSettings.put(MFM_Constants.PLAYSET_ROOT_DIRECTORY, playSetDir);
     }
 
-    public static String VIDsFullSetDir() {
+    public String VIDsFullSetDir() {
         return (String) mfmSettings.get(MFM_Constants.MAME_VIDS_DIRECTORY);
     }
 
-    public static void VIDsFullSetDir(String VIDsFullSetDir) {
+    public void VIDsFullSetDir(String VIDsFullSetDir) {
         mfmSettings.put(MFM_Constants.MAME_VIDS_DIRECTORY, VIDsFullSetDir);
     }
 
-    public static String VDubexe() {
+    public String VDubexe() {
         return (String) mfmSettings.get(MFM_Constants.VIRTUALDUB_EXE);
     }
 
-    public static void VDubexe(String VDubdir) {
+    public void VDubexe(String VDubdir) {
         mfmSettings.put(MFM_Constants.VIRTUALDUB_EXE, VDubdir);
     }
 
-    public static String FFMPEGexe() {
+    public String FFMPEGexe() {
         return (String) mfmSettings.get(MFM_Constants.FFMPEG_EXE);
     }
 
-    public static void FFMPEGexe(String FFmpegEXE) {
+    public void FFMPEGexe(String FFmpegEXE) {
         mfmSettings.put(MFM_Constants.FFMPEG_EXE, FFmpegEXE);
     }
 
-    public static String FFmpegEXEdir() {
+    public String FFmpegEXEdir() {
         return (String) mfmSettings.get(MFM_Constants.FFMPEG_EXE_DIRECTORY);
     }
 
-    public static void FFmpegEXEdir(String FFmpegEXEdir) {
+    public void FFmpegEXEdir(String FFmpegEXEdir) {
         mfmSettings.put(MFM_Constants.FFMPEG_EXE_DIRECTORY, FFmpegEXEdir);
     }
 
-    public static String FFmpegInputFolder() {
+    public String FFmpegInputFolder() {
         return (String) mfmSettings.get(MFM_Constants.FFmpeg_INPUT_FOLDER);
     }
 
-    public static void FFmpegInputFolder(String FFmpegInputFolder) {
+    public void FFmpegInputFolder(String FFmpegInputFolder) {
         mfmSettings.put(MFM_Constants.FFmpeg_INPUT_FOLDER, FFmpegInputFolder);
     }
 
-    public static String FFmpegOutputFolder() {
+    public String FFmpegOutputFolder() {
         return (String) mfmSettings.get(MFM_Constants.FFmpeg_OUTPUT_FOLDER);
     }
 
-    public static void FFmpegOutputFolder(String FFmpegOutputFolder) {
+    public void FFmpegOutputFolder(String FFmpegOutputFolder) {
         mfmSettings.put(MFM_Constants.FFmpeg_OUTPUT_FOLDER, FFmpegOutputFolder);
     }
 
-    public static String MAMEexeDir() {
+    public String MAMEexeDir() {
         return (String) mfmSettings.get(MFM_Constants.MAME_EXE_DIRECTORY);
     }
 
-    public static void MAMEexeDir(String MAMEexeDir) {
+    public void MAMEexeDir(String MAMEexeDir) {
         mfmSettings.put(MFM_Constants.MAME_EXE_DIRECTORY, MAMEexeDir);
     }
 
-    private static void initMySettings() {
+    private void initMySettings() {
         mfmSettings = new HashMap<String, Object>(15);
         MFMFontSize(MFM_Constants.NORMAL);
     }
 
-    public static String MAMEexeName() {
+    public String MAMEexeName() {
         return (String) mfmSettings.get(MFM_Constants.MAME_EXE_NAME);
     }
 
-    public static void MAMEexeName(String MAMEexeName) {
+    public void MAMEexeName(String MAMEexeName) {
         exeChanged = true;
         mfmSettings.put(MFM_Constants.MAME_EXE_NAME, MAMEexeName);
     }
 
-    public static String fullMAMEexePath() {
+    public String fullMAMEexePath() {
         return MAMEexeDir() + FileUtils.DIRECTORY_SEPARATOR + MAMEexeName();
     }
 
-    public static String RomsFullSetDir() {
+    public String RomsFullSetDir() {
         return (String) mfmSettings.get(MFM_Constants.ROMS_FULL_SET_DIRECTORY);
     }
 
-    public static void RomsFullSetDir(String romsFullSetDir) {
+    public void RomsFullSetDir(String romsFullSetDir) {
         mfmSettings.put(MFM_Constants.ROMS_FULL_SET_DIRECTORY, romsFullSetDir);
     }
 
-    public static void nonMerged(boolean mergedIn) {
+    public void nonMerged(boolean mergedIn) {
         mfmSettings.put(MFM_Constants.NONMERGED, mergedIn);
     }
 
-    public static boolean isnonMerged() {
+    public boolean isnonMerged() {
         return mfmSettings.get(MFM_Constants.NONMERGED) != null && (boolean) mfmSettings.get(MFM_Constants.NONMERGED);
     }
 
-    public static String CHDsFullSetDir() {
+    public String CHDsFullSetDir() {
         return (String) mfmSettings.get(MFM_Constants.CHDS_FULL_SET_DIRECTORY);
     }
 
-    public static void CHDsFullSetDir(String CHDsFullSetDir) {
+    public void CHDsFullSetDir(String CHDsFullSetDir) {
         mfmSettings.put(MFM_Constants.CHDS_FULL_SET_DIRECTORY, CHDsFullSetDir);
     }
 
-    public static String SoftwareListRomsFullSetDir() {
+    public String SoftwareListRomsFullSetDir() {
         return (String) mfmSettings.get(MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY);
     }
 
-    public static void SoftwareListRomsFullSetDir(String SoftwareListROMsFullSetDir) {
+    public void SoftwareListRomsFullSetDir(String SoftwareListROMsFullSetDir) {
         mfmSettings.put(MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY, SoftwareListROMsFullSetDir);
     }
 
-    public static String SoftwareListCHDsFullSetDir() {
+    public String SoftwareListCHDsFullSetDir() {
         return (String) mfmSettings.get(MFM_Constants.SOFTWARELIST_CHDS_FULL_SET_DIRECTORY);
     }
 
-    public static void SoftwareListCHDsFullSetDir(String SoftwareListCHDsFullSetDir) {
+    public void SoftwareListCHDsFullSetDir(String SoftwareListCHDsFullSetDir) {
         mfmSettings.put(MFM_Constants.SOFTWARELIST_CHDS_FULL_SET_DIRECTORY, SoftwareListCHDsFullSetDir);
     }
 
-    public static String getExtrasFullSetDir() {
+    public String getExtrasFullSetDir() {
         return (String) mfmSettings.get(MFM_Constants.EXTRAS_FULL_SET_DIRECTORY);
     }
 
-    public static void setExtrasFullSetDir(String extrasFullSetDir) {
+    public void setExtrasFullSetDir(String extrasFullSetDir) {
         mfmSettings.put(MFM_Constants.EXTRAS_FULL_SET_DIRECTORY, extrasFullSetDir);
     }
 
-    public static String getHistoryDAT() {
+    public String getHistoryDAT() {
         return (String) mfmSettings.get(MFM_Constants.HISTORY_DAT_FILE);
     }
 
-    private static void setHistoryDAT(String historyDAT) {
+    private void setHistoryDAT(String historyDAT) {
         mfmSettings.put(MFM_Constants.HISTORY_DAT_FILE, historyDAT);
     }
 
-    public static String getMAMEInfoDAT() {
+    public String getMAMEInfoDAT() {
         return (String) mfmSettings.get(MFM_Constants.MAMEINFO_DAT_FILE);
     }
 
-    private static void setMAMEInfoDAT(String MAMEInfoDAT) {
+    private void setMAMEInfoDAT(String MAMEInfoDAT) {
         mfmSettings.put(MFM_Constants.MAMEINFO_DAT_FILE, MAMEInfoDAT);
     }
 
-    public static String getCatverINI() {
+    public String getCatverINI() {
         return (String) mfmSettings.get(MFM_Constants.CATVER_INI_FILE);
     }
 
-    private static void setCatverINI(String catverINI) {
+    private void setCatverINI(String catverINI) {
         mfmSettings.put(MFM_Constants.CATVER_INI_FILE, catverINI);
     }
 
-    public static HashMap<String, File> getExtrasZipFilesMap() {
+    public HashMap<String, File> getExtrasZipFilesMap() {
         extrasZipFilesMap = new HashMap<String, File>();
         for (String key : extrasZips.keySet()) {
             extrasZipFilesMap.put(key, new File(extrasZips.get(key)));
@@ -272,13 +272,13 @@ public class MFMSettings {
         return extrasZipFilesMap;
     }
 
-    static String getMAMEFoldersDir() {
+    String getMAMEFoldersDir() {
         // TODO fixme me. How are we getting here with a null? We got here before it was set?
         String answer = (String) mfmSettings.get(MFM_Constants.MAME_FOLDER_DIRECTORY);
         return (answer == null) ? "" : answer;
     }
 
-    private static void setMAMEFoldersDir(String MAMEFoldersDir) {
+    private void setMAMEFoldersDir(String MAMEFoldersDir) {
         if (MAMEFoldersDir != null) {
             mfmSettings.put(MFM_Constants.MAME_FOLDER_DIRECTORY, MAMEFoldersDir);
         } else {
@@ -286,65 +286,65 @@ public class MFMSettings {
         }
     }
 
-    public static String MFMFontSize() {
+    public String MFMFontSize() {
         if (mfmSettings == null) {
             return MFM_Constants.NORMAL;
         }
         return (String) mfmSettings.get(MFM_Constants.FONTSIZE);
     }
 
-    public static void MFMFontSize(String MFMFontSize) {
+    public void MFMFontSize(String MFMFontSize) {
         mfmSettings.put(MFM_Constants.FONTSIZE, MFMFontSize);
     }
 
-    public static String MFMCurrentList() {
+    public String MFMCurrentList() {
         return (String) mfmSettings.get(MFM_Constants.CURRENTLIST);
     }
 
-    public static void MFMCurrentList(String MFMCurrentList) {
+    public void MFMCurrentList(String MFMCurrentList) {
         mfmSettings.put(MFM_Constants.CURRENTLIST, MFMCurrentList);
     }
 
-    public static String MFMLookAndFeel() {
+    public String MFMLookAndFeel() {
         return (String) mfmSettings.get(MFM_Constants.LOOKANDFEEL);
     }
 
-    public static void MFMLookAndFeel(String MFMLookAndFeel) {
+    public void MFMLookAndFeel(String MFMLookAndFeel) {
         mfmSettings.put(MFM_Constants.LOOKANDFEEL, MFMLookAndFeel);
     }
 
-    public static HashMap<String, String> FullSetDirectories() {
+    public HashMap<String, String> FullSetDirectories() {
         return fullSetExtrasDirectories;
     }
 
-    public static Integer selectedTab() {
+    public Integer selectedTab() {
         return (Integer) mfmSettings.get(MFM_Constants.SELECTEDTAB);
     }
 
-    public static void selectedTab(Integer index) {
+    public void selectedTab(Integer index) {
         mfmSettings.put(MFM_Constants.SELECTEDTAB, index);
     }
 
-    public static HashMap<String, String> PlaySetDirectories() {
+    public HashMap<String, String> PlaySetDirectories() {
         return playSetDirectories;
     }
 
-    public static void isLoaded(boolean bool) {
+    public void isLoaded(boolean bool) {
         loaded = bool;
     }
 
-    public static boolean isHascatverini() {
+    public boolean isHascatverini() {
         return hascatverini;
     }
 
-    public static void setHascatverini(boolean hascatverini) {
+    public void setHascatverini(boolean hascatverini) {
         MFMSettings.hascatverini = hascatverini;
     }
 
     /*
     * We require these folders to exist. Create them if missing
     */
-    private static void mkDirs() {
+    private void mkDirs() {
         String[] folders = MFM_Constants.MAME_FOLDER_NAMES_ARRAY;
 
         for (String folderName : folders) {
@@ -373,80 +373,80 @@ public class MFMSettings {
         }
     }
 
-    public static String getMESSInfoDAT() {
+    public String getMESSInfoDAT() {
         return (String) mfmSettings.get(MFM_Constants.MESSINFO_DAT_FILE);
     }
 
-    private static void setMESSInfoDAT(String MESSInfoDAT) {
+    private void setMESSInfoDAT(String MESSInfoDAT) {
         mfmSettings.put(MFM_Constants.MESSINFO_DAT_FILE, MESSInfoDAT);
     }
 
-    public static String getSYSInfoDAT() {
+    public String getSYSInfoDAT() {
         return (String) mfmSettings.get(MFM_Constants.SYSINFO_DAT_FILE);
     }
 
-    private static void setSYSInfoDAT(String SYSInfoDAT) {
+    private void setSYSInfoDAT(String SYSInfoDAT) {
         mfmSettings.put(MFM_Constants.SYSINFO_DAT_FILE, SYSInfoDAT);
     }
 
-    public static String getnPlayerINI() {
+    public String getnPlayerINI() {
         return (String) mfmSettings.get(MFM_Constants.NPLAYERS_INI_FILE);
     }
 
-    private static void setnPlayerINI(String nPlayerINI) {
+    private void setnPlayerINI(String nPlayerINI) {
         mfmSettings.put(MFM_Constants.NPLAYERS_INI_FILE, nPlayerINI);
     }
 
-    static String getLanguageINI() {
+    String getLanguageINI() {
         return (String) mfmSettings.get(MFM_Constants.LANGUAGES_INI_FILE);
     }
 
-    private static String setLanguageINI(String languagesINI) {
+    private String setLanguageINI(String languagesINI) {
         return (String) mfmSettings.put(MFM_Constants.LANGUAGES_INI_FILE, languagesINI);
     }
 
-    public static String getFFmpegMoveAVItoFolder() {
+    public String getFFmpegMoveAVItoFolder() {
         return (String) mfmSettings.get(MFM_Constants.FFmpeg_MoveAVIto_Folder);
     }
 
-    public static void setFFmpegMoveAVItoFolder(String folder) {
+    public void setFFmpegMoveAVItoFolder(String folder) {
         mfmSettings.put(MFM_Constants.FFmpeg_MoveAVIto_Folder, folder);
     }
 
-    static HashMap<String, String> getFullSetExtrasDirectories() {
+    HashMap<String, String> getFullSetExtrasDirectories() {
         return fullSetExtrasDirectories;
     }
 
-    public static HashMap<String, String> getPlaySetDirectories() {
+    public HashMap<String, String> getPlaySetDirectories() {
         return playSetDirectories;
     }
 
-    public static String getMAMEVersion() {
+    public String getMAMEVersion() {
         return (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
     }
 
-    public static String trimMAMEVersion(String version) {
+    public String trimMAMEVersion(String version) {
         return version.contains("(") ? version.substring(0, version.indexOf('(')).trim() : version.trim();
     }
 
-    static String getDataVersion() {
+    String getDataVersion() {
         return (String) mfmSettings.get(MFM_Constants.DATA_VERSION);
     }
 
-    public static void setDataVersion(String dataVersion) {
+    public void setDataVersion(String dataVersion) {
         mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
         // Can be transiently set during parse operation
         ms.persistMySettings();
     }
 
-    public static boolean isFullXMLcompatible() {
+    public boolean isFullXMLcompatible() {
         return (boolean) mfmSettings.get(MFM_Constants.COMPATIBLE);
     }
 
     public void persistMySettings() {
         if (exeChanged) {
             // Set MAME exe for running
-            MAMEexe.setBaseArgs(MFMSettings.fullMAMEexePath());
+            MAMEexe.setBaseArgs(this.fullMAMEexePath());
 
             // get EXE version
             setMAMEexeVersion();
@@ -485,7 +485,7 @@ public class MFMSettings {
             playSetDirectories = (HashMap<String, String>) mfmSettings.get(MFM_Constants.PLAY_SET_DIRECTORIES_MAP);
             extrasZips = (HashMap<String, String>) mfmSettings.get(MFM_Constants.EXTRAS_ZIPS);
 
-            MAMEexe.setBaseArgs(MFMSettings.fullMAMEexePath());
+            MAMEexe.setBaseArgs(this.fullMAMEexePath());
             loaded = true;
         }
     }
@@ -582,7 +582,7 @@ public class MFMSettings {
 
     private HashMap<String, String> findExtrasZips() {
         HashMap<String, String> map = new HashMap<String, String>();
-        File extrasDir = new File(MFMSettings.getExtrasFullSetDir());
+        File extrasDir = new File(this.getExtrasFullSetDir());
         if (extrasDir.exists()) {
             TreeSet<String> extrasFolderNames =
                     new TreeSet<String>(Arrays.asList(MFM_Constants.MAME_FOLDER_NAMES_ARRAY));

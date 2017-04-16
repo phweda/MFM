@@ -36,7 +36,7 @@ import java.io.File;
  * Date: 12/18/11
  * Time: 7:07 PM
  */
-public final class MFM_SettingsPanel extends JPanel {
+final class MFM_SettingsPanel extends JPanel {
 
     private static final Font font = new Font("Arial", Font.BOLD, 16);
     private static final Dimension size = new Dimension(1024, 768);
@@ -55,6 +55,8 @@ public final class MFM_SettingsPanel extends JPanel {
     private JTextField FFmpegPath = new JTextField();
     private JCheckBox nonmergedCB = new JCheckBox("MAME ROMs NON-MERGED?");
 
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     private MFM_SettingsPanel() {
 
         this.setLayout(new GridLayout(0, 2, 4, 10));
@@ -67,7 +69,7 @@ public final class MFM_SettingsPanel extends JPanel {
         this.setBackground(MFMUI.getMFMSettingsBGcolor());
     }
 
-    public static void showSettingsPanel(JFrame frameIn) {
+    static void showSettingsPanel(JFrame frameIn) {
         frame = frameIn;
         frame.setContentPane(new MFM_SettingsPanel());
         setComponentsFont(frame.getComponents());
@@ -190,35 +192,35 @@ public final class MFM_SettingsPanel extends JPanel {
                     }
 
                     if (!mameexe.isEmpty() && mameexe.length() > 5 && mameexe.contains(FileUtils.DIRECTORY_SEPARATOR)) {
-                        MFMSettings.MAMEexeName(MAMEExePath.getText().substring(
+                        mfmSettings.MAMEexeName(MAMEExePath.getText().substring(
                                 MAMEExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
-                        MFMSettings.MAMEexeDir(MAMEExePath.getText().substring(0,
+                        mfmSettings.MAMEexeDir(MAMEExePath.getText().substring(0,
                                 MAMEExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
 
                         // NOTE added 9/20/2016 removing MFMSettings call from MAME class and class rename
                         // needed here for a first run
-                        MAMEexe.setBaseArgs(MFMSettings.fullMAMEexePath());
+                        MAMEexe.setBaseArgs(mfmSettings.fullMAMEexePath());
                     }
 
-                    MFMSettings.RomsFullSetDir(MAMERomsPath.getText());
-                    MFMSettings.CHDsFullSetDir(MAMECHDsPath.getText());
-                    MFMSettings.setExtrasFullSetDir(MAMEExtrasPath.getText());
-                    //    MFMSettings.RomsPlaySetDir(MAMEPlayPath.getText());
-                    MFMSettings.setPlaySetDir(MAMEPlayPath.getText());
-                    MFMSettings.VIDsFullSetDir(MAMEVidsPath.getText());
-                    MFMSettings.SoftwareListRomsFullSetDir(SoftwareListRomsPath.getText());
-                    MFMSettings.SoftwareListCHDsFullSetDir(SoftwareListCHDsPath.getText());
-                    MFMSettings.nonMerged(nonmergedCB.isSelected());
+                    mfmSettings.RomsFullSetDir(MAMERomsPath.getText());
+                    mfmSettings.CHDsFullSetDir(MAMECHDsPath.getText());
+                    mfmSettings.setExtrasFullSetDir(MAMEExtrasPath.getText());
+                    //    mfmSettings.RomsPlaySetDir(MAMEPlayPath.getText());
+                    mfmSettings.setPlaySetDir(MAMEPlayPath.getText());
+                    mfmSettings.VIDsFullSetDir(MAMEVidsPath.getText());
+                    mfmSettings.SoftwareListRomsFullSetDir(SoftwareListRomsPath.getText());
+                    mfmSettings.SoftwareListCHDsFullSetDir(SoftwareListCHDsPath.getText());
+                    mfmSettings.nonMerged(nonmergedCB.isSelected());
 
 //*************************************************************************************************
                     frame.setVisible(false);
                     frame.dispose();
-                    if (MFMSettings.PlaySetDirectories() == null) {
+                    if (mfmSettings.PlaySetDirectories() == null) {
                         MFM.getMFMSettings().updateDirectoriesResourceFiles();
                     }
 
-                    MFMSettings.isLoaded(true);
-                    MFMSettings.getInstance().updateDirectoriesResourceFiles();
+                    mfmSettings.isLoaded(true);
+                    mfmSettings.getInstance().updateDirectoriesResourceFiles();
                     // fixme is this correct place and sequence? 12/25/16
                     if (!MFM.isFirstRun()) {
                         MAMEInfo.loadINIs();
@@ -231,7 +233,7 @@ public final class MFM_SettingsPanel extends JPanel {
                     MFM.logger.separateLine();
                 } else if (((JButton) e.getSource()).getName().equals("Cancel")) {
                     frame.dispose();
-                    if (!MFMSettings.getInstance().isLoaded()) {
+                    if (!mfmSettings.getInstance().isLoaded()) {
                         MFM.logger.addToList("User canceled Settings", true);
                         System.exit(4);
                     }
@@ -316,19 +318,19 @@ public final class MFM_SettingsPanel extends JPanel {
         this.setMaximumSize(size);
         this.setMinimumSize(size);
 
-        if (MFMSettings.getInstance().isLoaded()) {
-            if (MFMSettings.MAMEexeDir() != null && !MFMSettings.MAMEexeDir().isEmpty()) {
+        if (mfmSettings.isLoaded()) {
+            if (mfmSettings.MAMEexeDir() != null && !mfmSettings.MAMEexeDir().isEmpty()) {
                 MAMEExePath.setText(
-                        MFMSettings.MAMEexeDir() + FileUtils.DIRECTORY_SEPARATOR + MFMSettings.MAMEexeName());
+                        mfmSettings.MAMEexeDir() + FileUtils.DIRECTORY_SEPARATOR + mfmSettings.MAMEexeName());
             }
-            MAMERomsPath.setText(MFMSettings.RomsFullSetDir());
-            MAMECHDsPath.setText(MFMSettings.CHDsFullSetDir());
-            MAMEExtrasPath.setText(MFMSettings.getExtrasFullSetDir());
-            MAMEPlayPath.setText(MFMSettings.getPlaySetDir());
-            MAMEVidsPath.setText(MFMSettings.VIDsFullSetDir());
-            SoftwareListRomsPath.setText(MFMSettings.SoftwareListRomsFullSetDir());
-            SoftwareListCHDsPath.setText(MFMSettings.SoftwareListCHDsFullSetDir());
-            nonmergedCB.setSelected(MFMSettings.isnonMerged());
+            MAMERomsPath.setText(mfmSettings.RomsFullSetDir());
+            MAMECHDsPath.setText(mfmSettings.CHDsFullSetDir());
+            MAMEExtrasPath.setText(mfmSettings.getExtrasFullSetDir());
+            MAMEPlayPath.setText(mfmSettings.getPlaySetDir());
+            MAMEVidsPath.setText(mfmSettings.VIDsFullSetDir());
+            SoftwareListRomsPath.setText(mfmSettings.SoftwareListRomsFullSetDir());
+            SoftwareListCHDsPath.setText(mfmSettings.SoftwareListCHDsFullSetDir());
+            nonmergedCB.setSelected(mfmSettings.isnonMerged());
         }
     }
 

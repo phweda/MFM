@@ -57,6 +57,7 @@ public class FFMPEG {
     private static String FFMPEGexe;
     private static File inputFolder;
 
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
     /*  COMMAND LINE
          ffmpeg.exe -i <fileIn>.avi -c:v libx264 -aspect 3:4 -preset veryslow
@@ -98,13 +99,13 @@ public class FFMPEG {
      * Load FFmpeg EXE and input/output folders for conversion
      */
     private static void refreshSettings() {
-        FFMPEGexe = MFMSettings.FFMPEGexe();
+        FFMPEGexe = mfmSettings.FFMPEGexe();
         args.set(0, FFMPEGexe);
 
-        inputFolder = new File(MFMSettings.FFmpegInputFolder());
-        outputFolder = new File(MFMSettings.FFmpegOutputFolder());
+        inputFolder = new File(mfmSettings.FFmpegInputFolder());
+        outputFolder = new File(mfmSettings.FFmpegOutputFolder());
 
-        String moveAVItoFolderPath = MFMSettings.getFFmpegMoveAVItoFolder();
+        String moveAVItoFolderPath = mfmSettings.getFFmpegMoveAVItoFolder();
         if (moveAVItoFolderPath != null && !moveAVItoFolderPath.isEmpty()) {
             moveAVItoFolder = new File(moveAVItoFolderPath);
         }
@@ -129,7 +130,7 @@ public class FFMPEG {
         }
         try {
             MFM.logger.addToList(pb.command().toString(), true);
-            pb.directory(new File(MFMSettings.FFmpegEXEdir()));
+            pb.directory(new File(mfmSettings.FFmpegEXEdir()));
             process = pb.start();
             if (output == null) {
                 // TODO what about capturing Standard outputstream??

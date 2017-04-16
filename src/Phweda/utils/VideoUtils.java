@@ -43,6 +43,8 @@ import java.util.ArrayList;
  */
 public class VideoUtils {
 
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     public static final FileFilter GIFfilter = new FileFilter() {
         @Override
         public boolean accept(File f) {
@@ -77,7 +79,7 @@ public class VideoUtils {
     }
 
 
-    public static ArrayList<BufferedImage> getFrames(File gif) throws IOException {
+    static ArrayList<BufferedImage> getFrames(File gif) throws IOException {
         ArrayList<BufferedImage> frames = new ArrayList<BufferedImage>();
         ImageReader ir = new GIFImageReader(new GIFImageReaderSpi());
         ir.setInput(ImageIO.createImageInputStream(gif));
@@ -125,7 +127,7 @@ public class VideoUtils {
     }
 
     public static void runVirtualDub(String filePath) {
-        if (MFMSettings.VDubexe() == null || MFMSettings.VDubexe().equals("")) {
+        if (mfmSettings.VDubexe() == null || mfmSettings.VDubexe().equals("")) {
             // JOptionPane.showMessageDialog(null, "MFM needs your VirtualDub executable");
 
             JFileChooser fc = new JFileChooser();
@@ -135,7 +137,7 @@ public class VideoUtils {
 
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
-                MFMSettings.VDubexe(file.getAbsolutePath());
+                mfmSettings.VDubexe(file.getAbsolutePath());
             } else {
                 return;
             }
@@ -145,9 +147,9 @@ public class VideoUtils {
         ProcessBuilder pb;
         if (!aviFile.exists()) {
             //  JOptionPane.showMessageDialog(null, "File not found: " + file);
-            pb = new ProcessBuilder(MFMSettings.VDubexe());
+            pb = new ProcessBuilder(mfmSettings.VDubexe());
         } else {
-            pb = new ProcessBuilder(MFMSettings.VDubexe(), filePath);
+            pb = new ProcessBuilder(mfmSettings.VDubexe(), filePath);
         }
         try {
             pb.start();

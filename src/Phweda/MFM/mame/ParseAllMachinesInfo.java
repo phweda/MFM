@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static Phweda.MFM.MFMSettings.trimMAMEVersion;
 import static Phweda.MFM.mame.Machine.*;
 
 /**
@@ -58,6 +57,7 @@ public class ParseAllMachinesInfo {
     private static ArrayList<String> machineList;
     private static int machineCount = 0;
 
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
     /**
      * NOTE : Unless MFM arg -all flag is present we only load Playable games as determined by :
      * <driver status="good" or
@@ -71,10 +71,10 @@ public class ParseAllMachinesInfo {
         mame = loadAllMachinesInfoJAXB();
         // Set data version here. 0.85 change to handle older Mame versions
         if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
-            MFMSettings.setDataVersion(mame.getBuild());
+            mfmSettings.getInstance().setDataVersion(mame.getBuild());
         } else {
-            String version = trimMAMEVersion(MAMEexe.getMAMEexeVersion());
-            MFMSettings.setDataVersion(version);
+            String version = mfmSettings.trimMAMEVersion(MAMEexe.getMAMEexeVersion());
+            mfmSettings.setDataVersion(version);
             mame.setBuild(version);
         }
 
@@ -106,7 +106,7 @@ public class ParseAllMachinesInfo {
      * Retained for versions prior to MAME 173 which is the last change in MAME DTD
      *
      * @return Map of all Machines
-     * @deprecated 0.85 release handles all Mame versions with -listxml (from o.70)
+     * @deprecated 0.85 release handles all Mame versions with -listxml (from 0.70)
      */
     private static void loadAllMachinesInfoDOM(Set<String> prefixes) {
         machineList = new ArrayList<String>();

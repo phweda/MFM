@@ -81,6 +81,8 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     // private final String CreateList_Mode = "creatlist";
     private String currentMode = PlayList_Mode;
 
+    static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     static void showListInfo(String listName) {
         TreeSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
         String output = decimalFormater.format(list.size());
@@ -109,10 +111,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     static void setFontSize(Container container) {
-        if (MFMSettings.MFMFontSize() != null &&
-                !MFMSettings.MFMFontSize().equals(MFM_Constants.NORMAL)) {
+        if (mfmSettings.MFMFontSize() != null &&
+                !mfmSettings.MFMFontSize().equals(MFM_Constants.NORMAL)) {
 
-            int num = MFMSettings.MFMFontSize().equals(MFM_Constants.LARGE) ?
+            int num = mfmSettings.MFMFontSize().equals(MFM_Constants.LARGE) ?
                     MFM_Constants.LARGEINT : MFM_Constants.VERYLARGEINT;
 
             SwingUtils.changeFont(container, MFM_Constants.FONTSIZEINT + num);
@@ -224,7 +226,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         // table change event now in tabelmodel
         showListInfo(listName);
         updateUI();
-        MFMSettings.MFMCurrentList(listName);
+        mfmSettings.MFMCurrentList(listName);
     }
 
     void commandDialog() {
@@ -500,12 +502,12 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
 
         // TODO update for zipped Extras Done 11/17/16 needs testing
-        if (new File(MFMSettings.PlaySetDirectories().get(folder) +
+        if (new File(mfmSettings.PlaySetDirectories().get(folder) +
                 FileUtils.DIRECTORY_SEPARATOR + fileName).exists()) {
-            imagePanel.Image(MFMSettings.PlaySetDirectories().get(folder) + FileUtils.DIRECTORY_SEPARATOR + fileName);
-        } else if (new File(MFMSettings.FullSetDirectories().get(folder) + fileName).exists()) {
-            imagePanel.Image(MFMSettings.FullSetDirectories().get(folder) + fileName);
-        } else if (MFMSettings.getExtrasZipFilesMap().containsKey(folder)) {
+            imagePanel.Image(mfmSettings.PlaySetDirectories().get(folder) + FileUtils.DIRECTORY_SEPARATOR + fileName);
+        } else if (new File(mfmSettings.FullSetDirectories().get(folder) + fileName).exists()) {
+            imagePanel.Image(mfmSettings.FullSetDirectories().get(folder) + fileName);
+        } else if (mfmSettings.getExtrasZipFilesMap().containsKey(folder)) {
             try {
                 StringBuilder sb = new StringBuilder(MFM.TEMP_DIR);
                 sb.append(folder);
@@ -514,7 +516,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 File tempImage = new File(sb.toString()); // temp file name needs to be unique
                 // if it doesn't exist try in the Zip
                 if (!tempImage.exists()) {
-                    ZipUtils.extractFile(MFMSettings.getExtrasZipFilesMap().get(folder).toPath(),
+                    ZipUtils.extractFile(mfmSettings.getExtrasZipFilesMap().get(folder).toPath(),
                             fileName, Paths.get(sb.toString()));
                 }
                 // if it still doesn't exist we do not have it
@@ -540,18 +542,18 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         String machineName = getSelectedMachine();
         String fullPath = null;
         File tempManual = null;
-        String dir = MFMSettings.PlaySetDirectories().get(MANUALS);
+        String dir = mfmSettings.PlaySetDirectories().get(MANUALS);
         if (dir != null && FileUtils.fileExists(dir, machineName + PDF_EXT)) {
-            fullPath = MFMSettings.PlaySetDirectories().get(MANUALS) + FileUtils.DIRECTORY_SEPARATOR
+            fullPath = mfmSettings.PlaySetDirectories().get(MANUALS) + FileUtils.DIRECTORY_SEPARATOR
                     + machineName + PDF_EXT;
         }
         // Can't be guaranteed this exists either!
-        else if (MFMSettings.FullSetDirectories().get(MANUALS) != null &&
-                FileUtils.fileExists(MFMSettings.FullSetDirectories().get(MANUALS),
+        else if (mfmSettings.FullSetDirectories().get(MANUALS) != null &&
+                FileUtils.fileExists(mfmSettings.FullSetDirectories().get(MANUALS),
                         machineName + PDF_EXT)) {
-            fullPath = MFMSettings.FullSetDirectories().get(MANUALS) + FileUtils.DIRECTORY_SEPARATOR
+            fullPath = mfmSettings.FullSetDirectories().get(MANUALS) + FileUtils.DIRECTORY_SEPARATOR
                     + machineName + PDF_EXT;
-        } else if (MFMSettings.getExtrasZipFilesMap().containsKey(MANUALS)) {
+        } else if (mfmSettings.getExtrasZipFilesMap().containsKey(MANUALS)) {
             StringBuilder sb = new StringBuilder(MFM.TEMP_DIR);
             sb.append(MANUALS);
             sb.append("-");
@@ -561,7 +563,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             // if it doesn't exist try in the Zip
             if (!tempManual.exists()) {
                 try {
-                    ZipUtils.extractFile(MFMSettings.getExtrasZipFilesMap().get(MANUALS).toPath(),
+                    ZipUtils.extractFile(mfmSettings.getExtrasZipFilesMap().get(MANUALS).toPath(),
                             machineName + PDF_EXT, Paths.get(sb.toString()));
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -847,8 +849,8 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     private void loadState() {
 
-        // NOTE added 9/20/2016 removing MFMSettings call from MAME class and class rename
-        MAMEexe.setBaseArgs(MFMSettings.fullMAMEexePath());
+        // NOTE added 9/20/2016 removing mfmSettings call from MAME class and class rename
+        MAMEexe.setBaseArgs(mfmSettings.fullMAMEexePath());
 
         // NOTE Oh Well Obi complained: I personally hate it when apps grab the whole screen on startup
         mainFrame.setPreferredSize(new Dimension(screenSize.width, screenSize.height));
@@ -856,19 +858,19 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         mainFrame.addWindowListener(new MFMUI_Setup.MFMWindow());
         setFontSize(mainFrame);
 
-        String list = MFMSettings.MFMCurrentList();
+        String list = mfmSettings.MFMCurrentList();
         if (list != null && list.length() > 0) {
             changeList(list);
         } else {
             changeList(MFMListBuilder.ALL);
         }
 
-        Integer tabIndex = MFMSettings.selectedTab();
+        Integer tabIndex = mfmSettings.selectedTab();
         if (tabIndex != null && tabIndex > 0) {
             comps.ExtrasTabbedPane().setSelectedIndex(tabIndex);
         }
 
-        String LnF = MFMSettings.MFMLookAndFeel();
+        String LnF = mfmSettings.MFMLookAndFeel();
         if (LnF != null && LnF.length() > 0) {
             changeLnF(LnF);
         }
@@ -881,7 +883,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     void VDUB() {
         final String selectedGame = getSelectedMachine();
-        VideoUtils.runVirtualDub(MFMSettings.VIDsFullSetDir() + FileUtils.DIRECTORY_SEPARATOR + selectedGame + ".avi");
+        VideoUtils.runVirtualDub(mfmSettings.VIDsFullSetDir() + FileUtils.DIRECTORY_SEPARATOR + selectedGame + ".avi");
     }
 
     void showGameVideoInfo() {
@@ -920,7 +922,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     void refreshVersion() {
         if (!MFM.isFirstRun()) {
-            ((JLabel) statusBar.getZone("Version")).setText(MFMSettings.getMAMEVersion() +
+            ((JLabel) statusBar.getZone("Version")).setText(mfmSettings.getMAMEVersion() +
                     " : DATA " + MAMEInfo.getVersion());
         }
     }

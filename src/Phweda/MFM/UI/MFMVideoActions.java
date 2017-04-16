@@ -47,10 +47,10 @@ class MFMVideoActions {
     static void showVideo(String gameName) {
         // TODO refactor so we can do the following efficiently
         Path fullPath = null;
-        File snapFolder = new File(MFMSettings.getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + "snap" +
-                FileUtils.DIRECTORY_SEPARATOR);
+        File snapFolder = new File(MFMSettings.getInstance().getPlaySetDir() +
+                FileUtils.DIRECTORY_SEPARATOR + "snap" + FileUtils.DIRECTORY_SEPARATOR);
 
-        File VIDsfolder = new File(MFMSettings.VIDsFullSetDir() + FileUtils.DIRECTORY_SEPARATOR);
+        File VIDsfolder = new File(MFMSettings.getInstance().VIDsFullSetDir() + FileUtils.DIRECTORY_SEPARATOR);
 
         if (MFM.isDebug()) {
             MFM.logger.addToList(snapFolder.getAbsolutePath() + " : " + VIDsfolder.getAbsolutePath()
@@ -125,7 +125,7 @@ class MFMVideoActions {
     }
 
     static void CropAVI(String machine, MFMInformationPanel infoPanel) {
-        final String path = MFMSettings.getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + "snap" +
+        final String path = MFMSettings.getInstance().getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + "snap" +
                 FileUtils.DIRECTORY_SEPARATOR + machine + ".avi";
         final File machineVideo = new File(path);
         if (machineVideo.exists()) {

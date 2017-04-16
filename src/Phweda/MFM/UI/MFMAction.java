@@ -73,6 +73,7 @@ public class MFMAction extends AbstractAction {
     private static MFMController controller = MFMUI_Setup.getController();
     private final String ExitAction = "Exit";
     private final String GameVideoInfoAction = "Machine Video Info";
+
     public MFMAction(String text, Icon icon) {
         super(text, icon);
     }
@@ -166,19 +167,19 @@ public class MFMAction extends AbstractAction {
                     SwingUtils.resizeFonts(MFM_Constants.VERYLARGEINT);
                     SwingUtils.changeFont(MFMController.getFrame(), MFM_Constants.FONTSIZEINT + MFM_Constants.VERYLARGEINT);
                     controller.updateUI();
-                    MFMSettings.MFMFontSize(MFM_Constants.VERYLARGE);
+                    MFMSettings.getInstance().MFMFontSize(MFM_Constants.VERYLARGE);
                     break;
                 case MFM_Constants.LARGE:
                     SwingUtils.resizeFonts(MFM_Constants.LARGEINT);
                     SwingUtils.changeFont(MFMController.getFrame(), MFM_Constants.FONTSIZEINT + MFM_Constants.LARGEINT);
                     controller.updateUI();
-                    MFMSettings.MFMFontSize(MFM_Constants.LARGE);
+                    MFMSettings.getInstance().MFMFontSize(MFM_Constants.LARGE);
                     break;
                 case MFM_Constants.NORMAL:
                     SwingUtils.resizeFonts(MFM_Constants.FONTSIZEINT);
                     SwingUtils.changeFont(MFMController.getFrame(), MFM_Constants.FONTSIZEINT);
                     controller.updateUI();
-                    MFMSettings.MFMFontSize(MFM_Constants.NORMAL);
+                    MFMSettings.getInstance().MFMFontSize(MFM_Constants.NORMAL);
                     break;
 
                 case "Show History":
@@ -332,7 +333,7 @@ public class MFMAction extends AbstractAction {
                     if (SwingUtils.LandFNames().contains(command)) {
                         controller.changeLnF(command);
                         controller.showMFMmessage("Changed UI to " + command);
-                        MFMSettings.MFMLookAndFeel(command);
+                        MFMSettings.getInstance().MFMLookAndFeel(command);
 
                     }
                     controller.updateUI();

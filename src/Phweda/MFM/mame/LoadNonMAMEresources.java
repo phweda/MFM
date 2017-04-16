@@ -20,14 +20,11 @@ package Phweda.MFM.mame;
 
 import Phweda.MFM.MFM;
 import Phweda.MFM.MFMSettings;
-import Phweda.MFM.MFM_Constants;
-import Phweda.MFM.MFM_Data;
 import Phweda.MFM.Utils.*;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,27 +42,29 @@ public class LoadNonMAMEresources {
     private static HashMap<String, String> nplayers = new HashMap<String, String>();
     private static HashMap<String, String> MachinetoCategoryMap = new HashMap<String, String>();
 
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     static {
         loadCatverINI();
         loadNplayersINI();
 
         /* Load history.dat if it exists */     // && !MAMESettings.HistoryDATFILENAME().equals("")
-        if (MFMSettings.getHistoryDAT() != null && !MFMSettings.getHistoryDAT().equals("") && !MFM.isListOnly()) {
+        if (mfmSettings.getHistoryDAT() != null && !mfmSettings.getHistoryDAT().equals("") && !MFM.isListOnly()) {
             loadHistoryDAT();
         }
 
         /* Load MAMEInfo.dat if it exists */
-        if (MFMSettings.getMAMEInfoDAT() != null && !MFMSettings.getMAMEInfoDAT().equals("")) {
+        if (mfmSettings.getMAMEInfoDAT() != null && !mfmSettings.getMAMEInfoDAT().equals("")) {
             loadMAMEInfoDAT();
         }
 
         /* Load MESSInfo.dat if it exists */
-        if (MFMSettings.getMESSInfoDAT() != null && !MFMSettings.getMESSInfoDAT().equals("")) {
+        if (mfmSettings.getMESSInfoDAT() != null && !mfmSettings.getMESSInfoDAT().equals("")) {
             loadMESSInfoDAT();
         }
 
         /* Load SYSInfo.dat if it exists */
-        if (MFMSettings.getSYSInfoDAT() != null && !MFMSettings.getSYSInfoDAT().equals("")) {
+        if (mfmSettings.getSYSInfoDAT() != null && !mfmSettings.getSYSInfoDAT().equals("")) {
             loadSYSInfoDAT();
         }
     }
@@ -100,7 +99,7 @@ public class LoadNonMAMEresources {
 
     private static void loadHistoryDAT() {
         try {
-            new ParseHistoryDAT(MFMSettings.getHistoryDAT(), HistoryDAT).processFile();
+            new ParseHistoryDAT(mfmSettings.getHistoryDAT(), HistoryDAT).processFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -108,7 +107,7 @@ public class LoadNonMAMEresources {
 
     private static void loadMAMEInfoDAT() {
         try {
-            new ParseExtrasInfoDATs(MFMSettings.getMAMEInfoDAT(), MAMEInfoDAT).processFile();
+            new ParseExtrasInfoDATs(mfmSettings.getMAMEInfoDAT(), MAMEInfoDAT).processFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -116,7 +115,7 @@ public class LoadNonMAMEresources {
 
     private static void loadMESSInfoDAT() {
         try {
-            new ParseExtrasInfoDATs(MFMSettings.getMESSInfoDAT(), MESSInfoDAT).processFile();
+            new ParseExtrasInfoDATs(mfmSettings.getMESSInfoDAT(), MESSInfoDAT).processFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -124,7 +123,7 @@ public class LoadNonMAMEresources {
 
     private static void loadSYSInfoDAT() {
         try {
-            new ParseSYSINFODAT(MFMSettings.getSYSInfoDAT(), SYSInfoDAT).processFile();
+            new ParseSYSINFODAT(mfmSettings.getSYSInfoDAT(), SYSInfoDAT).processFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -140,8 +139,8 @@ public class LoadNonMAMEresources {
             CatverINImap.put("category", MachinetoCategoryMap);
             CatverINImap.put("version", Version);
 
-            new ParseCatverINI(MFMSettings.getCatverINI(), CatverINImap).processFile();
-            MFMSettings.setHascatverini(true);
+            new ParseCatverINI(mfmSettings.getCatverINI(), CatverINImap).processFile();
+            mfmSettings.setHascatverini(true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -152,7 +151,7 @@ public class LoadNonMAMEresources {
             if (MFM.isDebug()) {
                 MFM.logger.addToList("In loadNplayersINI");
             }
-            new ParsenPlayerINI(MFMSettings.getnPlayerINI(), nplayers).processFile();
+            new ParsenPlayerINI(mfmSettings.getnPlayerINI(), nplayers).processFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

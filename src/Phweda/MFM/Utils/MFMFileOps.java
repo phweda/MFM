@@ -25,10 +25,10 @@ import Phweda.utils.ZipUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-
-import static Phweda.MFM.MFMSettings.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,6 +41,9 @@ import static Phweda.MFM.MFMSettings.*;
  * Provides methods for performing MFM File operations
  */
 public class MFMFileOps {
+
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     /* TODO determine if we need this here ??*/
     public static void fileOps(String opName) {
         try {
@@ -100,16 +103,18 @@ public class MFMFileOps {
             // Find all Extras
             String name = machineName.toString();
             try {
-                ff = new FileUtils.MFM_FindFile(Paths.get(RomsFullSetDir()), Paths.get(name), true, false);
+                ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.RomsFullSetDir()), Paths.get(name),
+                        true, false);
 
-                if (CHDsFullSetDir() != null && CHDsFullSetDir().length() > 0 && !RomsFullSetDir().equals
-                        (CHDsFullSetDir())) {
-                    ff = new FileUtils.MFM_FindFile(Paths.get(CHDsFullSetDir()),
+                if (mfmSettings.CHDsFullSetDir() != null && mfmSettings.CHDsFullSetDir().length() > 0 &&
+                        !mfmSettings.RomsFullSetDir().equals(mfmSettings.CHDsFullSetDir())) {
+                    ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.CHDsFullSetDir()),
                             Paths.get(name), true, true);
                 }
 
                 // With MESS merge we need to look for Systems' directory fixme??
-                ff = new FileUtils.MFM_FindFile(Paths.get(getExtrasFullSetDir()), Paths.get(name), true, true);
+                ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.getExtrasFullSetDir()), Paths.get(name),
+                        true, true);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -160,11 +165,11 @@ public class MFMFileOps {
             FileUtils.MFM_FindFile ff = null;
             for (Object name : deviceRef) {
                 try {
-                    ff = new FileUtils.MFM_FindFile(Paths.get(RomsFullSetDir()),
+                    ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.RomsFullSetDir()),
                             Paths.get(name.toString()), true, false);
-                    if (CHDsFullSetDir() != null && CHDsFullSetDir().length() > 0 && !RomsFullSetDir().equals
-                            (CHDsFullSetDir())) {
-                        ff = new FileUtils.MFM_FindFile(Paths.get(CHDsFullSetDir()),
+                    if (mfmSettings.CHDsFullSetDir() != null && mfmSettings.CHDsFullSetDir().length() > 0 &&
+                            !mfmSettings.RomsFullSetDir().equals(mfmSettings.CHDsFullSetDir())) {
+                        ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.CHDsFullSetDir()),
                                 Paths.get(name.toString()), true, false);
                     }
                 } catch (IOException e) {
@@ -210,7 +215,7 @@ public class MFMFileOps {
          **/
 
         // ROMs
-        String romsDir = MFMSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
+        String romsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
         TreeSet<File> romsList = (TreeSet<File>) files.get(MFM_Constants.ROMS);
         for (File file : romsList) {
             Path path = Paths.get(file.getAbsolutePath());
@@ -231,9 +236,9 @@ public class MFMFileOps {
         }
 
         // CHDs
-        String CHDsDir = MFMSettings.getPlaySetDirectories().get(MFM_Constants.CHDS);
+        String CHDsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.CHDS);
         if (CHDsDir == null) {
-            CHDsDir = MFMSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
+            CHDsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
         }
 
         File CHDfile = new File(CHDsDir);
@@ -272,14 +277,14 @@ public class MFMFileOps {
         for (String folder : ((TreeMap<String, TreeSet<String>>) files.get(MAME_Resources.ZIPEXTRAS)).keySet()) {
             TreeSet<String> zippedExtraFiles =
                     ((TreeMap<String, TreeSet<String>>) files.get(MAME_Resources.ZIPEXTRAS)).get(folder);
-            File zipFile = MFMSettings.getExtrasZipFilesMap().get(folder);
-            String extrasDir = MFMSettings.getPlaySetDirectories().get(folder);
+            File zipFile = mfmSettings.getExtrasZipFilesMap().get(folder);
+            String extrasDir = mfmSettings.getPlaySetDirectories().get(folder);
             if (extrasDir == null) {
-                extrasDir = MFMSettings.getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folder;
+                extrasDir = mfmSettings.getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folder;
                 File extrasDirFile = new File(extrasDir);
                 boolean created = extrasDirFile.mkdir();
                 if (created) {
-                    MFMSettings.getPlaySetDirectories().put(folder, extrasDirFile.getAbsolutePath());
+                    mfmSettings.getPlaySetDirectories().put(folder, extrasDirFile.getAbsolutePath());
                 } else {
                     MFM.logger.out("Failed to create Playset directory while copying resources");
                 }
@@ -301,7 +306,7 @@ public class MFMFileOps {
         // NOTE assumption is unzipped dupes are newest - we will not support any other scheme
         for (String folder : ((TreeMap<String, TreeSet<File>>) files.get(MAME_Resources.EXTRAS)).keySet()) {
             TreeSet<File> extraFiles = ((TreeMap<String, TreeSet<File>>) files.get(MAME_Resources.EXTRAS)).get(folder);
-            String extrasDir = MFMSettings.getPlaySetDirectories().get(folder);
+            String extrasDir = mfmSettings.getPlaySetDirectories().get(folder);
 
             for (File file : extraFiles) {
                 Path path = Paths.get(file.getAbsolutePath());
@@ -329,11 +334,11 @@ public class MFMFileOps {
             if (path.toString().endsWith(".zip") || path.toString().endsWith(".7z")) {
 
                 if (path.toString().toLowerCase().contains("roms")) {
-                    dir = MFMSettings.PlaySetDirectories().get("roms");
+                    dir = mfmSettings.PlaySetDirectories().get("roms");
                 } else if (path.toString().toLowerCase().contains("samples")) {
-                    dir = MFMSettings.PlaySetDirectories().get("samples");
+                    dir = mfmSettings.PlaySetDirectories().get("samples");
                 } else if (path.toString().toLowerCase().contains("artwork")) {
-                    dir = MFMSettings.PlaySetDirectories().get("artwork");
+                    dir = mfmSettings.PlaySetDirectories().get("artwork");
                 } else {
                     // TODO how to punt here??
                     // dir = MAMESettings.PlaySetDirectories().get("roms");
@@ -354,10 +359,10 @@ public class MFMFileOps {
 
             } /*else if (path.toString().endsWith(".chd")) {
                 // Have to add CHD dir here
-                if ((dir = MFMSettings.PlaySetDirectories().get("chds")) != null) {
+                if ((dir = mfmSettings.PlaySetDirectories().get("chds")) != null) {
 
                 } else {
-                    dir = MFMSettings.PlaySetDirectories().get("roms");
+                    dir = mfmSettings.PlaySetDirectories().get("roms");
                 }
                 // Strip off file name. For CHD we need to copy over the parent directory first
                 Path parentPath = path.getParent();
@@ -383,7 +388,7 @@ public class MFMFileOps {
                 // This is where we hook for CHD
 
                 // Parse the path to get the parent folder name and load the corresponding PlaySetDir
-                dir = MFMSettings.PlaySetDirectories().get(path.getParent().getFileName().toString());
+                dir = mfmSettings.PlaySetDirectories().get(path.getParent().getFileName().toString());
 
                 /**
                  * With MESS merge we will have bunches of files to NOT move

@@ -50,6 +50,8 @@ class FFMPEG_Panel extends JPanel {
     private Font font = new Font("Arial", Font.BOLD, 16);
     private JButton runCommandButton;
 
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     FFMPEG_Panel() {
         this.setLayout(new GridLayout(10, 2, 10, 10));
         createPanel();
@@ -91,13 +93,13 @@ class FFMPEG_Panel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (((JButton) e.getSource()).getName().equals("Save")) {
-                    MFMSettings.FFmpegEXEdir(FFmpegEXE.getText().substring(0,
+                    mfmSettings.FFmpegEXEdir(FFmpegEXE.getText().substring(0,
                             FFmpegEXE.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
                     // Full Path
-                    MFMSettings.FFMPEGexe(FFmpegEXE.getText());
-                    MFMSettings.FFmpegOutputFolder(FFmpegOutputFolder.getText());
-                    MFMSettings.FFmpegInputFolder(FFmpegInputFolder.getText());
-                    MFMSettings.setFFmpegMoveAVItoFolder(FFmpegMoveAVItoFolder.getText());
+                    mfmSettings.FFMPEGexe(FFmpegEXE.getText());
+                    mfmSettings.FFmpegOutputFolder(FFmpegOutputFolder.getText());
+                    mfmSettings.FFmpegInputFolder(FFmpegInputFolder.getText());
+                    mfmSettings.setFFmpegMoveAVItoFolder(FFmpegMoveAVItoFolder.getText());
                     runCommandButton.setEnabled(isConfigured());
                 } else if (((JButton) e.getSource()).getName().equals("Cancel")) {
                     dialog.dispose();
@@ -153,27 +155,27 @@ class FFMPEG_Panel extends JPanel {
         tb.setTitleColor(new Color(81, 222, 255));
         this.setBorder(tb);
 
-        if (MFMSettings.getInstance().isLoaded()) {
-            if (MFMSettings.FFmpegEXEdir() != null) {
-                FFmpegEXE.setText(MFMSettings.FFMPEGexe());
-                if (MFMSettings.FFmpegInputFolder() != null) {
-                    FFmpegInputFolder.setText(MFMSettings.FFmpegInputFolder());
+        if (mfmSettings.getInstance().isLoaded()) {
+            if (mfmSettings.FFmpegEXEdir() != null) {
+                FFmpegEXE.setText(mfmSettings.FFMPEGexe());
+                if (mfmSettings.FFmpegInputFolder() != null) {
+                    FFmpegInputFolder.setText(mfmSettings.FFmpegInputFolder());
                 }
-                if (MFMSettings.FFmpegOutputFolder() != null) {
-                    FFmpegOutputFolder.setText(MFMSettings.FFmpegOutputFolder());
+                if (mfmSettings.FFmpegOutputFolder() != null) {
+                    FFmpegOutputFolder.setText(mfmSettings.FFmpegOutputFolder());
                     runCommandButton.setEnabled(isConfigured());
                 }
-                if (MFMSettings.getFFmpegMoveAVItoFolder() != null) {
-                    FFmpegMoveAVItoFolder.setText(MFMSettings.getFFmpegMoveAVItoFolder());
+                if (mfmSettings.getFFmpegMoveAVItoFolder() != null) {
+                    FFmpegMoveAVItoFolder.setText(mfmSettings.getFFmpegMoveAVItoFolder());
                 }
             }
         }
     }
 
     private boolean isConfigured() {
-        return (MFMSettings.FFMPEGexe() != null && MFMSettings.FFMPEGexe().length() > 3 &&
-                MFMSettings.FFmpegInputFolder() != null && MFMSettings.FFmpegInputFolder().length() > 3 &&
-                MFMSettings.FFmpegOutputFolder() != null && MFMSettings.FFmpegOutputFolder().length() > 3
+        return (mfmSettings.FFMPEGexe() != null && mfmSettings.FFMPEGexe().length() > 3 &&
+                mfmSettings.FFmpegInputFolder() != null && mfmSettings.FFmpegInputFolder().length() > 3 &&
+                mfmSettings.FFmpegOutputFolder() != null && mfmSettings.FFmpegOutputFolder().length() > 3
         );
     }
 

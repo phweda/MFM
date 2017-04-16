@@ -58,6 +58,8 @@ public class MAME_Resources {
     private static TreeMap<String, TreeMap<String, String>> zipExtrasResourceCache;
     private static StringBuilder listResourceLog;
 
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     private MAME_Resources() {
         loadCaches();
     }
@@ -111,17 +113,17 @@ public class MAME_Resources {
         TreeMap<String, TreeSet<File>> extras = new TreeMap<>();
         // TODO Shouldn't I check/update Extras full set directories here? They could have changed
         // TODO or perhaps on resource scan?
-        for (String key : MFMSettings.getFullSetExtrasDirectories().keySet()) {
+        for (String key : mfmSettings.getFullSetExtrasDirectories().keySet()) {
             extras.put(key, new TreeSet<File>());
         }
 
-        if (MFMSettings.VIDsFullSetDir() != null && MFMSettings.VIDsFullSetDir().length() > 2) {
+        if (mfmSettings.VIDsFullSetDir() != null && mfmSettings.VIDsFullSetDir().length() > 2) {
             extras.put(MFM_Constants.VIDEOS, new TreeSet<File>());
         }
         resources.put(EXTRAS, extras);
 
         TreeMap<String, TreeSet<String>> zipExtras = new TreeMap<String, TreeSet<String>>();
-        for (String key : MFMSettings.getExtrasZipFilesMap().keySet()) {
+        for (String key : mfmSettings.getExtrasZipFilesMap().keySet()) {
             zipExtras.put(key, new TreeSet<String>());
         }
         resources.put(ZIPEXTRAS, zipExtras);
@@ -370,12 +372,12 @@ public class MAME_Resources {
 
     public void scan() {
         // roms_chdsCache = new TreeMap<String, TreeMap<String, File>>();
-        TreeMap<String, String> roots = MFMSettings.getResourceRoots();
+        TreeMap<String, String> roots = mfmSettings.getResourceRoots();
         for (String root : roots.keySet()) {
             try {
                 if (root.equals(MFM_Constants.EXTRAS_FULL_SET_DIRECTORY)) {
                     extrasResourceCache = cacheResourceFiles.cacheExtrasFiles(Paths.get(roots.get(root)));
-                    zipExtrasResourceCache = ZipUtils.getZipEntryNames(MFMSettings.getExtrasZipFilesMap());
+                    zipExtrasResourceCache = ZipUtils.getZipEntryNames(mfmSettings.getExtrasZipFilesMap());
                     persistCaches.put(EXTRASRESOURCECACHE, extrasResourceCache);
                     persistCaches.put(ZIPEXTRASRESOURCECACHE, zipExtrasResourceCache);
                 } else {
@@ -398,13 +400,13 @@ public class MAME_Resources {
      * "roms" -> ArrayList of rom files
      * "chds" -> ArrayList of CHD files
      * <p>
-     * "extras" -> TreeMap<String, ArrayList<File>> keys from MFMSettings.getFullSetExtrasDirectories()
+     * "extras" -> TreeMap<String, ArrayList<File>> keys from mfmSettings.getFullSetExtrasDirectories()
      * "artwork" ...
      * "flyers"
      * "icons"  ...
      * "snap"
      * ......
-     * "zipextras" -> TreeMap<String, TreeSet<String>> keys from MFMSettings.getExtrasZipFilesMap()
+     * "zipextras" -> TreeMap<String, TreeSet<String>> keys from mfmSettings.getExtrasZipFilesMap()
      *
      * @param listName name of the list
      * @param list     set of Machine names
@@ -417,7 +419,7 @@ public class MAME_Resources {
 
         try { // NOTE removed because SPLIT needs these too! 12/21/2016
             // If Merged or Split Set add Ancestors to the list
-            if (!MFMSettings.isnonMerged()) {
+            if (!mfmSettings.isnonMerged()) {
                 // adds ancestors to this list
                 checkRomof(list);
             }
