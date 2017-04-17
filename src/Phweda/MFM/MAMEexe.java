@@ -98,7 +98,7 @@ public class MAMEexe {
 
     /**
      * @param args    process arguments
-     * @param output  fiel to pipe process output to
+     * @param output  file to pipe process output to
      * @param logging to allow for not extraneous MFM output
      * @return
      * @throws MAME_Exception
