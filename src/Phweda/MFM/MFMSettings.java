@@ -484,8 +484,6 @@ public class MFMSettings {
                     MFM_Constants.FULL_SET_DIRECTORIES_MAP);
             playSetDirectories = (HashMap<String, String>) mfmSettings.get(MFM_Constants.PLAY_SET_DIRECTORIES_MAP);
             extrasZips = (HashMap<String, String>) mfmSettings.get(MFM_Constants.EXTRAS_ZIPS);
-
-            MAMEexe.setBaseArgs(this.fullMAMEexePath());
             loaded = true;
         }
     }

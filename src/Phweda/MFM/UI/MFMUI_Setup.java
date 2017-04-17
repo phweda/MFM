@@ -48,6 +48,7 @@ public class MFMUI_Setup {
 
     private MFMUI_Setup() {
         //    System.out.println("MFMUI_Setup()" + listBuilder.toString());
+        MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
     }
 
     public static MFMUI_Setup getInstance() {
