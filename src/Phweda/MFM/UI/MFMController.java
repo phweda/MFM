@@ -59,9 +59,7 @@ import static Phweda.MFM.UI.MFMUI_Setup.*;
  */
 
 /**
- *
  * GUI Controller
- *
  */
 class MFMController extends ClickListener implements ListSelectionListener, ChangeListener, KeyListener {
     static final DecimalFormat decimalFormater = new DecimalFormat("###,###");
@@ -710,19 +708,19 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-            showNextList( true, true);
+            showNextList(true, true);
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-            showNextList( true,false);
+            showNextList(true, false);
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & KeyEvent.ALT_MASK) != 0)) {
-            showNextList( false, true);
+            showNextList(false, true);
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & KeyEvent.ALT_MASK) != 0)) {
-            showNextList( false, false);
+            showNextList(false, false);
         }
 
     }
@@ -733,7 +731,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     private void showNextList(boolean all, boolean next) {
-        if(all){
+        if (all) {
             changeList(MFMPlayLists.getInstance().getNextListName(currentListName.getName(), next));
         } else {
             changeList(MFMPlayLists.getInstance().getNextMyListName(currentListName.getName(), next));
@@ -923,7 +921,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     void refreshVersion() {
         if (!MFM.isFirstRun()) {
             ((JLabel) statusBar.getZone("Version")).setText("MAME " + mfmSettings.getMAMEVersion() +
-                    " : DATA " + MAMEInfo.getVersion());
+                    " : DATA " + MFM_Data.getInstance().getDataVersion());
         }
     }
 

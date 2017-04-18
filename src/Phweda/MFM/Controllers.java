@@ -32,6 +32,7 @@ import java.util.stream.Stream;
  * Date: 9/16/2015
  * Time: 7:34 PM
  */
+// TODO needs rename: MAMEControllers ? MachineControllers ?
 public class Controllers implements Serializable {
 
     public static final String TYPE = "type";

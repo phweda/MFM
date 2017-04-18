@@ -58,14 +58,8 @@ public class MFMSettings {
     // Note
     // TODO we need an update call triggered by the user to re-search
     // TODO for folders when they change/add them : fullSetExtrasDirectories  &  playSetDirectories
-    // TODO zipped Extras files
-
     private MFMSettings() {
         loadSettings();
-        /* If we did not succeed return NULL TODO wire this to a message dialog?? */
-        if (!loaded) {
-            System.out.println("NO MFM SETTINGS FOUND");
-        }
     }
 
     public static MFMSettings getInstance() {
@@ -427,11 +421,12 @@ public class MFMSettings {
 
     /**
      * Updated to handle oldest versions
+     *
      * @param version
      * @return
      */
     public String trimMAMEVersion(String version) {
-        if(version.contains("M.A.M.E.")){
+        if (version.contains("M.A.M.E.")) {
             int start = version.indexOf('v');
             return version.substring(start + 1, start + 6).trim();
         }
