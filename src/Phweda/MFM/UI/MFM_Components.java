@@ -131,7 +131,7 @@ public class MFM_Components {
         ClockPanel clock = new ClockPanel();
         clock.start();
 
-        JLabel versionJL = new JLabel(MFMSettings.getInstance().getMAMEVersion() + "   :   DATA " +
+        JLabel versionJL = new JLabel("MAME " + MFMSettings.getInstance().getMAMEVersion() + "   :   DATA " +
                 MFM_Data.getInstance().getDataVersion(), SwingConstants.CENTER);
         currentListName = new JLabel(MFMListBuilder.ALL,
                 getResources().getImageIcon(MFMUI_Resources.UPARROW_PNG), SwingConstants.LEFT);

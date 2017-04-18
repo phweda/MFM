@@ -401,8 +401,8 @@ public class MFMSettings {
         return (String) mfmSettings.get(MFM_Constants.LANGUAGES_INI_FILE);
     }
 
-    private String setLanguageINI(String languagesINI) {
-        return (String) mfmSettings.put(MFM_Constants.LANGUAGES_INI_FILE, languagesINI);
+    private void setLanguageINI(String languagesINI) {
+        mfmSettings.put(MFM_Constants.LANGUAGES_INI_FILE, languagesINI);
     }
 
     public String getFFmpegMoveAVItoFolder() {
@@ -425,7 +425,16 @@ public class MFMSettings {
         return (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
     }
 
+    /**
+     * Updated to handle oldest versions
+     * @param version
+     * @return
+     */
     public String trimMAMEVersion(String version) {
+        if(version.contains("M.A.M.E.")){
+            int start = version.indexOf('v');
+            return version.substring(start + 1, start + 6).trim();
+        }
         return version.contains("(") ? version.substring(0, version.indexOf('(')).trim() : version.trim();
     }
 
@@ -437,6 +446,15 @@ public class MFMSettings {
         mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
         // Can be transiently set during parse operation
         ms.persistMySettings();
+    }
+
+
+    public String getDataSetFile() {
+        return (String) mfmSettings.get(MFM_Constants.DATA_SET_FILE);
+    }
+
+    public void setDataSetFile(String dataSetFile) {
+        mfmSettings.put(MFM_Constants.DATA_SET_FILE, dataSetFile);
     }
 
     public boolean isFullXMLcompatible() {
@@ -621,5 +639,4 @@ public class MFMSettings {
         fullXMLcompatible = MAME_Compatible.versionNew(getMAMEVersion());
         mfmSettings.put(MFM_Constants.COMPATIBLE, fullXMLcompatible);
     }
-
 }

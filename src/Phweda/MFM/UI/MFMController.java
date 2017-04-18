@@ -922,7 +922,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     void refreshVersion() {
         if (!MFM.isFirstRun()) {
-            ((JLabel) statusBar.getZone("Version")).setText(mfmSettings.getMAMEVersion() +
+            ((JLabel) statusBar.getZone("Version")).setText("MAME " + mfmSettings.getMAMEVersion() +
                     " : DATA " + MAMEInfo.getVersion());
         }
     }
