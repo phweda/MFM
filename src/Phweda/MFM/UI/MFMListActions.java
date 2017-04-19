@@ -143,7 +143,8 @@ class MFMListActions {
         if (listName != null) {
             MFM.logger.addToList(listName + " is being saved to file", true);
             TreeSet<String> ts = MFMPlayLists.getInstance().getPlayList(listName);
-            File listFile = new File(MFM.MFM_LISTS_DIR + listName + " " + MAMEInfo.getVersion().substring(0, 5) + ".txt");
+            File listFile = new File(MFM.MFM_LISTS_DIR + listName + " " +
+                    MFM_Data.getInstance().getDataVersion() + ".txt");
             try {
                 PrintWriter pw = new PrintWriter(new FileWriter(listFile));
                 for (String game : ts) {
@@ -173,7 +174,7 @@ class MFMListActions {
             try {
                 Datafile DATFile = MFM_DATmaker.generateDAT(listName, ts);
                 PersistUtils.saveDATtoFile(DATFile, MFM.MFM_LISTS_DIR + listName +
-                        "(" + MAMEInfo.getVersion() + ").dat");
+                        "(" + MFM_Data.getInstance().getDataVersion() + ").dat");
             } catch (ParserConfigurationException | TransformerException | JAXBException e) {
                 e.printStackTrace();
             } catch (FileNotFoundException e) {
@@ -185,7 +186,7 @@ class MFMListActions {
     private static void resourcestoFile(String list, TreeMap<String, Object> files) {
         MFM.logger.addToList(list + " resources are being saved to file", true);
         File listFile = new File(MFM.MFM_LISTS_DIR + list + " " +
-                MAMEInfo.getVersion().substring(0, 5) + "_Resources.txt");
+                MFM_Data.getInstance().getDataVersion() + "_Resources.txt");
         int counter = 1;
         try {
 

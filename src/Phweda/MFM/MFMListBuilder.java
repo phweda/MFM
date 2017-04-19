@@ -481,7 +481,8 @@ public final class MFMListBuilder {
     }
 
     public static void dumpListData(String list) {
-        File newFile = new File(MFM.MFM_LISTS_DIR + list + "-data.csv");
+        File newFile = new File(MFM.MFM_LISTS_DIR + list +
+                        MFM_Data.getInstance().getDataVersion() + "_data.csv");
         TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
         PrintWriter pw = null;
         try {

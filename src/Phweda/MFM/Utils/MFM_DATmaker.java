@@ -27,6 +27,7 @@ package Phweda.MFM.Utils;
 
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MFM;
+import Phweda.MFM.MFM_Data;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.datafile.Disk;
 import Phweda.MFM.datafile.Game;
@@ -36,7 +37,9 @@ import Phweda.MFM.mame.Rom;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates a standard DAT file for a list
@@ -44,14 +47,13 @@ import java.util.*;
 public class MFM_DATmaker {
 
     private static Map<String, Machine> map;
-    public static final String NODUMP = "nodump";
+    private static final String NODUMP = "nodump";
 
     public static Datafile generateDAT(String listName, Set list) throws ParserConfigurationException {
         return createDAT(listName, list);
     }
 
     private static Datafile createDAT(String listName, Set<String> list) throws ParserConfigurationException {
-
         Datafile df = new Datafile();
         df.setHeader(createHeader(listName));
         addMachines(df, list);
@@ -91,7 +93,7 @@ public class MFM_DATmaker {
         for (Phweda.MFM.mame.Disk disk : machine.getDisk()) {
             Disk newDisk = transformDisk(disk);
             // Eliminate nodump
-            if(disk.getStatus().equals(NODUMP)){
+            if (disk.getStatus().equals(NODUMP)) {
                 continue;
             }
             // Check for dupes - Parent & Child may have same Disk/CHD
@@ -125,7 +127,6 @@ public class MFM_DATmaker {
     private static Phweda.MFM.datafile.Disk transformDisk(Phweda.MFM.mame.Disk diskIn) {
         Phweda.MFM.datafile.Disk disk = new Phweda.MFM.datafile.Disk();
         disk.setName(diskIn.getName());
-        disk.getMd5();
         disk.setSha1(diskIn.getSha1());
         return disk;
     }
@@ -147,7 +148,7 @@ public class MFM_DATmaker {
         header.setComment("MFM generated list - " + listName);
         header.setCategory("Standard DatFile");
         header.setDate(new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
-        header.setVersion(MAMEInfo.getVersion());
+        header.setVersion(MFM_Data.getInstance().getDataVersion());
         header.setAuthor(MFM.APPLICATION_NAME);
 
         return header;
