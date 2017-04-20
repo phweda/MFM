@@ -65,20 +65,20 @@ public class ParseAllMachinesInfo {
      * see MAME source info.c - info_xml_creator::output_driver()
      **/
 
-    public static Mame loadAllMachinesInfo() {
+    public static Mame loadAllMachinesInfo(boolean all) {
         // Note as of 0.85 we handle all Mame -listxml versions the same
 
         mame = loadAllMachinesInfoJAXB();
         // Set data version here. 0.85 change to handle older Mame versions
         if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
-            mfmSettings.getInstance().setDataVersion(mame.getBuild());
+            mfmSettings.setDataVersion(mame.getBuild());
         } else {
             String version = mfmSettings.trimMAMEVersion(MAMEexe.getMAMEexeVersion());
             mfmSettings.setDataVersion(version);
             mame.setBuild(version);
         }
 
-        if (!MFM.isProcessAll()) {
+        if (!all) {
             removeNotRunnable();
         }
         for (Machine machine : mame.getMachineMap().values()) {
