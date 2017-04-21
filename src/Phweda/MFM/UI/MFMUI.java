@@ -41,9 +41,8 @@ public class MFMUI {
     private static final Color MFMLightGreen = new Color(102, 255, 102);
     private static final Color MFMLightRed = new Color(255, 48, 48);
     private static MFMUI mfmui = null;
-    private MFMUI_Setup setup;
     public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    public static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
+    static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
     private static JFrame settingsFrame;
     private static boolean progressRunning = false;
     private static JDialog busyDialog = new JDialog(settingsFrame, MFM.MFM_TITLE);
@@ -51,7 +50,7 @@ public class MFMUI {
 
     private MFMUI() {
         // GUI initializer
-        setup = MFMUI_Setup.getInstance();
+        MFMUI_Setup.getInstance();
     }
 
     // NOTE UNCOMMENT if you run directly from this class
@@ -59,7 +58,7 @@ public class MFMUI {
     //   private static MAMESettings MS = MAMESettings.getInstance();
 
     public static void main(String[] args) {
-        // set a new dismiss delay milliseconds in millis
+        // set a new dismiss delay milliseconds
         ToolTipManager.sharedInstance().setDismissDelay(20000);
 
         // Schedule a job for the event-dispatching thread:
@@ -151,8 +150,7 @@ public class MFMUI {
     }
 
 
-
-    public static Color getMFMcolor() {
+    static Color getMFMcolor() {
         return MFMcolor;
     }
 
