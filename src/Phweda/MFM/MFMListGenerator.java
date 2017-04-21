@@ -33,7 +33,8 @@ import static Phweda.MFM.MFMListBuilder.*;
  * Time: 9:35 PM
  */
 class MFMListGenerator {
-    // TODO fixme reduce this to only the Arcade exclusions since we now have Systems Categories
+    // TODO eliminate this since VIDs project is dead ?
+    // fixme reduce this to only the Arcade exclusions since we now have Systems Categories
     private static final List<String> vidsExcludeCategoriesList =
             Arrays.asList(
                     "3D Printer", "Arcade BIOS", "Astrological Computer", "Audio Sequencer",
@@ -148,7 +149,8 @@ class MFMListGenerator {
                     continue;
                 }
 
-                // For 0.85 release needed since older Mame versions' BIOS Machines did not have a driver
+                // For 0.85 release null check needed since older Mame versions' BIOS Machines and Devices
+                // do not have a driver
                 if (machine.getDriver() != null) {
                     if (!machine.getDriver().getStatus().equalsIgnoreCase(IMPERFECT)) {
                         noImpefectList.add(machineName);
@@ -229,6 +231,7 @@ class MFMListGenerator {
 
             lists.put(ALL, allList);
             lists.put(BIOS, biosList);
+            lists.put(DEVICES, devicesList);
             lists.put(VERTICAL, verticalsList);
             lists.put(HORIZONTAL, horizontalList);
             lists.put(PD_VIDS, VIDsList);

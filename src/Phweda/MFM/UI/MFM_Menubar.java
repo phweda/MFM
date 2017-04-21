@@ -212,7 +212,7 @@ class MFM_Menubar {
         item.setText(ListBuilderUI.New);
         listBuilder.add(new JSeparator());
 
-        for (String name : MFMPlayLists.getInstance().getListBuilderPLsKeys()) {
+        for (String name : MFMPlayLists.getInstance().getListBuilderPlaylistsKeys()) {
             item = listBuilder.add(mfmActionListBuilder);
             item.setActionCommand(MFMAction.ListBuilderAction);
             item.setText(name);
@@ -287,7 +287,7 @@ class MFM_Menubar {
     private JMenu createMFMLists() {
         JMenu mfmList = new JMenu("MFM Lists");
         JMenuItem item;
-        TreeMap<String, TreeSet> builtinPL = MFMPlayLists.getInstance().getMFMplsTree();
+        TreeMap<String, TreeSet> builtinPL = MFMPlayLists.getInstance().getMFMplaylistsTree();
 
         JMenu languageList = new JMenu("Language Lists");
         for (String name : MFMListBuilder.getLanguagesListsMap().keySet()) {

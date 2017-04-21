@@ -28,12 +28,12 @@ package Phweda.MFM.mame;
 
 import Phweda.MFM.MFM;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -1154,11 +1154,6 @@ public class Machine implements Serializable {
      */
     public String getValueOf(String paramName) {
         String value = "";
-
-        //NOTE Bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7071246
-        // can not put () around case Strings
-        // DONE Java 8 has fixed
-
         // For display column mapping see @MachineListTableModel
         switch (paramName) {
             case (MACHINE_NAME):
@@ -1178,10 +1173,15 @@ public class Machine implements Serializable {
             case ROMOF:
                 return getRomof();
             case STATUS_CAPS:
-                return getDriver().getStatus();
+                if (getDriver() != null) {
+                    return getDriver().getStatus();
+                }
+                return "";
             case CHD:
-                return getDisk().size() > 0 ? "Yes" : "";
-
+                if (getDisk() != null) {
+                    return getDisk().size() > 0 ? "Yes" : "";
+                }
+                return "";
         }
         return value;
     }
@@ -1190,11 +1190,11 @@ public class Machine implements Serializable {
     public String toString() {
         // return super.toString();
         StringBuilder sb = new StringBuilder();
-        sb.append( doubleQuoteString(getDescription()));
+        sb.append(doubleQuoteString(getDescription()));
         sb.append(COMMA);
         sb.append(getName());
         sb.append(COMMA);
-        sb.append( doubleQuoteString(getManufacturer()));
+        sb.append(doubleQuoteString(getManufacturer()));
         sb.append(COMMA);
         sb.append(getYear());
         sb.append(COMMA);
@@ -1258,9 +1258,9 @@ public class Machine implements Serializable {
     }
 
     // TODO find a better place for this
-    public static String doubleQuoteString(String input){
+    public static String doubleQuoteString(String input) {
         StringBuilder stringBuilder = new StringBuilder("\"");
-        if(input.contains("\"")){
+        if (input.contains("\"")) {
             input = input.replace("\"", "''");
         }
         stringBuilder.append(input);

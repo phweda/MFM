@@ -57,6 +57,7 @@ public final class MFMListBuilder {
     public static final String NO_IMPERFECT = "NOIMPERFECT";
     public static final String PD_VIDS = "PD VIDs";
     public static final String CLONE = "CLONE";
+    public static final String DEVICES = "DEVICES";
     public static final String NO_CLONE = "NOCLONE";
     public static final String VERTICAL = "VERTICAL";
     public static final String HORIZONTAL = "HORIZONTAL";
@@ -134,12 +135,11 @@ public final class MFMListBuilder {
             categoryHierarchy = MAMEInfo.getCategoryHierarchy();
         } catch (Exception e) {
             e.printStackTrace();
-            MFM.logger.out("FATAL error is MFMListBuilder. Check your Settings folder for MFM_cache.ser.");
+            MFM.logger.out("FATAL error is MFMListBuilder. Check your Data Set");
             // TODO ?? Consolodate these exit calls
             System.exit(5);
         }
 
-        // System.out.println("Start STATIC MFMListBuilder");
         getCategoryLists();
         // Populate built in lists
         lists = MFMListGenerator.getInstance().generateMFMLists();
@@ -162,6 +162,10 @@ public final class MFMListBuilder {
 
     static TreeSet<String> getBiosList() {
         return lists.get(BIOS);
+    }
+
+    static TreeSet<String> getDevicesList() {
+        return lists.get(DEVICES);
     }
 
     static TreeSet<String> getRunnableList() {
@@ -367,7 +371,7 @@ public final class MFMListBuilder {
         MFMUI_Setup.updateMenuBar(name);
     }
 
-    protected static TreeSet<String> checkList(String[] list) {
+    static TreeSet<String> checkList(String[] list) {
         TreeSet<String> newList = new TreeSet<String>();
         for (String machine : list) {
             if (lists.get(ALL).contains(machine)) {
