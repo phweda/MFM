@@ -394,11 +394,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     void showControlsDevices() {
         String machineName = getSelectedMachine();
-        // TODO do we need this? Think not
-        if (machineName == null) {
+        Machine machine = MAMEInfo.getMachine(machineName);
+        if(machine.getIsdevice().equals(Machine.YES) || machine.getIsbios().equals(Machine.YES)){
             return;
         }
-        Machine machine = MAMEInfo.getMachine(machineName);
+
         StringBuilder info = new StringBuilder();
         List<Control> controls = machine.getInput().getControl();
         info.append("Controls:\n\t");
