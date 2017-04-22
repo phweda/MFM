@@ -100,10 +100,12 @@ class MFMListGenerator {
         languagesMap.entrySet().removeIf(set -> set.getValue().isEmpty());
     }
 
+/*
     private static boolean needsVID(Machine machine) {
         String category = machine.getCategory();
         return !vidsExcludeCategoriesList.contains(category);
     }
+*/
 
     HashMap<String, TreeSet<String>> generateMFMLists() {
         HashMap<String, TreeSet<String>> lists;
@@ -176,9 +178,6 @@ class MFMListGenerator {
                 String cloneof = machine.getCloneof();
                 if (cloneof == null || cloneof.isEmpty()) {
                     noClonesList.add(machineName);
-                    if (needsVID(machine)) {
-                        VIDsList.add(machineName);
-                    }
                 } else if (cloneof.length() > 1) {
                     clonesList.add(machineName);
                 } else {
@@ -234,7 +233,6 @@ class MFMListGenerator {
             lists.put(DEVICES, devicesList);
             lists.put(VERTICAL, verticalsList);
             lists.put(HORIZONTAL, horizontalList);
-            lists.put(PD_VIDS, VIDsList);
             lists.put(CLONE, clonesList);
             lists.put(NO_CLONE, noClonesList);
             lists.put(COCKTAIL, cocktailList);
