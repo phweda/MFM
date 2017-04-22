@@ -88,7 +88,7 @@ public final class MFMListBuilder {
     static final String SYSTEM_CATEGORIES = "System Categories";
     static final String ARCADE_NOMATURE_CATEGORIES = "Arcade No Mature Categories";
     static final String SYSTEM_NOMATURE_CATEGORIES = "System No Mature Categories";
-    private static final MFMPlayLists playLists;
+    private static MFMPlayLists playLists;
     static Map<String, Machine> allMachines;
     static TreeSet<String> runnableList;
     static ArrayList<String> arcadeCategories;
@@ -98,7 +98,8 @@ public final class MFMListBuilder {
     static TreeSet<String> devicesList = new TreeSet<String>();
     static TreeSet<String> noClonesList = new TreeSet<String>();
     static TreeSet<String> noImpefectList = new TreeSet<String>();
-    static TreeSet<String> VIDsList = new TreeSet<String>();
+    // Remove as VIDs project is dead
+    // static TreeSet<String> VIDsList = new TreeSet<String>();
     static TreeSet<String> clonesList = new TreeSet<String>();
     static TreeSet<String> verticalsList = new TreeSet<String>();
     static TreeSet<String> horizontalList = new TreeSet<String>();
@@ -128,6 +129,10 @@ public final class MFMListBuilder {
     private static HashMap<String, TreeSet<String>> lists;
 
     static {
+        initLists();
+    }
+
+    static void initLists() {
         try {
             allMachines = MAMEInfo.getMame().getMachineMap();
             runnableList = new TreeSet<String>(MAMEInfo.getRunnableMachines());
@@ -136,7 +141,6 @@ public final class MFMListBuilder {
         } catch (Exception e) {
             e.printStackTrace();
             MFM.logger.out("FATAL error is MFMListBuilder. Check your Data Set");
-            // TODO ?? Consolodate these exit calls
             System.exit(5);
         }
 
@@ -150,9 +154,6 @@ public final class MFMListBuilder {
             if (MAMEInfo.getCategoryHierarchy() != null) {
                 MFM.logger.addToList("Main categories has : " + MAMEInfo.getCategoryHierarchy().size() + " entries");
             }
-        }
-        if (MFM.isSystemDebug()) {
-            System.out.println("End STATIC MFMListBuilder");
         }
     }
 
@@ -180,9 +181,11 @@ public final class MFMListBuilder {
         return lists.get(NO_CLONE);
     }
 
+/*
     static TreeSet<String> getVIDsList() {
         return lists.get(PD_VIDS);
     }
+*/
 
     static TreeSet<String> getClonesList() {
         return lists.get(CLONE);
@@ -371,7 +374,7 @@ public final class MFMListBuilder {
         MFMUI_Setup.updateMenuBar(name);
     }
 
-    static TreeSet<String> checkList(String[] list) {
+    private static TreeSet<String> checkList(String[] list) {
         TreeSet<String> newList = new TreeSet<String>();
         for (String machine : list) {
             if (lists.get(ALL).contains(machine)) {
@@ -423,7 +426,6 @@ public final class MFMListBuilder {
         if (files.length > 2) {
             JOptionPane.showMessageDialog(null, "Diff will be the first two files returned");
         }
-
 
         String name1 = stripSuffix(files[0].getName());
         String name2 = stripSuffix(files[1].getName());
@@ -486,7 +488,7 @@ public final class MFMListBuilder {
 
     public static void dumpListData(String list) {
         File newFile = new File(MFM.MFM_LISTS_DIR + list +
-                        MFM_Data.getInstance().getDataVersion() + "_data.csv");
+                MFM_Data.getInstance().getDataVersion() + "_data.csv");
         TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
         PrintWriter pw = null;
         try {
@@ -501,6 +503,7 @@ public final class MFMListBuilder {
         }
     }
 
+    // TODO Should this NOT be inner class
     public static final class Builder {
 
         public static final QuadState orientation = new QuadState(VERTICAL, HORIZONTAL, COCKTAIL, QuadState.ALL);
@@ -934,7 +937,7 @@ public final class MFMListBuilder {
             return true;
         }
 
-        // TODO change for Gauntlet logic Done needs testing
+
         // If simultaneous is selected ignore Players settings
         private boolean checkButtonsPlayers(int machineButtons, int machinePlayers) {
 

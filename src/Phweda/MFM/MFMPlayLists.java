@@ -50,7 +50,8 @@ public class MFMPlayLists implements Serializable {
     private TreeSet<String> deviceMachineNames = null;
     private TreeSet<String> runnableMachineNames = null;
     private TreeSet<String> noCloneMachineNames = null;
-    private TreeSet<String> VIDsMachineNames = null;
+    // Remove as VIDs project is dead
+    // private TreeSet<String> VIDsMachineNames = null;
     private TreeSet<String> clonesMachineNames = null;
     private TreeSet<String> verticalsMachineNames = null;
     private TreeSet<String> horizontalsMachineNames = null;
@@ -64,7 +65,6 @@ public class MFMPlayLists implements Serializable {
     private TreeSet<String> rasterDisplayMachineNames = null;
     private TreeSet<String> vectorDisplayMachineNames = null;
     private TreeSet<String> lcdDisplayMachineNames = null;
-    private TreeSet<String> unknownDisplayMachineNames = null;
 
     // Note very hackish - quick way to populate the set inline
     private TreeSet<String> doNotPopulateList = new TreeSet<String>() {{
@@ -74,10 +74,21 @@ public class MFMPlayLists implements Serializable {
 
     private MFMPlayLists() {
         loadPlayLists();
+        populateNames();
+    }
+
+    public void refreshLists() {
+        MFMListBuilder.initLists();
+        allMachineNames = null;
+        loadPlayLists();
+        populateNames();
+    }
+
+    private void populateNames() {
         allListsNames = new ArrayList<>(MFMPlayListsTree.keySet());
         allListsNames.addAll(myPlayListsTree.keySet());
         allListsNames.addAll(languagesLists.keySet());
-        myListsNames = new ArrayList(myPlayListsTree.keySet());
+        myListsNames = new ArrayList<String>(myPlayListsTree.keySet());
     }
 
     public static MFMPlayLists getInstance() {
@@ -159,13 +170,6 @@ public class MFMPlayLists implements Serializable {
 
     private Set<String> getAllPlayListNames() {
         return new TreeSet<>(allListsNames);
-    }
-
-    // TODO remove??
-    public Object[] getPopulatableLists() {
-        Set<String> populateNames = getAllPlayListNames();
-        populateNames.removeAll(doNotPopulateList);
-        return populateNames.toArray();
     }
 
     public String getNextListName(String currentName, boolean next) {
@@ -257,7 +261,7 @@ public class MFMPlayLists implements Serializable {
             }
             clonesMachineNames = MFMListBuilder.getClonesList();
             noCloneMachineNames = MFMListBuilder.getNoClonesList();
-            VIDsMachineNames = MFMListBuilder.getVIDsList();
+        //    VIDsMachineNames = MFMListBuilder.getVIDsList();
             verticalsMachineNames = MFMListBuilder.getVerticalsList();
             horizontalsMachineNames = MFMListBuilder.getHorizontalsList();
             cocktailMachineNames = MFMListBuilder.getCocktailsList();
@@ -269,7 +273,6 @@ public class MFMPlayLists implements Serializable {
             lcdDisplayMachineNames = MFMListBuilder.getLcdDisplayList();
             CHDMachineNames = MFMListBuilder.getCHDList();
             noImperfectMachineNames = MFMListBuilder.getNoImperfectList();
-            //    unknownDisplayMachineNames = MFMListBuilder.getUnknownDisplayList();
         }
         MFMPlayListsTree = new TreeMap<String, TreeSet<String>>();
         MFMPlayListsTree.put(MFMListBuilder.ALL, allMachineNames);
@@ -281,7 +284,7 @@ public class MFMPlayLists implements Serializable {
         }
         MFMPlayListsTree.put(MFMListBuilder.CLONE, clonesMachineNames);
         MFMPlayListsTree.put(MFMListBuilder.NO_CLONE, noCloneMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.PD_VIDS, VIDsMachineNames);
+    //    MFMPlayListsTree.put(MFMListBuilder.PD_VIDS, VIDsMachineNames);
         MFMPlayListsTree.put(MFMListBuilder.VERTICAL, verticalsMachineNames);
         MFMPlayListsTree.put(MFMListBuilder.HORIZONTAL, horizontalsMachineNames);
         MFMPlayListsTree.put(MFMListBuilder.COCKTAIL, cocktailMachineNames);
