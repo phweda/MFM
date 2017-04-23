@@ -18,17 +18,19 @@
 
 package Phweda.MFM;
 
+import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.mame.Mame;
+import Phweda.utils.Hasher;
 import Phweda.utils.PersistUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectStreamException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,48 +40,85 @@ import java.util.concurrent.TimeUnit;
  */
 
 /**
- * fixme again singleton pattern with mostly static methods
+ *
  */
 public class MFM_Data {
-    private static final MFM_Data ourInstance;
+    private static MFM_Data ourInstance;
+    private static MFM_Data_Sets datasets;
 
     private static HashMap<String, Object> settings = new HashMap<String, Object>();
-
+    // Provides common name mapping for Controllers
     private static File controllersLabelsFile;
+    // Contains list of Mame folders
     private static File folderNamesFile;
 
     // Machine:built-in(catver,nplayers,category roots, category/arcade:system):
     private static HashMap<String, Object> permData = new HashMap<String, Object>();
     private static Mame mame;
 
+    private static String dataVersion;
+
+    /*
+     * File naming for Data Sets incorporating version
+        180 - Each ZIP file contains MFM_MAME.xml & MFM_cache.ser
+        MFM_MAME_ALL_180.zip    Everything
+        MFM_MAME_180.zip        Runnable Machines only
+     */
+    private static final String MFM_CACHE = "MFM_cache";
+    private static final String SER_SUFFIX = ".ser";
+    private static final String MFM_MAME = "MFM_MAME";
+    private static final String XML_SUFFIX = ".xml";
+    private static final String ZIP_SUFFIX = ".zip";
+
+    private static final String MFM_CACHE_SER = MFM_CACHE + SER_SUFFIX;
+    private static final String MFM_MAME_XML = MFM_MAME + XML_SUFFIX;
+    private static final String MFM_USER_INI_FILE = MFM.MFM_SETTINGS_DIR + "UserIniData.xml";
+    private static final String MFM_DATA_SETS_FILE = MFM.MFM_SETTINGS_DIR + "DataSets.ser";
+
     private static boolean staticChanged = false;
     private static boolean firstCall = true;
     private static boolean loaded = false;
-
-    static {
-        if (MFM.isSystemDebug()) {
-            System.out.println("MFM_Data static initializer");
-        }
-        ourInstance = new MFM_Data();
-        ourInstance.loadData();
-    }
+    private static boolean persisting = false;
 
     public static MFM_Data getInstance() {
+        if (ourInstance == null) {
+            ourInstance = new MFM_Data();
+            ourInstance.loadData();
+        }
         return ourInstance;
     }
 
-    static boolean isLoaded() {
+    public boolean isLoaded() {
         return loaded;
     }
 
-    private static void persistMameData() {
-        // TODO when we have user triggered Parse from UI need to put this on its own thread
-        // TODO and flag to block closing MFM during save
-        PersistUtils.saveJAXB(mame, MFM.MFM_SETTINGS_DIR + MFM.MFM_MAME_FILE, mame.getClass());
+    public void setLoaded() {
+        loaded = true;
     }
 
-    public static void persistStaticData() {
-        // TODO is this boolean needed? Maybe in the future with updates to Data?
+    /**
+     * @deprecated now that we write results to ZIP do it at the same time see persistStaticData below
+     */
+    private void persistMameData() {
+        // Done needs testing 4/11/17
+        //    PersistUtils.saveJAXB(mame, MFM.MFM_DATA_DIR + MFM_MAME_XML, mame.getClass());
+        //      PersistUtils.saveJAXBtoZip(mame, getZipPathString(), MFM_MAME_XML, Mame.class);
+    }
+
+    private String getZipPathString(String directory, boolean all) {
+        if (all) {
+            return directory + MFM_MAME + "_ALL_" + getDataVersion() + ZIP_SUFFIX;
+        } else {
+            return directory + MFM_MAME + "_" + getDataVersion() + ZIP_SUFFIX;
+        }
+    }
+
+    boolean isPersisting() {
+        return persisting;
+    }
+
+    public void persistStaticData(String saveDirectory, boolean all) {
+        // TODO is this boolean needed?
         if (!staticChanged) {
             return;
         }
@@ -87,89 +126,43 @@ public class MFM_Data {
             @Override
             public void run() {
                 if (MFM.isSystemDebug()) {
-                    System.out.print("##");
+                    System.out.println("## Static data persist thread");
                 }
 
                 synchronized (this) {
+                    persisting = true;
                     String logMessage = "persistStaticData: " + permData.size() + " : " +
                             permData.keySet() + "\n\n";
                     System.out.println(logMessage);
                     MFM.logger.addToList(logMessage);
 
-                    PersistUtils.saveAnObject(permData, MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_SER);
-                    //    PersistUtils.saveAnObjectXML(permData, MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_XML);
-                    setStaticChanged(false);
-                }
-            }
-        };
-        persist.start();
-
-/*
-
-        Thread persist = new Thread(){
-            @Override
-            public void run() {
-                if(MFM.isSystemDebug()){
-                    System.out.print("##");
-                }
-                MFM.logger.addToList("##");
-                int trys = 0;
-                while (trys < 20) {
-                    trys++;
-                    if (isStaticChanged()){
-                        try {
-                            synchronized (this){
-                                if(MFM.isSystemDebug()){
-                                    System.out.println("##");
-                                }
-                                MFM.logger.addToList("##");
-                                // Wait 20 seconds as hack to ensure repeated saves from multiple calls
-                                wait(20000);
-
-                                String logMessage = "persistStaticData: " + permData.size() + " : " +
-                                        permData.keySet() + "\n\n";
-                                System.out.println(logMessage);
-                                MFM.logger.addToList(logMessage);
-
-                                PersistUtils.saveAnObject(permData, MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_SER);
-                                setStaticChanged(false);
-                            }
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    try (ZipOutputStream zipOutputStream =
+                                 new ZipOutputStream(new FileOutputStream(getZipPathString(saveDirectory, all)))) {
+                        PersistUtils.saveAnObjecttoZip(permData, zipOutputStream, MFM_CACHE_SER);
+                        PersistUtils.saveJAXBtoZip(mame, zipOutputStream, MFM_MAME_XML, Mame.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                    setStaticChanged(false);
+                    persisting = false;
                 }
             }
         };
         persist.start();
-*/
     }
 
-    public static boolean contains(String key) {
+    public boolean contains(String key) {
         return (settings.containsKey(key) || permData.containsKey(key));
     }
 
     private void loadData() {
-        MFM.showBusy(true, true);
         if (MFM.isSystemDebug()) {
-            System.out.print("Loading data");
+            System.out.println("Loading data");
         }
+        loadDataSets();
 
         try {
-            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MFM_MAME_FILE).exists()) {
-                long millis = System.currentTimeMillis();
-                if (MFM.isSystemDebug()) {
-                    System.out.println("\nMAME load starting: " + new Date(millis));
-                }
-
-                mame = (Mame) PersistUtils.retrieveJAXB(MFM.MFM_SETTINGS_DIR + MFM.MFM_MAME_FILE, Mame.class);
-                if (MFM.isSystemDebug()) {
-                    System.out.println("MAME load took: " +
-                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - millis));
-                }
-            }
-
+            // Load files first - required as of 0.85 for first run special case
             if (new File(MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE).exists()) {
                 settings = (HashMap<String, Object>)
                         PersistUtils.loadAnObjectXML(MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE);
@@ -182,36 +175,87 @@ public class MFM_Data {
             if (new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_FOLDER_NAMES_FILE).exists()) {
                 folderNamesFile = new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_FOLDER_NAMES_FILE);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        try {
-            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_SER).exists()) {
-                permData = (HashMap<String, Object>)
-                        PersistUtils.loadAnObject(MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_SER);
+            // Get previous Data Set
+            String dataVersion = MFMSettings.getInstance().getDataVersion();
+            String dataSetFile;
 
-/*
-            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_XML).exists()) {
-                permData = (HashMap<String, Object>)
-                        PersistUtils.loadAnObjectXML(MFM.MFM_SETTINGS_DIR + MFM.MFM_CACHE_XML);
-*/
-                if (permData.isEmpty() || !permData.containsKey(MFMListBuilder.CATEGORY_LISTS_HASHMAP)) {
-                    try {
-                        HashMap<String, ArrayList<String>> categoryRootsMap = (HashMap<String, ArrayList<String>>)
-                                PersistUtils.loadAnObjectXML(MFM.MFM_CATEGORY_DIR + MFM.MFM_CATEGORY_DATA_FILE);
-                        permData.put(MFMListBuilder.CATEGORY_LISTS_HASHMAP, categoryRootsMap);
-                        // NOTE should not need persist call here
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
+            if (dataVersion == null || !datasets.containsDataSet(dataVersion)) {
+                return; // Let MFMInfo -> MFMController handle special case
+            }
+            dataSetFile = datasets.getDataSet(dataVersion).getFilePath();
+            // dataSetFile = "MFM_MAME_ALL_0.70.zip";
+            loadData(dataSetFile);
+
+            if (permData.isEmpty() || !permData.containsKey(MFMListBuilder.CATEGORY_LISTS_HASHMAP)) {
+                HashMap<String, ArrayList<String>> categoryRootsMap = (HashMap<String, ArrayList<String>>)
+                        PersistUtils.loadAnObjectXML(MFM.MFM_CATEGORY_DIR + MFM.MFM_CATEGORY_DATA_FILE);
+                permData.put(MFMListBuilder.CATEGORY_LISTS_HASHMAP, categoryRootsMap);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         loaded = true;
-        MFM.showBusy(false, true);
+    }
+
+    private void loadDataSets() {
+        if (Files.exists(Paths.get(MFM_DATA_SETS_FILE))) {
+            try {
+                datasets = (MFM_Data_Sets) PersistUtils.loadAnObject(MFM_DATA_SETS_FILE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (datasets == null || !datasets.checkSets()) {
+            datasets = new MFM_Data_Sets();
+            Thread scanDataSets = new Thread() {
+                @Override
+                public void run() {
+                    synchronized (this) {
+                        datasets.scanSets();
+                        MFM.logger.addToList("Scanned for Data Sets and found: " +
+                                datasets.getAvailableVersions().size());
+                        System.out.println("Scanned for Data Sets and found: " +
+                                datasets.getAvailableVersions().size());
+                        PersistUtils.saveAnObject(datasets, MFM_DATA_SETS_FILE);
+                    }
+                }
+            };
+            scanDataSets.start();
+        }
+    }
+
+    private void loadData(String filePath) {
+        if (filePath != null && !filePath.isEmpty()) {
+            MFMUI.showBusy(true, true);
+            long millis = System.currentTimeMillis();
+            if (MFM.isSystemDebug()) {
+                System.out.println("\nMAME load starting: " + new Date(millis));
+            }
+
+            mame = (Mame) PersistUtils.retrieveJAXBfromZip(filePath, MFM_MAME_XML, Mame.class);
+            setDataVersion();
+            if (MFM.isSystemDebug()) {
+                System.out.println("MAME load took: " +
+                        TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - millis));
+            }
+
+            try {
+                permData = (HashMap<String, Object>)
+                        PersistUtils.loadAnObjectFromZip(filePath, MFM_CACHE_SER);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void loadDataSet(String dataSet) {
+        if (dataSet == null) {
+            return;
+        }
+        final MFM_Data_Sets.Data_Set dataSet1 = datasets.getDataSet(dataSet);
+        loadData(dataSet1.getFilePath());
     }
 
     File getControllerLabelsFile() {
@@ -220,6 +264,21 @@ public class MFM_Data {
 
     File getFolderNamesFile() {
         return folderNamesFile;
+    }
+
+    final void persistUserInis(HashMap<String, Map> INIfiles) {
+        PersistUtils.saveAnObjectXML(INIfiles, MFM_USER_INI_FILE);
+    }
+
+    final Object getUserInis() {
+        try {
+            if (Files.exists(Paths.get(MFM_USER_INI_FILE))) {
+                return PersistUtils.loadAnObjectXML(MFM_USER_INI_FILE);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     final void setObject(String key, Object obj) {
@@ -237,13 +296,6 @@ public class MFM_Data {
         }
         permData.put(key, obj);
         setStaticChanged(true);
-/*
-        if (firstCall) {
-            firstCall = false;
-            persistStaticData();
-        }
-*/
-        //   persistStaticData();
     }
 
     final Object getStaticData(String key) {
@@ -257,8 +309,12 @@ public class MFM_Data {
         return staticChanged;
     }
 
-    private static void setStaticChanged(boolean staticChanged) {
+    private void setStaticChanged(boolean staticChanged) {
         MFM_Data.staticChanged = staticChanged;
+    }
+
+    public HashMap<String, Object> getPermanentData() {
+        return permData;
     }
 
     public Mame getMame() {
@@ -267,30 +323,144 @@ public class MFM_Data {
 
     public void setMame(Mame mame) {
         MFM_Data.mame = mame;
-        persistMameData();
+        setDataVersion();
+    }
+
+    private void setDataVersion() {
+        dataVersion = MFMSettings.getInstance().trimMAMEVersion(mame.getBuild());
+    }
+
+    public String getDataVersion() {
+        return dataVersion;
+    }
+
+    public String[] getDataSets() {
+        TreeSet<String> versions = datasets.getAvailableVersions();
+        return (String[]) versions.toArray(new String[versions.size()]);
     }
 
     private void persistSettings() {
         PersistUtils.saveAnObjectXML(settings, MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE);
     }
 
-/*  Note does not save significant memory. We have live references to all these objects
-    public static void flush(){
-        permData = null;
-        System.gc();
-        if (MFM.isSystemDebug()) {
-            System.out.println("Perm Data purged from memory");
-        }
-    }
-*/
+    // Nested classes to just keep all the logic and data related storage in the same place
+    private static final class MFM_Data_Sets implements Serializable {
+        private static final long serialVersionUID = -3590232248802621035L;
+        transient Path dataDirPath = Paths.get(MFM.MFM_DATA_DIR);
+        transient PathMatcher filter =
+                dataDirPath.getFileSystem().getPathMatcher("glob:**/MFM_MAME*.zip");
+        private HashMap<String, Data_Set> dataSets;
 
-    /**
-     * Deserialization hook to ensure Singleton behavior
-     *
-     * @return Object instance
-     * @throws ObjectStreamException
-     */
-    private Object readResolve() throws ObjectStreamException {
-        return ourInstance;
+        MFM_Data_Sets() {
+        }
+
+        TreeSet<String> getAvailableVersions() {
+            return new TreeSet<String>(dataSets.keySet());
+        }
+
+        Data_Set getDataSet(String key) {
+            return dataSets.get(key);
+        }
+
+        boolean containsDataSet(String version) {
+            return dataSets.containsKey(version);
+        }
+
+        private void scanSets() {
+            try {
+                dataSets = new HashMap<String, Data_Set>();
+                Files.find(dataDirPath, 5, (filePath, fileAttr) -> fileAttr.isRegularFile())
+                        .filter(filter::matches)
+                        .forEach(this::createDataSet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private boolean checkSets() {
+            long setsNumber = 0;
+            try {
+                setsNumber = Files.find(dataDirPath, 5, (filePath, fileAttr) -> fileAttr.isRegularFile())
+                        .filter(filter::matches)
+                        .count();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return dataSets.size() == setsNumber;
+        }
+
+        private void createDataSet(Path path) {
+            Data_Set dataSet = new Data_Set(getVersion(path.getFileName().toString()), path.toString(),
+                    calculateSHA1(path));
+            dataSets.put(dataSet.getVersion(), dataSet);
+        }
+
+        private String getVersion(String path) {
+            // example name is MFM_MAME_0.180.zip
+            return path.substring(9, path.lastIndexOf('.'));
+        }
+
+        private String calculateSHA1(Path path) {
+            return Hasher.getSHA1(path.toFile());
+        }
+
+        private void readObject(java.io.ObjectInputStream in)
+                throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            dataDirPath = Paths.get(MFM.MFM_DATA_DIR);
+            filter = dataDirPath.getFileSystem().getPathMatcher("glob:**/MFM_MAME*.zip");
+        }
+
+        final class Data_Set implements Serializable {
+            private static final long serialVersionUID = -2151579106718487671L;
+            // Version is extracted or equal to the fileName substring '0.180' or 'ALL_0.180'
+            private String version;
+            private String filePath;
+            private String fileSHA1;
+
+            Data_Set(String version, String filePath, String fileSHA1) {
+                this.version = version;
+                this.filePath = filePath;
+                this.fileSHA1 = fileSHA1;
+            }
+
+            /**
+             * For User created Data Sets
+             *
+             * @param name
+             * @param version
+             * @param filePath
+             * @param fileSHA1
+             */
+            Data_Set(String name, String version, String filePath, String fileSHA1) {
+                this.version = name + ':' + version;
+                this.filePath = filePath;
+                this.fileSHA1 = fileSHA1;
+            }
+
+            public String getVersion() {
+                return version;
+            }
+
+            String getFilePath() {
+                return filePath;
+            }
+
+            public String getFileSHA1() {
+                return fileSHA1;
+            }
+
+            private void setVersion(String version) {
+                this.version = version;
+            }
+
+            private void setFilePath(String filePath) {
+                this.filePath = filePath;
+            }
+
+            private void setFileSHA1(String fileSHA1) {
+                this.fileSHA1 = fileSHA1;
+            }
+        }
     }
 }

@@ -42,7 +42,6 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import static Phweda.MFM.UI.MFMController.*;
-import static Phweda.MFM.UI.MFMUI_Setup.updateMenuBar;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,8 +62,7 @@ class MFMListActions {
             data = MFMPlayLists.getInstance().myPlayListNames();
         }
 
-        @SuppressWarnings("MagicConstant")
-        final String list = (String) JOptionPane.showInputDialog(
+        @SuppressWarnings("MagicConstant") final String list = (String) JOptionPane.showInputDialog(
                 mainFrame, message,
                 "List Picker", JOptionPane.OK_CANCEL_OPTION, MFMUI_Setup.getMFMIcon(), data, data[0]);
 
@@ -86,7 +84,7 @@ class MFMListActions {
 
         // Hack so we can position Dialog where mouse is. Do not want to subclass JOptionPane
         JFrame frame = new JFrame();
-        frame.setSize(0,0);
+        frame.setSize(0, 0);
         frame.setLocation(mainFrame.getMousePosition());
         frame.setVisible(true); // frame must be visible
 
@@ -101,7 +99,7 @@ class MFMListActions {
                 return;
             }
             MFMPlayLists.getInstance().createPlayList(newName, new String[]{machine});
-            MFMUI_Setup.updateMenuBar(newName);
+            MFMUI_Setup.getInstance().updateMenuBar(newName);
             return;
         }
         playLists.addGameToPlayList(listName, machine);
@@ -123,15 +121,14 @@ class MFMListActions {
     static String removeList() {
         Object[] data = MFMPlayLists.getInstance().myPlayListNames();
 
-        @SuppressWarnings("MagicConstant")
-        final String result = (String) JOptionPane.showInputDialog(
+        @SuppressWarnings("MagicConstant") final String result = (String) JOptionPane.showInputDialog(
                 mainFrame, "Select list to Remove",
                 "Remove", JOptionPane.OK_CANCEL_OPTION, null, data, data[0]);
 
         if (result != null) {
             MFM.logger.addToList(result + " is being removed", true);
             MFMPlayLists.getInstance().removePlayList(result);
-            updateMenuBar("");
+            MFMUI_Setup.getInstance().updateMenuBar("");
         }
         return result;
     }

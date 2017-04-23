@@ -473,9 +473,6 @@ public class MFMSettings {
             MFM.logger.separateLine();
             MFM.logger.addToList("NO SETTINGS FOUND", true);
             MFM.logger.separateLine();
-        }
-
-        if (mfmSettings == null) {
             initMySettings();
         }
 

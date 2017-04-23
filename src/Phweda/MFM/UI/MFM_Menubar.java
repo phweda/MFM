@@ -153,6 +153,9 @@ class MFM_Menubar {
         MFMAction settings = new MFMAction("Settings",
                 getResources().getImageIcon(MFMUI_Resources.S_PNG));
 
+        MFMAction openDataSet = new MFMAction(MFMAction.LoadDataSetAction, null);
+        MFMAction parseMAME = new MFMAction(MFMAction.ParseMAMEAction, null);
+
         MFMAction exit = new MFMAction("Exit",
                 getResources().getImageIcon(MFMUI_Resources.EX_PNG));
 
@@ -160,6 +163,9 @@ class MFM_Menubar {
         item = MFMMenu.add(openFile);
         item = MFMMenu.add(settings);
         item.setMnemonic(KeyEvent.VK_S);
+        MFMMenu.add(new JSeparator());
+        item = MFMMenu.add(openDataSet);
+        item = MFMMenu.add(parseMAME);
         MFMMenu.add(new JSeparator());
         item = MFMMenu.add(exit);
         item.setMnemonic(KeyEvent.VK_E);

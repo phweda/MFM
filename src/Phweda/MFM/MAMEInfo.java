@@ -19,21 +19,20 @@
 package Phweda.MFM;
 
 import Phweda.MFM.UI.MAMEtoJTree;
+import Phweda.MFM.UI.MFMUI;
+import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.MFM.Utils.ParseCommandList;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
 import Phweda.MFM.mame.ParseAllMachinesInfo;
 import Phweda.utils.FileUtils;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InvalidClassException;
 import java.text.DecimalFormat;
 import java.util.*;
-
-import static javax.swing.JOptionPane.YES_NO_OPTION;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,9 +42,9 @@ import static javax.swing.JOptionPane.YES_NO_OPTION;
  */
 public class MAMEInfo // We'll just do the individual objects  ** implements Serializable
 {
+    private static MAMEInfo ourInstance = null;
+
     private static final String RUNNABLE_MACHINES = "RunnableMachines";
-    private static final String MACHINELIST = "MachineList";
-    private static final String INIFILES = "INIfiles";
     private static final String CATEGORIES = "Categories";
     private static final String CATEGORYMACHINES = "CategoryMachines";
     private static final String CATEGORYHIERARCHY = "CategoryHierarchy";
@@ -55,24 +54,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     // TODO figure out if we now need this and start to eliminate static calls 3/30/2017
     private static final ParseAllMachinesInfo PAMI = new ParseAllMachinesInfo();
 
-/*  fixme remove after testing
-    public static final String MAME_INI = "mame.ini";
-    private static final String MachineObjectMap = "Machines";
-    private static final String MAME = "MAME";
-
-    private static final String COMMANDS_FILENAME = "Commands";
-
-    private static final String ALLROOTS = "CategoryRoots";
-    private static final String ARCADEROOTS = "ArcadeCategoryRoots";
-    private static final String MAME_VERSION = "MAME Version";
-    private static final String NUM_BUTTONS = "Max_buttons";
-    private static final String NUM_PLAYERS = "Max players";
-    private static final String RUNNABLE = "Runnable";
-
-    private static String version;  // From -listxml
-
-*/
-    private static final MAMEtoJTree mameJTreePanel;
+    private static MAMEtoJTree mameJTreePanel;
     private static int runnable;
     private static HashMap<String, HashMap<String, String>> commands; // From -showusage
     private static ArrayList<String> allCategories;  // From catver_full.ini or catver.ini
@@ -131,119 +113,116 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     *
     */
 
-    /*
-         * Load persisted objects or if not available generate from MAME
-         * TODO break this up
-         */
-    static {
+    /**
+     * Load persisted objects or if not available generate from MAME
+     */
+    private MAMEInfo() {
+        if (MFM.isDebug() && allCategories != null) {
+            MFM.logger.addToList("Total categories is : " + allCategories.size());
+        }
         try {
             mame = loadMame();
-            INIfiles = (HashMap<String, Map>) MFM_Data.getInstance().getStaticData(INIFILES);
             if (mame != null) {
-                runnableMachines = (TreeSet<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
-                allCategories = (ArrayList<String>) MFM_Data.getInstance().getStaticData(CATEGORIES);
-                categoryMachines = (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().
-                        getStaticData(CATEGORYMACHINES);
-                categoryHierarchy = (TreeMap<String, ArrayList<String>>)
-                        MFM_Data.getInstance().getStaticData(CATEGORYHIERARCHY);
-
-                controllers = Controllers.getInstance();
-                Controllers.setControls((TreeMap<Integer, Phweda.MFM.mame.Control>)
-                        MFM_Data.getInstance().getStaticData(CONTROLLERS));
-
-                Controllers.setControlMachinesList((TreeMap<Integer, TreeSet<String>>)
-                        MFM_Data.getInstance().getStaticData(CONTROLLERSMACHINES));
+                loadCaches();
+                loadINIs();
+            } else {
+                // TODO 0.85 with 0.85 we now have several options: pick a Data Set, Parse MAME if one is set, or Quit
+                // fixme bad design
+                MFMUI_Setup.getInstance().loadDataSet();
+                MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
+                return;
+                //    generateAllMameData(MFM.isProcessAll(), true);
             }
-
         } catch (Exception exc) {
             if (MFM.isDebug()) {
-                MFM.logger.addToList("Exception loading Mame and data objects : " + exc.getClass().getCanonicalName());
+                MFM.logger.addToList("Exception loading Mame and data objects : " +
+                        exc.getClass().getCanonicalName());
+                exc.printStackTrace();
             }
             // Removed for 0.85 no longer needed
         }
 
-        // Note if it is still null could also be we changed Machine/Game class
-        if (mame == null) {
-            // TODO right place to start? End it in MFMUI_Setup getFrame
-            MFM.showBusy(true, false);
-            // START with INI files used in parsing Games 9/20/15
-            // NOTE now switched where we do catver and nplayers 10/14/15
-            loadINIs();
-            // NOTE order makes a difference!!
-            mame = generateMame();
-            getParsedData();
-
-
-            if (mame != null) {
-                // Persist it
-                MFM_Data.getInstance().setMame(mame);
-                MFM_Data.getInstance().setStaticData(RUNNABLE_MACHINES, runnableMachines);
-                MFM_Data.getInstance().setStaticData(CATEGORIES, allCategories);
-                MFM_Data.getInstance().setStaticData(CATEGORYHIERARCHY, categoryHierarchy);
-
-                if (controllers != null) {
-                    MFM_Data.getInstance().setStaticData(CONTROLLERS, controllers.getControls());
-                    MFM_Data.getInstance().setStaticData(CONTROLLERSMACHINES, controllers.getControlMachinesList());
-                }
-
-                if (categoryMachines != null) {
-                    MFM_Data.getInstance().setStaticData(CATEGORYMACHINES, categoryMachines);
-                }
-
-            } else {
-                //TODo how do we punt? Something's really wrong if we get here!!!
-                MFM.logger.separateLine();
-                MFM.logger.addToList(
-                        "EXITING on FATAL error. Unable to load games Information.\n" +
-                                "Check your MAME setup and ensure it is running properly", true);
-                System.exit(3);
-            }
-        }
-
-        if (INIfiles == null) {
-            loadINIs();
-        }
-
-        loadCommands();
+        loadCommands(); // Legacy functionality
 
         if (runnableMachines != null) {
             setRunnable(runnableMachines.size());
         } else {
             setRunnable(mame.getMachineMap().size());
         }
-
+        loadMameResources();
         mameJTreePanel = MAMEtoJTree.getInstance();
     }
 
-    public MAMEInfo() {
-        if (MFM.isDebug() && allCategories != null) {
-            MFM.logger.addToList("Total categories is : " + allCategories.size());
+    public static MAMEInfo getInstance(boolean reset) {
+        if (ourInstance == null || reset) {
+            ourInstance = new MAMEInfo();
         }
+        return ourInstance;
     }
 
     /**
      * Load the Mame data set from file
+     *
      * @return Mame data set
      */
-    public static Mame loadMame(){
+    private static Mame loadMame() {
         return MFM_Data.getInstance().getMame();
     }
 
     /**
      * Parse the currently set Mame executable
-     * @see Phweda.MFM.MAMEexe
+     *
      * @return Mame XML
+     * @see Phweda.MFM.MAMEexe
      */
-    public static Mame generateMame(){
-        return ParseAllMachinesInfo.loadAllMachinesInfo();
+    private static Mame generateMame(boolean all) {
+        return ParseAllMachinesInfo.loadAllMachinesInfo(all);
+    }
+
+    static void parseMAME(boolean all) {
+
+    }
+
+    private void generateAllMameData(boolean all, boolean showBusy) {
+        if (showBusy) {
+            MFMUI.showBusy(true, false);
+        }
+        MFMSettings.getInstance();
+        loadINIs();
+        // NOTE order makes a difference!!
+        mame = generateMame(all);
+        getParsedData();
+
+        if (mame != null) {
+            // Persist it
+            MFM_Data.getInstance().setMame(mame);
+            MFM_Data.getInstance().setStaticData(RUNNABLE_MACHINES, runnableMachines);
+            MFM_Data.getInstance().setStaticData(CATEGORIES, allCategories);
+            MFM_Data.getInstance().setStaticData(CATEGORYHIERARCHY, categoryHierarchy);
+
+            if (controllers != null) {
+                MFM_Data.getInstance().setStaticData(CONTROLLERS, controllers.getControls());
+                MFM_Data.getInstance().setStaticData(CONTROLLERSMACHINES, controllers.getControlMachinesList());
+            }
+
+            if (categoryMachines != null) {
+                MFM_Data.getInstance().setStaticData(CATEGORYMACHINES, categoryMachines);
+            }
+
+        } else {
+            MFM.logger.separateLine();
+            MFM.logger.addToList(
+                    "EXITING on FATAL error. Unable to load Machines information.\n" +
+                            "Check your MAME setup and ensure it is running properly", true);
+            System.exit(3);
+        }
     }
 
     /**
      * TODO further refactor needed this is messy
      * Extract parsed Runnable list, Categories info, Controllers
-     *
      */
-    public static void getParsedData(){
+    private static void getParsedData() {
         runnableMachines = ParseAllMachinesInfo.getRunnable();
         allCategories = ParseAllMachinesInfo.getCategoriesList();
         if (allCategories != null && !allCategories.isEmpty()) {
@@ -257,7 +236,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
      * Get MAME Command list and descriptions
      * >mame64 -showusage
      */
-    static void loadCommands(){
+    private static void loadCommands() {
         commands = (HashMap<String, HashMap<String, String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.COMMANDS);
 
         if (commands == null || commands.isEmpty()) {
@@ -293,6 +272,45 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         }
     }
 
+    /**
+     * Load cached Mame Resources - User's Mame sets
+     */
+    private static void loadMameResources() {
+        Thread loadMameResources = new Thread() {
+            @Override
+            public void run() {
+                long millis = System.currentTimeMillis();
+                if (MFM.isSystemDebug()) {
+                    System.out.println("\nMAME Resources load starting: " + new Date(millis));
+                }
+                // TODO why is this taking so long?
+                MAME_Resources.getInstance(); // load and initialize
+                if (MFM.isSystemDebug()) {
+                    System.out.println("MAME Resources load took: " +
+                            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - millis));
+                }
+            }
+        };
+        loadMameResources.start();
+    }
+
+    private static void loadCaches() {
+        INIfiles = (HashMap<String, Map>) MFM_Data.getInstance().getUserInis();
+        runnableMachines = (TreeSet<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
+        allCategories = (ArrayList<String>) MFM_Data.getInstance().getStaticData(CATEGORIES);
+        categoryMachines = (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().
+                getStaticData(CATEGORYMACHINES);
+        categoryHierarchy = (TreeMap<String, ArrayList<String>>)
+                MFM_Data.getInstance().getStaticData(CATEGORYHIERARCHY);
+
+        controllers = Controllers.getInstance();
+        Controllers.setControls((TreeMap<Integer, Phweda.MFM.mame.Control>)
+                MFM_Data.getInstance().getStaticData(CONTROLLERS));
+
+        Controllers.setControlMachinesList((TreeMap<Integer, TreeSet<String>>)
+                MFM_Data.getInstance().getStaticData(CONTROLLERSMACHINES));
+    }
+
     static TreeSet<String> getAllCategories() {
         return new TreeSet<String>(allCategories);
     }
@@ -301,15 +319,17 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
      * Mame Data Set version
      *
      * @return MFM Data Set version
+     * @see MFM_Data::getDataVersion()
+     * @deprecated since 0.85 with multiple Data sets
      */
     public static String getVersion() {
         // Bug with this older Mame versions do not have the build Attribute
         //    return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
-        return MFMSettings.getDataVersion();
+        return MFMSettings.getInstance().getDataVersion();
     }
 
     public static double getVersionDouble() {
-        String str = MFMSettings.getDataVersion().replaceAll("[^\\d.]", "");
+        String str = MFMSettings.getInstance().getDataVersion().replaceAll("[^\\d.]", "");
         return Double.parseDouble(str);
     }
 
@@ -365,7 +385,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         runnable = runnableIn;
     }
 
-    public static HashMap<String, ArrayList<String>> getCategoryMachines() {
+    static HashMap<String, ArrayList<String>> getCategoryMachines() {
         return categoryMachines;
     }
 
@@ -424,9 +444,14 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         }
     }
 
+    /**
+     * Parse and store any user <mame root>/folder/*.ini files<br>
+     * Excludes Category Version and nPlayer ini files.<br>
+     * User's ini files become UI left hand tree
+     */
     public static void loadINIs() {
         HashSet<File> files;
-        String folderDir = MFMSettings.getMAMEFoldersDir();
+        String folderDir = MFMSettings.getInstance().getMAMEFoldersDir();
         if (folderDir != null) {
             File folder = new File(folderDir);
             // Quit if it is not a directory
@@ -435,10 +460,12 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                 if (MFM.isSystemDebug()) {
                     System.out.println("Folders files are : " + files.toString());
                 }
-                INIfiles = ParseAllMachinesInfo.INIfiles(files);
-                // Persist it
-                MFM_Data.getInstance().setStaticData(INIFILES, INIfiles);
-                MFM_Data.persistStaticData();
+
+                if (!files.isEmpty()) {
+                    INIfiles = ParseAllMachinesInfo.INIfiles(files);
+                    // Persist it
+                    MFM_Data.getInstance().persistUserInis(INIfiles);
+                }
             }
         }
     }

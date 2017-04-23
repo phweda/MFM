@@ -66,13 +66,12 @@ public class MFMUI {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 mfmui = new MFMUI();
-                MFMUI_Setup.getController().init();
+                MFMUI_Setup.getInstance().getController().init();
             }
         });
     }
 
     public static void showBusy(boolean start, boolean task) { // task false is empty startup. task true is loading data
-
         progressRunning = start;
         if (start) {
             busyThread = new Thread() {
@@ -100,7 +99,12 @@ public class MFMUI {
             busyDialog.dispose();
             busyThread.interrupt();
             busyThread = null;
+            busyDialog = new JDialog((Dialog) null, MFM.MFM_TITLE);
         }
+    }
+
+    static String pickVersion(JFrame frame) {
+        return MFM_Components.dataSetPicker(frame);
     }
 
     private static JXBusyLabel createComplexBusyLabel() {

@@ -371,7 +371,7 @@ public final class MFMListBuilder {
             return;
         }
         MFMPlayLists.getInstance().createPlayList(name, checkList(list));
-        MFMUI_Setup.updateMenuBar(name);
+        MFMUI_Setup.getInstance().updateMenuBar(name);
     }
 
     private static TreeSet<String> checkList(String[] list) {

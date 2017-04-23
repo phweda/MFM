@@ -53,7 +53,7 @@ public class MFM {
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
     public static final String VERSION = "Version 0.8.5";
-    public static final String BUILD = "BUILD 0.8.105";
+    public static final String BUILD = "BUILD 0.8.107";
     public static final String RELEASE_DATE = "Released : April 2017";
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION + "  :  " + MFM.BUILD;
 
@@ -120,17 +120,18 @@ public class MFM {
         // Start the GUI
         MFMUI.main(null);
 
-        // End progress Dialog here - needs testing
+        // End progress Dialog here
         if (MFMUI.isProgressRunning()) {
             MFMUI.showBusy(false, false);
         }
     }
 
-    private static void loadSettingsandInfo(){
+    private static void loadSettingsandInfo() {
         try {
             MS = MFMSettings.getInstance();
             MAMEInfo MI = null;
             if (MS.isLoaded()) {
+/*
                 while (!MFM_Data.getInstance().isLoaded()) {
                     try {
                         Thread.sleep(10);
@@ -138,9 +139,10 @@ public class MFM {
                         e.printStackTrace();
                     }
                 }
-                MI = new MAMEInfo();
+*/
+                MI = MAMEInfo.getInstance(false);
             } else {
-                setFirstRun(true); // fixme no loner needed?
+                setFirstRun(true); // fixme no longer needed?
                 // first run must acquire base settings before continuing
                 MFMUI.getSettings();
             }
@@ -153,14 +155,14 @@ public class MFM {
                 }
             }
             if (MI == null) {
-                MI = new MAMEInfo();
+                MAMEInfo.getInstance(false);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static void loadSwitches(List switches){
+    private static void loadSwitches(List switches) {
         /*
           Command line switches
         */
@@ -196,7 +198,7 @@ public class MFM {
         }
     }
 
-    private static void logEnvironment(){
+    private static void logEnvironment() {
         logger.out("Temp dir is " + TEMP_DIR);
 
         // Get the VM arguments and log
@@ -227,7 +229,7 @@ public class MFM {
         logger.separateLine();
     }
 
-    private static void setPathsandDirectories(String path){
+    private static void setPathsandDirectories(String path) {
         // Path we are executing in
         MFM_DIR = path + FileUtils.DIRECTORY_SEPARATOR;
         // Folder we create on the local file system
@@ -287,7 +289,7 @@ public class MFM {
         }
     }
 
-    private static void createLogs(){
+    private static void createLogs() {
         int timeNow = (int) System.currentTimeMillis();
         // Gives us a 6 digit descending, over time, number
         logNumber = timeNow >> 12;
@@ -338,9 +340,10 @@ public class MFM {
         }
     }
 
-    public static void exit(){
+    public static void exit() {
         // Wait for final exit while data is writing to disk
-        while(MFM_Data.getInstance().isPersisting()){}
+        while (MFM_Data.getInstance().isPersisting()) {
+        }
         System.exit(0);
     }
 

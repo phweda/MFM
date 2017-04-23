@@ -97,6 +97,7 @@ class MFMListGenerator {
                 set.removeIf(machineName -> !allList.contains(machineName))
         );
         // Remove any empty lists
+        // fixme not removing empty set i.e Swedish
         languagesMap.entrySet().removeIf(set -> set.getValue().isEmpty());
     }
 
@@ -219,7 +220,7 @@ class MFMListGenerator {
                 }
             }
 
-            runnableList = MAMEInfo.getRunnableMachines();
+            // runnableList = MAMEInfo.getRunnableMachines();
             // Which Categories have at least one Machine
             HashMap<String, ArrayList<String>> categoryGames = MAMEInfo.getCategoryMachines();
             for (Map.Entry<String, ArrayList<String>> categoryEntry : categoryGames.entrySet()) {

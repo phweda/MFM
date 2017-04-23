@@ -33,7 +33,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -160,7 +163,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
 
     void setController() {
         // This is bad design
-        controller = MFMUI_Setup.getController();
+        controller = MFMUI_Setup.getInstance().getController();
     }
 
     private void reset() {
@@ -422,7 +425,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
 
             case IMPORT_LIST:
                 String listName = MFMListBuilder.importList(getListBuilderPanel());
-                MFMUI_Setup.updateMenuBar(listName);
+                MFMUI_Setup.getInstance().updateMenuBar(listName);
                 break;
 
             case GAME_PICKER:

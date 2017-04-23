@@ -49,6 +49,7 @@ import java.util.TreeSet;
 
 import static Phweda.MFM.MFM_Constants.*;
 import static Phweda.MFM.UI.MFMListActions.pickList;
+import static Phweda.MFM.UI.MFMUI.pickVersion;
 import static Phweda.MFM.UI.MFMUI_Setup.*;
 
 /**
@@ -395,7 +396,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     void showControlsDevices() {
         String machineName = getSelectedMachine();
         Machine machine = MAMEInfo.getMachine(machineName);
-        if(machine.getIsdevice().equals(Machine.YES) || machine.getIsbios().equals(Machine.YES)){
+        if (machine.getIsdevice().equals(Machine.YES) || machine.getIsbios().equals(Machine.YES)) {
             return;
         }
 
@@ -925,6 +926,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
     }
 
+    private void refreshRunnable() {
+        ((JLabel) statusBar.getZone("Working")).setText("Runnable " + MAMEInfo.getRunnable());
+    }
+
     void MAMEControlsDUMP() {
         Controllers.dumpAllWaysControls();
         JOptionPane.showMessageDialog(mainFrame, "Files are in the MFM/Lists folder");
@@ -994,6 +999,62 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             FileUtils.openFileFromOS(fileChooser.getSelectedFile().toPath());
         }
+    }
+
+    public void loadDataSet() {
+        String dataSet = null;
+        // Special case first run no Data Sets found!
+        int dSets = MFM_Data.getInstance().getDataSets().length;
+        if (dSets < 1) {
+            int result = getFirstRunNoDataSetsOption();
+            if (result == 1) {
+                MFM.exit();
+            } else {
+                parseMAME();
+            }
+        } else if (dSets == 1) {
+            dataSet = MFM_Data.getInstance().getDataSets()[0];
+        } else {
+            dataSet = pickVersion(mainFrame);
+        }
+
+        // Load this Data Set
+        MFM_Data.getInstance().loadDataSet(dataSet);
+        // Refresh MameInfo
+        MAMEInfo.getInstance(true);
+        MFM_Data.getInstance().setLoaded();
+
+        if (mainFrame != null && mainFrame.isVisible()) {
+            // Refresh PlayLists
+            MFMPlayLists.getInstance().refreshLists();
+            // Force table refresh if needed
+            changeList(currentListName.getName());
+
+            // Change UI display to new version
+            refreshVersion();
+            refreshRunnable();
+            // End progress Dialog here
+            if (MFMUI.isProgressRunning()) {
+                MFMUI.showBusy(false, false);
+            }
+        }
+        MFMSettings.getInstance().setDataVersion(dataSet);
+    }
+
+    private int getFirstRunNoDataSetsOption() {
+        Object[] options = {"Parse Mame", "Exit"};
+        return JOptionPane.showOptionDialog(mainFrame,
+                "No MFM Data Sets detected. Download and place into <MFM Root>/Data/ directory.",
+                "No MFM Data Sets",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,     //do not use a custom Icon
+                options,  //the titles of buttons
+                options[1]); //default button title
+    }
+
+    void parseMAME() {
+        MAMEInfo.getInstance(true);
     }
 }
 

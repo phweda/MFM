@@ -39,7 +39,7 @@ public class MFMUI_Setup {
     static MFM_Components comps;
     private static MFMUI_Setup ourInstance = new MFMUI_Setup();
     private static JFrame frame;
-    private static MFMController controller = new MFMController();
+    private MFMController controller = new MFMController();
     private static JSplitPane MFMmainPane;
     private static JSplitPane MFMGamePane;
     private static MFMInformationPanel progress = new MFMInformationPanel();
@@ -62,8 +62,12 @@ public class MFMUI_Setup {
         return frame;
     }
 
-    static MFMController getController() {
+    MFMController getController() {
         return controller;
+    }
+
+    public void loadDataSet() {
+        controller.loadDataSet();
     }
 
     static MFM_Components getComps() {
@@ -78,7 +82,7 @@ public class MFMUI_Setup {
         return MFM_Components.getFillPanel();
     }
 
-    public static void updateMenuBar(String newListName) {
+    public void updateMenuBar(String newListName) {
         comps.updateListMenu();
         frame.pack();
         if (!newListName.isEmpty()) {

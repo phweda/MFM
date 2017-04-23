@@ -277,7 +277,9 @@ public class MFMPlayLists implements Serializable {
         MFMPlayListsTree = new TreeMap<String, TreeSet<String>>();
         MFMPlayListsTree.put(MFMListBuilder.ALL, allMachineNames);
         MFMPlayListsTree.put(MFMListBuilder.BIOS, biosMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.DEVICES, deviceMachineNames);
+        if (!deviceMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.DEVICES, deviceMachineNames);
+        }
 
         if (MFM.isProcessAll()) {
             MFMPlayListsTree.put(MFMListBuilder.RUNNABLE, runnableMachineNames);
