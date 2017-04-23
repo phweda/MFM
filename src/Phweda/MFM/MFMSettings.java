@@ -426,7 +426,7 @@ public class MFMSettings {
      * @return
      */
     public String trimMAMEVersion(String version) {
-        if (version.contains("M.A.M.E.")) {
+        if (version.contains("M.A.M.E.") || version.contains("MAME")) {
             int start = version.indexOf('v');
             return version.substring(start + 1, start + 6).trim();
         }
