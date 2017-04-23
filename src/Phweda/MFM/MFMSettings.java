@@ -443,15 +443,6 @@ public class MFMSettings {
         ms.persistMySettings();
     }
 
-
-    public String getDataSetFile() {
-        return (String) mfmSettings.get(MFM_Constants.DATA_SET_FILE);
-    }
-
-    public void setDataSetFile(String dataSetFile) {
-        mfmSettings.put(MFM_Constants.DATA_SET_FILE, dataSetFile);
-    }
-
     public boolean isFullXMLcompatible() {
         return (boolean) mfmSettings.get(MFM_Constants.COMPATIBLE);
     }

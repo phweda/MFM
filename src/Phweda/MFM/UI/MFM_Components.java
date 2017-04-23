@@ -59,7 +59,6 @@ public class MFM_Components {
     private static JLabel currentListName;
     private static MFMInformationPanel infoPanel;
     private static JPanel fillPanel;
-    private static String[][] data;
     private JTree tree;
 
     MFM_Components(MFMController controller) {
@@ -116,6 +115,18 @@ public class MFM_Components {
 
     static JPanel getFillPanel() {
         return fillPanel;
+    }
+
+    static String dataSetPicker(JFrame frame) {
+        String[] dataSets = MFM_Data.getInstance().getDataSets();
+        String dataSet = (String) JOptionPane.showInputDialog(frame,
+                "Pick a Data Set",
+                "Available Data Sets",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                dataSets,
+                dataSets[0]);
+        return dataSet;
     }
 
     public static JPanel getMFMListPanel() {

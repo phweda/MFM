@@ -61,7 +61,6 @@ public final class MFM_Constants {
     public static final String FFmpeg_SETTINGS = "FFmpeg Settings";
     public static final String COMPATIBLE = "compatible";
     public static final String DATA_VERSION = "Data version";
-    public static final String DATA_SET_FILE = "Data Set File";
     public static final String NEW_LIST = "-NEW-";
     public static final char[] alphanum = new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
