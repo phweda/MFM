@@ -97,14 +97,9 @@ class MFMVideoActions {
     static void runFFmpeg() {
         try {
             MFM_Components.InfoPanel().showProgress("Converting Files");
-            MFM_Components.InfoPanel().updateUI();
-
             SwingWorker sw = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    /*    JOptionPane.showMessageDialog(frame, "We are in SW doInBackground" +
-                          SwingUtilities.isEventDispatchThread());
-                    */
                     FFMPEG.getInstance().convertAll();
                     return true;
                 }
@@ -112,13 +107,10 @@ class MFMVideoActions {
                 @Override
                 protected void done() {
                     super.done();
-                    //    JOptionPane.showMessageDialog(frame, "We are past SW");
                 }
             };
             Thread fileOps = new Thread(sw);
             fileOps.start();
-
-            // dialog.dispose();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -131,14 +123,10 @@ class MFMVideoActions {
         if (machineVideo.exists()) {
             MFM.logger.addToList(path + " is being cropped", true);
             infoPanel.showProgress("Cropping Video");
-            infoPanel.updateUI();
 
             SwingWorker sw = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
-                    /*    JOptionPane.showMessageDialog(frame, "We are in SW doInBackground" +
-                            SwingUtilities.isEventDispatchThread());
-                    */
                     FFMPEG.getInstance().cropAVI(machineVideo, MAMEInfo.getMachine(machine));
                     return true;
                 }
@@ -146,9 +134,7 @@ class MFMVideoActions {
                 @Override
                 protected void done() {
                     super.done();
-                    //    JOptionPane.showMessageDialog(frame, "We are past SW");
                     infoPanel.showMessage(path + " has been cropped");
-                    infoPanel.updateUI();
                     MFM.logger.addToList("Cropping finished", true);
                 }
             };
@@ -177,14 +163,10 @@ class MFMVideoActions {
 
         final File file = new File(filePath);
         infoPanel.showProgress(action);
-        infoPanel.updateUI();
         MFM.logger.addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
-                    /*    JOptionPane.showMessageDialog(frame, "We are in SW doInBackground" +
-                            SwingUtilities.isEventDispatchThread());
-                    */
                 if (action.equals(MFMAction.GIFImagesAction)) {
                     VideoUtils.showGIFimages(file);
                 } else if (action.equals(MFMAction.AVIImagesAction)) {
@@ -196,9 +178,7 @@ class MFMVideoActions {
             @Override
             protected void done() {
                 super.done();
-                //    JOptionPane.showMessageDialog(frame, "We are past SW");
                 infoPanel.showMessage(action + " completed");
-                infoPanel.updateUI();
                 MFM.logger.addToList(action + " completed", true);
             }
         };
