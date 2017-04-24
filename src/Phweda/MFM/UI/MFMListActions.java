@@ -266,7 +266,6 @@ class MFMListActions {
         final String action = message;
         if (copy) {
             infoPanel.showProgress(action);
-            infoPanel.updateUI();
         }
         MFM.logger.addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
@@ -297,7 +296,6 @@ class MFMListActions {
                 super.done();
                 if (copy) {
                     infoPanel.showMessage(action + " completed");
-                    infoPanel.updateUI();
                 }
                 long estimatedTime = (System.nanoTime() - startTime);
                 // System.out.println("Estimated time long is : " + estimatedTime);
@@ -315,7 +313,6 @@ class MFMListActions {
 
         final String action = "Scanning Resources";
         infoPanel.showProgress(action);
-        infoPanel.updateUI();
         MFM.logger.addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
             long startTime;
@@ -331,9 +328,7 @@ class MFMListActions {
             protected void done() {
                 super.done();
                 infoPanel.showMessage(action + " completed");
-                infoPanel.updateUI();
                 long estimatedTime = (System.nanoTime() - startTime);
-                //    System.out.println("Estimated time long is : " + estimatedTime);
                 MFM.logger.addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
                         FileUtils.NEWLINE, true);
             }
