@@ -83,6 +83,7 @@ public class MFM_Data {
     public static MFM_Data getInstance() {
         if (ourInstance == null) {
             ourInstance = new MFM_Data();
+            MFMUI.showBusy(true, true);
             ourInstance.loadData();
         }
         return ourInstance;
@@ -228,7 +229,6 @@ public class MFM_Data {
 
     private void loadData(String filePath) {
         if (filePath != null && !filePath.isEmpty()) {
-            MFMUI.showBusy(true, true);
             long millis = System.currentTimeMillis();
             if (MFM.isSystemDebug()) {
                 System.out.println("\nMAME load starting: " + new Date(millis));

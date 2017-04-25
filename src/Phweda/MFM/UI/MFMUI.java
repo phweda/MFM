@@ -45,7 +45,7 @@ public class MFMUI {
     static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
     private static JFrame settingsFrame;
     private static boolean progressRunning = false;
-    private static JDialog busyDialog = new JDialog(settingsFrame, MFM.MFM_TITLE);
+    private static JDialog busyDialog = new JDialog((Dialog) null, MFM.MFM_TITLE);
     private static Thread busyThread = null;
 
     private MFMUI() {
@@ -99,7 +99,6 @@ public class MFMUI {
             busyDialog.dispose();
             busyThread.interrupt();
             busyThread = null;
-            busyDialog = new JDialog((Dialog) null, MFM.MFM_TITLE);
         }
     }
 
