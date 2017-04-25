@@ -1001,7 +1001,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
     }
 
-    public void loadDataSet() {
+    void loadDataSet() {
         String dataSet = null;
         // Special case first run no Data Sets found!
         int dSets = MFM_Data.getInstance().getDataSets().length;
@@ -1018,27 +1018,44 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             dataSet = pickVersion(mainFrame);
         }
 
-        // Load this Data Set
-        MFM_Data.getInstance().loadDataSet(dataSet);
-        // Refresh MameInfo
-        MAMEInfo.getInstance(true);
-        MFM_Data.getInstance().setLoaded();
-
         if (mainFrame != null && mainFrame.isVisible()) {
-            // Refresh PlayLists
-            MFMPlayLists.getInstance().refreshLists();
-            // Force table refresh if needed
-            changeList(currentListName.getName());
-
-            // Change UI display to new version
-            refreshVersion();
-            refreshRunnable();
-            // End progress Dialog here
-            if (MFMUI.isProgressRunning()) {
-                MFMUI.showBusy(false, false);
-            }
+            infoPanel.showProgress("Loading Data Set :  " + dataSet);
+            loadDataSet(dataSet);
+        } else {
+            loadDataSet(dataSet);
         }
+
         MFMSettings.getInstance().setDataVersion(dataSet);
+    }
+
+    private void loadDataSet(String dataSet) {
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                // Load this Data Set
+                MFM_Data.getInstance().loadDataSet(dataSet);
+                // Refresh MameInfo
+                MAMEInfo.getInstance(true);
+                MFM_Data.getInstance().setLoaded();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                if (mainFrame.isVisible()) {
+                    // Refresh PlayLists
+                    MFMPlayLists.getInstance().refreshLists();
+                    // Force table refresh if needed
+                    changeList(currentListName.getName());
+
+                    // Change UI display to new version
+                    refreshVersion();
+                    refreshRunnable();
+                    infoPanel.showMessage(dataSet + " loaded");
+                }
+            }
+        };
+        sw.execute();
     }
 
     private int getFirstRunNoDataSetsOption() {
