@@ -20,7 +20,6 @@ package Phweda.MFM;
 
 import Phweda.MFM.UI.MAMEtoJTree;
 import Phweda.MFM.UI.MFMUI;
-import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.MFM.Utils.ParseCommandList;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
@@ -125,13 +124,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             if (mame != null) {
                 loadCaches();
                 loadINIs();
-            } else {
-                // TODO 0.85 with 0.85 we now have several options: pick a Data Set, Parse MAME if one is set, or Quit
-                // fixme bad design
-                MFMUI_Setup.getInstance().loadDataSet();
-                MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
-                return;
-                //    generateAllMameData(MFM.isProcessAll(), true);
             }
         } catch (Exception exc) {
             if (MFM.isDebug()) {

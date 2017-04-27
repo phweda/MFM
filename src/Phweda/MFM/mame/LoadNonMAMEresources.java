@@ -140,7 +140,6 @@ public class LoadNonMAMEresources {
             CatverINImap.put("version", Version);
 
             new ParseCatverINI(mfmSettings.getCatverINI(), CatverINImap).processFile();
-            mfmSettings.setHascatverini(true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

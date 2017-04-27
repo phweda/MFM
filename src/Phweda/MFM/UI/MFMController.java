@@ -49,7 +49,6 @@ import java.util.TreeSet;
 
 import static Phweda.MFM.MFM_Constants.*;
 import static Phweda.MFM.UI.MFMListActions.pickList;
-import static Phweda.MFM.UI.MFMUI.pickVersion;
 import static Phweda.MFM.UI.MFMUI_Setup.*;
 
 /**
@@ -803,7 +802,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void init() {
-
         mainFrame = getInstance().getFrame();
         mainFrame.addMouseListener(this);
 
@@ -1015,17 +1013,13 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         } else if (dSets == 1) {
             dataSet = MFM_Data.getInstance().getDataSets()[0];
         } else {
-            dataSet = pickVersion(mainFrame);
+            dataSet = MFMSettings.getInstance().pickVersion();
         }
 
+        this.loadDataSet(dataSet);
         if (mainFrame != null && mainFrame.isVisible()) {
             infoPanel.showProgress("Loading Data Set :  " + dataSet);
-            loadDataSet(dataSet);
-        } else {
-            loadDataSet(dataSet);
         }
-
-        MFMSettings.getInstance().setDataVersion(dataSet);
     }
 
     private void loadDataSet(String dataSet) {

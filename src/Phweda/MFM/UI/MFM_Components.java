@@ -117,16 +117,15 @@ public class MFM_Components {
         return fillPanel;
     }
 
-    static String dataSetPicker(JFrame frame) {
+    public static String dataSetPicker() {
         String[] dataSets = MFM_Data.getInstance().getDataSets();
-        String dataSet = (String) JOptionPane.showInputDialog(frame,
+        return (String) JOptionPane.showInputDialog(null,
                 "Pick a Data Set",
                 "Available Data Sets",
                 JOptionPane.QUESTION_MESSAGE,
                 null,
                 dataSets,
                 dataSets[0]);
-        return dataSet;
     }
 
     public static JPanel getMFMListPanel() {

@@ -102,10 +102,6 @@ public class MFMUI {
         }
     }
 
-    static String pickVersion(JFrame frame) {
-        return MFM_Components.dataSetPicker(frame);
-    }
-
     private static JXBusyLabel createComplexBusyLabel() {
         JXBusyLabel label = new JXBusyLabel(new Dimension(325, 150));
         // default is 100

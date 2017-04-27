@@ -221,7 +221,6 @@ final class MFM_SettingsPanel extends JPanel {
 
                     mfmSettings.isLoaded(true);
                     mfmSettings.getInstance().updateDirectoriesResourceFiles();
-                    // fixme is this correct place and sequence? 12/25/16
                     if (!MFM.isFirstRun()) {
                         MAMEInfo.loadINIs();
                     }
