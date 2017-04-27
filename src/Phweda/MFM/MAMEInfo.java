@@ -121,10 +121,15 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         }
         try {
             mame = loadMame();
-            if (mame != null) {
-                loadCaches();
-                loadINIs();
+            if (mame == null) {
+                // With 0.85 Parse MAME if one is set, or Quit
+                MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
+                generateAllMameData(MFM.isProcessAll(), true);
             }
+
+            mame = loadMame();
+            loadCaches();
+            loadINIs();
         } catch (Exception exc) {
             if (MFM.isDebug()) {
                 MFM.logger.addToList("Exception loading Mame and data objects : " +
@@ -133,8 +138,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             }
             // Removed for 0.85 no longer needed
         }
-
-        loadCommands(); // Legacy functionality
+        // loadCommands(); // Legacy functionality
 
         if (runnableMachines != null) {
             setRunnable(runnableMachines.size());
