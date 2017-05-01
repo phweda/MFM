@@ -19,6 +19,7 @@
 package Phweda.MFM;
 
 import Phweda.MFM.UI.MFMUI;
+import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 import Phweda.utils.MemoryMonitor;
@@ -53,8 +54,8 @@ public class MFM {
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
     public static final String VERSION = "Version 0.8.5";
-    public static final String BUILD = "BUILD 0.8.107";
-    public static final String RELEASE_DATE = "Released : April 2017";
+    public static final String BUILD = "BUILD 0.8.108";
+    public static final String RELEASE_DATE = "Released : May 2017";
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION + "  :  " + MFM.BUILD;
 
     public static int logNumber;
@@ -98,7 +99,6 @@ public class MFM {
         }
 
         setPathsandDirectories(path);
-
         createLogs();
 
         try {
@@ -115,8 +115,9 @@ public class MFM {
         // Add LookandFeels
         add3rdPartyLFs();
         // Get settings and Mame Information
-        loadSettingsandInfo();
+        loadSettingsAndInfo();
 
+        MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
         // Start the GUI
         MFMUI.main(null);
 
@@ -126,27 +127,16 @@ public class MFM {
         }
     }
 
-    private static void loadSettingsandInfo() {
+    private static void loadSettingsAndInfo() {
         try {
+            // MFMSettings initiates MFM_Data and Data Set scan if needed
             MS = MFMSettings.getInstance();
-            MAMEInfo MI = null;
-            if (MS.isLoaded()) {
-/*
-                while (!MFM_Data.getInstance().isLoaded()) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-*/
-                MI = MAMEInfo.getInstance(false);
-            } else {
-                setFirstRun(true); // fixme no longer needed?
+            if (!MS.isLoaded()) {
+                setFirstRun(true); // Note needed to trigger .ini scan initiated in MFM_SettingsPanel
                 // first run must acquire base settings before continuing
                 MFMUI.getSettings();
             }
-
+            // Wait for user settings input
             while (!MS.isLoaded()) {
                 try {
                     Thread.sleep(10);
@@ -154,9 +144,18 @@ public class MFM {
                     e.printStackTrace();
                 }
             }
-            if (MI == null) {
-                MAMEInfo.getInstance(false);
+            // Load Data Set
+            MFMUI_Setup.getInstance().loadDataSet();
+            // Wait for Data Set load
+            while (!MFM_Data.getInstance().isLoaded()) {
+                try {
+                    Thread.sleep(25);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+
+            MAMEInfo.getInstance(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -341,7 +340,8 @@ public class MFM {
     }
 
     public static void exit() {
-        // Wait for final exit while data is writing to disk
+        MFM_Data.getInstance().persistSettings(); // Capture and persist any user driven settings: UI & Current List
+        // Wait for final exit if a Data Set is writing to disk
         while (MFM_Data.getInstance().isPersisting()) {
         }
         System.exit(0);
