@@ -218,7 +218,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case LoadDataSetAction:
-                    controller.loadDataSet();
+                    controller.loadDataSet(true);
                     break;
 
                 case ParseMAMEAction:

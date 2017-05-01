@@ -247,8 +247,9 @@ public class MFMPlayLists implements Serializable {
         }
         // We retrieve the built in game lists each time
         // They are persisted by MAMEInfo in MFM_Data
+        boolean ALL = MFMSettings.getInstance().getDataVersion().contains("ALL");
         if (allMachineNames == null) {
-            // fixme How did we get here without MFMListBuilder existing?
+            // fixme How did we get here without MFMListBuilder existing? NOTE as of May 2017 no repro
             if (MFMListBuilder.getAllList() == null) {
                 MFM.logger.addToList("MFMListBuilder is null in MFMPlayLists");
                 MFM.logger.addToList(Arrays.toString(Thread.currentThread().getStackTrace()));
@@ -256,12 +257,13 @@ public class MFMPlayLists implements Serializable {
             allMachineNames = MFMListBuilder.getAllList();
             biosMachineNames = MFMListBuilder.getBiosList();
             deviceMachineNames = MFMListBuilder.getDevicesList();
-            if (MFM.isProcessAll()) {
+            // Need to determine by Data Set NOT application flag
+            if (ALL) {
                 runnableMachineNames = MFMListBuilder.getRunnableList();
             }
             clonesMachineNames = MFMListBuilder.getClonesList();
             noCloneMachineNames = MFMListBuilder.getNoClonesList();
-        //    VIDsMachineNames = MFMListBuilder.getVIDsList();
+            //    VIDsMachineNames = MFMListBuilder.getVIDsList();
             verticalsMachineNames = MFMListBuilder.getVerticalsList();
             horizontalsMachineNames = MFMListBuilder.getHorizontalsList();
             cocktailMachineNames = MFMListBuilder.getCocktailsList();
@@ -276,28 +278,48 @@ public class MFMPlayLists implements Serializable {
         }
         MFMPlayListsTree = new TreeMap<String, TreeSet<String>>();
         MFMPlayListsTree.put(MFMListBuilder.ALL, allMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.BIOS, biosMachineNames);
-        if (!deviceMachineNames.isEmpty()) {
+        // NOTE as of 0.85 we have multiple built in lists that DO NOT exist
+        if (biosMachineNames != null && !biosMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.BIOS, biosMachineNames);
+        }
+        if (deviceMachineNames != null && !deviceMachineNames.isEmpty()) {
             MFMPlayListsTree.put(MFMListBuilder.DEVICES, deviceMachineNames);
         }
 
-        if (MFM.isProcessAll()) {
+        if (ALL) {
             MFMPlayListsTree.put(MFMListBuilder.RUNNABLE, runnableMachineNames);
         }
         MFMPlayListsTree.put(MFMListBuilder.CLONE, clonesMachineNames);
         MFMPlayListsTree.put(MFMListBuilder.NO_CLONE, noCloneMachineNames);
-    //    MFMPlayListsTree.put(MFMListBuilder.PD_VIDS, VIDsMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.VERTICAL, verticalsMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.HORIZONTAL, horizontalsMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.COCKTAIL, cocktailMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.SIMULTANEOUS, simultaneousMachineNames);
+        //    MFMPlayListsTree.put(MFMListBuilder.PD_VIDS, VIDsMachineNames);
+        if (verticalsMachineNames != null && !verticalsMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.VERTICAL, verticalsMachineNames);
+        }
+        if (horizontalsMachineNames != null && !horizontalsMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.HORIZONTAL, horizontalsMachineNames);
+        }
+        if (cocktailMachineNames != null && !cocktailMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.COCKTAIL, cocktailMachineNames);
+        }
+        if (simultaneousMachineNames != null && !simultaneousMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.SIMULTANEOUS, simultaneousMachineNames);
+        }
         MFMPlayListsTree.put(MFMListBuilder.ARCADE, arcadeMachineNames);
         MFMPlayListsTree.put(MFMListBuilder.SYSTEMS, systemMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.RASTER, rasterDisplayMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.VECTOR, vectorDisplayMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.LCD, lcdDisplayMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.CHD, CHDMachineNames);
+        if (rasterDisplayMachineNames != null && !rasterDisplayMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.RASTER, rasterDisplayMachineNames);
+        }
+        if (vectorDisplayMachineNames != null && !vectorDisplayMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.VECTOR, vectorDisplayMachineNames);
+        }
+        if (lcdDisplayMachineNames != null && !lcdDisplayMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.LCD, lcdDisplayMachineNames);
+        }
+        if (CHDMachineNames != null && !CHDMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.CHD, CHDMachineNames);
+        }
         MFMPlayListsTree.put(MFMListBuilder.NO_IMPERFECT, noImperfectMachineNames);
+
         languagesLists = MFMListBuilder.getLanguagesListsMap();
     }
 

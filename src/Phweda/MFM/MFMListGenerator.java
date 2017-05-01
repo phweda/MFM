@@ -229,28 +229,30 @@ class MFMListGenerator {
                 }
             }
 
+
             lists.put(ALL, allList);
-            lists.put(BIOS, biosList);
-            lists.put(DEVICES, devicesList);
-            lists.put(VERTICAL, verticalsList);
-            lists.put(HORIZONTAL, horizontalList);
-            lists.put(CLONE, clonesList);
-            lists.put(NO_CLONE, noClonesList);
-            lists.put(COCKTAIL, cocktailList);
-            lists.put(SIMULTANEOUS, simultaneousList);
-            lists.put(RUNNABLE, runnableList);
-            lists.put(ARCADE, arcadeList);
-            lists.put(SYSTEMS, systemList);
-            lists.put(RASTER, rasterDisplayList);
-            lists.put(VECTOR, vectorDisplayList);
-            lists.put(LCD, lcdDisplayList);
-            lists.put(CHD, CHDList);
-            lists.put(NO_IMPERFECT, noImpefectList);
-            lists.put(CATEGORIES, categoriesWithMachineList);
+            // Eliminate empty non Language lists here for older MAME versions
+            if (!biosList.isEmpty()) {lists.put(BIOS, biosList);}
+            if (!devicesList.isEmpty()) {lists.put(DEVICES, devicesList);}
+            if (!verticalsList.isEmpty()) {lists.put(VERTICAL, verticalsList);}
+            if (!horizontalList.isEmpty()) {lists.put(HORIZONTAL, horizontalList);}
+            if (!clonesList.isEmpty()) {lists.put(CLONE, clonesList);}
+            if (!noClonesList.isEmpty()) {lists.put(NO_CLONE, noClonesList);}
+            if (!cocktailList.isEmpty()) {lists.put(COCKTAIL, cocktailList);}
+            if (!simultaneousList.isEmpty()) {lists.put(SIMULTANEOUS, simultaneousList); }
+            if (!runnableList.isEmpty()) {lists.put(RUNNABLE, runnableList);}
+            if (!arcadeList.isEmpty()) {lists.put(ARCADE, arcadeList);}
+            if (!systemList.isEmpty()) {lists.put(SYSTEMS,systemList);}
+            if (!rasterDisplayList.isEmpty()) {lists.put(RASTER,rasterDisplayList);}
+            if (!vectorDisplayList.isEmpty()) {lists.put(VECTOR,vectorDisplayList);}
+            if (!lcdDisplayList.isEmpty()) {lists.put(LCD,lcdDisplayList);}
+            if (!CHDList.isEmpty()) {lists.put(CHD,CHDList);}
+            if (!noImpefectList.isEmpty()) {lists.put(NO_IMPERFECT,noImpefectList);}
+            if (!categoriesWithMachineList.isEmpty()) {lists.put(CATEGORIES, categoriesWithMachineList);}
 
             MFM_Data.getInstance().setStaticData(MFM_Constants.LISTS, lists);
         }
-        // must be here have to ensure ALL list already exists
+        // Dependency ALL list must already exists
         languagesListsMap = getLanguageLists();
         return lists;
     }

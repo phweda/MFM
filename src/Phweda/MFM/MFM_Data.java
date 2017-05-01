@@ -76,15 +76,18 @@ public class MFM_Data {
     private static final String MFM_DATA_SETS_FILE = MFM.MFM_SETTINGS_DIR + "DataSets.ser";
 
     private static boolean staticChanged = false;
-    private static boolean firstCall = true;
-    private static boolean loaded = false;
+    private static boolean scanningDataSets = false;
+    private volatile boolean loaded = false;
     private static boolean persisting = false;
+
+    private MFM_Data() {
+        loadSettingsFiles();
+        findDataSets();
+    }
 
     public static MFM_Data getInstance() {
         if (ourInstance == null) {
             ourInstance = new MFM_Data();
-            MFMUI.showBusy(true, true);
-            ourInstance.loadData();
         }
         return ourInstance;
     }
@@ -95,6 +98,10 @@ public class MFM_Data {
 
     public void setLoaded() {
         loaded = true;
+    }
+
+    public static boolean isScanningDataSets() {
+        return scanningDataSets;
     }
 
     /**
@@ -156,34 +163,36 @@ public class MFM_Data {
         return (settings.containsKey(key) || permData.containsKey(key));
     }
 
-    private void loadData() {
+    private void loadSettingsFiles() {
+        // Load files first - required as of 0.85 for first run special case
+        if (new File(MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE).exists()) {
+            try {
+                settings = (HashMap<String, Object>)
+                        PersistUtils.loadAnObjectXML(MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_CONTROLLERS).exists()) {
+            controllersLabelsFile = new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_CONTROLLERS);
+        }
+
+        if (new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_FOLDER_NAMES_FILE).exists()) {
+            folderNamesFile = new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_FOLDER_NAMES_FILE);
+        }
+    }
+
+    void loadData() {
         if (MFM.isSystemDebug()) {
             System.out.println("Loading data");
         }
-        loadDataSets();
-
         try {
-            // Load files first - required as of 0.85 for first run special case
-            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE).exists()) {
-                settings = (HashMap<String, Object>)
-                        PersistUtils.loadAnObjectXML(MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE);
-            }
-
-            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_CONTROLLERS).exists()) {
-                controllersLabelsFile = new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_CONTROLLERS);
-            }
-
-            if (new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_FOLDER_NAMES_FILE).exists()) {
-                folderNamesFile = new File(MFM.MFM_SETTINGS_DIR + MFM.MAME_FOLDER_NAMES_FILE);
-            }
-
             // Get previous Data Set
             String dataVersion = MFMSettings.getInstance().getDataVersion();
             String dataSetFile;
 
-            if (dataVersion == null || !datasets.containsDataSet(dataVersion)) {
-                return; // Let MFMInfo -> MFMController handle special case
-            }
+            MFMUI.showBusy(true, true);
             dataSetFile = datasets.getDataSet(dataVersion).getFilePath();
             // dataSetFile = "MFM_MAME_ALL_0.70.zip";
             loadData(dataSetFile);
@@ -199,7 +208,7 @@ public class MFM_Data {
         loaded = true;
     }
 
-    private void loadDataSets() {
+    private void findDataSets() {
         if (Files.exists(Paths.get(MFM_DATA_SETS_FILE))) {
             try {
                 datasets = (MFM_Data_Sets) PersistUtils.loadAnObject(MFM_DATA_SETS_FILE);
@@ -209,17 +218,22 @@ public class MFM_Data {
         }
 
         if (datasets == null || !datasets.checkSets()) {
+            scanningDataSets = true;
             datasets = new MFM_Data_Sets();
             Thread scanDataSets = new Thread() {
                 @Override
                 public void run() {
                     synchronized (this) {
                         datasets.scanSets();
-                        MFM.logger.addToList("Scanned for Data Sets and found: " +
-                                datasets.getAvailableVersions().size());
-                        System.out.println("Scanned for Data Sets and found: " +
-                                datasets.getAvailableVersions().size());
-                        PersistUtils.saveAnObject(datasets, MFM_DATA_SETS_FILE);
+                        int sets = datasets.getAvailableVersions().size();
+                        MFM.logger.addToList("Scanned for Data Sets and found: " + sets);
+                        System.out.println("Scanned for Data Sets and found: " + sets);
+                        scanningDataSets = false;
+                        if (sets > 0) {
+                            PersistUtils.saveAnObject(datasets, MFM_DATA_SETS_FILE);
+                        } else {
+                            // fixme do we need this
+                        }
                     }
                 }
             };
@@ -235,7 +249,6 @@ public class MFM_Data {
             }
 
             mame = (Mame) PersistUtils.retrieveJAXBfromZip(filePath, MFM_MAME_XML, Mame.class);
-            setDataVersion();
             if (MFM.isSystemDebug()) {
                 System.out.println("MAME load took: " +
                         TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - millis));
@@ -247,6 +260,7 @@ public class MFM_Data {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            loaded = true;
         }
     }
 
@@ -256,7 +270,16 @@ public class MFM_Data {
         }
         final MFM_Data_Sets.Data_Set dataSet1 = datasets.getDataSet(dataSet);
         loadData(dataSet1.getFilePath());
+        setDataVersion(dataSet);
     }
+
+    public void loadDataSet(String dataSet, boolean showProgress) {
+        if (showProgress) {
+            MFMUI.showBusy(true, true);
+        }
+        loadDataSet(dataSet);
+    }
+
 
     File getControllerLabelsFile() {
         return controllersLabelsFile;
@@ -323,11 +346,14 @@ public class MFM_Data {
 
     public void setMame(Mame mame) {
         MFM_Data.mame = mame;
-        setDataVersion();
+        MFMSettings.getInstance().setDataVersion(mame.getBuild());
+        setDataVersion(MFMSettings.getInstance().getDataVersion());
     }
 
-    private void setDataVersion() {
-        dataVersion = MFMSettings.getInstance().trimMAMEVersion(mame.getBuild());
+
+    private void setDataVersion(String dataVersion1) {
+     //   dataVersion = MFMSettings.getInstance().trimMAMEVersion(mame.getBuild());
+        dataVersion = dataVersion1;
     }
 
     public String getDataVersion() {
@@ -339,22 +365,25 @@ public class MFM_Data {
         return (String[]) versions.toArray(new String[versions.size()]);
     }
 
-    private void persistSettings() {
+    void persistSettings() {
         PersistUtils.saveAnObjectXML(settings, MFM.MFM_SETTINGS_DIR + MFM.MFM_SETTINGS_FILE);
     }
 
     // Nested classes to just keep all the logic and data related storage in the same place
     private static final class MFM_Data_Sets implements Serializable {
-        private static final long serialVersionUID = -3590232248802621035L;
+        private static final long serialVersionUID = 6923846781578691002L;
         transient Path dataDirPath = Paths.get(MFM.MFM_DATA_DIR);
         transient PathMatcher filter =
                 dataDirPath.getFileSystem().getPathMatcher("glob:**/MFM_MAME*.zip");
         private HashMap<String, Data_Set> dataSets;
+        private boolean scanning = false;
 
         MFM_Data_Sets() {
         }
 
         TreeSet<String> getAvailableVersions() {
+            while (scanning) {
+            }
             return new TreeSet<String>(dataSets.keySet());
         }
 
@@ -367,6 +396,7 @@ public class MFM_Data {
         }
 
         private void scanSets() {
+            scanning = true;
             try {
                 dataSets = new HashMap<String, Data_Set>();
                 Files.find(dataDirPath, 5, (filePath, fileAttr) -> fileAttr.isRegularFile())
@@ -375,6 +405,7 @@ public class MFM_Data {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            scanning = false;
         }
 
         private boolean checkSets() {

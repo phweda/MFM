@@ -67,7 +67,7 @@ public class MFMUI_Setup {
     }
 
     public void loadDataSet() {
-        controller.loadDataSet();
+        controller.loadDataSet(false);
     }
 
     static MFM_Components getComps() {
@@ -101,11 +101,12 @@ public class MFMUI_Setup {
 
         listBuilder = new MFMListBuilder();
 
+/*      NOTE with 0.85 STATIC Data never changes during run.
         // FIXME: 10/17/2016 where should this be
         if (MFM_Data.getInstance().isStaticChanged()) {
             MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, MFM.isProcessAll());
         }
-
+*/
         comps = new MFM_Components(controller);
         frame.setJMenuBar(comps.getMenuBar());
         setupMainView();

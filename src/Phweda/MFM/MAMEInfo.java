@@ -124,7 +124,9 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             if (mame == null) {
                 // With 0.85 Parse MAME if one is set, or Quit
                 MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
-                generateAllMameData(MFM.isProcessAll(), true);
+                // OK just for fun using 'Bitwise inclusive OR'
+                boolean ALL = MFM.isProcessAll() | MFMSettings.getInstance().isPreMAME143exe();
+                generateAllMameData(ALL, true);
             }
 
             mame = loadMame();
@@ -145,6 +147,8 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         } else {
             setRunnable(mame.getMachineMap().size());
         }
+        // Parse MAME special case
+        MFM_Data.getInstance().setLoaded();
         loadMameResources();
         mameJTreePanel = MAMEtoJTree.getInstance();
     }
@@ -204,7 +208,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             if (categoryMachines != null) {
                 MFM_Data.getInstance().setStaticData(CATEGORYMACHINES, categoryMachines);
             }
-
+            MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, true);
         } else {
             MFM.logger.separateLine();
             MFM.logger.addToList(

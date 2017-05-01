@@ -999,26 +999,36 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
     }
 
-    void loadDataSet() {
-        String dataSet = null;
-        // Special case first run no Data Sets found!
-        int dSets = MFM_Data.getInstance().getDataSets().length;
-        if (dSets < 1) {
-            int result = getFirstRunNoDataSetsOption();
-            if (result == 1) {
-                MFM.exit();
+    void loadDataSet(boolean pickList) {
+        String dataSet = mfmSettings.getDataVersion();
+        if (pickList || dataSet == null) {
+            // Special case first run no Data Sets found!
+            int dSets = MFM_Data.getInstance().getDataSets().length;
+            if (dSets < 1) {
+                int result = getFirstRunNoDataSetsOption();
+                if (result == 1) {
+                    MFM.exit();
+                } else {
+                    parseMAME();
+                }
+            } else if (dSets == 1) {
+                dataSet = MFM_Data.getInstance().getDataSets()[0];
             } else {
-                parseMAME();
+                dataSet = MFMSettings.getInstance().pickVersion();
             }
-        } else if (dSets == 1) {
-            dataSet = MFM_Data.getInstance().getDataSets()[0];
-        } else {
-            dataSet = MFMSettings.getInstance().pickVersion();
         }
 
+        if (dataSet != null) {
+            mfmSettings.setDataVersion(dataSet);
+        } else {
+            // Parsed MAME special case
+            dataSet = mfmSettings.getDataVersion();
+        }
         this.loadDataSet(dataSet);
         if (mainFrame != null && mainFrame.isVisible()) {
             infoPanel.showProgress("Loading Data Set :  " + dataSet);
+        } else {
+            MFMUI.showBusy(true, true);
         }
     }
 
@@ -1036,7 +1046,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
             @Override
             protected void done() {
-                if (mainFrame.isVisible()) {
+                if (mainFrame != null && mainFrame.isVisible()) {
                     // Refresh PlayLists
                     MFMPlayLists.getInstance().refreshLists();
                     // Force table refresh if needed
@@ -1049,7 +1059,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 }
             }
         };
-        sw.execute();
+        new Thread(sw).run();
     }
 
     private int getFirstRunNoDataSetsOption() {

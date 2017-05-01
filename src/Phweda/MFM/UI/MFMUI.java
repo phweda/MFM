@@ -71,7 +71,7 @@ public class MFMUI {
         });
     }
 
-    public static void showBusy(boolean start, boolean task) { // task false is empty startup. task true is loading data
+    public static void showBusy(boolean start, boolean loadData) {
         progressRunning = start;
         if (start) {
             busyThread = new Thread() {
@@ -79,7 +79,7 @@ public class MFMUI {
                 public void run() {
                     busyDialog.setLocation(screenCenterPoint.x - 150, screenCenterPoint.y - 50);
                     JXBusyLabel busyLabel = createComplexBusyLabel();
-                    if (task) {
+                    if (loadData) {
                         busyLabel.setText("<HTML>DATA<br>LOADING</HTML>");
                         busyLabel.setToolTipText("MFM Data Loading");
                     } else {

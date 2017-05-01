@@ -66,16 +66,15 @@ public class ParseAllMachinesInfo {
      **/
 
     public static Mame loadAllMachinesInfo(boolean all) {
+        System.out.println("Parsing with ALL flag: " + all);
         // Note as of 0.85 we handle all Mame -listxml versions the same
-
         mame = loadAllMachinesInfoJAXB();
         // Set data version here. 0.85 change to handle older Mame versions
         if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
             mfmSettings.setDataVersion(mame.getBuild());
         } else {
-            String version = mfmSettings.trimMAMEVersion(MAMEexe.getMAMEexeVersion());
-            mfmSettings.setDataVersion(version);
-            mame.setBuild(version);
+            mfmSettings.setDataVersion(MAMEexe.getMAMEexeVersion());
+            mame.setBuild(mfmSettings.getDataVersion());
         }
 
         if (!all) {
@@ -85,7 +84,6 @@ public class ParseAllMachinesInfo {
             addNonMAMEinfo(machine, machine.getName());
             findControls(machine);
         }
-
 
         // TODO where to put this?
         findCategories();
