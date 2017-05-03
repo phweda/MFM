@@ -129,13 +129,11 @@ class MFM_Menubar {
         commandMenu.setMnemonic(KeyEvent.VK_C);
 
         MFMAction MAMECommandBuilder = new MFMAction(MFMAction.MAMECommandBuilderAction,
-                //        resources.getImageIcon(resources.MAME_LOGO));
                 MFM_Components.getResources().getImageIcon(MFMUI_Resources.MAME_LOGO_SMALL));
 
         JMenuItem item;
         item = commandMenu.add(MAMECommandBuilder);
         commandMenu.add(new JSeparator());
-        // commandMenu.add(MESSCommandBuilder);
         commandMenu.setMargin(new Insets(0, 20, 0, 0));
 
         return commandMenu;
@@ -189,7 +187,6 @@ class MFM_Menubar {
         JMenuItem item;
 
         item = listMenu.add(createListbuildermenu());
-        //  item.setMnemonic(KeyEvent.VK_L);
         listMenu.add(new JSeparator());
         listMenu.add(createMyListmenu());
         listMenu.add(createMFMLists());

@@ -155,7 +155,7 @@ public class MFM {
                 }
             }
 
-            MAMEInfo.getInstance(false);
+            // MAMEInfo.getInstance(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
