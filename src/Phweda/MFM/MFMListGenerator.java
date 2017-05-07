@@ -115,7 +115,6 @@ class MFMListGenerator {
         if (lists == null) {
             lists = new HashMap<String, TreeSet<String>>();
             for (Map.Entry<String, Machine> entry : allMachines.entrySet()) {
-
                 Machine machine = entry.getValue();
                 String machineName = machine.getName();
                 if (machine.getIsbios().equals(Machine.YES)) {
@@ -186,7 +185,6 @@ class MFMListGenerator {
                     MFM.logger.addToList("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
                 }
 
-
                 if (machine.getDisplay().size() > 0 || !machine.getScreentype().isEmpty()) {
                     String screenType = null;
                     if (!machine.getScreentype().isEmpty()) {
@@ -215,12 +213,10 @@ class MFMListGenerator {
                             if (MFM.isSystemDebug()) {
                                 System.out.println(machineName + " has no screenType : " + screenType);
                             }
-
                     }
                 }
             }
 
-            // runnableList = MAMEInfo.getRunnableMachines();
             // Which Categories have at least one Machine
             HashMap<String, ArrayList<String>> categoryGames = MAMEInfo.getCategoryMachines();
             for (Map.Entry<String, ArrayList<String>> categoryEntry : categoryGames.entrySet()) {
@@ -229,26 +225,59 @@ class MFMListGenerator {
                 }
             }
 
-
             lists.put(ALL, allList);
             // Eliminate empty non Language lists here for older MAME versions
-            if (!biosList.isEmpty()) {lists.put(BIOS, biosList);}
-            if (!devicesList.isEmpty()) {lists.put(DEVICES, devicesList);}
-            if (!verticalsList.isEmpty()) {lists.put(VERTICAL, verticalsList);}
-            if (!horizontalList.isEmpty()) {lists.put(HORIZONTAL, horizontalList);}
-            if (!clonesList.isEmpty()) {lists.put(CLONE, clonesList);}
-            if (!noClonesList.isEmpty()) {lists.put(NO_CLONE, noClonesList);}
-            if (!cocktailList.isEmpty()) {lists.put(COCKTAIL, cocktailList);}
-            if (!simultaneousList.isEmpty()) {lists.put(SIMULTANEOUS, simultaneousList); }
-            if (!runnableList.isEmpty()) {lists.put(RUNNABLE, runnableList);}
-            if (!arcadeList.isEmpty()) {lists.put(ARCADE, arcadeList);}
-            if (!systemList.isEmpty()) {lists.put(SYSTEMS,systemList);}
-            if (!rasterDisplayList.isEmpty()) {lists.put(RASTER,rasterDisplayList);}
-            if (!vectorDisplayList.isEmpty()) {lists.put(VECTOR,vectorDisplayList);}
-            if (!lcdDisplayList.isEmpty()) {lists.put(LCD,lcdDisplayList);}
-            if (!CHDList.isEmpty()) {lists.put(CHD,CHDList);}
-            if (!noImpefectList.isEmpty()) {lists.put(NO_IMPERFECT,noImpefectList);}
-            if (!categoriesWithMachineList.isEmpty()) {lists.put(CATEGORIES, categoriesWithMachineList);}
+            if (!biosList.isEmpty()) {
+                lists.put(BIOS, biosList);
+            }
+            if (!devicesList.isEmpty()) {
+                lists.put(DEVICES, devicesList);
+            }
+            if (!verticalsList.isEmpty()) {
+                lists.put(VERTICAL, verticalsList);
+            }
+            if (!horizontalList.isEmpty()) {
+                lists.put(HORIZONTAL, horizontalList);
+            }
+            if (!clonesList.isEmpty()) {
+                lists.put(CLONE, clonesList);
+            }
+            if (!noClonesList.isEmpty()) {
+                lists.put(NO_CLONE, noClonesList);
+            }
+            if (!cocktailList.isEmpty()) {
+                lists.put(COCKTAIL, cocktailList);
+            }
+            if (!simultaneousList.isEmpty()) {
+                lists.put(SIMULTANEOUS, simultaneousList);
+            }
+            if (!runnableList.isEmpty()) {
+                lists.put(RUNNABLE, runnableList);
+            }
+            if (!arcadeList.isEmpty()) {
+                lists.put(ARCADE, arcadeList);
+            }
+            if (!systemList.isEmpty()) {
+                lists.put(SYSTEMS, systemList);
+            }
+            if (!rasterDisplayList.isEmpty()) {
+                lists.put(RASTER, rasterDisplayList);
+            }
+            if (!vectorDisplayList.isEmpty()) {
+                lists.put(VECTOR, vectorDisplayList);
+            }
+            if (!lcdDisplayList.isEmpty()) {
+                lists.put(LCD, lcdDisplayList);
+            }
+            if (!CHDList.isEmpty()) {
+                lists.put(CHD, CHDList);
+            }
+            if (!noImpefectList.isEmpty()) {
+                lists.put(NO_IMPERFECT, noImpefectList);
+            }
+            if (!categoriesWithMachineList.isEmpty()) {
+                lists.put(CATEGORIES, categoriesWithMachineList);
+            }
 
             MFM_Data.getInstance().setStaticData(MFM_Constants.LISTS, lists);
         }
