@@ -57,8 +57,8 @@ public class MAMEtoJTree extends JPanel {
     private static Mame root;
     private static MAMEtoJTree ourInstance;
     private static MouseListener ml = null;
-    final String valueDivider = " \u00bb ";
-    final String machineDivider = " \u00A8 ";
+    private final String valueDivider = " \u00bb ";
+    private final String machineDivider = " \u00A8 ";
 
     private MAMEtoJTree() {
         if (root == null) {
@@ -119,8 +119,9 @@ public class MAMEtoJTree extends JPanel {
         // dataDump(top,"MAME_tree_data.txt");
     }
 
-    public static MAMEtoJTree getInstance() {
-        if (ourInstance == null) {
+    public static MAMEtoJTree getInstance(boolean refresh) {
+        if (ourInstance == null || refresh) {
+            root = null; // ensure full refresh of Data
             ourInstance = new MAMEtoJTree();
         }
         return ourInstance;

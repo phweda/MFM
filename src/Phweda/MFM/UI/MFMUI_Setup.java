@@ -46,6 +46,8 @@ public class MFMUI_Setup {
     // Here for race condition where lists sizes were not present when ListBuilder is opened
     private MFMListBuilder listBuilder = null;
 
+    private static JComponent leftPane;
+
     private MFMUI_Setup() {
         //    System.out.println("MFMUI_Setup()" + listBuilder.toString());
         MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
@@ -101,12 +103,8 @@ public class MFMUI_Setup {
 
         listBuilder = new MFMListBuilder();
 
-/*      NOTE with 0.85 STATIC Data never changes during run.
-        // FIXME: 10/17/2016 where should this be
-        if (MFM_Data.getInstance().isStaticChanged()) {
-            MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, MFM.isProcessAll());
-        }
-*/
+        /* NOTE with 0.85 STATIC Data never changes during run. Removed code*/
+
         comps = new MFM_Components(controller);
         frame.setJMenuBar(comps.getMenuBar());
         setupMainView();
@@ -152,11 +150,7 @@ public class MFMUI_Setup {
             fullView();
         }
 
-        if (MFM_Components.MFMFolderTreePane() != null) {
-            MFMmainPane.setLeftComponent(MFM_Components.MFMFolderTreePane());
-        } else {
-            MFMmainPane.setLeftComponent(new JScrollPane(MAMEtoJTree.getInstance().getMAMEjTree()));
-        }
+        setLeftPane();
         frame.getContentPane().add(MFMmainPane, BorderLayout.CENTER);
     }
 
@@ -176,11 +170,24 @@ public class MFMUI_Setup {
         MFMmainPane.setRightComponent(MFMGamePane);
     }
 
+    private static void setLeftPane() {
+        if (MFM_Components.getMFMFolderTreeScrollPane() != null) {
+            leftPane = MFM_Components.getMFMFolderTreeScrollPane();
+        } else {
+            leftPane = new JScrollPane(MAMEtoJTree.getInstance(false).getMAMEjTree());
+        }
+        MFMmainPane.setLeftComponent(leftPane);
+    }
+
+    void refreshLeftPane() {
+        leftPane.removeAll();
+        setLeftPane();
+        MFMmainPane.validate();
+    }
+
     static class MFMWindow extends WindowAdapter {
         @Override
         public void windowClosing(WindowEvent e) {
-            // fixme No longer needed?? 4/7/2017
-            //    MFMSettings.getInstance().persistMySettings();
             super.windowClosing(e);
             MFM.logger.addToList("MFM Closing on frame closing command", true);
             MFM.exit();
