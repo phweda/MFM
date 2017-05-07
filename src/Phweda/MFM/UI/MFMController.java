@@ -78,8 +78,9 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     private final JTextPane HTMLtextPane = new MFMHTMLTextPane();
     // private final String CreateList_Mode = "creatlist";
     private String currentMode = PlayList_Mode;
+    private boolean firstLoad = true;
 
-    static MFMSettings mfmSettings = MFMSettings.getInstance();
+    private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
     static void showListInfo(String listName) {
         TreeSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
@@ -943,7 +944,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         //    Container container = folderTree.getParent().getParent().getParent(); // JViewPort -> JScrollPane -> JSplitPane
         //    container.remove(folderTree);
         Container container = (Container) mainFrame.getContentPane().getComponents()[0];
-        ((JSplitPane) container).setLeftComponent(new JScrollPane(MAMEtoJTree.getInstance().getMAMEjTree()));
+        ((JSplitPane) container).setLeftComponent(new JScrollPane(MAMEtoJTree.getInstance(false).getMAMEjTree()));
         ((JSplitPane) container).setDividerLocation(.16);
         updateUI();
     }
@@ -963,7 +964,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
                     Object obj = selPath.getLastPathComponent();
                     if (obj != null) {
-                        MAMEtoJTree.getInstance().copytoClipboard(obj.toString());
+                        MAMEtoJTree.getInstance(false).copytoClipboard(obj.toString());
                     }
                 }
             }
@@ -977,7 +978,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                         DefaultMutableTreeNode node
                                 = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
                         String value = node.getUserObject().toString();
-                        MAMEtoJTree.getInstance().copytoClipboard(value);
+                        MAMEtoJTree.getInstance(false).copytoClipboard(value);
                     }
                 });
         SwingUtils.changeFont(tree, mainFrame.getFont().getSize());
@@ -1009,27 +1010,29 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 if (result == 1) {
                     MFM.exit();
                 } else {
-                    parseMAME();
+                    parseMAME(false);
                 }
-            } else if (dSets == 1) {
+            } else if (dSets == 1 && mainFrame != null) {
+                return; // Already loaded NOTE look for a better way to do this
+            } else if (dSets == 1 && mainFrame == null) {
                 dataSet = MFM_Data.getInstance().getDataSets()[0];
             } else {
                 dataSet = MFMSettings.getInstance().pickVersion();
             }
         }
 
-        if (dataSet != null) {
+        if (dataSet != null && !dataSet.isEmpty()) {
             mfmSettings.setDataVersion(dataSet);
         } else {
-            // Parsed MAME special case
-            dataSet = mfmSettings.getDataVersion();
+            return;
         }
-        this.loadDataSet(dataSet);
-        if (mainFrame != null && mainFrame.isVisible()) {
-            infoPanel.showProgress("Loading Data Set :  " + dataSet);
+
+        if (mainFrame != null) {
+            infoPanel.showProgress("Loading Data");
         } else {
             MFMUI.showBusy(true, true);
         }
+        this.loadDataSet(dataSet);
     }
 
     private void loadDataSet(String dataSet) {
@@ -1039,27 +1042,43 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 // Load this Data Set
                 MFM_Data.getInstance().loadDataSet(dataSet);
                 // Refresh MameInfo
-                MAMEInfo.getInstance(true);
+                MAMEInfo.getInstance(true, false);
                 MFM_Data.getInstance().setLoaded();
+                // Refresh PlayLists
+                MFMPlayLists.getInstance().refreshLists();
                 return null;
             }
 
             @Override
             protected void done() {
-                if (mainFrame != null && mainFrame.isVisible()) {
-                    // Refresh PlayLists
-                    MFMPlayLists.getInstance().refreshLists();
-                    // Force table refresh if needed
-                    changeList(currentListName.getName());
-
-                    // Change UI display to new version
-                    refreshVersion();
-                    refreshRunnable();
-                    infoPanel.showMessage(dataSet + " loaded");
-                }
+                updateuiData(dataSet);
             }
         };
-        new Thread(sw).run();
+        Thread loadDataSet = new Thread(sw);
+        loadDataSet.start();
+    }
+
+    private void updateuiData(String dataSet) {
+        if (mainFrame != null && mainFrame.isVisible() && !firstLoad) {
+            // Refresh PlayLists
+            MFMPlayLists.getInstance().refreshLists();
+
+            // Refresh MAME JTree
+            MAMEtoJTree.getInstance(true);
+            MFMUI_Setup.getInstance().refreshLeftPane();
+
+            // Force table refresh if needed
+            changeList(currentListName.getName());
+
+            updateUI();
+
+            // Change UI display to new version
+            refreshVersion();
+            refreshRunnable();
+            infoPanel.showMessage(dataSet + " loaded");
+        } else {
+            firstLoad = false;
+        }
     }
 
     private int getFirstRunNoDataSetsOption() {
@@ -1074,8 +1093,32 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 options[1]); //default button title
     }
 
-    void parseMAME() {
-        MAMEInfo.getInstance(true);
+    void parseMAME(boolean showing) {
+        if (showing) {
+            infoPanel.showProgress("Parsing MAME :  " + mfmSettings.getMAMEVersion());
+        } else {
+            MFMUI.showBusy(true, false);
+        }
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                synchronized (this) {
+                    MAMEInfo.getInstance(true, true);
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                MFM_Data.getInstance().rescanSets();
+                String dataSet = MAMEInfo.isALL() ? "ALL_" +
+                        MFMSettings.getInstance().getMAMEVersion() : MFMSettings.getInstance().getMAMEVersion();
+                mfmSettings.setDataVersion(dataSet);
+                loadDataSet(false);
+            }
+        };
+        Thread parseMAME = new Thread(sw);
+        parseMAME.start();
     }
 }
 
