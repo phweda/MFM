@@ -139,7 +139,7 @@ public class MAME_Game_Prefixes {
         try {
             new MFM();
             if (MFMSettings.getInstance().isLoaded()) {
-                MAMEInfo.getInstance(false);
+                MAMEInfo.getInstance(false, false);
             } else {
                 MFM.logger.addToList("No MAME Settings ", true);
             }

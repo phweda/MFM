@@ -115,21 +115,23 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     /**
      * Load persisted objects or if not available generate from MAME
      */
-    private MAMEInfo() {
+    private MAMEInfo(boolean parse) {
         if (MFM.isDebug() && allCategories != null) {
             MFM.logger.addToList("Total categories is : " + allCategories.size());
         }
         try {
-            mame = loadMame();
-            if (mame == null) {
+            if (parse) {
+                MFM_Data.getInstance().reset(); // Does this really help memory? Is GC happening in time to help during parsing?
+            } else {
+                mame = loadMame();
+            }
+            if (mame == null || parse) {
                 // With 0.85 Parse MAME if one is set, or Quit
                 MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
-                // OK just for fun using 'Bitwise inclusive OR'
-                boolean ALL = MFM.isProcessAll() | MFMSettings.getInstance().isPreMAME143exe();
-                generateAllMameData(ALL, true);
+                generateAllMameData(isALL());
+                mame = loadMame();
             }
 
-            mame = loadMame();
             loadCaches();
             loadINIs();
         } catch (Exception exc) {
@@ -150,12 +152,16 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         // Parse MAME special case
         MFM_Data.getInstance().setLoaded();
         loadMameResources();
-        mameJTreePanel = MAMEtoJTree.getInstance();
+        mameJTreePanel = MAMEtoJTree.getInstance(true);
     }
 
-    public static MAMEInfo getInstance(boolean reset) {
+    public static boolean isALL(){
+        return MFM.isProcessAll() | MFMSettings.getInstance().isPreMAME143exe();
+    }
+
+    public static MAMEInfo getInstance(boolean reset, boolean parse) {
         if (ourInstance == null || reset) {
-            ourInstance = new MAMEInfo();
+            ourInstance = new MAMEInfo(parse);
         }
         return ourInstance;
     }
@@ -179,19 +185,22 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return ParseAllMachinesInfo.loadAllMachinesInfo(all);
     }
 
-    static void parseMAME(boolean all) {
+    private void generateAllMameData(boolean all) {
+        MFMSettings.getInstance();// Ensure it is loaded. ?? TODO needed?
 
-    }
+        StringBuilder message = new StringBuilder("Parsing MAME: ");
+        message.append(MFMSettings.getInstance().getMAMEVersion());
+        message.append(" - All flag is ");
+        message.append(all);
 
-    private void generateAllMameData(boolean all, boolean showBusy) {
-        if (showBusy) {
-            MFMUI.showBusy(true, false);
-        }
-        MFMSettings.getInstance();
+        MFM.logger.addToList(message.toString(), true);
+        System.out.println(message.toString());
+
         loadINIs();
         // NOTE order makes a difference!!
         mame = generateMame(all);
         getParsedData();
+        MFMListGenerator.getInstance().generateMFMLists(); // fixme is this correct place?
 
         if (mame != null) {
             // Persist it
