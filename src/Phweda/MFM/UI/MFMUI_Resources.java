@@ -34,14 +34,14 @@ import java.util.HashMap;
  */
 public class MFMUI_Resources {
 
-    public static final String MFM_Icon_PNG = "MFM_Icon.png";
+    static final String MFM_Icon_PNG = "MFM_Icon.png";
     // Help files
     static final String MFM_HTML = "MFM.html";
     static final String MFM_COPYRIGHT_HTML = "MFM Copyright.html";
     static final String GNU_GPL_V3 = "GNU GPL V3.html";
-    static final String USAGE = "Usage.html";
-    static final String MFM_Bugs = "MFM-bugs.html";
-    static final String HOTKEYS = "Hotkeys.html";
+//    static final String USAGE = "Usage.html";
+//    static final String MFM_Bugs = "MFM-bugs.html";
+//    static final String HOTKEYS = "Hotkeys.html";
 
     // Icons
     static final String A_PNG = "A.png";
@@ -78,7 +78,7 @@ public class MFMUI_Resources {
     private static MFMUI_Resources ourInstance;
     private static HashMap<String, URL> resourceURLs;
     private final String[] resourceNames = {
-            MFM_HTML, MFM_COPYRIGHT_HTML, GNU_GPL_V3, USAGE, MFM_Bugs, HOTKEYS,
+            MFM_HTML, MFM_COPYRIGHT_HTML, GNU_GPL_V3,
             A_PNG, Arrow_PNG, C_PNG, CHECKMARK_PNG, EX_PNG, MFM_Icon_PNG, MFM_Image_PNG, Minus_PNG,
             I_PNG, L_PNG, P_PNG, S_PNG,
             UPARROW_PNG, VDUB, MAME_LOGO, MAME_LOGO_SMALL,
@@ -124,7 +124,7 @@ public class MFMUI_Resources {
         return resourceURLs;
     }
 
-    public ImageIcon getImageIcon(String name) {
+    ImageIcon getImageIcon(String name) {
         return new ImageIcon(resourceURLs.get(name));
     }
 
