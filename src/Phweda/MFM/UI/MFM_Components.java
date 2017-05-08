@@ -53,7 +53,7 @@ public class MFM_Components {
     private static JPanel MFMListPanel;
     private static JTabbedPane ExtrasTabbedPane;
     private static JTable machineListTable;
-    private static JScrollPane MFMFolderTreePane;
+    private static JScrollPane mfmFolderTreeScrollPane;
     private static JMenuBar menuBar;
     private static StatusBar statusBar;
     private static JLabel currentListName;
@@ -74,8 +74,8 @@ public class MFM_Components {
         return MFMPopupMenu;
     }
 
-    static JPanel MFMFolderTreePane() {
-        if (MFMFolderTreePane == null) {
+    static JPanel getMFMFolderTreeScrollPane() {
+        if (mfmFolderTreeScrollPane == null) {
             return null;
         }
 
@@ -83,12 +83,12 @@ public class MFM_Components {
         BorderLayout borderLayout = new BorderLayout();
         treePanel.setLayout(borderLayout);
         treePanel.add(getTreeButton(), BorderLayout.NORTH);
-        leftTreeScrollPane.getViewport().add(MFMFolderTreePane);
+        leftTreeScrollPane.getViewport().add(mfmFolderTreeScrollPane);
         treePanel.add(leftTreeScrollPane, BorderLayout.CENTER);
         return treePanel;
     }
 
-    static JButton getTreeButton() {
+    private static JButton getTreeButton() {
         final String showXML = "Show MAME XML";
         final String showINIs = "Show Folder INIs";
 
@@ -99,10 +99,10 @@ public class MFM_Components {
             public void actionPerformed(ActionEvent e) {
                 if (((AbstractButton) e.getSource()).getText().equals(showXML)) {
                     treeButton.setText(showINIs);
-                    leftTreeScrollPane.getViewport().add(MAMEtoJTree.getInstance().getMAMEjTree());
+                    leftTreeScrollPane.getViewport().add(MAMEtoJTree.getInstance(false).getMAMEjTree());
                 } else {
                     treeButton.setText(showXML);
-                    leftTreeScrollPane.getViewport().add(MFMFolderTreePane);
+                    leftTreeScrollPane.getViewport().add(mfmFolderTreeScrollPane);
                 }
             }
         });
@@ -223,7 +223,7 @@ public class MFM_Components {
             root.add(folderNode);
         }
         tree.addMouseListener(MFMController);
-        MFMFolderTreePane = new JScrollPane(tree);
+        mfmFolderTreeScrollPane = new JScrollPane(tree);
         // Expand root folder
         tree.expandRow(0);
     }
