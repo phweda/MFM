@@ -95,7 +95,7 @@ public class MFM {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("MFM FATAL error failed to detect run directory");
-            System.exit(7);
+            exit(7);
         }
 
         setPathsandDirectories(path);
@@ -154,8 +154,6 @@ public class MFM {
                     e.printStackTrace();
                 }
             }
-
-            // MAMEInfo.getInstance(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -339,12 +337,19 @@ public class MFM {
         }
     }
 
-    public static void exit() {
+    public static void exit(int status) {
         MFM_Data.getInstance().persistSettings(); // Capture and persist any user driven settings: UI & Current List
         // Wait for final exit if a Data Set is writing to disk
         while (MFM_Data.getInstance().isPersisting()) {
         }
-        System.exit(0);
+        if (status != 0) {
+            System.err.println("Process finished with exit code " + status);
+        }
+        System.exit(status);
+    }
+
+    public static void exit() {
+        exit(0);
     }
 
     protected void finalize() throws Throwable {
