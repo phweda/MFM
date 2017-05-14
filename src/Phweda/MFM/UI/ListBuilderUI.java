@@ -248,28 +248,42 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
     }
 
     private void setLabelsText() {
+        // with 0.85 we are NOT guaranteed to have these lists
+        String number = MFMListBuilder.getArcadeList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getArcadeList().size()) : "0";
+        arcadeOnlyRadioButton.setText(ARCADE_ONLY_COMMAND + " - " + number);
 
-        arcadeOnlyRadioButton.setText(ARCADE_ONLY_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getArcadeList().size()));
-        systemsOnlyRadioButton.setText(SYSTEMS_ONLY_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getSystemList().size()));
+        number = MFMListBuilder.getSystemList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getSystemList().size()) : "0";
+        systemsOnlyRadioButton.setText(SYSTEMS_ONLY_COMMAND + " - " + number);
 
-        verticalRadioButton.setText(VERTICAL_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getVerticalsList().size()));
-        horizontalRadioButton.setText(HORIZONTAL_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getHorizontalsList().size()));
-        cocktailRadioButton.setText(COCKTAIL_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getCocktailsList().size()));
+        number = MFMListBuilder.getVerticalsList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getVerticalsList().size()) : "0";
+        verticalRadioButton.setText(VERTICAL_COMMAND + " - " + number);
 
-        vectorRadioButton.setText(VECTOR_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getVectorDisplayList().size()));
-        rasterRadioButton.setText(RASTER_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getRasterDisplayList().size()));
-        LCDRadioButton.setText(LCD_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getLcdDisplayList().size()));
+        number = MFMListBuilder.getHorizontalsList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getHorizontalsList().size()) : "0";
+        horizontalRadioButton.setText(HORIZONTAL_COMMAND + " - " + number);
 
-        simultaneousCB.setText(SIMULTANEOUS_COMMAND + " - " +
-                MFMController.decimalFormater.format(MFMListBuilder.getSimultaneousList().size()));
+        number = MFMListBuilder.getCocktailsList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getCocktailsList().size()) : "0";
+        cocktailRadioButton.setText(COCKTAIL_COMMAND + " - " + number);
+
+        number = MFMListBuilder.getVectorDisplayList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getVectorDisplayList().size()) : "0";
+        vectorRadioButton.setText(VECTOR_COMMAND + " - " + number);
+
+        number = MFMListBuilder.getRasterDisplayList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getRasterDisplayList().size()) : "0";
+        rasterRadioButton.setText(RASTER_COMMAND + " - " + number);
+
+        number = MFMListBuilder.getLcdDisplayList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getLcdDisplayList().size()) : "0";
+        LCDRadioButton.setText(LCD_COMMAND + " - " + number);
+
+        number = MFMListBuilder.getSimultaneousList() != null ?
+                MFMController.decimalFormater.format(MFMListBuilder.getSimultaneousList().size()) : "0";
+        simultaneousCB.setText(SIMULTANEOUS_COMMAND + " - " + number);
 
     }
 

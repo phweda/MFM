@@ -63,7 +63,6 @@ class MFMListGenerator {
                     "VTR Control", "Word-processing Machine", "Workstation / Server"
             );
     private static MFMListGenerator ourInstance = new MFMListGenerator();
-    private static TreeMap<String, TreeSet<String>> languagesListMap;
 
     private MFMListGenerator() {
     }
@@ -79,10 +78,7 @@ class MFMListGenerator {
             }
             TreeMap<String, TreeSet<String>> languagesMap = new TreeMap<String, TreeSet<String>>();
             new ParseFolderINIs(MFMSettings.getInstance().getLanguageINI(), languagesMap).processFile();
-            // if not all then remove non-playable machines
-            if (!MFM.isProcessAll()) {
-                filterLanguagesMap(languagesMap);
-            }
+            filterLanguagesMap(languagesMap);
             MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesMap);
             return languagesMap;
         } catch (FileNotFoundException e) {
@@ -92,7 +88,7 @@ class MFMListGenerator {
     }
 
     private static void filterLanguagesMap(TreeMap<String, TreeSet<String>> languagesMap) {
-        // remove any non-playable machines
+        // remove any non-existent machines - some entries in the languages.ini do not exist in many versions
         languagesMap.forEach((key, set) ->
                 set.removeIf(machineName -> !allList.contains(machineName))
         );
@@ -108,9 +104,11 @@ class MFMListGenerator {
     }
 */
 
-    HashMap<String, TreeSet<String>> generateMFMLists() {
-        HashMap<String, TreeSet<String>> lists;
-        lists = (HashMap<String, TreeSet<String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.LISTS);
+    HashMap<String, TreeSet<String>> generateMFMLists(boolean parsing) {
+        HashMap<String, TreeSet<String>> lists = null;
+        if (!parsing) {
+            lists = (HashMap<String, TreeSet<String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.LISTS);
+        }
 
         if (lists == null) {
             lists = new HashMap<String, TreeSet<String>>();
@@ -281,20 +279,22 @@ class MFMListGenerator {
 
             MFM_Data.getInstance().setStaticData(MFM_Constants.LISTS, lists);
         }
-        // Dependency ALL list must already exists
-        languagesListsMap = getLanguageLists();
         return lists;
     }
 
-    TreeMap<String, TreeSet<String>> getLanguageLists() {
-        if (languagesListMap == null) {
+    TreeMap<String, TreeSet<String>> getLanguageLists(boolean parsing) {
+        TreeMap<String, TreeSet<String>> languagesListMap;
+        if (!parsing) {
             languagesListMap =
                     (TreeMap<String, TreeSet<String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.LANGUAGESLISTS);
-        }
-        if (languagesListMap == null) {
+        } else {
             languagesListMap = loadLanguagesINI();
+            // Dependency ALL list must already exists
+            MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesListMap);
             if (languagesListMap == null && MFM.isSystemDebug()) {
                 System.out.println("In MFMListGenerator failed to generate Languages lists");
+            } else {
+
             }
         }
         return languagesListMap;

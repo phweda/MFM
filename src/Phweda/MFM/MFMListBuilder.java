@@ -128,27 +128,26 @@ public final class MFMListBuilder {
     private static ArrayList<String> systemNoMatureCategories;
     private static HashMap<String, TreeSet<String>> lists;
 
-    static {
-        initLists();
-    }
-
-    static void initLists() {
+    static void initLists(boolean parsing) {
         try {
             allMachines = MAMEInfo.getMame().getMachineMap();
-            runnableList = new TreeSet<String>(MAMEInfo.getRunnableMachines());
             allCategoriesList = MAMEInfo.getAllCategories();
             categoryHierarchy = MAMEInfo.getCategoryHierarchy();
+            runnableList = new TreeSet<String>(MAMEInfo.getRunnableMachines());
+            getCategoryLists();
+
+            // Populate built in lists
+            lists = MFMListGenerator.getInstance().generateMFMLists(parsing);
+            languagesListsMap = MFMListGenerator.getInstance().getLanguageLists(parsing);
         } catch (Exception e) {
             e.printStackTrace();
             MFM.logger.out("FATAL error is MFMListBuilder. Check your Data Set");
             System.exit(5);
         }
 
-        getCategoryLists();
-        // Populate built in lists
-        lists = MFMListGenerator.getInstance().generateMFMLists();
-        languagesListsMap = MFMListGenerator.getInstance().getLanguageLists();
-
+        if(playLists != null){
+            MFMPlayLists.getInstance().refreshLists();
+        }
         playLists = MFMPlayLists.getInstance();
         if (MFM.isDebug()) {
             if (MAMEInfo.getCategoryHierarchy() != null) {

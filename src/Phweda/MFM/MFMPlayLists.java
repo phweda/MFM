@@ -66,22 +66,13 @@ public class MFMPlayLists implements Serializable {
     private TreeSet<String> vectorDisplayMachineNames = null;
     private TreeSet<String> lcdDisplayMachineNames = null;
 
-    // Note very hackish - quick way to populate the set inline
-    private TreeSet<String> doNotPopulateList = new TreeSet<String>() {{
-        add(ALL);
-        add(SYSTEMS);
-    }};
-
     private MFMPlayLists() {
         loadPlayLists();
         populateNames();
     }
 
-    public void refreshLists() {
-        MFMListBuilder.initLists();
-        allMachineNames = null;
-        loadPlayLists();
-        populateNames();
+    void refreshLists() {
+        playlists = new MFMPlayLists();
     }
 
     private void populateNames() {
@@ -305,7 +296,9 @@ public class MFMPlayLists implements Serializable {
             MFMPlayListsTree.put(MFMListBuilder.SIMULTANEOUS, simultaneousMachineNames);
         }
         MFMPlayListsTree.put(MFMListBuilder.ARCADE, arcadeMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.SYSTEMS, systemMachineNames);
+        if (systemMachineNames != null && !systemMachineNames.isEmpty()) {
+            MFMPlayListsTree.put(MFMListBuilder.SYSTEMS, systemMachineNames);
+        }
         if (rasterDisplayMachineNames != null && !rasterDisplayMachineNames.isEmpty()) {
             MFMPlayListsTree.put(MFMListBuilder.RASTER, rasterDisplayMachineNames);
         }
