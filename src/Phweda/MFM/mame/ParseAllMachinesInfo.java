@@ -20,11 +20,7 @@ package Phweda.MFM.mame;
 
 import Phweda.MFM.*;
 import Phweda.MFM.Utils.ParseFolderINIs;
-import Phweda.utils.XMLUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -58,6 +54,7 @@ public class ParseAllMachinesInfo {
     private static int machineCount = 0;
 
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
+
     /**
      * NOTE : Unless MFM arg -all flag is present we only load Playable games as determined by :
      * <driver status="good" or
@@ -66,14 +63,16 @@ public class ParseAllMachinesInfo {
      **/
 
     public static Mame loadAllMachinesInfo(boolean all) {
-        System.out.println("Parsing with ALL flag: " + all);
+        String message = "Parsing with ALL flag: " + all;
+        System.out.println(message);
+        MFM.logger.addToList(message + "\nMAME exe is: " + MFMSettings.getInstance().fullMAMEexePath());
         // Note as of 0.85 we handle all Mame -listxml versions the same
         mame = loadAllMachinesInfoJAXB();
         // Set data version here. 0.85 change to handle older Mame versions
         if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
-            mfmSettings.setDataVersion(mame.getBuild());
+            mfmSettings.generateDataVersion(mame.getBuild());
         } else {
-            mfmSettings.setDataVersion(MAMEexe.getMAMEexeVersion());
+            mfmSettings.generateDataVersion(MAMEexe.getMAMEexeVersion());
             mame.setBuild(mfmSettings.getDataVersion());
         }
 
@@ -106,6 +105,7 @@ public class ParseAllMachinesInfo {
      * @return Map of all Machines
      * @deprecated 0.85 release handles all Mame versions with -listxml (from 0.70)
      */
+/*
     private static void loadAllMachinesInfoDOM(Set<String> prefixes) {
         machineList = new ArrayList<String>();
         Document dom = null;
@@ -122,6 +122,7 @@ public class ParseAllMachinesInfo {
         MFM.logger.addToList("\nTotal Machines : " + machineCount + "\n\n", true);
 
     }
+*/
 
     private static Mame loadAllMachinesInfoJAXB() {
         return loadAllMAME();
@@ -149,6 +150,7 @@ public class ParseAllMachinesInfo {
         return new MAME_Game_Prefixes().getPrefixes();
     }
 
+ /* NOTE removed with 0.85 version we exclusively use JAXB
     private static void getMachineInfo(Document dom, String chars) {
         // TODO we should extract this to a method see other calls for -listxml MAME_Compatible
         ArrayList<String> fullListargs = new ArrayList<String>();
@@ -175,7 +177,7 @@ public class ParseAllMachinesInfo {
             machineNodes = root.getElementsByTagName(GAME);
         }
 
-        /* */
+        *//* *//*
         // Get a total count of Machine nodes in XML - 2/2/2016 trying to rectify count with coccola
         // NOTE assumption machines are only returned once is incorrect - think it is device_refs 10/21/2016
         // machineCount += machineNodes.getLength();
@@ -185,7 +187,7 @@ public class ParseAllMachinesInfo {
             // Ensure there are children
             if (machineNode.hasChildNodes()) {
                 String bios = machineNode.getAttribute(Machine.ISBIOS);
-                /* if playable */
+                *//* if playable *//*
                 Element driver = (Element) machineNode.getElementsByTagName(DRIVER).item(0);
                 if (driver != null) {
                     String status = driver.getAttribute(STATUS);
@@ -207,10 +209,10 @@ public class ParseAllMachinesInfo {
         }
     }
 
-    /*
+    *//*
      * Huge rewrite to JAXB objects Oct 2016
      *
-     */
+     *//*
     private static void loadMachineInfo(Element machineElement, String status, String isBios) {
         Machine machine = new Machine();
 
@@ -235,10 +237,10 @@ public class ParseAllMachinesInfo {
             MFM.logger.addToList(machineName);
         }
 
-        /* We know there is one and only one description*/
+        *//* We know there is one and only one description*//*
         machine.setDescription(machineElement.getElementsByTagName(Machine.DESCRIPTION).item(0).getTextContent());
 
-        /* We may not get these */
+        *//* We may not get these *//*
         Element yearEL = (Element) machineElement.getElementsByTagName(Machine.YEAR).item(0);
         if (yearEL != null) {
             machine.setYear(yearEL.getTextContent());
@@ -387,13 +389,14 @@ public class ParseAllMachinesInfo {
             machine.setInput(input);
         }
 
-//************** NON MAME INFORMATION SOURCES *************************************************************
-        addNonMAMEinfo(machine, machineName);
-//**********************************************************************************************
+/*//************** NON MAME INFORMATION SOURCES *************************************************************
+     addNonMAMEinfo(machine, machineName);
+     /*/
+    /**********************************************************************************************
 
-        mame.getMachine().add(machine);
-    }
-
+     mame.getMachine().add(machine);
+     }
+     */
     private static void addNonMAMEinfo(Machine machine, String machineName) {
         machine.setHistory(LoadNonMAMEresources.getHistoryDAT().get(machineName));
         machine.setInfo(LoadNonMAMEresources.getMAMEInfoDAT().get(machineName));

@@ -50,8 +50,6 @@ public class MFMInformationPanel extends JPanel {
     }
 
     void showProgress(String title) {
-        // TODO why are these show calls failing to work properly??
-        //   ((CardLayout) this.getLayout()).show(this, PROGRESS);
         ((CardLayout) this.getLayout()).last(this);
         progressBar.setString(title);
         message.setText("");
@@ -68,20 +66,18 @@ public class MFMInformationPanel extends JPanel {
     }
 
     public void showMessage(String message) {
-        //    JOptionPane.showMessageDialog(null, "We are in showMessage()");
         running = false;
         MFMInformationPanel.message.setText(message);
         if (timer != null) {
             timer.stop();
             timer = null;
         }
-        //((CardLayout) this.getLayout()).show(this, MESSAGE);
         ((CardLayout) this.getLayout()).first(this);
     }
 
 
     private void runProgress() {
-        //   JOptionPane.showMessageDialog(null, "We are in runProgress()");
+        // JOptionPane.showMessageDialog(null, "We are in runProgress()");
         progressBar.setIndeterminate(true);
         progressBar.setStringPainted(true);
     }
