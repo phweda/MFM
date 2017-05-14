@@ -425,20 +425,34 @@ public class MFMSettings {
     }
 
     public void setDataVersion(String dataVersion) {
-        dataVersion = trimMAMEVersion(dataVersion);
-        if(!dataVersion.contains(ALL_) && (MFM.isProcessAll() || Double.valueOf(dataVersion) <= DBL_143)){
-            mfmSettings.put(MFM_Constants.DATA_VERSION, ALL_ + dataVersion);
-        }
         mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
     }
 
+    public void generateDataVersion(String dataVersion) {
+        if (MFM.isSystemDebug()) {
+            System.out.println("MFMSettings.setDataVersion dataVersion IN is: " + dataVersion);
+        }
+        dataVersion = trimMAMEVersion(dataVersion);
+        // strip *. for Double comparison
+        Double dataVersionDouble = Double.valueOf(dataVersion.substring(dataVersion.indexOf('.') + 1));
+
+        if (!dataVersion.contains(ALL_) && (MFM.isProcessAll() || Double.valueOf(dataVersionDouble) <= DBL_143)) {
+            mfmSettings.put(MFM_Constants.DATA_VERSION, ALL_ + dataVersion);
+        } else {
+            mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
+        }
+        if (MFM.isSystemDebug()) {
+            System.out.println("MFMSettings.setDataVersion dataVersion OUT is: " + dataVersion);
+        }
+    }
+
     // Supports parsing
-    boolean isPreMAME143exe(){
-        String version = (String)mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
+    boolean isPreMAME143exe() {
+        String version = (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
         // Not sure we need this but ...
-        if(version == null || version.trim().isEmpty()){
+        if (version == null || version.trim().isEmpty()) {
             setMAMEexeVersion();
-            version = (String)mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
+            version = (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
         }
         version = version.substring(version.indexOf('.') + 1);// remove "0." for comparison
         return Double.valueOf(version) <= DBL_143;
@@ -627,7 +641,8 @@ public class MFMSettings {
         }
         // Throw event to update UI
         final MFMAction updateVersion = new MFMAction(MFMAction.UpdateVersionAction, null);
-        updateVersion.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "updateVersion"));
+        updateVersion.actionPerformed(
+                new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MFMAction.UpdateVersionAction));
     }
 
     /**
