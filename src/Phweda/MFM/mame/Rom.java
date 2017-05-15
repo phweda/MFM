@@ -26,11 +26,7 @@
 
 package Phweda.MFM.mame;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
@@ -80,7 +76,7 @@ import java.io.Serializable;
 @XmlRootElement(name = "rom")
 public class Rom implements Serializable {
 
-    private static final long serialVersionUID = 2573874911257977998L;
+    private static final long serialVersionUID = -3410963362656346422L;
 
     @XmlAttribute(name = "name", required = true)
     protected String name;
@@ -90,6 +86,8 @@ public class Rom implements Serializable {
     protected String size;
     @XmlAttribute(name = "crc")
     protected String crc;
+    @XmlAttribute(name = "md5")
+    protected String md5;
     @XmlAttribute(name = "sha1")
     protected String sha1;
     @XmlAttribute(name = "merge")
@@ -183,6 +181,26 @@ public class Rom implements Serializable {
      */
     public void setCrc(String value) {
         this.crc = value;
+    }
+
+    /**
+     * Gets the value of the md5 property.
+     *
+     * @return possible object is
+     * {@link String }
+     */
+    public String getMd5() {
+        return md5;
+    }
+
+    /**
+     * Sets the value of the md5 property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setMds(String value) {
+        this.md5 = value;
     }
 
     /**

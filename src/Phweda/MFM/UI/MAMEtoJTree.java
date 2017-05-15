@@ -534,6 +534,11 @@ public class MAMEtoJTree extends JPanel {
             dmtNode.add(new DefaultMutableTreeNode("crc" + valueDivider + crc));
         }
 
+        String md5 = rom.getMd5();
+        if (md5 != null && !md5.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("md5" + valueDivider + md5));
+        }
+
         String sha1 = rom.getSha1();
         if (sha1 != null && !sha1.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("sha1" + valueDivider + sha1));
@@ -572,6 +577,11 @@ public class MAMEtoJTree extends JPanel {
 
         String name = disk.getName();
         dmtNode = new DefaultMutableTreeNode("Disk" + valueDivider + name);
+
+        String md5 = disk.getMd5();
+        if (md5 != null && !md5.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("md5" + valueDivider + md5));
+        }
 
         String sha1 = disk.getSha1();
         if (sha1 != null && !sha1.isEmpty()) {
@@ -663,6 +673,11 @@ public class MAMEtoJTree extends JPanel {
         String rotate = display.getRotate();
         if (rotate != null && !rotate.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("rotate" + valueDivider + rotate));
+        }
+
+        String orientation = display.getOrientation();
+        if (orientation != null && !orientation.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("orientation" + valueDivider + orientation));
         }
 
         String flipx = display.getFlipx();

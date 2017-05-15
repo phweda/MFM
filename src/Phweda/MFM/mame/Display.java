@@ -26,11 +26,7 @@
 
 package Phweda.MFM.mame;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
@@ -94,7 +90,7 @@ import java.io.Serializable;
 @XmlRootElement(name = "display")
 public class Display implements Serializable {
 
-    private static final long serialVersionUID = 3093941743215036746L;
+    private static final long serialVersionUID = -1947876231341041143L;
 
     @XmlAttribute(name = "tag")
     protected String tag;
@@ -128,6 +124,11 @@ public class Display implements Serializable {
     @XmlAttribute(name = "vbstart")
     protected String vbstart;
 
+    @XmlAttribute(name = "orientation")
+    protected String orientation; // MAME older versions. vertical|horizontal (equivalent of rotate (0|90|180|270))
+    @XmlAttribute(name = "screen")
+    protected String screen; // MAME older versions. screen == type : raster|vector
+
     /**
      * Gets the value of the tag property.
      *
@@ -150,12 +151,18 @@ public class Display implements Serializable {
 
     /**
      * Gets the value of the type property.
+     * <p>
+     * Altered for MFM to handle previous DTDs with screen attribute
      *
      * @return possible object is
      * {@link String }
      */
     public String getType() {
-        return type;
+        if (type != null && !type.isEmpty()) {
+            return type;
+        } else {
+            return getScreen();
+        }
     }
 
     /**
@@ -166,6 +173,26 @@ public class Display implements Serializable {
      */
     public void setType(String value) {
         this.type = value;
+    }
+
+    /**
+     * Sets the value of the screen property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setScreen(String value) {
+        this.screen = value;
+    }
+
+    /**
+     * Gets the value of the screen property.
+     *
+     * @return possible object is
+     * {@link String }
+     */
+    public String getScreen() {
+        return screen;
     }
 
     /**
@@ -186,6 +213,26 @@ public class Display implements Serializable {
      */
     public void setRotate(String value) {
         this.rotate = value;
+    }
+
+    /**
+     * Gets the value of the orientation property.
+     *
+     * @return possible object is
+     * {@link String }
+     */
+    public String getOrientation() {
+        return orientation;
+    }
+
+    /**
+     * Sets the value of the orientation property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setOrientation(String value) {
+        this.orientation = value;
     }
 
     /**

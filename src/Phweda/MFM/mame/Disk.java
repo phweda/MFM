@@ -91,6 +91,8 @@ public class Disk implements Serializable {
     protected String name;
     @XmlAttribute(name = "sha1")
     protected String sha1;
+    @XmlAttribute(name = "md5")
+    protected String md5;
     @XmlAttribute(name = "merge")
     protected String merge;
     @XmlAttribute(name = "region")
@@ -145,6 +147,26 @@ public class Disk implements Serializable {
      */
     public void setSha1(String value) {
         this.sha1 = value;
+    }
+
+    /**
+     * Gets the value of the md5 property.
+     *
+     * @return possible object is
+     * {@link String }
+     */
+    public String getMd5() {
+        return md5;
+    }
+
+    /**
+     * Sets the value of the md5 property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setMd5(String value) {
+        this.md5 = value;
     }
 
     /**

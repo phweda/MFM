@@ -118,7 +118,7 @@ public class MFM_DATmaker {
         rom.setName(romIn.getName());
         rom.setSize(romIn.getSize());
         rom.setCrc(romIn.getCrc());
-        //    rom.setMd5(romIn.)
+        rom.setMd5(romIn.getMd5());
         rom.setSha1(romIn.getSha1());
 
         return rom;
@@ -128,6 +128,7 @@ public class MFM_DATmaker {
         Phweda.MFM.datafile.Disk disk = new Phweda.MFM.datafile.Disk();
         disk.setName(diskIn.getName());
         disk.setSha1(diskIn.getSha1());
+        disk.setMd5(diskIn.getMd5());
         return disk;
     }
 
@@ -141,6 +142,7 @@ public class MFM_DATmaker {
 		    <clrmamepro forcepacking="unzip"/>
 	    </header>
     */
+
     private static Header createHeader(String listName) {
         Header header = new Header();
         header.setName(listName);
