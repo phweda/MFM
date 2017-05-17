@@ -70,7 +70,7 @@ public class MFMAction extends AbstractAction {
     static final String MAME_TREEAction = "Show MAME tree";
     static final String MACHINE_TREEAction = "Show Machine tree";
     static final String OpenFileAction = "Open File";
-    static final String LoadDataSetAction = "Load Data Set";
+    public static final String LoadDataSetAction = "Load Data Set";
     static final String ParseMAMEAction = "Parse MAME";
 
     private static MFMController controller = MFMUI_Setup.getInstance().getController();
@@ -222,7 +222,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case ParseMAMEAction:
-                    controller.parseMAME();
+                    controller.parseMAME(true);
                     break;
 
                 case MAMECommandBuilderAction:

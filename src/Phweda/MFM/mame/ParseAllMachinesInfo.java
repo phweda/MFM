@@ -105,12 +105,12 @@ public class ParseAllMachinesInfo {
      * @return Map of all Machines
      * @deprecated 0.85 release handles all Mame versions with -listxml (from 0.70)
      */
-/*
+
     private static void loadAllMachinesInfoDOM(Set<String> prefixes) {
         machineList = new ArrayList<String>();
         Document dom = null;
         for (String str : prefixes) {
-            getMachineInfo(dom, str);
+          //  getMachineInfo(dom, str);
             dom = null;
             // TODO figure out which version it is
             if (MAMEInfo.getVersionDouble() < 0.139d) {
@@ -122,7 +122,6 @@ public class ParseAllMachinesInfo {
         MFM.logger.addToList("\nTotal Machines : " + machineCount + "\n\n", true);
 
     }
-*/
 
     private static Mame loadAllMachinesInfoJAXB() {
         return loadAllMAME();
@@ -133,6 +132,11 @@ public class ParseAllMachinesInfo {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Mame.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+            if (MFM.isSystemDebug()) {
+                jaxbUnmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
+            }
+
             Process process = MAMEexe.run("-listxml");
             InputStream inputStream = process.getInputStream();
             mame = (Mame) jaxbUnmarshaller.unmarshal(inputStream);
