@@ -110,6 +110,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "history",
@@ -145,8 +146,7 @@ import java.util.List;
 @XmlRootElement(name = "machine")
 public class Machine implements Serializable {
 
-    private static final long serialVersionUID = -3641131840728993150L;
-
+    private static final long serialVersionUID = -4771053482371649224L;
 
     //========================= MFM ===================================
 
@@ -168,7 +168,7 @@ public class Machine implements Serializable {
     @XmlAttribute(name = "nplayerEntry")
     private String nplayerEntry; // From nplayers.ini
     @XmlAttribute(name = "category")
-    private String category; // From Catver_full.ini or Catver.ini NOTE not guaranteed to have one
+    private String category; // Catver.ini TODO change to category.ini plus version.ini
     @XmlAttribute(name = "supportsSimultaneous")
     private boolean supportsSimultaneous = false; // From nplayers.ini
     @XmlAttribute(name = "MAMEVersionAdded")
@@ -238,6 +238,12 @@ public class Machine implements Serializable {
     protected List<DeviceRef> deviceRef;
     protected List<Sample> sample;
     protected List<Chip> chip;
+
+    @XmlElements({
+            @XmlElement(name = "display", type = Display.class),
+            @XmlElement(name = "video", type = Display.class)
+    })
+
     protected List<Display> display;
     protected Sound sound;
     protected Input input;
@@ -1033,11 +1039,16 @@ public class Machine implements Serializable {
     }
 
     public String getIsVertical() {
-        if (!this.getDisplay().isEmpty()) {
-            String rotate = this.getDisplay().get(0).getRotate();
-            return rotate.equals("90") || rotate.equals("270") ? VERTICAL : HORIZONTAL;
+        if (this.getDisplay().isEmpty()) {
+            return "";
         }
-        return "";
+
+        String rotate = this.getDisplay().get(0).getRotate();
+        if (rotate != null && !rotate.isEmpty()) {
+            return rotate.equals("90") || rotate.equals("270") ? VERTICAL : HORIZONTAL;
+        } else {
+            return this.getDisplay().get(0).getOrientation();
+        }
     }
 
     public void setOrientation(String orientation) {
@@ -1127,6 +1138,9 @@ public class Machine implements Serializable {
     }
 
     public int getButtons() {
+        if(getInput() != null && getInput().getButtons() != null){
+            buttons = Integer.parseInt(getInput().getButtons());
+        }
         if (buttons == -1) {
             for (Control control : this.getInput().getControl()) {
                 String tempStr = control.getButtons();
