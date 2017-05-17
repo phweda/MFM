@@ -72,13 +72,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     private static JLabel currentListName;
     private static MFMInformationPanel infoPanel;
     private static StatusBar statusBar;
-    // TODO clean this up since modes not longer matter 11/12/16
-    protected final String SETTINGS_Mode = "settings"; // Base settings
     private final String PlayList_Mode = "playlist"; // Create, view and play games from playlists
     private final JTextPane HTMLtextPane = new MFMHTMLTextPane();
-    // private final String CreateList_Mode = "creatlist";
     private String currentMode = PlayList_Mode;
     private boolean firstLoad = true;
+    private static boolean parsing = false;
 
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
@@ -211,13 +209,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void changeList(String listName) {
-        MFMPlayLists pl = MFMPlayLists.getInstance();
-
-        TreeSet<String> list = pl.getALLPlayListsTree().get(listName);
+        TreeSet<String> list = MFMPlayLists.getInstance().getALLPlayListsTree().get(listName);
         if (list == null || (list.size() < 1)) {
             showError(listName + " is empty");
             listName = MFMListBuilder.ALL;
-            list = pl.getALLPlayListsTree().get(MFMListBuilder.ALL);
+            list = MFMPlayLists.getInstance().getALLPlayListsTree().get(MFMListBuilder.ALL);
         }
 
         MachineListTableModel gltm = (MachineListTableModel) machineListTable.getModel();
@@ -1008,9 +1004,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             if (dSets < 1) {
                 int result = getFirstRunNoDataSetsOption();
                 if (result == 1) {
-                    MFM.exit();
+                    MFM.exit(2);
                 } else {
+                    parsing = true;
                     parseMAME(false);
+                    return;
                 }
             } else if (dSets == 1 && mainFrame != null) {
                 return; // Already loaded NOTE look for a better way to do this
@@ -1023,8 +1021,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
         if (dataSet != null && !dataSet.isEmpty()) {
             mfmSettings.setDataVersion(dataSet);
-        } else {
-            return;
         }
 
         if (mainFrame != null) {
@@ -1044,8 +1040,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 // Refresh MameInfo
                 MAMEInfo.getInstance(true, false);
                 MFM_Data.getInstance().setLoaded();
-                // Refresh PlayLists
-                MFMPlayLists.getInstance().refreshLists();
                 return null;
             }
 
@@ -1060,9 +1054,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     private void updateuiData(String dataSet) {
         if (mainFrame != null && mainFrame.isVisible() && !firstLoad) {
-            // Refresh PlayLists
-            MFMPlayLists.getInstance().refreshLists();
-
             // Refresh MAME JTree
             MAMEtoJTree.getInstance(true);
             MFMUI_Setup.getInstance().refreshLeftPane();
@@ -1075,9 +1066,15 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             // Change UI display to new version
             refreshVersion();
             refreshRunnable();
+            MFMUI_Setup.getInstance().updateMenuBar("");
             infoPanel.showMessage(dataSet + " loaded");
         } else {
             firstLoad = false;
+            // Hack for Parsing on first run load
+            if (mainFrame != null) {
+                updateUI();
+                infoPanel.showMessage(dataSet + " loaded");
+            }
         }
     }
 
@@ -1103,6 +1100,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             @Override
             protected Object doInBackground() throws Exception {
                 synchronized (this) {
+                    System.out.println("**** Parsing MAME ****");
                     MAMEInfo.getInstance(true, true);
                 }
                 return null;
@@ -1111,9 +1109,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             @Override
             protected void done() {
                 MFM_Data.getInstance().rescanSets();
-                String dataSet = MAMEInfo.isALL() ? "ALL_" +
-                        MFMSettings.getInstance().getMAMEVersion() : MFMSettings.getInstance().getMAMEVersion();
-                mfmSettings.setDataVersion(dataSet);
+                mfmSettings.setDataVersion(MFM_Data.getInstance().getDataVersion());
                 loadDataSet(false);
             }
         };

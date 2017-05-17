@@ -18,11 +18,13 @@
 
 package Phweda.MFM;
 
+import Phweda.MFM.UI.MFMAction;
 import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.mame.Mame;
 import Phweda.utils.Hasher;
 import Phweda.utils.PersistUtils;
 
+import java.awt.event.ActionEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -275,8 +277,20 @@ public class MFM_Data {
             }
             final MFM_Data_Sets.Data_Set dataSet2 = datasets.getDataSet(dataSet);
             if (dataSet2 == null) {
+                /*
                 MFM.logger.addToList("Process finished with exit code 6", true);
                 MFM.exit(6);
+                */
+
+                // If there are Data Set(s) available pick one
+                if (!datasets.getAvailableVersions().isEmpty()) {
+                    MFMAction pickDataSet = new MFMAction(MFMAction.LoadDataSetAction, null);
+                    pickDataSet.actionPerformed(
+                            new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MFMAction.LoadDataSetAction));
+                } else {
+                    MFM.logger.addToList("Process finished with exit code 6", true);
+                    MFM.exit(6);
+                }
             }
             loadData(dataSet2.getFilePath());
         } else {
@@ -291,7 +305,6 @@ public class MFM_Data {
         }
         loadDataSet(dataSet);
     }
-
 
     File getControllerLabelsFile() {
         return controllersLabelsFile;
@@ -358,7 +371,7 @@ public class MFM_Data {
 
     public void setMame(Mame mame) {
         MFM_Data.mame = mame;
-        MFMSettings.getInstance().setDataVersion(mame.getBuild());
+        MFMSettings.getInstance().generateDataVersion(mame.getBuild());
         setDataVersion(MFMSettings.getInstance().getDataVersion());
     }
 
@@ -392,6 +405,7 @@ public class MFM_Data {
     // Nested classes to just keep all the logic and data related storage in the same place
     private static final class MFM_Data_Sets implements Serializable {
         private static final long serialVersionUID = 6923846781578691002L;
+
         transient Path dataDirPath = Paths.get(MFM.MFM_DATA_DIR);
         transient PathMatcher filter =
                 dataDirPath.getFileSystem().getPathMatcher("glob:**/MFM_MAME*.zip");

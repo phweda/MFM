@@ -19,7 +19,6 @@
 package Phweda.MFM;
 
 import Phweda.MFM.UI.MAMEtoJTree;
-import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.Utils.ParseCommandList;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
@@ -126,6 +125,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                 mame = loadMame();
             }
             if (mame == null || parse) {
+                System.out.println("**** Parsing MAME ****");
                 // With 0.85 Parse MAME if one is set, or Quit
                 MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
                 generateAllMameData(isALL());
@@ -134,11 +134,19 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
 
             loadCaches();
             loadINIs();
+            MFMListBuilder.initLists(parse);
+            MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, true);
         } catch (Exception exc) {
             if (MFM.isDebug()) {
-                MFM.logger.addToList("Exception loading Mame and data objects : " +
-                        exc.getClass().getCanonicalName());
+                if (parse) {
+                    MFM.logger.addToList("Exception parsing Mame : " +
+                            exc.getClass().getCanonicalName());
+                } else {
+                    MFM.logger.addToList("Exception loading Mame and data objects : " +
+                            exc.getClass().getCanonicalName());
+                }
                 exc.printStackTrace();
+                MFM.exit(9);
             }
             // Removed for 0.85 no longer needed
         }
@@ -155,7 +163,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         mameJTreePanel = MAMEtoJTree.getInstance(true);
     }
 
-    public static boolean isALL(){
+    public static boolean isALL() {
         return MFM.isProcessAll() | MFMSettings.getInstance().isPreMAME143exe();
     }
 
@@ -200,7 +208,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         // NOTE order makes a difference!!
         mame = generateMame(all);
         getParsedData();
-        MFMListGenerator.getInstance().generateMFMLists(); // fixme is this correct place?
 
         if (mame != null) {
             // Persist it
@@ -217,7 +224,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             if (categoryMachines != null) {
                 MFM_Data.getInstance().setStaticData(CATEGORYMACHINES, categoryMachines);
             }
-            MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, true);
         } else {
             MFM.logger.separateLine();
             MFM.logger.addToList(
@@ -407,6 +413,9 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     }
 
     public static Machine getMachine(String machineName) {
+        if (mame.getMachineMap().get(machineName) == null) {
+            System.out.println("MAMEInfo null Machine in getMachine is: " + machineName);
+        }
         return mame.getMachineMap().get(machineName);
     }
 
