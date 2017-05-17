@@ -131,7 +131,7 @@ public final class MFM_Constants {
 
     static {
         File folderNamesFile = MFM_Data.getInstance().getFolderNamesFile();
-        if (folderNamesFile.exists()) {
+        if (folderNamesFile != null && folderNamesFile.exists()) {
             try {
                 Object[] folders = Files.readAllLines(folderNamesFile.toPath()).toArray();
                 MAME_FOLDER_NAMES_ARRAY = Arrays.copyOf(folders, folders.length, String[].class);
@@ -139,7 +139,7 @@ public final class MFM_Constants {
                 e.printStackTrace();
             }
         } else {
-            MAME_FOLDER_NAMES_ARRAY = (String[]) folderNames.toArray();
+            MAME_FOLDER_NAMES_ARRAY = folderNames.toArray(new String[folderNames.size()]);
         }
     }
 }
