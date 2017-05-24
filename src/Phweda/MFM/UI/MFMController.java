@@ -21,6 +21,7 @@ package Phweda.MFM.UI;
 import Phweda.MFM.*;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Device;
+import Phweda.MFM.mame.MAME_Stats;
 import Phweda.MFM.mame.Machine;
 import Phweda.utils.*;
 
@@ -720,6 +721,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             showNextList(false, false);
         }
 
+        if ((e.getKeyCode() == KeyEvent.VK_COMMA) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+            new MAME_Stats().saveStats();
+        }
+
     }
 
     @Override
@@ -1019,8 +1024,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             }
         }
 
-        if (dataSet != null && !dataSet.isEmpty()) {
+        if (dataSet != null && !dataSet.isEmpty() && !dataSet.equals("null")) {
             mfmSettings.setDataVersion(dataSet);
+        } else {
+            return;
         }
 
         if (mainFrame != null) {
