@@ -20,7 +20,6 @@ package Phweda.MFM.UI;
 
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MAMEexe;
-import Phweda.MFM.MFM;
 import Phweda.MFM.mame.*;
 
 import javax.swing.*;

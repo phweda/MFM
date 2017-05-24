@@ -18,10 +18,10 @@
 
 package Phweda.MFM.mame;
 
-import Phweda.MFM.MAMEexe;
 import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFMSettings;
+import Phweda.MFM.MAMEexe;
 import Phweda.MFM.MFM;
+import Phweda.MFM.MFMSettings;
 
 import java.io.BufferedReader;
 import java.io.IOException;

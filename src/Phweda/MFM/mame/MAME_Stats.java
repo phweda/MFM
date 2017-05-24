@@ -83,7 +83,7 @@ public class MAME_Stats {
         try (PrintWriter pw = new PrintWriter(new File(MFM.MFM_LISTS_DIR +
                 MFM_Data.getInstance().getDataVersion() + "_stats.csv"))) {
             pw.println(getHeaderLine());
-        //    pw.println(getDescriptionLine());
+            //    pw.println(getDescriptionLine());
             pw.println(getCountsLine());
             pw.flush();
         } catch (FileNotFoundException e) {

@@ -1138,7 +1138,7 @@ public class Machine implements Serializable {
     }
 
     public int getButtons() {
-        if(getInput() != null && getInput().getButtons() != null){
+        if (getInput() != null && getInput().getButtons() != null) {
             buttons = Integer.parseInt(getInput().getButtons());
         }
         if (buttons == -1) {

@@ -80,6 +80,7 @@ public class MFMOptionPane {
         static final String SELECTALL = "Select All";
         static final String COPY = "Copy";
         static final String SAVETOFILE = "Save to File";
+
         private MFMOptionAction(String name) {
             super(name);
         }

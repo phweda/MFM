@@ -1,4 +1,3 @@
-
 /*
  * MAME FILE MANAGER - MAME resources management tool
  * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com

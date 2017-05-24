@@ -26,11 +26,14 @@
 
 package Phweda.MFM.mame;
 
-import java.io.Serializable;
-import java.util.*;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -70,8 +73,8 @@ public class Mame implements Serializable {
     private static final long serialVersionUID = -2353256163229379894L;
 
     @XmlElements({
-            @XmlElement(name="machine", type=Machine.class),
-            @XmlElement(name="game", type=Machine.class)
+            @XmlElement(name = "machine", type = Machine.class),
+            @XmlElement(name = "game", type = Machine.class)
     })
     protected Set<Machine> machine;
     @XmlAttribute(name = "build")

@@ -110,7 +110,7 @@ public class ParseAllMachinesInfo {
         machineList = new ArrayList<String>();
         Document dom = null;
         for (String str : prefixes) {
-          //  getMachineInfo(dom, str);
+            //  getMachineInfo(dom, str);
             dom = null;
             // TODO figure out which version it is
             if (MAMEInfo.getVersionDouble() < 0.139d) {

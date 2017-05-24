@@ -165,6 +165,7 @@ class PercentLayout implements LayoutManager2 {
     public PercentLayout() {
         this(HORIZONTAL, 0);
     }
+
     public PercentLayout(int orientation, int gap) {
         setOrientation(orientation);
         this.gap = gap;

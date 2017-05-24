@@ -86,7 +86,7 @@ class MachineListTableModel extends AbstractTableModel {
         if (machine == null) {
             if (columnIndex == MachineListTable.keyColumn) {
                 String message = "MachineListTableModel.java:88 machine is null " + list[rowIndex];
-                if(MFM.isSystemDebug()){
+                if (MFM.isSystemDebug()) {
                     System.out.println(message);
                 }
                 MFM.logger.out(message);

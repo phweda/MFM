@@ -145,7 +145,7 @@ public final class MFMListBuilder {
             System.exit(5);
         }
 
-        if(playLists != null){
+        if (playLists != null) {
             MFMPlayLists.getInstance().refreshLists();
         }
         playLists = MFMPlayLists.getInstance();
@@ -761,6 +761,11 @@ public final class MFMListBuilder {
             language = languageIn;
         }
 
+        /**
+         * This is the core functionality.
+         *
+         * @return filtered list
+         */
         public final TreeSet<String> generateList() {
             // fixme probably should just use single list
             TreeSet<String> baseList;
@@ -865,7 +870,6 @@ public final class MFMListBuilder {
                 baseList.retainAll(tempList);
             }
 
-            //    TreeSet<String> selectedControls = new TreeSet<String>(this.controls);
             TreeSet<String> expandedControls = expandControls(this.controls);
             if (MFM.isSystemDebug()) {
                 System.out.println("Expanded Controls are : " + expandedControls);
@@ -935,7 +939,6 @@ public final class MFMListBuilder {
             }
             return true;
         }
-
 
         // If simultaneous is selected ignore Players settings
         private boolean checkButtonsPlayers(int machineButtons, int machinePlayers) {
