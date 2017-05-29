@@ -160,7 +160,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         // Parse MAME special case
         MFM_Data.getInstance().setLoaded();
         loadMameResources();
-        mameJTreePanel = MAMEtoJTree.getInstance(true);
     }
 
     public static boolean isALL() {
