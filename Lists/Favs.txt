@@ -3,11 +3,12 @@ arkanoid
 asteroid
 btime
 centiped
+defender
 depthch
 dkong
+drmario
 frogger
 galaga
-galgame2
 invaders
 klax
 llander
