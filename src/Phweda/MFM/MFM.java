@@ -54,8 +54,8 @@ public class MFM {
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
     public static final String VERSION = "Version 0.8.5";
-    public static final String BUILD = "BUILD 0.8.108";
-    public static final String RELEASE_DATE = "Released : May 2017";
+    public static final String BUILD = "BUILD 0.8.500";
+    public static final String RELEASE_DATE = "Released : June 2017";
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION + "  :  " + MFM.BUILD;
 
     public static int logNumber;
