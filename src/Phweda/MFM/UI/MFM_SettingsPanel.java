@@ -125,10 +125,10 @@ final class MFM_SettingsPanel extends JPanel {
         MAMEVidsPath.addMouseListener(controller);
         MAMEVidsPath.setToolTipText("Click here and select the Directory of your MAME videos");
 
-        JLabel MAMEPLAYPATHlabel = new JLabel("<HTML>Select playing root Directory to place MAME resources</HTML>");
+        JLabel MAMEPLAYPATHlabel = new JLabel("<HTML>Select Playset Directory to place MAME resources</HTML>");
         MAMEPlayPath.setName(MFM_Constants.PLAYSET_ROOT_DIRECTORY);
         MAMEPlayPath.addMouseListener(controller);
-        MAMEPlayPath.setToolTipText("Click here to set the Directory where you want your playset");
+        MAMEPlayPath.setToolTipText("Click here to set the Directory where you want your Playset");
 
         JLabel SLROMSlabel = new JLabel("<HTML>Select root Directory full Software List ROMs</HTML>");
         SoftwareListRomsPath.setName(MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY);
