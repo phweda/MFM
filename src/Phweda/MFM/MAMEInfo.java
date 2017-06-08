@@ -18,7 +18,6 @@
 
 package Phweda.MFM;
 
-import Phweda.MFM.UI.MAMEtoJTree;
 import Phweda.MFM.Utils.ParseCommandList;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
@@ -52,7 +51,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     // TODO figure out if we now need this and start to eliminate static calls 3/30/2017
     private static final ParseAllMachinesInfo PAMI = new ParseAllMachinesInfo();
 
-    private static MAMEtoJTree mameJTreePanel;
     private static int runnable;
     private static HashMap<String, HashMap<String, String>> commands; // From -showusage
     private static ArrayList<String> allCategories;  // From catver_full.ini or catver.ini
@@ -420,10 +418,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
 
     public static HashMap<String, Map> getINIfiles() {
         return INIfiles;
-    }
-
-    public static MAMEtoJTree getMameJTreePanel() {
-        return mameJTreePanel;
     }
 
     private static void createCatHierarchy(ArrayList<String> categories) {

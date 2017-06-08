@@ -955,7 +955,12 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         JDialog dialog = new JDialog(getFrame(), machineName);
         JScrollPane scrollPane = new JScrollPane();
 
-        JTree tree = new JTree(MAMEInfo.getMameJTreePanel().getMachineNode(machineName));
+        DefaultMutableTreeNode machineNode = MAMEtoJTree.getInstance(false).getMachineNode(machineName);
+        if (machineNode == null) {
+            return; // probably should notify user but we should never get here
+        }
+
+        JTree tree = new JTree(machineNode);
 
         // Duplicative of MAMEtoJTree fixme maybe our own treelistener?
         tree.addMouseListener(new MouseAdapter() {
