@@ -138,10 +138,10 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             if (MFM.isDebug()) {
                 if (parse) {
                     MFM.logger.addToList("Exception parsing Mame : " +
-                            exc.getClass().getCanonicalName());
+                            exc.getClass().getCanonicalName(), true);
                 } else {
                     MFM.logger.addToList("Exception loading Mame and data objects : " +
-                            exc.getClass().getCanonicalName());
+                            exc.getClass().getCanonicalName(), true);
                 }
                 exc.printStackTrace();
                 MFM.exit(9);

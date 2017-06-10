@@ -344,6 +344,7 @@ public class MFM {
         }
         if (status != 0) {
             System.err.println("Process finished with exit code " + status);
+            logger.addToList("Process finished with exit code " + status, true);
         }
         System.exit(status);
     }
