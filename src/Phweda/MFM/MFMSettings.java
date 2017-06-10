@@ -455,7 +455,14 @@ public class MFMSettings {
             version = (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
         }
         version = version.substring(version.indexOf('.') + 1);// remove "0." for comparison
-        return Double.valueOf(version) <= DBL_143;
+        // Edge 'bad user' case
+        try {
+            return Double.valueOf(version) <= DBL_143;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            MFM.logger.out("Version is not a number : " + version);
+        }
+        return false;
     }
 
     public boolean isFullXMLcompatible() {
@@ -649,8 +656,9 @@ public class MFMSettings {
      * Parse version to split on 172/173 - -listxml changed there and with going to full XML import
      * we need to differentiate for method of data extraction and access
      *
-     * @deprecated 0.85 no longer needed
+     * @Deprecated 0.85 no longer needed
      */
+    @Deprecated
     private void checkFullXMLCompatible() {
         fullXMLcompatible = MAME_Compatible.versionNew(getMAMEVersion());
         mfmSettings.put(MFM_Constants.COMPATIBLE, fullXMLcompatible);
