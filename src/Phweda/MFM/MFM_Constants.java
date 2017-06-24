@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 
 /**
  * Created by IntelliJ IDEA.
@@ -128,6 +129,7 @@ public final class MFM_Constants {
             "Software Lists", "titles", "titles_SL", "versus", "video", "videosnaps"}));
     // TODO now this is dynamic should move WHERE?
     public static String[] MAME_FOLDER_NAMES_ARRAY;
+    public static String[] yearsList;
 
     static {
         File folderNamesFile = MFM_Data.getInstance().getFolderNamesFile();
@@ -140,6 +142,15 @@ public final class MFM_Constants {
             }
         } else {
             MAME_FOLDER_NAMES_ARRAY = folderNames.toArray(new String[folderNames.size()]);
+        }
+
+        int offset = 4;
+        int finalYear = Calendar.getInstance().get(Calendar.YEAR) - offset;
+        yearsList = new String[finalYear - 1974];
+        yearsList[0] = "All";
+        int k = 1;
+        for(int i = 1975; i < finalYear; i++){
+            yearsList[k++] = String.valueOf(i);
         }
     }
 }
