@@ -335,7 +335,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
      * @deprecated since 0.85 with multiple Data sets
      */
     public static String getVersion() {
-        // Bug with this older Mame versions do not have the build Attribute
+        // Bug with this. Older Mame versions do not have the build Attribute
         //    return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
         return MFMSettings.getInstance().getDataVersion();
     }
