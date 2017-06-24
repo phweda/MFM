@@ -27,6 +27,7 @@ package Phweda.MFM;
 
 import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.UI.MFMUI_Setup;
+import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Machine;
 import Phweda.utils.PersistUtils;
@@ -38,12 +39,13 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static Phweda.utils.FileUtils.stripSuffix;
 
 /**
  * Adding more built in lists i.e. noclones and PD VIDs
@@ -168,7 +170,7 @@ public final class MFMListBuilder {
         return lists.get(DEVICES);
     }
 
-    static TreeSet<String> getRunnableList() {
+    public static TreeSet<String> getRunnableList() {
         return lists.get(RUNNABLE);
     }
 
@@ -343,32 +345,8 @@ public final class MFMListBuilder {
 
     }
 
-    public static String importList(Container container) {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_LISTS_DIR);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.showDialog(null, JFileChooser.APPROVE_SELECTION);
 
-        File file = fileChooser.getSelectedFile();
-
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines(file.toPath(), Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String fileName = stripSuffix(file.getName());
-        String[] machines = lines.toArray(new String[lines.size()]);
-        createPlayList(fileName, machines, container);
-
-        return fileName;
-    }
-
-    public static void createPlayList(String name, String[] list, Container container) {
-        boolean ok = MFMListBuilder.checkListName(name, container);
-        if (!ok) {
-            return;
-        }
+    public static void createPlayList(String name, String[] list) {
         MFMPlayLists.getInstance().createPlayList(name, checkList(list));
         MFMUI_Setup.getInstance().updateMenuBar(name);
     }
@@ -381,32 +359,6 @@ public final class MFMListBuilder {
             }
         }
         return newList;
-    }
-
-    private static boolean checkListName(String name, Component comp) {
-
-        if (playLists.getALLPlayListsTree().containsKey(name)) {
-            if (playLists.getMyPlayListsTree().containsKey(name)) {
-                int result = JOptionPane.showConfirmDialog(comp,
-                        "That list name already exists. Overwrite it?", "", JOptionPane.YES_NO_OPTION);
-                if (result == JOptionPane.NO_OPTION) {
-                    return false;
-                }
-            } else {
-                JOptionPane.showMessageDialog(comp, "Please rename that is a reserved list name.");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static String stripSuffix(String fileName) {
-        // Strip suffix
-        int pos = fileName.lastIndexOf(".");
-        if (pos > 0) {
-            fileName = fileName.substring(0, pos);
-        }
-        return fileName;
     }
 
     public static void diffLists(Frame frame) {
@@ -481,25 +433,13 @@ public final class MFMListBuilder {
         dialog.setVisible(true);
     }
 
-    public static Object[] getRunnableArray() {
-        return getRunnableList().toArray();
+    public static String[] getRunnableArray() {
+        return getRunnableList().toArray(new String[getRunnableList().size()]);
     }
 
-    public static void dumpListData(String list) {
-        File newFile = new File(MFM.MFM_LISTS_DIR + list +
-                MFM_Data.getInstance().getDataVersion() + "_data.csv");
-        TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
-        PrintWriter pw = null;
-        try {
-            pw = new PrintWriter(newFile);
-            pw.println(Machine.CSV_HEADER);
-            for (String machine : machines) {
-                pw.println(MAMEInfo.getMachine(machine).toString());
-            }
-            pw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void createListfromDAT(String listName, Datafile DAT) {
+        TreeSet<String> list = MFMListGenerator.getInstance().generateListfromDAT(DAT);
+        MFMPlayLists.getInstance().createPlayList(listName, list);
     }
 
     // TODO Should this NOT be inner class

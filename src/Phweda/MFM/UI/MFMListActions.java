@@ -22,6 +22,7 @@ import Phweda.MFM.*;
 import Phweda.MFM.Utils.MFMFileOps;
 import Phweda.MFM.Utils.MFM_DATmaker;
 import Phweda.MFM.datafile.Datafile;
+import Phweda.MFM.mame.Machine;
 import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
@@ -31,9 +32,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -41,7 +45,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import static Phweda.MFM.MFMListBuilder.createPlayList;
 import static Phweda.MFM.UI.MFMController.*;
+import static Phweda.utils.FileUtils.stripSuffix;
 
 /**
  * Created by IntelliJ IDEA.
@@ -133,6 +139,14 @@ class MFMListActions {
         return result;
     }
 
+    static void showListEditor() {
+        Dialog listEditorDialog = new JDialog(mainFrame, MFMAction.ListEditorAction);
+        listEditorDialog.add(ListEditor.getInstance().$$$getRootComponent$$$());
+        listEditorDialog.pack();
+        listEditorDialog.setLocationRelativeTo(mainFrame);
+        listEditorDialog.setVisible(true);
+    }
+
     static void ListtoFile() {
         Object[] data = MFMPlayLists.getInstance().PlayListNames();
         final String listName = pickList(true, "Select list to Save");
@@ -166,18 +180,140 @@ class MFMListActions {
         final String listName = pickList(true, "Select list for DAT");
         if (listName != null) {
             MFM.logger.addToList("DAT for " + listName + " is being created and saved to file", true);
-            TreeSet<String> ts = MFMPlayLists.getInstance().getPlayList(listName);
-            //    File DATFile = new File(MFM.MFM_LISTS_DIR + list + " " + MAMEInfo.getVersion().substring(0, 5) + ".DAT");
+            TreeSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
             try {
-                Datafile DATFile = MFM_DATmaker.generateDAT(listName, ts);
+                Datafile DATFile = MFM_DATmaker.generateDAT(listName, list);
                 PersistUtils.saveDATtoFile(DATFile, MFM.MFM_LISTS_DIR + listName +
                         "(" + MFM_Data.getInstance().getDataVersion() + ").dat");
-            } catch (ParserConfigurationException | TransformerException | JAXBException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException | ParserConfigurationException | TransformerException | JAXBException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    static String DATtoList() {
+        File inputDATfile = pickDAT();
+        if (inputDATfile != null) {
+            Datafile DATfile = (Datafile) PersistUtils.retrieveJAXB(inputDATfile.getAbsolutePath(), Datafile.class);
+            MFMListBuilder.createListfromDAT(inputDATfile.getName(), DATfile);
+            return inputDATfile.getName();
+        } else {
+            return "";
+        }
+    }
+
+    static void FilterDATbyList() {
+        String list = pickList(true, "Select filter List");
+        File inputDATfile = pickDAT();
+        if (inputDATfile != null) {
+
+        } else {
+
+        }
+    }
+
+    static void FilterDATbyExternalList() {
+        File externalList = pickListFile();
+        if (externalList != null) {
+            File inputfile = pickDAT();
+            Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputfile.getPath(), Datafile.class);
+            if (inputDAT != null) {
+                try {
+                    Datafile DATFile = MFM_DATmaker.filterDATbyList(inputDAT, FileUtils.listFromFile(externalList));
+                    PersistUtils.saveDATtoFile(DATFile, MFM.MFM_LISTS_DIR + "filtered" + inputfile.getName());
+                } catch (FileNotFoundException | ParserConfigurationException |
+                        TransformerException | JAXBException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private static File pickDAT() {
+        JFileChooser fileChooser = new JFileChooser(MFM.MFM_DIR);
+        fileChooser.setPreferredSize(new Dimension(640, 480));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle("Select DAT File");
+
+        int returnValue = fileChooser.showDialog(mainFrame, "OK");
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }
+        return null;
+    }
+
+    public static void dumpListData(String list) {
+        File newFile = new File(MFM.MFM_LISTS_DIR + list +
+                MFM_Data.getInstance().getDataVersion() + "_data.csv");
+        TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(newFile);
+            pw.println(Machine.CSV_HEADER);
+            for (String machine : machines) {
+                try {
+                    pw.println(MAMEInfo.getMachine(machine).toString());
+                } catch (Exception e) {
+                    // e.printStackTrace(); swallow it older sets missing driver
+                }
+            }
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static String importList(Container container) {
+        JFileChooser fileChooser = new JFileChooser(MFM.MFM_LISTS_DIR);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.showDialog(null, JFileChooser.APPROVE_SELECTION);
+        File file = fileChooser.getSelectedFile();
+
+        java.util.List<String> lines = null;
+        try {
+            lines = Files.readAllLines(file.toPath(), Charset.defaultCharset());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String fileName = stripSuffix(file.getName());
+        boolean ok = checkListName(fileName, container);
+        if (!ok) {
+            return null;
+        }
+
+        String[] machines = lines.toArray(new String[lines.size()]);
+        createPlayList(fileName, machines);
+        return fileName;
+    }
+
+    private static boolean checkListName(String name, Component comp) {
+        if (MFMPlayLists.getInstance().getALLPlayListsTree().containsKey(name)) {
+            if (MFMPlayLists.getInstance().getMyPlayListsTree().containsKey(name)) {
+                int result = JOptionPane.showConfirmDialog(comp,
+                        "That list name already exists. Overwrite it?", "", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.NO_OPTION) {
+                    return false;
+                }
+            } else {
+                JOptionPane.showMessageDialog(comp, "Please rename that is a reserved list name.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static File pickListFile() {
+        JFileChooser fileChooser = new JFileChooser(MFM.MFM_DIR);
+        fileChooser.setPreferredSize(new Dimension(640, 480));
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle("Select filter List File");
+
+        int returnValue = fileChooser.showDialog(mainFrame, "OK");
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            return fileChooser.getSelectedFile();
+        }
+        return null;
     }
 
     private static void resourcestoFile(String list, TreeMap<String, Object> files) {
