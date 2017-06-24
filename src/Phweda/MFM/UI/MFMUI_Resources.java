@@ -39,10 +39,6 @@ public class MFMUI_Resources {
     static final String MFM_HTML = "MFM.html";
     static final String MFM_COPYRIGHT_HTML = "MFM Copyright.html";
     static final String GNU_GPL_V3 = "GNU GPL V3.html";
-//    static final String USAGE = "Usage.html";
-//    static final String MFM_Bugs = "MFM-bugs.html";
-//    static final String HOTKEYS = "Hotkeys.html";
-
     // Icons
     static final String A_PNG = "A.png";
     static final String Arrow_PNG = "Arrow.png";
@@ -59,6 +55,7 @@ public class MFMUI_Resources {
     static final String VDUB = "vdub_32.png";
     static final String MAME_LOGO = "mame-logo.png";
     static final String MAME_LOGO_SMALL = "mame-logo-SM.png";
+    static final String CIRCULAR_ARROW = "circular_arrow.png";
     private static final String BUTTON_CONTROL_IMG = "Button_control.png";
     private static final String DBL_JOYSTICK_CONTROL_IMG = "2Joystick_control.png";
     private static final String DIAL_CONTROL_IMG = "Dial_control.png";
@@ -79,7 +76,7 @@ public class MFMUI_Resources {
     private static HashMap<String, URL> resourceURLs;
     private final String[] resourceNames = {
             MFM_HTML, MFM_COPYRIGHT_HTML, GNU_GPL_V3,
-            A_PNG, Arrow_PNG, C_PNG, CHECKMARK_PNG, EX_PNG, MFM_Icon_PNG, MFM_Image_PNG, Minus_PNG,
+            A_PNG, Arrow_PNG, C_PNG, CHECKMARK_PNG, CIRCULAR_ARROW, EX_PNG, MFM_Icon_PNG, MFM_Image_PNG, Minus_PNG,
             I_PNG, L_PNG, P_PNG, S_PNG,
             UPARROW_PNG, VDUB, MAME_LOGO, MAME_LOGO_SMALL,
             BUTTON_CONTROL_IMG, DBL_JOYSTICK_CONTROL_IMG, DIAL_CONTROL_IMG, GAMBLING_CONTROL_IMG, HANAFUDA_CONTROL_IMG,
@@ -104,7 +101,6 @@ public class MFMUI_Resources {
         URL testURL = this.getClass().getResource("");
         MFM.logger.addToList("Resources : \n" + testURL, true);
         for (String name : resourceNames) {
-
             // NOTE works multisystem with slash it is in .jar that way
             URL url = this.getClass().getResource("Resources" + FileUtils.SLASH + name);
             if (url != null) {
@@ -116,9 +112,7 @@ public class MFMUI_Resources {
                 MFM.logger.addToList("Failed to load resource : " + name, true);
             }
         }
-        //    System.out.println(resourceURLs);
     }
-
 
     HashMap<String, URL> ResourceURLs() {
         return resourceURLs;
