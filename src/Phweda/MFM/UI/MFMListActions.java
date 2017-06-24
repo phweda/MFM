@@ -32,8 +32,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
@@ -108,11 +106,11 @@ class MFMListActions {
             MFMUI_Setup.getInstance().updateMenuBar(newName);
             return;
         }
-        playLists.addGameToPlayList(listName, machine);
+        playLists.addMachineToPlayList(listName, machine);
     }
 
     static void removefromList(String machine, String listName) {
-        MFMPlayLists.getInstance().removeGameFromPlayList(listName, machine);
+        MFMPlayLists.getInstance().removeMachineFromPlayList(listName, machine);
         int row = getMachineListTable().getSelectedRow();
 
         // TODO Refactor with  changeList(listName)

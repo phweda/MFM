@@ -66,7 +66,11 @@ public class MFMAction extends AbstractAction {
     static final String SaveListDataAction = "Save List Data";
     static final String ScanResourcesAction = "Scan Resources";
     static final String SaveListtoFileAction = "Save List to File";
-    static final String ListtoDATAction = "Create List DAT";
+    static final String ListEditorAction = "List Editor";
+    static final String ListtoDATAction = "Create DAT from List";
+    static final String DATtoListAction = "Create List from DAT";
+    static final String FilterDATbyListAction = "Filter DAT by List";
+    static final String FilterDATbyExternalListAction = "Filter DAT by External List";
     static final String MAME_TREEAction = "Show MAME tree";
     static final String MACHINE_TREEAction = "Show Machine tree";
     static final String OpenFileAction = "Open File";
@@ -248,11 +252,15 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case ImportListCommand:
-                    MFMListBuilder.importList(MFMController.getFrame());
+                    controller.importList();
                     break;
 
                 case "Remove List":
                     controller.removeList();
+                    break;
+
+                case ListEditorAction:
+                    controller.listEditor();
                     break;
 
                 case AddtoListAction:
@@ -269,6 +277,18 @@ public class MFMAction extends AbstractAction {
 
                 case ListtoDATAction:
                     controller.ListtoDAT();
+                    break;
+
+                case DATtoListAction:
+                    controller.DATtoList();
+                    break;
+
+                case FilterDATbyListAction:
+                    controller.FilterDATbyList();
+                    break;
+
+                case FilterDATbyExternalListAction:
+                    controller.FilterDATbyExternalList();
                     break;
 
                 case SaveListDataAction:
