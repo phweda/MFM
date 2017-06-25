@@ -25,7 +25,6 @@ import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -38,15 +37,9 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -196,12 +189,12 @@ public class PersistUtils {
      * @param fileName
      * @param _class
      */
-    public static void saveJAXBtoZip(Object obj, ZipOutputStream zipOutputStream, String fileName, Class _class) {
+    public static void saveJAXBtoZip(Object obj, ZipOutputStream zipOutputStream, String fileName, Class _class,
+                                     boolean formatted) {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(_class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            // output optimized not readable
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formatted);
 
             ZipEntry zipEntry = new ZipEntry(fileName);
             zipOutputStream.putNextEntry(zipEntry);
