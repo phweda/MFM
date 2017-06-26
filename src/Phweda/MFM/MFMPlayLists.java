@@ -158,6 +158,7 @@ public class MFMPlayLists implements Serializable {
         myPlayListsTree.put(name, treeSet);
         persistPlayLists();
         allListsNames.add(name);
+        myListsNames.add(name);
         persistPlayLists();
     }
 
@@ -203,6 +204,16 @@ public class MFMPlayLists implements Serializable {
 
     public Object[] myPlayListNames() {
         return myListsNames.toArray();
+    }
+
+    public Object[] getListBuilderNames() {
+        ArrayList<String> builderNames = new ArrayList<String>();
+        if (MFMSettings.getInstance().getDataVersion().contains(MFMListBuilder.ALL)) {
+            builderNames.add(MFMListBuilder.RUNNABLE);
+        }
+        builderNames.add(MFMListBuilder.ALL);
+        builderNames.addAll(myListsNames);
+        return builderNames.toArray();
     }
 
     public TreeSet<String> getPlayList(String name) {
