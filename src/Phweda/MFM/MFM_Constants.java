@@ -147,7 +147,7 @@ public final class MFM_Constants {
         int offset = 4;
         int finalYear = Calendar.getInstance().get(Calendar.YEAR) - offset;
         yearsList = new String[finalYear - 1974];
-        yearsList[0] = "All";
+        yearsList[0] = MFMListBuilder.ALL; // bad design fixme maybe should be here
         int k = 1;
         for(int i = 1975; i < finalYear; i++){
             yearsList[k++] = String.valueOf(i);
