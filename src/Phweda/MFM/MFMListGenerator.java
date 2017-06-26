@@ -19,6 +19,7 @@
 package Phweda.MFM;
 
 import Phweda.MFM.Utils.ParseFolderINIs;
+import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Machine;
 
 import java.io.FileNotFoundException;
@@ -93,7 +94,6 @@ class MFMListGenerator {
                 set.removeIf(machineName -> !allList.contains(machineName))
         );
         // Remove any empty lists
-        // fixme not removing empty set i.e Swedish
         languagesMap.entrySet().removeIf(set -> set.getValue().isEmpty());
     }
 
@@ -298,5 +298,11 @@ class MFMListGenerator {
             }
         }
         return languagesListMap;
+    }
+
+    TreeSet<String> generateListfromDAT(Datafile DAT){
+        TreeSet<String> list = new TreeSet<String>();
+        DAT.getGame().forEach(game -> list.add(game.getName()));
+        return list;
     }
 }
