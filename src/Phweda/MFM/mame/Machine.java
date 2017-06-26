@@ -1143,7 +1143,7 @@ public class Machine implements Serializable {
         if (getInput() != null && getInput().getButtons() != null) {
             buttons = Integer.parseInt(getInput().getButtons());
         }
-        if (buttons == -1) {
+        if (buttons == -1 && getInput() != null && getInput().getControl() != null) {
             for (Control control : this.getInput().getControl()) {
                 String tempStr = control.getButtons();
                 if (tempStr != null && !tempStr.isEmpty()) {
