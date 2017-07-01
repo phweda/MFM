@@ -125,6 +125,10 @@ class MFMListGenerator {
                     allList.add(machineName);
                 }
 
+                if (machine.getIsmechanical().equals(Machine.YES)) {
+                    mechanicalList.add(machineName);
+                }
+
                 // Create System & Arcade lists
                 String category = machine.getCategory();
                 category = category.trim();
