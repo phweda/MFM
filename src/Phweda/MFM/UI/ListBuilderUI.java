@@ -59,15 +59,11 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
     private JPanel MAMEPanel;
     private JPanel categoriesCBpanel;
 
-    private static final JTextArea newListGames = new JTextArea();
-
     private JComboBox<String> gameButtonsNum;
     private JComboBox<Integer> gamePlayersNum;
     private JTextField listNameTF;
 
     private JButton createListButton;
-    private JButton populateListButton;
-    private JButton gamePickerButton;
     private JButton importListButton;
 
     private JRadioButton bothRadioButton = new JRadioButton();
@@ -93,7 +89,6 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
     private JRadioButton vectorRadioButton = new JRadioButton();
     private JRadioButton allDisplaysRadioButton = new JRadioButton();
 
-    private JButton diffListsButton;
     private JScrollPane controlsScrollPane;
     private JCheckBox noImperfectCheckBox;
     private JComboBox<String> joyComboBox;
@@ -101,23 +96,34 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
     private JCheckBox exactMatchOnlyCheckBox;
     private JButton saveListToFileButton;
     private JPanel filterJPanel;
-    private JComboBox<String> languagesCombobox;
+    private JComboBox<String> languagesComboBox;
+    private JComboBox yearComboBox;
+    private JCheckBox noMechanicalCheckBox;
+    private JComboBox baseListComboBox;
+    private JPanel UIControlsScrollPanel;
+    private JPanel UIRightPanel;
+
+    private JPanel controlsRBPanel;
+    private JRadioButton anyControlsRB = new JRadioButton();
+    private JRadioButton allControlsRB = new JRadioButton();
+    private JRadioButton exactControlsRB = new JRadioButton();
+
+    private JLabel baseListLabel;
 
     private static final String VIEW_ALL_CATEGORIES_COMMAND = "View All Categories";
     private static final String SELECT_ALL_CATEGORIES_COMMAND = "Select All Categories";
     private static final String ARCADE_ONLY_COMMAND = "Arcade only";
     private static final String NO_MATURE_COMMAND = "No Mature";
+    private static final String NO_MECHANICAL_COMMAND = "No Mechanical";
     private static final String SYSTEMS_ONLY_COMMAND = "Systems only";
     private static final String BOTH_COMMAND = "Both";
 
-    private static final String ALL_COMMAND = "All";
+    private static final String ALL_ORIENTATIONS_COMMAND = "All Orientations";
     private static final String VERTICAL_COMMAND = "Vertical";
     private static final String HORIZONTAL_COMMAND = "Horizontal";
     private static final String COCKTAIL_COMMAND = "Cocktail";
 
-    private static final String GAMEBUTTONS_COMMAND = "GameButtons";
     private static final String GAMEBUTTONS_ORLESS_COMMAND = "GameButtonsorless";
-    private static final String PLAYERS_COMMAND = "Players";
     private static final String PLAYERS_ORLESS_COMMAND = "Playersorless";
     private static final String SIMULTANEOUS_COMMAND = "Simultaneous";
     private static final String NOCLONES_COMMAND = "No Clones";
@@ -127,13 +133,13 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
     private static final String VECTOR_COMMAND = "Vector";
     private static final String LCD_COMMAND = "LCD";
 
-    private static final String JOY_WAYS_COMMAND = "joyCBCommand";
-    private static final String DOUBLEJOY_WAYS_COMMAND = "doublejoyCBCommand";
+    private static final String CREATE_LIST_COMMAND = "Create List";
+    private static final String IMPORT_LIST_COMMAND = "Import List";
+    private static final String LIST_EDITOR_COMMAND = "List Editor";
 
-    private static final String CREATE_LIST = "Create List";
-    private static final String IMPORT_LIST = "Import List";
-    private static final String GAME_PICKER = "Game Picker";
-    private static final String DIFF_LISTS = "Diff Lists";
+    private static final String ANY_CONTROLS_COMMAND = "AnyControls";
+    private static final String ALL_CONTROLS_COMMAND = "AllControls";
+    private static final String EXACT_CONTROLS_COMMAND = "ExactControls";
 
     static final String Previous = "Previous";
     static final String New = "New";
@@ -182,7 +188,8 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gamePlayersNum.setSelectedIndex(gamePlayersNum.getModel().getSize() - 1);
         orLessPlayersCB.setSelected(true);
 
-        languagesCombobox.setSelectedIndex(0);
+        languagesComboBox.setSelectedIndex(0);
+        yearComboBox.setSelectedIndex(0);
     }
 
     void setState(String state) {
@@ -232,15 +239,11 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
             case MFMListBuilder.SIMULTANEOUS:
                 simultaneousCB.setSelected(true);
                 break;
-/*
-            case MFMListBuilder. :
-                .setSelected(true);
-                break;
-*/
+
             // Handle languages with default
             default:
                 if (MFMPlayLists.getInstance().getLanguagesListMap().containsKey(state)) {
-                    languagesCombobox.getModel().setSelectedItem(state);
+                    languagesComboBox.getModel().setSelectedItem(state);
                 }
                 break;
         }
@@ -286,13 +289,15 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
 
     }
 
-
     private void addItemListeners() {
         gameButtonsNum.addItemListener(this);
         gamePlayersNum.addItemListener(this);
 
         joyComboBox.addItemListener(this);
         doubleJoyComboBox.addItemListener(this);
+
+        yearComboBox.addItemListener(this);
+        baseListComboBox.addItemListener(this);
     }
 
     /**
@@ -320,6 +325,9 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         }
 
         if (MFM.isDebug()) {
+            if (MFM.isSystemDebug()) {
+                System.out.println("ListBuilderUI command is: " + command);
+            }
             MFM.logger.addToList("ListBuilderUI command is: " + command, true);
         }
 
@@ -351,6 +359,10 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
                 MFMListBuilder.Builder.setNoMature(((AbstractButton) e.getSource()).isSelected());
                 break;
 
+            case NO_MECHANICAL_COMMAND:
+                MFMListBuilder.Builder.setNoMechanical(((AbstractButton) e.getSource()).isSelected());
+                break;
+
             case BOTH_COMMAND:
                 showCategories();
                 if ((((AbstractButton) e.getSource()).isSelected())) {
@@ -358,7 +370,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
                 }
                 break;
 
-            case ALL_COMMAND:
+            case ALL_ORIENTATIONS_COMMAND:
                 if ((((AbstractButton) e.getSource()).isSelected())) {
                     MFMListBuilder.Builder.orientation.setState(QuadState.ALL);
                 }
@@ -406,18 +418,8 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
                 }
                 break;
 
-            case GAMEBUTTONS_COMMAND:
-                MFMListBuilder.Builder.buttons = Integer.getInteger(
-                        (String) ((JComboBox<String>) e.getSource()).getSelectedItem());
-                break;
-
             case GAMEBUTTONS_ORLESS_COMMAND:
                 MFMListBuilder.Builder.orLessButtons = (((AbstractButton) e.getSource()).isSelected());
-                break;
-
-            case PLAYERS_COMMAND:
-                MFMListBuilder.Builder.players = Integer.getInteger(
-                        (String) ((JComboBox<String>) e.getSource()).getSelectedItem());
                 break;
 
             case PLAYERS_ORLESS_COMMAND:
@@ -432,36 +434,50 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
                 MFMListBuilder.Builder.noClones = (((AbstractButton) e.getSource()).isSelected());
                 break;
 
-            case CREATE_LIST:
+            case CREATE_LIST_COMMAND:
                 createList(listNameTF.getText());
                 break;
 
-            case IMPORT_LIST:
-                String listName = MFMListBuilder.importList(getListBuilderPanel());
-                MFMUI_Setup.getInstance().updateMenuBar(listName);
+            case IMPORT_LIST_COMMAND:
+                controller.importList();
                 break;
 
-            case GAME_PICKER:
-                // replaced with MFMAction
+            case LIST_EDITOR_COMMAND:
                 // showMachinePicker();
                 break;
 
-            case DIFF_LISTS:
-                MFMListBuilder.diffLists(MFMController.getFrame());
+            case ANY_CONTROLS_COMMAND:
+                MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.ANY_CONTROLS);
                 break;
+
+            case ALL_CONTROLS_COMMAND:
+                MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.ALL_CONTROLS);
+                break;
+
+            case EXACT_CONTROLS_COMMAND:
+                MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.EXACT_CONTROLS);
+                break;
+
         }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
+        if (MFM.isDebug()) {
+            if (MFM.isSystemDebug()) {
+                System.out.println("ListBuilderUI itemState is: " + e.paramString());
+            }
+            MFM.logger.addToList("ListBuilderUI itemState is: " + e.paramString(), true);
+        }
+
         if (e.getSource() == joyComboBox) {
-            if (!((String) joyComboBox.getSelectedItem()).equalsIgnoreCase(ALL_COMMAND)) {
+            if (!((String) joyComboBox.getSelectedItem()).equalsIgnoreCase(ALL_ORIENTATIONS_COMMAND)) {
                 ((DynamicCBpanel) controlsCBPanel).getJCheckBoxbyText(
                         Controllers.getMAMEControllerLabelName("joy")).setSelected(true);
                 MFMListBuilder.Builder.setWays((String) joyComboBox.getSelectedItem());
             }
         } else if (e.getSource() == doubleJoyComboBox) {
-            if (!((String) doubleJoyComboBox.getSelectedItem()).equalsIgnoreCase(ALL_COMMAND)) {
+            if (!((String) doubleJoyComboBox.getSelectedItem()).equalsIgnoreCase(ALL_ORIENTATIONS_COMMAND)) {
                 ((DynamicCBpanel) controlsCBPanel).getJCheckBoxbyText(
                         Controllers.getMAMEControllerLabelName("doublejoy")).setSelected(true);
                 MFMListBuilder.Builder.setWays2((String) doubleJoyComboBox.getSelectedItem());
@@ -475,51 +491,31 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
             MFMListBuilder.Builder.setButtons(selected);
         } else if (e.getSource() == gamePlayersNum) {
             MFMListBuilder.Builder.setPlayers((Integer) gamePlayersNum.getSelectedItem());
+        } else if (e.getSource() == yearComboBox) {
+            MFMListBuilder.Builder.setYear((String) yearComboBox.getSelectedItem());
+        } else if (e.getSource() == baseListComboBox) {
+            MFMListBuilder.Builder.setBaseListName((String) baseListComboBox.getSelectedItem());
         }
     }
 
     private void createList(String listName) {
-
         builder.setCategories(((DynamicCBpanel) categoriesCBpanel).getChecked());
-        // fixme reverse the Controller names Done test 12/24/2016
         builder.setControls(Controllers.getMAMEControllerNames(((DynamicCBpanel) controlsCBPanel).getChecked()));
 
+/*
         // Do here since Builder State is NOT retained in all circumstances
         MFMListBuilder.Builder.setButtons((String) gameButtonsNum.getSelectedItem());
         MFMListBuilder.Builder.setPlayers((Integer) gamePlayersNum.getSelectedItem());
-
-
-        if (bothRadioButton.isSelected()) {
-            MFMListBuilder.Builder.MAME.setState(TriState.BOTH);
-        } else if (arcadeOnlyRadioButton.isSelected()) {
-            MFMListBuilder.Builder.MAME.setState(MFMListBuilder.ARCADE);
-        } else if (systemsOnlyRadioButton.isSelected()) {
-            MFMListBuilder.Builder.MAME.setState(MFMListBuilder.SYSTEMS);
-        }
-
-        if (allDisplaysRadioButton.isSelected()) {
-            MFMListBuilder.Builder.MAME.setState(QuadState.ALL);
-        } else if (horizontalRadioButton.isSelected()) {
-            MFMListBuilder.Builder.MAME.setState(MFMListBuilder.HORIZONTAL);
-        } else if (verticalRadioButton.isSelected()) {
-            MFMListBuilder.Builder.MAME.setState(MFMListBuilder.VERTICAL);
-        } else if (LCDRadioButton.isSelected()) {
-            MFMListBuilder.Builder.MAME.setState(MFMListBuilder.LCD);
-        }
-
-
-        MFMListBuilder.Builder.setOrLessButtons(orLessButtonsCB.isSelected());
-        MFMListBuilder.Builder.setOrLessPlayers(orLessPlayersCB.isSelected());
 
         MFMListBuilder.Builder.setWays((String) joyComboBox.getSelectedItem());
         MFMListBuilder.Builder.setWays2((String) doubleJoyComboBox.getSelectedItem());
         MFMListBuilder.Builder.setExactMatch(exactMatchOnlyCheckBox.isSelected());
 
-        MFMListBuilder.Builder.setNoMature(noMatureCB.isSelected());
-        MFMListBuilder.Builder.setNoClones(noClonesCheckBox.isSelected());
-        MFMListBuilder.Builder.setNoImperfect(noImperfectCheckBox.isSelected());
-        MFMListBuilder.Builder.setLanguage(languagesCombobox.getSelectedItem().toString());
+        MFMListBuilder.Builder.setLanguage(languagesComboBox.getSelectedItem().toString());
+        MFMListBuilder.Builder.setYear(yearComboBox.getSelectedItem().toString());
+        MFMListBuilder.Builder.setBaseListName(baseListComboBox.getSelectedItem().toString());
 
+*/
         TreeSet<String> list = builder.generateList();
         if (list.isEmpty()) {
             JOptionPane.showMessageDialog(getListBuilderPanel(), listName + " : list is empty");
@@ -528,8 +524,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
 
         String[] machines = new String[list.size()];
         Arrays.asList(list.toArray()).toArray(machines);
-        MFMListBuilder.createPlayList(listName, machines, getListBuilderPanel());
-
+        MFMListBuilder.createPlayList(listName, machines);
         getListBuilderPanel().getTopLevelAncestor().requestFocus();
     }
 
@@ -580,7 +575,6 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         ListBuilderPanel.repaint();
     }
 
-
     private void createUIComponents() {
         // TODO: place custom component creation code here
 
@@ -589,9 +583,6 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gameButtonsNum = new JComboBox<String>(MAMEInfo.getNumButtons());
         gameButtonsNum.setSelectedIndex(4);
         gamePlayersNum = new JComboBox<Integer>(MAMEInfo.getNumPlayers());
-
-        listNameLabel = new JLabel();
-        listNameLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
         categoriesCBpanel = new DynamicCBpanel(MFMListBuilder.getAllNoMatureCategoryRoots(), 2);
 
@@ -618,8 +609,14 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         bg3.add(LCDRadioButton);
         allDisplaysRadioButton.setSelected(true);
 
-//****************************************************
+        // Controls filtering type
+        ButtonGroup bg4 = new ButtonGroup();
+        bg4.add(anyControlsRB);
+        bg4.add(allControlsRB);
+        bg4.add(exactControlsRB);
+        anyControlsRB.setSelected(true);
 
+//****************************************************
         // In case somebody deletes or renames the controllers.ini file
         // fixme a little convoluted
         // TreeSet to apply natural ordering
@@ -641,7 +638,6 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
             }
         }
         ((DynamicCBpanel) controlsCBPanel).setToolTips(tooltips);
-
 //****************************************************
 
         controlsScrollPane = new JScrollPane();
@@ -652,16 +648,19 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         CategoriesScrollPane.getVerticalScrollBar().setUnitIncrement(24);
         CategoriesScrollPane.getHorizontalScrollBar().setUnitIncrement(24);
 
-
         saveListToFileButton = new JButton(new MFMAction(MFMAction.SaveListtoFileAction, null));
-        populateListButton = new JButton(new MFMAction(MFMAction.CopyResourcesAction, null));
-        populateListButton.addActionListener(controller);
 
         joyComboBox = new JComboBox<String>(Controllers.getJoysticks());
         doubleJoyComboBox = new JComboBox<String>(Controllers.getDoubleJoysticks());
 
-        languagesCombobox = new JComboBox<String>(MFMPlayLists.getInstance().getLanguagesPLsKeys());
-        languagesCombobox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.gray, Color.gray));
+        languagesComboBox = new JComboBox<String>(MFMPlayLists.getInstance().getLanguagesPLsKeys());
+        languagesComboBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.gray, Color.gray));
+
+        yearComboBox = new JComboBox<String>(MFM_Constants.yearsList);
+        yearComboBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.gray, Color.gray));
+
+        baseListComboBox = new JComboBox(MFMPlayLists.getInstance().getListBuilderNames());
+        //   baseListComboBox.setSelectedItem();
     }
 
 
@@ -679,38 +678,41 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         ListBuilderPanel.setAlignmentY(1.0f);
         ListBuilderPanel.setMaximumSize(new Dimension(1280, 960));
         ListBuilderPanel.setMinimumSize(new Dimension(1080, 750));
-        ListBuilderPanel.setPreferredSize(new Dimension(1280, 900));
+        ListBuilderPanel.setPreferredSize(new Dimension(1280, 920));
         ListBuilderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
-        buttonPanel.setMinimumSize(new Dimension(709, 70));
-        buttonPanel.setPreferredSize(new Dimension(709, 70));
+        buttonPanel.setMaximumSize(new Dimension(1000, 100));
+        buttonPanel.setMinimumSize(new Dimension(700, 70));
+        buttonPanel.setPreferredSize(new Dimension(700, 70));
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 3;
+        gbc.gridx = 1;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.BOTH;
         ListBuilderPanel.add(buttonPanel, gbc);
         buttonPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(), null));
-        listNameTF = new JTextField();
-        listNameTF.setMargin(new Insets(0, 20, 0, 30));
-        listNameTF.setMaximumSize(new Dimension(255, 30));
-        listNameTF.setMinimumSize(new Dimension(255, 30));
-        listNameTF.setOpaque(true);
-        listNameTF.setPreferredSize(new Dimension(255, 30));
+        final JPanel spacer1 = new JPanel();
         gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0.4;
-        gbc.weighty = 1.0;
-        gbc.insets = new Insets(5, 0, 5, 0);
-        buttonPanel.add(listNameTF, gbc);
+        gbc.gridx = 6;
+        gbc.gridy = 0;
+        gbc.weightx = 0.025;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonPanel.add(spacer1, gbc);
+        final JPanel spacer2 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 0;
+        gbc.weightx = 0.1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonPanel.add(spacer2, gbc);
         createListButton = new JButton();
         createListButton.setLabel("Create List");
-        createListButton.setMaximumSize(new Dimension(135, 32));
-        createListButton.setMinimumSize(new Dimension(135, 32));
-        createListButton.setPreferredSize(new Dimension(135, 32));
+        createListButton.setMargin(new Insets(2, 16, 2, 16));
+        createListButton.setMaximumSize(new Dimension(140, 33));
+        createListButton.setMinimumSize(new Dimension(140, 33));
+        createListButton.setPreferredSize(new Dimension(140, 33));
         createListButton.setText("Create List");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -720,6 +722,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 0, 5, 0);
         buttonPanel.add(createListButton, gbc);
+        listNameLabel = new JLabel();
         listNameLabel.setEnabled(true);
         listNameLabel.setHorizontalAlignment(0);
         listNameLabel.setHorizontalTextPosition(0);
@@ -731,60 +734,19 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.SOUTH;
         buttonPanel.add(listNameLabel, gbc);
-        gamePickerButton = new JButton();
-        gamePickerButton.setEnabled(false);
-        gamePickerButton.setHideActionText(true);
-        gamePickerButton.setMaximumSize(new Dimension(135, 32));
-        gamePickerButton.setMinimumSize(new Dimension(135, 32));
-        gamePickerButton.setPreferredSize(new Dimension(135, 32));
-        gamePickerButton.setText("Game Picker");
+        listNameTF = new JTextField();
+        listNameTF.setMargin(new Insets(0, 20, 0, 30));
+        listNameTF.setMaximumSize(new Dimension(255, 33));
+        listNameTF.setMinimumSize(new Dimension(255, 33));
+        listNameTF.setOpaque(true);
+        listNameTF.setPreferredSize(new Dimension(255, 33));
         gbc = new GridBagConstraints();
-        gbc.gridx = 5;
-        gbc.gridy = 0;
-        gbc.weightx = 0.2;
-        gbc.weighty = 0.8;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 0, 5, 0);
-        buttonPanel.add(gamePickerButton, gbc);
-        importListButton = new JButton();
-        importListButton.setMaximumSize(new Dimension(135, 32));
-        importListButton.setMinimumSize(new Dimension(135, 32));
-        importListButton.setPreferredSize(new Dimension(135, 32));
-        importListButton.setText("Import List");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        gbc.weightx = 0.2;
-        gbc.weighty = 0.8;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 0, 5, 0);
-        buttonPanel.add(importListButton, gbc);
-        populateListButton.setMaximumSize(new Dimension(135, 32));
-        populateListButton.setMinimumSize(new Dimension(135, 32));
-        populateListButton.setPreferredSize(new Dimension(135, 32));
-        populateListButton.setText("Copy Resources");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.weightx = 0.2;
-        gbc.weighty = 0.8;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0.4;
+        gbc.weighty = 1.0;
         gbc.insets = new Insets(5, 0, 5, 0);
-        buttonPanel.add(populateListButton, gbc);
-        final JPanel spacer1 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 6;
-        gbc.gridy = 0;
-        gbc.weightx = 0.1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        buttonPanel.add(spacer1, gbc);
-        final JPanel spacer2 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        gbc.weightx = 0.1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        buttonPanel.add(spacer2, gbc);
+        buttonPanel.add(listNameTF, gbc);
         final JPanel spacer3 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
@@ -792,11 +754,25 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.weightx = 0.1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPanel.add(spacer3, gbc);
-        diffListsButton = new JButton();
-        diffListsButton.setMaximumSize(new Dimension(135, 32));
-        diffListsButton.setMinimumSize(new Dimension(135, 32));
-        diffListsButton.setPreferredSize(new Dimension(135, 32));
-        diffListsButton.setText("Diff Lists");
+        importListButton = new JButton();
+        importListButton.setMargin(new Insets(2, 16, 2, 16));
+        importListButton.setMaximumSize(new Dimension(140, 33));
+        importListButton.setMinimumSize(new Dimension(140, 33));
+        importListButton.setPreferredSize(new Dimension(140, 33));
+        importListButton.setText("Import List");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 5;
+        gbc.gridy = 0;
+        gbc.weightx = 0.2;
+        gbc.weighty = 0.8;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        buttonPanel.add(importListButton, gbc);
+        saveListToFileButton.setMargin(new Insets(2, 16, 2, 16));
+        saveListToFileButton.setMaximumSize(new Dimension(140, 33));
+        saveListToFileButton.setMinimumSize(new Dimension(140, 33));
+        saveListToFileButton.setPreferredSize(new Dimension(140, 33));
+        saveListToFileButton.setText("Save List to File");
         gbc = new GridBagConstraints();
         gbc.gridx = 5;
         gbc.gridy = 1;
@@ -804,19 +780,33 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.weighty = 0.8;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 0, 5, 0);
-        buttonPanel.add(diffListsButton, gbc);
-        saveListToFileButton.setMaximumSize(new Dimension(135, 32));
-        saveListToFileButton.setMinimumSize(new Dimension(135, 32));
-        saveListToFileButton.setPreferredSize(new Dimension(135, 32));
-        saveListToFileButton.setText("Save List to File");
+        buttonPanel.add(saveListToFileButton, gbc);
+        baseListComboBox.setMinimumSize(new Dimension(135, 33));
+        baseListComboBox.setPreferredSize(new Dimension(135, 33));
+        baseListComboBox.setToolTipText("List to filter");
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridx = 3;
+        gbc.gridy = 1;
         gbc.weightx = 0.2;
         gbc.weighty = 0.8;
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 0, 5, 0);
-        buttonPanel.add(saveListToFileButton, gbc);
+        buttonPanel.add(baseListComboBox, gbc);
+        baseListLabel = new JLabel();
+        baseListLabel.setEnabled(true);
+        baseListLabel.setHorizontalAlignment(0);
+        baseListLabel.setHorizontalTextPosition(2);
+        baseListLabel.setMaximumSize(new Dimension(135, 21));
+        baseListLabel.setMinimumSize(new Dimension(135, 21));
+        baseListLabel.setPreferredSize(new Dimension(135, 21));
+        baseListLabel.setText("Set Base List");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.weightx = 0.4;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.SOUTHWEST;
+        buttonPanel.add(baseListLabel, gbc);
         UILeftPanel = new JPanel();
         UILeftPanel.setLayout(new GridBagLayout());
         UILeftPanel.setMaximumSize(new Dimension(32767, 32767));
@@ -827,11 +817,12 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridheight = 4;
+        gbc.gridheight = 6;
         gbc.weightx = 0.5;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         ListBuilderPanel.add(UILeftPanel, gbc);
+        UILeftPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null));
         MAMEPanel = new JPanel();
         MAMEPanel.setLayout(new GridBagLayout());
         MAMEPanel.setMaximumSize(new Dimension(2147483647, 2147483647));
@@ -993,8 +984,8 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         displayTypePanel.add(allDisplaysRadioButton, gbc);
         filterJPanel = new JPanel();
         filterJPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        filterJPanel.setMinimumSize(new Dimension(400, 80));
-        filterJPanel.setPreferredSize(new Dimension(400, 80));
+        filterJPanel.setMinimumSize(new Dimension(400, 110));
+        filterJPanel.setPreferredSize(new Dimension(400, 110));
         filterJPanel.setVerifyInputWhenFocusTarget(false);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1003,7 +994,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         UILeftPanel.add(filterJPanel, gbc);
         filterJPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
         noClonesCheckBox = new JCheckBox();
-        noClonesCheckBox.setMaximumSize(new Dimension(200, 20));
+        noClonesCheckBox.setMaximumSize(new Dimension(235, 20));
         noClonesCheckBox.setMinimumSize(new Dimension(200, 20));
         noClonesCheckBox.setPreferredSize(new Dimension(200, 20));
         noClonesCheckBox.setText("No Clones");
@@ -1025,9 +1016,16 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         noImperfectCheckBox.setPreferredSize(new Dimension(200, 20));
         noImperfectCheckBox.setText("No Imperfect");
         filterJPanel.add(noImperfectCheckBox);
+        noMechanicalCheckBox = new JCheckBox();
+        noMechanicalCheckBox.setHorizontalAlignment(2);
+        noMechanicalCheckBox.setMaximumSize(new Dimension(200, 20));
+        noMechanicalCheckBox.setMinimumSize(new Dimension(200, 20));
+        noMechanicalCheckBox.setPreferredSize(new Dimension(200, 20));
+        noMechanicalCheckBox.setText("No Mechanical");
+        filterJPanel.add(noMechanicalCheckBox);
         GameButtonsPanel = new JPanel();
         GameButtonsPanel.setLayout(new GridBagLayout());
-        GameButtonsPanel.setMaximumSize(new Dimension(2147483647, 120));
+        GameButtonsPanel.setMaximumSize(new Dimension(2147483647, 130));
         GameButtonsPanel.setMinimumSize(new Dimension(118, 50));
         GameButtonsPanel.setPreferredSize(new Dimension(118, 50));
         GameButtonsPanel.setRequestFocusEnabled(true);
@@ -1174,33 +1172,27 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.WEST;
         panel2.add(exactMatchOnlyCheckBox, gbc);
-        languagesCombobox.setToolTipText("Languages Filter");
+        languagesComboBox.setToolTipText("Languages Filter");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        UILeftPanel.add(languagesCombobox, gbc);
-        controlsScrollPane.setMaximumSize(new Dimension(175, 32767));
-        controlsScrollPane.setMinimumSize(new Dimension(175, 600));
-        controlsScrollPane.setPreferredSize(new Dimension(175, 550));
+        UILeftPanel.add(languagesComboBox, gbc);
+        yearComboBox.setMinimumSize(new Dimension(235, 33));
+        yearComboBox.setToolTipText("Year Filter");
         gbc = new GridBagConstraints();
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridheight = 4;
-        gbc.weightx = 0.5;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        ListBuilderPanel.add(controlsScrollPane, gbc);
-        controlsCBPanel.setAlignmentX(0.0f);
-        controlsCBPanel.setAlignmentY(0.0f);
-        controlsCBPanel.setMaximumSize(new Dimension(32767, 32767));
-        controlsCBPanel.setMinimumSize(new Dimension(175, 500));
-        controlsCBPanel.setOpaque(true);
-        controlsCBPanel.setPreferredSize(new Dimension(175, 550));
-        controlsCBPanel.setRequestFocusEnabled(true);
-        controlsScrollPane.setViewportView(controlsCBPanel);
-        controlsCBPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Controls", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        UILeftPanel.add(yearComboBox, gbc);
+        final JPanel spacer6 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 9;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        UILeftPanel.add(spacer6, gbc);
         CategoriesPanel = new JPanel();
         CategoriesPanel.setLayout(new BorderLayout(0, 0));
         CategoriesPanel.setMaximumSize(new Dimension(32767, 32767));
@@ -1212,7 +1204,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.gridheight = 4;
+        gbc.gridheight = 5;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         ListBuilderPanel.add(CategoriesPanel, gbc);
@@ -1249,7 +1241,51 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         categoriesCBpanel.setPreferredSize(new Dimension(560, 600));
         categoriesCBpanel.setRequestFocusEnabled(false);
         CategoriesScrollPane.setViewportView(categoriesCBpanel);
+        UIRightPanel = new JPanel();
+        UIRightPanel.setLayout(new BorderLayout(0, 0));
+        UIRightPanel.setMinimumSize(new Dimension(210, 645));
+        UIRightPanel.setPreferredSize(new Dimension(210, 595));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.gridheight = 5;
+        gbc.fill = GridBagConstraints.BOTH;
+        ListBuilderPanel.add(UIRightPanel, gbc);
+        UIRightPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null));
+        UIControlsScrollPanel = new JPanel();
+        UIControlsScrollPanel.setLayout(new BorderLayout(0, 0));
+        UIRightPanel.add(UIControlsScrollPanel, BorderLayout.CENTER);
+        UIControlsScrollPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null));
+        controlsScrollPane.setMaximumSize(new Dimension(175, 32767));
+        controlsScrollPane.setMinimumSize(new Dimension(175, 600));
+        controlsScrollPane.setPreferredSize(new Dimension(175, 550));
+        UIControlsScrollPanel.add(controlsScrollPane, BorderLayout.CENTER);
+        controlsCBPanel.setAlignmentX(0.0f);
+        controlsCBPanel.setAlignmentY(0.0f);
+        controlsCBPanel.setMaximumSize(new Dimension(32767, 32767));
+        controlsCBPanel.setMinimumSize(new Dimension(175, 500));
+        controlsCBPanel.setOpaque(true);
+        controlsCBPanel.setPreferredSize(new Dimension(175, 550));
+        controlsCBPanel.setRequestFocusEnabled(true);
+        controlsScrollPane.setViewportView(controlsCBPanel);
+        controlsCBPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Controls", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        controlsRBPanel = new JPanel();
+        controlsRBPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        UIRightPanel.add(controlsRBPanel, BorderLayout.SOUTH);
+        anyControlsRB = new JRadioButton();
+        anyControlsRB.setActionCommand("AnyControls");
+        anyControlsRB.setText("Any");
+        controlsRBPanel.add(anyControlsRB);
+        allControlsRB = new JRadioButton();
+        allControlsRB.setActionCommand("AllControls");
+        allControlsRB.setText("All");
+        controlsRBPanel.add(allControlsRB);
+        exactControlsRB = new JRadioButton();
+        exactControlsRB.setActionCommand("ExactControls");
+        exactControlsRB.setText("Exact");
+        controlsRBPanel.add(exactControlsRB);
         listNameLabel.setLabelFor(listNameTF);
+        baseListLabel.setLabelFor(listNameTF);
     }
 
     /**
