@@ -70,10 +70,6 @@ public class AddRemoveDividerUI extends BasicSplitPaneUI {
 
         addButtonV.setMargin(new Insets(0, -5, 0, -5));
         removeButtonV.setMargin(new Insets(0, -5, 0, -5));
-/*
-        addButtonH.setMargin(new Insets(0, 0, 0, 0));
-        removeButtonH.setMargin(new Insets(-5, 0, -5, 0));
-*/
     }
 
     AddRemoveDividerUI(int orientation) {
@@ -88,12 +84,6 @@ public class AddRemoveDividerUI extends BasicSplitPaneUI {
         };
 
         if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
-/*
-            divider.setLayout(new FlowLayout(FlowLayout.CENTER, 5,50));
-            divider.add(addButtonV);
-            divider.add(removeButtonV);
-*/
-
             divider.setLayout(new BoxLayout(divider, BoxLayout.Y_AXIS));
             divider.add(Box.createVerticalGlue());
             divider.add(addButtonV);

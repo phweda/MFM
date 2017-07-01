@@ -201,7 +201,7 @@ public class ListEditor implements ActionListener {
         flipViewButton.setBorderPainted(false);
         flipViewButton.setActionCommand(FLIP_VIEW);
 
-        Set<String> listKeys = MFMPlayLists.getInstance().getListBuilderPlaylistsKeys();
+        Set<String> listKeys = MFMPlayLists.getInstance().getListEditorKeys();
         listComboBox = new JComboBox<String>(listKeys.toArray(new String[listKeys.size()]));
         listComboBox.addItem(CLEAR_LIST);
         listComboBox.setSelectedItem(CLEAR_LIST);

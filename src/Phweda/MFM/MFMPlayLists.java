@@ -117,9 +117,11 @@ public class MFMPlayLists implements Serializable {
         tempSet.remove(BIOS);
         tempSet.remove(DEVICES);
         tempSet.addAll(languagesListsMap.keySet());
+        if (myPlayListsTree.size() > 0) {
+            tempSet.addAll(myPlayListsTree.keySet());
+        }
         return tempSet;
     }
-
 
     public String[] getLanguagesPLsKeys() {
         ArrayList<String> list = new ArrayList<String>();
@@ -143,7 +145,6 @@ public class MFMPlayLists implements Serializable {
         allTree.putAll(languagesLists);
         return allTree;
     }
-
 
     public void createPlayList(String name, String[] machines) {
         TreeSet<String> treeSet = new TreeSet<String>(Arrays.asList(machines));
@@ -229,6 +230,7 @@ public class MFMPlayLists implements Serializable {
     public void removePlayList(String name) {
         myPlayListsTree.remove(name);
         allListsNames.remove(name);
+        myListsNames.remove(name);
         persistPlayLists();
     }
 
@@ -243,7 +245,6 @@ public class MFMPlayLists implements Serializable {
     }
 
     private void loadPlayLists() {
-
         Path path = Paths.get(MFM.MFM_SETTINGS_DIR + "MFM_Playlists.xml");
         if (path.toFile().exists()) {
             try {
