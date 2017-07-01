@@ -19,6 +19,8 @@
 package Phweda.MFM.UI;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,7 +32,7 @@ import java.util.List;
 public class ListEditorModel<E> extends DefaultListModel<E> {
 
     /**
-     * Add all elements from set to existing list
+     * Add all elements from input List
      *
      * @param elements
      */
@@ -40,15 +42,17 @@ public class ListEditorModel<E> extends DefaultListModel<E> {
                 this.addElement(element);
             }
         });
+        this.fireContentsChanged(this, 0, this.getSize());
     }
 
     /**
-     * Remove all elements from set from existing list
+     * Remove all elements from input List
      *
      * @param elements
      */
     void removeAll(List<E> elements) {
         elements.forEach(this::removeElement);
+        this.fireContentsChanged(this, 0, this.getSize());
     }
 
     /**
@@ -59,6 +63,7 @@ public class ListEditorModel<E> extends DefaultListModel<E> {
     public void refreshList(List<E> newList) {
         this.clear();
         newList.forEach(this::addElement);
+        this.fireContentsChanged(this, 0, this.getSize());
     }
 
 }

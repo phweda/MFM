@@ -26,7 +26,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="b5b92" class="javax.swing.JList" binding="editedList" custom-create="true">
+              <component id="b5b92" class="javax.swing.JList" binding="workingList" custom-create="true">
                 <constraints/>
                 <properties/>
               </component>
@@ -56,12 +56,17 @@
       </splitpane>
       <grid id="87017" binding="buttonPanel" layout-manager="GridBagLayout">
         <constraints border-constraint="South"/>
-        <properties/>
+        <properties>
+          <alignmentX value="1.0"/>
+          <alignmentY value="1.0"/>
+          <minimumSize width="900" height="60"/>
+          <preferredSize width="900" height="60"/>
+        </properties>
         <border type="none"/>
         <children>
           <component id="affc4" class="javax.swing.JTextField" binding="nameTextField" default-binding="true">
             <constraints>
-              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+              <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
               </grid>
               <gridbag weightx="0.2" weighty="0.0"/>
@@ -80,51 +85,31 @@
               <text value="Create List"/>
             </properties>
           </component>
-          <component id="2aac3" class="javax.swing.JButton" binding="saveListButton">
-            <constraints>
-              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <text value="Save List"/>
-            </properties>
-          </component>
-          <hspacer id="d9eb5">
-            <constraints>
-              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.05" weighty="0.0"/>
-            </constraints>
-          </hspacer>
           <component id="bd713" class="javax.swing.JComboBox" binding="listComboBox" custom-create="true">
             <constraints>
               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.15" weighty="0.0"/>
             </constraints>
             <properties>
+              <enabled value="true"/>
               <minimumSize width="150" height="33"/>
             </properties>
           </component>
           <hspacer id="170b5">
             <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.05" weighty="0.0"/>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.01" weighty="0.0"/>
             </constraints>
           </hspacer>
           <hspacer id="9b146">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.1" weighty="0.0"/>
+              <gridbag weightx="0.05" weighty="0.0"/>
             </constraints>
           </hspacer>
           <hspacer id="36b94">
             <constraints>
               <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.1" weighty="0.0"/>
-            </constraints>
-          </hspacer>
-          <hspacer id="e5c1d">
-            <constraints>
-              <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.025" weighty="0.0"/>
             </constraints>
           </hspacer>
@@ -134,11 +119,64 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <actionCommand value=""/>
-              <text value=""/>
               <toolTipText value="Flip View"/>
             </properties>
           </component>
+          <grid id="37a3f" binding="combinationPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="d92bc" class="javax.swing.JCheckBox" binding="unionCB" custom-create="true">
+                <constraints/>
+                <properties>
+                  <font/>
+                  <horizontalTextPosition value="0"/>
+                  <toolTipText value="Add to List"/>
+                  <verticalTextPosition value="1"/>
+                </properties>
+              </component>
+              <component id="ff97d" class="javax.swing.JCheckBox" binding="intersectionCB" custom-create="true">
+                <constraints/>
+                <properties>
+                  <horizontalTextPosition value="0"/>
+                  <toolTipText value="Retain those in both lists"/>
+                  <verticalTextPosition value="1"/>
+                </properties>
+              </component>
+              <component id="30d0f" class="javax.swing.JCheckBox" binding="exclusionCB" custom-create="true" default-binding="true">
+                <constraints/>
+                <properties>
+                  <horizontalTextPosition value="0"/>
+                  <toolTipText value="Remove from list"/>
+                  <verticalTextPosition value="1"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <component id="469e1" class="javax.swing.JTextField" binding="countTextField">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <editable value="false"/>
+              <minimumSize width="125" height="31"/>
+              <preferredSize width="125" height="31"/>
+              <text value="Count"/>
+            </properties>
+          </component>
+          <hspacer id="7d83c">
+            <constraints>
+              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+          </hspacer>
         </children>
       </grid>
     </children>

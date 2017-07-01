@@ -18,12 +18,19 @@
 
 package Phweda.MFM.UI;
 
+import Phweda.MFM.MFM;
 import Phweda.MFM.MFMListBuilder;
 import Phweda.MFM.MFMPlayLists;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
@@ -42,18 +49,21 @@ public class ListEditor implements ActionListener {
     private JPanel buttonPanel;
     private JTextField nameTextField;
     private JButton createListButton;
-    private JButton saveListButton;
     private JScrollPane leftScrollPane;
     private JScrollPane rightScrollPane;
     private JList<String> machinesList;
     private JSplitPane listEditorSplitPane;
-    private JList<String> editedList;
+    private JList<String> workingList;
     private JComboBox<String> listComboBox;
     private JButton flipViewButton;
+    private JPanel combinationPanel;
+    private JCheckBox unionCB;
+    private JCheckBox intersectionCB;
+    private JCheckBox exclusionCB;
+    private JTextField countTextField;
 
-    private static final String SAVE_LIST = "Save List";
     private static final String CREATE_LIST = "Create List";
-    private static final String LOAD_LIST = "Load List";
+    private static final String EDIT_WORKING_LIST = "Edit List";
     private static final String FLIP_VIEW = "Flip View";
     private static final String CLEAR_LIST = "Clear List";
 
@@ -64,10 +74,22 @@ public class ListEditor implements ActionListener {
     private ListEditor() {
         $$$setupUI$$$();
         addListeners();
+        workingList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+                    if (MFM.isSystemDebug()) {
+                        System.out.println("Adding from clipboard");
+                    }
+                    addFromClipboard();
+                } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    createListButton.doClick();
+                }
+            }
+        });
     }
 
     private void addListeners() {
-        saveListButton.addActionListener(this);
         createListButton.addActionListener(this);
         flipViewButton.addActionListener(this);
         listComboBox.addActionListener(this);
@@ -77,16 +99,13 @@ public class ListEditor implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         System.out.println(e.getActionCommand());
         switch (e.getActionCommand()) {
-            case (SAVE_LIST):
-                // TODO is this different than createList?
-                break;
 
             case CREATE_LIST:
                 createList();
                 break;
 
-            case LOAD_LIST:
-                loadList();
+            case EDIT_WORKING_LIST:
+                editWorkingList();
                 break;
 
             case FLIP_VIEW:
@@ -100,25 +119,56 @@ public class ListEditor implements ActionListener {
             case AddRemoveDividerUI.REMOVE:
                 removeMachines();
                 break;
+
+        }
+    }
+
+    private void addFromClipboard() {
+        try {
+            String input = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor).toString();
+            ArrayList<String> inputList = new ArrayList<String>(Arrays.asList(input.split("\n")));
+            ((ListEditorModel<String>) workingList.getModel()).addAll(inputList);
+            displayCurrentCount();
+        } catch (UnsupportedFlavorException | IOException e) {
+            e.printStackTrace();
         }
     }
 
     private void addMachines() {
-        ((ListEditorModel<String>) editedList.getModel()).addAll(machinesList.getSelectedValuesList());
+        ((ListEditorModel<String>) workingList.getModel()).addAll(machinesList.getSelectedValuesList());
+        displayCurrentCount();
     }
 
     private void removeMachines() {
-        ((ListEditorModel<String>) editedList.getModel()).removeAll(machinesList.getSelectedValuesList());
+        ((ListEditorModel<String>) workingList.getModel()).removeAll(workingList.getSelectedValuesList());
+        displayCurrentCount();
     }
 
-    private void loadList() {
+    private void editWorkingList() {
         String list = listComboBox.getSelectedItem().toString();
         if (list.equals(CLEAR_LIST)) {
-            ((ListEditorModel<String>) editedList.getModel()).clear();
+            ((ListEditorModel<String>) workingList.getModel()).clear();
         } else {
-            ((ListEditorModel<String>) editedList.getModel()).addAll(
-                    new ArrayList<String>(MFMPlayLists.getInstance().getPlayList(list)));
+            if (unionCB.isSelected()) {
+                ((ListEditorModel<String>) workingList.getModel()).addAll(
+                        new ArrayList<String>(MFMPlayLists.getInstance().getPlayList(list)));
+            } else if (intersectionCB.isSelected()) {
+                // Gotta be a more direct way of doing this
+                Object[] elements = ((ListEditorModel<String>) workingList.getModel()).toArray();
+                String[] strings = Arrays.copyOf(elements, elements.length, String[].class);
+                ArrayList<String> currentList = new ArrayList<String>(Arrays.asList(strings));
+                currentList.retainAll(new ArrayList<String>(MFMPlayLists.getInstance().getPlayList(list)));
+                ((ListEditorModel<String>) workingList.getModel()).refreshList(currentList);
+            } else if (exclusionCB.isSelected()) {
+                ((ListEditorModel<String>) workingList.getModel()).removeAll(
+                        new ArrayList<String>(MFMPlayLists.getInstance().getPlayList(list)));
+            }
         }
+        displayCurrentCount();
+    }
+
+    private void displayCurrentCount() {
+        countTextField.setText("Count " + MFMController.decimalFormater.format(workingList.getModel().getSize()));
     }
 
     private void flipOrientation() {
@@ -132,15 +182,8 @@ public class ListEditor implements ActionListener {
         listEditorSplitPane.validate();
     }
 
-    private void addGame() {
-        int[] selected = machinesList.getSelectedIndices();
-        for (int index : selected) {
-            ((DefaultListModel<String>) editedList.getModel()).addElement(machinesList.getModel().getElementAt(index));
-        }
-    }
-
     private void createList() {
-        Object[] list = editedList.getSelectedValuesList().toArray();
+        Object[] list = workingList.getSelectedValuesList().toArray();
         MFMListBuilder.createPlayList(this.nameTextField.getText(), Arrays.copyOf(list, list.length, String[].class));
     }
 
@@ -162,26 +205,32 @@ public class ListEditor implements ActionListener {
         listComboBox = new JComboBox<String>(listKeys.toArray(new String[listKeys.size()]));
         listComboBox.addItem(CLEAR_LIST);
         listComboBox.setSelectedItem(CLEAR_LIST);
-        listComboBox.setActionCommand(LOAD_LIST);
+        listComboBox.setActionCommand(EDIT_WORKING_LIST);
+
+        Font cbFont = UIManager.getDefaults().getFont("CheckBox.font");
+        Font newCBFont = new Font(cbFont.getName(), cbFont.getStyle(), 20);
+        ButtonGroup bg = new ButtonGroup();
+        unionCB = new ListEditorJCheckBox("\u222a");
+        unionCB.setFont(newCBFont);
+        bg.add(unionCB);
+        intersectionCB = new ListEditorJCheckBox("\u2229");
+        bg.add(intersectionCB);
+        intersectionCB.setFont(newCBFont);
+        exclusionCB = new ListEditorJCheckBox("\u2212");// new JCheckBox("\u2212");
+        bg.add(exclusionCB);
+        exclusionCB.setFont(newCBFont);
+        unionCB.setSelected(true);
 
         listEditorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         listEditorSplitPane.setUI(getDivider());
 
         ListEditorModel<String> elm = new ListEditorModel<String>();
-        editedList = new JList<String>();
-        editedList.setModel(elm);
+        workingList = new JList<String>();
+        workingList.setModel(elm);
 
         machinesList = new JList<String>(MFMListBuilder.getRunnableArray());
         machinesList.setVisibleRowCount(MFMListBuilder.getRunnableList().size() / 3 + 2);
 
-        editedList.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    saveListButton.doClick();
-                }
-            }
-        });
     }
 
     /**
@@ -203,7 +252,7 @@ public class ListEditor implements ActionListener {
         listEditorPanel.add(listEditorSplitPane, BorderLayout.CENTER);
         rightScrollPane = new JScrollPane();
         listEditorSplitPane.setRightComponent(rightScrollPane);
-        rightScrollPane.setViewportView(editedList);
+        rightScrollPane.setViewportView(workingList);
         leftScrollPane = new JScrollPane();
         leftScrollPane.setMaximumSize(new Dimension(250, 32767));
         leftScrollPane.setMinimumSize(new Dimension(250, 450));
@@ -213,13 +262,17 @@ public class ListEditor implements ActionListener {
         leftScrollPane.setViewportView(machinesList);
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
+        buttonPanel.setAlignmentX(1.0f);
+        buttonPanel.setAlignmentY(1.0f);
+        buttonPanel.setMinimumSize(new Dimension(900, 60));
+        buttonPanel.setPreferredSize(new Dimension(900, 60));
         listEditorPanel.add(buttonPanel, BorderLayout.SOUTH);
         nameTextField = new JTextField();
         nameTextField.setMinimumSize(new Dimension(200, 29));
         nameTextField.setPreferredSize(new Dimension(100, 29));
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
-        gbc.gridx = 6;
+        gbc.gridx = 7;
         gbc.gridy = 0;
         gbc.weightx = 0.2;
         gbc.anchor = GridBagConstraints.WEST;
@@ -232,20 +285,7 @@ public class ListEditor implements ActionListener {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPanel.add(createListButton, gbc);
-        saveListButton = new JButton();
-        saveListButton.setText("Save List");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 4;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        buttonPanel.add(saveListButton, gbc);
-        final JPanel spacer1 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 5;
-        gbc.gridy = 0;
-        gbc.weightx = 0.05;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        buttonPanel.add(spacer1, gbc);
+        listComboBox.setEnabled(true);
         listComboBox.setMinimumSize(new Dimension(150, 33));
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
@@ -254,42 +294,70 @@ public class ListEditor implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPanel.add(listComboBox, gbc);
+        final JPanel spacer1 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 0;
+        gbc.weightx = 0.01;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonPanel.add(spacer1, gbc);
         final JPanel spacer2 = new JPanel();
         gbc = new GridBagConstraints();
-        gbc.gridx = 3;
+        gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 0.05;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPanel.add(spacer2, gbc);
         final JPanel spacer3 = new JPanel();
         gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0.1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        buttonPanel.add(spacer3, gbc);
-        final JPanel spacer4 = new JPanel();
-        gbc = new GridBagConstraints();
         gbc.gridx = 9;
-        gbc.gridy = 0;
-        gbc.weightx = 0.1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        buttonPanel.add(spacer4, gbc);
-        final JPanel spacer5 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 7;
         gbc.gridy = 0;
         gbc.weightx = 0.025;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        buttonPanel.add(spacer5, gbc);
-        flipViewButton.setActionCommand("");
-        flipViewButton.setText("");
+        buttonPanel.add(spacer3, gbc);
         flipViewButton.setToolTipText("Flip View");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPanel.add(flipViewButton, gbc);
+        combinationPanel = new JPanel();
+        combinationPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        buttonPanel.add(combinationPanel, gbc);
+        unionCB.setFont(new Font(unionCB.getFont().getName(), unionCB.getFont().getStyle(), unionCB.getFont().getSize()));
+        unionCB.setHorizontalTextPosition(0);
+        unionCB.setToolTipText("Add to List");
+        unionCB.setVerticalTextPosition(1);
+        combinationPanel.add(unionCB);
+        intersectionCB.setHorizontalTextPosition(0);
+        intersectionCB.setToolTipText("Retain those in both lists");
+        intersectionCB.setVerticalTextPosition(1);
+        combinationPanel.add(intersectionCB);
+        exclusionCB.setHorizontalTextPosition(0);
+        exclusionCB.setToolTipText("Remove from list");
+        exclusionCB.setVerticalTextPosition(1);
+        combinationPanel.add(exclusionCB);
+        countTextField = new JTextField();
+        countTextField.setEditable(false);
+        countTextField.setMinimumSize(new Dimension(125, 31));
+        countTextField.setPreferredSize(new Dimension(125, 31));
+        countTextField.setText("Count");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 5;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonPanel.add(countTextField, gbc);
+        final JPanel spacer4 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 6;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        buttonPanel.add(spacer4, gbc);
         machinesList.setNextFocusableComponent(machinesList);
     }
 
@@ -298,5 +366,29 @@ public class ListEditor implements ActionListener {
      */
     public JComponent $$$getRootComponent$$$() {
         return listEditorPanel;
+    }
+
+    class ListEditorJCheckBox extends JCheckBox {
+
+        ListEditorJCheckBox(String text) {
+            super(text);
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            return (new ListEditorToolTip(this));
+        }
+    }
+
+    class ListEditorToolTip extends JToolTip {
+        ListEditorToolTip(JComponent component) {
+            super();
+            Font parentFont = component.getParent().getFont();
+            Font zipFont = new Font(parentFont.getName(), parentFont.getStyle(), 16); //parentFont.getSize() + 2);
+            setFont(zipFont);
+            setComponent(component);
+            setBackground(Color.yellow);
+            setForeground(Color.red);
+        }
     }
 }
