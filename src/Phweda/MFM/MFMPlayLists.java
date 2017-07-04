@@ -207,14 +207,14 @@ public class MFMPlayLists implements Serializable {
         return myListsNames.toArray();
     }
 
-    public Object[] getListBuilderNames() {
+    public String[] getListBuilderNames() {
         ArrayList<String> builderNames = new ArrayList<String>();
         if (MFMSettings.getInstance().getDataVersion().contains(MFMListBuilder.ALL)) {
             builderNames.add(MFMListBuilder.RUNNABLE);
         }
         builderNames.add(MFMListBuilder.ALL);
         builderNames.addAll(myListsNames);
-        return builderNames.toArray();
+        return builderNames.toArray(new String[builderNames.size()]);
     }
 
     public TreeSet<String> getPlayList(String name) {
