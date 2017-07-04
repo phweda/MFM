@@ -33,7 +33,7 @@ import java.util.Date;
 public class MFMBusyPainter extends BusyPainter {
     private final long startMillis = System.currentTimeMillis();
 
-    public MFMBusyPainter(Shape point, Shape trajectory) {
+    MFMBusyPainter(Shape point, Shape trajectory) {
         super(point, trajectory);
     }
 
