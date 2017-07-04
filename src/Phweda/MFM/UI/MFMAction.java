@@ -260,7 +260,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case ListEditorAction:
-                    controller.listEditor();
+                    controller.showListEditor();
                     break;
 
                 case AddtoListAction:

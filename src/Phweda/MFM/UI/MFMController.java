@@ -294,7 +294,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         updateUI();
     }
 
-    void listEditor() {
+    void showListEditor() {
         MFMListActions.showListEditor();
     }
 
@@ -835,37 +835,21 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         mainFrame.addMouseListener(this);
 
         MFM_Components components = getComps();
-
         machineListTable = components.getMachineListTable();
         folderTree = components.getTree();
 
         extrasTabbedPane = components.ExtrasTabbedPane();
         extrasTabbedPane.addMouseListener(this);
 
-        //===========================================
         extrasTabbedPane.addKeyListener(this);
         machineListTable.addKeyListener(this);
-        //===========================================
 
         MFMPopupMenu = MFM_Components.MFMPopupMenu();
         currentListName = components.CurrentListName();
         infoPanel = MFM_Components.InfoPanel();
         statusBar = MFM_Components.StatusBar();
 
-
         mainFrame.pack();
-
-        // fixme not getting maximized frame with any of these?
-/*      Grabs full screen
-        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
-        graphicsDevice.setFullScreenWindow(mainFrame);
-*/
-        //    mainFrame.setPreferredSize(MFM.screenSize);
-        //    mainFrame.setPreferredSize(mainFrame.getMaximumSize());
-        //    mainFrame.setExtendedState(Frame.NORMAL);
-        //    mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
-
         mainFrame.setVisible(true);
         mainFrame.repaint();
         // Note order must be last!
