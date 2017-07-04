@@ -30,6 +30,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -56,7 +57,8 @@ public class MFM {
     public static final String VERSION = "Version 0.9";
     public static final String BUILD = "BUILD 0.8.900";
     public static final String RELEASE_DATE = "Released : July 2017";
-    public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION + "  :  " + MFM.BUILD;
+    public static final String LOCAL_COUNTRY = Locale.getDefault().getCountry();
+    public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION;
 
     public static int logNumber;
     static final String MFM_SETTINGS_FILE = "MFM_SETTINGS.xml";
@@ -356,5 +358,4 @@ public class MFM {
     protected void finalize() throws Throwable {
         super.finalize();
     }
-
 }
