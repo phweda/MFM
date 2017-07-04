@@ -345,7 +345,6 @@ public final class MFMListBuilder {
 
     }
 
-
     public static void createPlayList(String name, String[] list) {
         MFMPlayLists.getInstance().createPlayList(name, checkList(list));
         MFMUI_Setup.getInstance().updateMenuBar(name);
@@ -359,77 +358,6 @@ public final class MFMListBuilder {
             }
         }
         return newList;
-    }
-
-    public static void diffLists(Frame frame) {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_LISTS_DIR);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setMultiSelectionEnabled(true);
-        fileChooser.showDialog(null, JFileChooser.APPROVE_SELECTION);
-
-        File[] files = fileChooser.getSelectedFiles();
-
-        if (files.length < 2) {
-            JOptionPane.showMessageDialog(null, "You must select two files.");
-            return;
-        }
-
-        if (files.length > 2) {
-            JOptionPane.showMessageDialog(null, "Diff will be the first two files returned");
-        }
-
-        String name1 = stripSuffix(files[0].getName());
-        String name2 = stripSuffix(files[1].getName());
-
-        List<String> lines1 = null;
-        List<String> lines2 = null;
-        try {
-            lines1 = Files.readAllLines(files[0].toPath(), Charset.defaultCharset());
-            lines2 = Files.readAllLines(files[1].toPath(), Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        TreeSet<String> list1 = new TreeSet<String>(lines1);
-        TreeSet<String> list2 = new TreeSet<String>(lines2);
-        TreeSet<String> commonList = new TreeSet<String>(list1);
-        commonList.retainAll(list2);
-        list1.removeAll(commonList);
-        list2.removeAll(commonList);
-
-        StringBuilder output = new StringBuilder();
-        output.append("Machines unique to each list are:\n\n");
-        output.append(name1);
-        output.append(" : \n");
-
-        for (String aList1 : list1) {
-            output.append(aList1);
-            output.append("\n");
-        }
-        output.deleteCharAt(output.length() - 2);
-        output.append("\n\n");
-
-        output.append(name2);
-        output.append(" : \n");
-        for (String aList2 : list2) {
-            output.append(aList2);
-            output.append("\n");
-        }
-        // Remove the final newline NOTE very Anal!! ;)
-        output.deleteCharAt(output.length() - 1);
-
-        JTextArea txt = new JTextArea(output.toString());
-        txt.setLineWrap(true);
-        JScrollPane scrollPane = new JScrollPane(txt);
-        JDialog dialog = new JDialog(frame, "Lists Difference");
-        dialog.getContentPane().add(scrollPane);
-        dialog.setMinimumSize(new Dimension(300, 200));
-        dialog.setPreferredSize(new Dimension(400, (int) MFMUI.screenSize.getHeight() / 2));
-        dialog.setMaximumSize(new Dimension(400, (int) MFMUI.screenSize.getHeight() / 2));
-
-        dialog.setLocation(MFMUI.screenSize.width / 2 - 150, MFMUI.screenSize.height / 2 - 100);
-        dialog.pack();
-        dialog.setVisible(true);
     }
 
     public static String[] getRunnableArray() {
@@ -565,7 +493,7 @@ public final class MFMListBuilder {
         static boolean noMechanical = false;
         static boolean waysSelected = false;
         static boolean exactMatch = false;
-        static String language = null;
+        static String language = ALL_LANGUAGES;
         static String year = null;
         static String baseListName = ALL;
         private static String ways = ALL;
