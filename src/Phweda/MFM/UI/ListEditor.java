@@ -18,18 +18,17 @@
 
 package Phweda.MFM.UI;
 
+import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MFM;
 import Phweda.MFM.MFMListBuilder;
 import Phweda.MFM.MFMPlayLists;
+import Phweda.MFM.mame.Machine;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +73,13 @@ public class ListEditor implements ActionListener {
     private ListEditor() {
         $$$setupUI$$$();
         addListeners();
+    }
+
+    private void addListeners() {
+        createListButton.addActionListener(this);
+        flipViewButton.addActionListener(this);
+        listComboBox.addActionListener(this);
+
         workingList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -87,12 +93,20 @@ public class ListEditor implements ActionListener {
                 }
             }
         });
-    }
 
-    private void addListeners() {
-        createListButton.addActionListener(this);
-        flipViewButton.addActionListener(this);
-        listComboBox.addActionListener(this);
+        // Show Machine description using parent tooltip
+        machinesList.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                JList list = (JList) e.getSource();
+                ListModel listModel = list.getModel();
+                int index = list.locationToIndex(e.getPoint());
+                if (index > -1) {
+                    Machine machine = MAMEInfo.getMachine(listModel.getElementAt(index).toString());
+                    list.setToolTipText(machine.getDescription());
+                }
+            }
+        });
     }
 
     @Override
@@ -183,7 +197,10 @@ public class ListEditor implements ActionListener {
     }
 
     private void createList() {
-        Object[] list = workingList.getSelectedValuesList().toArray();
+        Object[] list = new Object[workingList.getModel().getSize()];
+        for (int i = 0; i < workingList.getModel().getSize(); i++) {
+            list[i] = workingList.getModel().getElementAt(i);
+        }
         MFMListBuilder.createPlayList(this.nameTextField.getText(), Arrays.copyOf(list, list.length, String[].class));
     }
 
