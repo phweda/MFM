@@ -179,6 +179,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         noClonesCheckBox.setSelected(false);
         noImperfectCheckBox.setSelected(false);
         noMatureCB.setSelected(false);
+        noMechanicalCheckBox.setSelected(false);
 
         setSelectAllCategories(false);
         setSelectAllControls(false);
@@ -298,6 +299,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
 
         yearComboBox.addItemListener(this);
         baseListComboBox.addItemListener(this);
+        languagesComboBox.addItemListener(this);
     }
 
     /**
@@ -443,7 +445,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
                 break;
 
             case LIST_EDITOR_COMMAND:
-                // showMachinePicker();
+                controller.showListEditor();
                 break;
 
             case ANY_CONTROLS_COMMAND:
@@ -470,7 +472,9 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
             MFM.logger.addToList("ListBuilderUI itemState is: " + e.paramString(), true);
         }
 
-        if (e.getSource() == joyComboBox) {
+        if (e.getSource() == languagesComboBox) {
+            MFMListBuilder.Builder.setLanguage((String) languagesComboBox.getSelectedItem());
+        } else if (e.getSource() == joyComboBox) {
             if (!((String) joyComboBox.getSelectedItem()).equalsIgnoreCase(ALL_ORIENTATIONS_COMMAND)) {
                 ((DynamicCBpanel) controlsCBPanel).getJCheckBoxbyText(
                         Controllers.getMAMEControllerLabelName("joy")).setSelected(true);
@@ -502,20 +506,6 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         builder.setCategories(((DynamicCBpanel) categoriesCBpanel).getChecked());
         builder.setControls(Controllers.getMAMEControllerNames(((DynamicCBpanel) controlsCBPanel).getChecked()));
 
-/*
-        // Do here since Builder State is NOT retained in all circumstances
-        MFMListBuilder.Builder.setButtons((String) gameButtonsNum.getSelectedItem());
-        MFMListBuilder.Builder.setPlayers((Integer) gamePlayersNum.getSelectedItem());
-
-        MFMListBuilder.Builder.setWays((String) joyComboBox.getSelectedItem());
-        MFMListBuilder.Builder.setWays2((String) doubleJoyComboBox.getSelectedItem());
-        MFMListBuilder.Builder.setExactMatch(exactMatchOnlyCheckBox.isSelected());
-
-        MFMListBuilder.Builder.setLanguage(languagesComboBox.getSelectedItem().toString());
-        MFMListBuilder.Builder.setYear(yearComboBox.getSelectedItem().toString());
-        MFMListBuilder.Builder.setBaseListName(baseListComboBox.getSelectedItem().toString());
-
-*/
         TreeSet<String> list = builder.generateList();
         if (list.isEmpty()) {
             JOptionPane.showMessageDialog(getListBuilderPanel(), listName + " : list is empty");
@@ -659,8 +649,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         yearComboBox = new JComboBox<String>(MFM_Constants.yearsList);
         yearComboBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.gray, Color.gray));
 
-        baseListComboBox = new JComboBox(MFMPlayLists.getInstance().getListBuilderNames());
-        //   baseListComboBox.setSelectedItem();
+        baseListComboBox = new JComboBox<String>(MFMPlayLists.getInstance().getListBuilderNames());
     }
 
 
@@ -1272,16 +1261,10 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         controlsRBPanel = new JPanel();
         controlsRBPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
         UIRightPanel.add(controlsRBPanel, BorderLayout.SOUTH);
-        anyControlsRB = new JRadioButton();
-        anyControlsRB.setActionCommand("AnyControls");
         anyControlsRB.setText("Any");
         controlsRBPanel.add(anyControlsRB);
-        allControlsRB = new JRadioButton();
-        allControlsRB.setActionCommand("AllControls");
         allControlsRB.setText("All");
         controlsRBPanel.add(allControlsRB);
-        exactControlsRB = new JRadioButton();
-        exactControlsRB.setActionCommand("ExactControls");
         exactControlsRB.setText("Exact");
         controlsRBPanel.add(exactControlsRB);
         listNameLabel.setLabelFor(listNameTF);

@@ -712,24 +712,21 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="11a91" class="javax.swing.JRadioButton" binding="anyControlsRB">
+              <component id="11a91" class="javax.swing.JRadioButton" binding="anyControlsRB" custom-create="true">
                 <constraints/>
                 <properties>
-                  <actionCommand value="AnyControls"/>
                   <text value="Any"/>
                 </properties>
               </component>
-              <component id="dee9e" class="javax.swing.JRadioButton" binding="allControlsRB">
+              <component id="dee9e" class="javax.swing.JRadioButton" binding="allControlsRB" custom-create="true">
                 <constraints/>
                 <properties>
-                  <actionCommand value="AllControls"/>
                   <text value="All"/>
                 </properties>
               </component>
-              <component id="6bfce" class="javax.swing.JRadioButton" binding="exactControlsRB">
+              <component id="6bfce" class="javax.swing.JRadioButton" binding="exactControlsRB" custom-create="true">
                 <constraints/>
                 <properties>
-                  <actionCommand value="ExactControls"/>
                   <text value="Exact"/>
                 </properties>
               </component>

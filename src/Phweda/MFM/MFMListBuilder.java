@@ -25,7 +25,6 @@ package Phweda.MFM;
  * Time: 2:47 PM
  */
 
-import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Control;
@@ -34,18 +33,9 @@ import Phweda.utils.PersistUtils;
 import Phweda.utils.QuadState;
 import Phweda.utils.TriState;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
-
-import static Phweda.utils.FileUtils.stripSuffix;
 
 /**
  * Adding more built in lists i.e. noclones and PD VIDs
@@ -57,7 +47,7 @@ public final class MFMListBuilder {
     public static final String ALL = "ALL";
     public static final String RUNNABLE = "RUNNABLE";
     public static final String NO_IMPERFECT = "NOIMPERFECT";
-    public static final String NO_MECHANICAL = "NOMECHANICAL";
+    public static final String MECHANICAL = "MECHANICAL";
     public static final String CLONE = "CLONE";
     public static final String DEVICES = "DEVICES";
     public static final String NO_CLONE = "NOCLONE";
@@ -98,6 +88,7 @@ public final class MFMListBuilder {
     static TreeSet<String> runnableList;
     static ArrayList<String> arcadeCategories;
     static ArrayList<String> systemCategories;
+    //======= For use by MFMListGenerator when Parsing MAME ===================
     static TreeSet<String> allList = new TreeSet<String>();
     static TreeSet<String> biosList = new TreeSet<String>();
     static TreeSet<String> devicesList = new TreeSet<String>();
@@ -115,6 +106,7 @@ public final class MFMListBuilder {
     static TreeSet<String> rasterDisplayList = new TreeSet<String>();
     static TreeSet<String> vectorDisplayList = new TreeSet<String>();
     static TreeSet<String> lcdDisplayList = new TreeSet<String>();
+//=====================================================================
     static TreeSet<String> categoriesWithMachineList = new TreeSet<String>();
     static TreeMap<String, TreeSet<String>> languagesListsMap;
     private static TreeSet<String> allCategoriesList;
@@ -143,6 +135,9 @@ public final class MFMListBuilder {
             // Populate built in lists
             lists = MFMListGenerator.getInstance().generateMFMLists(parsing);
             languagesListsMap = MFMListGenerator.getInstance().getLanguageLists(parsing);
+            if (MFM.isSystemDebug()) {
+                System.out.println("Mechanical list:\n" + mechanicalList);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             MFM.logger.out("FATAL error is MFMListBuilder. Check your Data Set");
@@ -181,7 +176,7 @@ public final class MFMListBuilder {
     }
 
     static TreeSet<String> getMechanicalList() {
-        return lists.get(NO_MECHANICAL);
+        return lists.get(MECHANICAL);
     }
 
     static TreeSet<String> getNoClonesList() {
@@ -653,7 +648,9 @@ public final class MFMListBuilder {
             Builder.year = yearIn;
         }
 
-        public static void setNoMechanical(boolean noMechanical) { Builder.noMechanical = noMechanical;}
+        public static void setNoMechanical(boolean noMechanical) {
+            Builder.noMechanical = noMechanical;
+        }
 
         public static void setBaseListName(String baseListNameIn) {
             if (MFM.isSystemDebug()) {
@@ -806,7 +803,7 @@ public final class MFMListBuilder {
                 // Is there an Exact match of Controls
                 if (ControlsFilterType.getState().equals(EXACT_CONTROLS) &&
                         (!machineControls.containsAll(this.controls) ||
-                        machineControls.size() != this.controls.size())) {
+                                machineControls.size() != this.controls.size())) {
                     continue;
                 }
 
