@@ -35,6 +35,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static Phweda.utils.FileUtils.doubleQuoteString;
+
 
 /**
  * <p>Java class for anonymous complex type.
@@ -1141,7 +1143,7 @@ public class Machine implements Serializable {
         if (getInput() != null && getInput().getButtons() != null) {
             buttons = Integer.parseInt(getInput().getButtons());
         }
-        if (buttons == -1) {
+        if (buttons == -1 && getInput() != null && getInput().getControl() != null) {
             for (Control control : this.getInput().getControl()) {
                 String tempStr = control.getButtons();
                 if (tempStr != null && !tempStr.isEmpty()) {
@@ -1203,6 +1205,7 @@ public class Machine implements Serializable {
     @Override
     public String toString() {
         // return super.toString();
+        // TODO eliminate any possible null pointers! Older data sets have anomalies
         StringBuilder sb = new StringBuilder();
         sb.append(doubleQuoteString(getDescription()));
         sb.append(COMMA);
@@ -1222,7 +1225,6 @@ public class Machine implements Serializable {
         sb.append(COMMA);
 
         // NESTED TERNARY
-        // String temp = isCocktail() ? COCKTAIL : isVertical() ? "vertical" : "horizontal";
         sb.append(getDriver().getCocktail() != null && !getDriver().getCocktail().isEmpty()
                 ? COCKTAIL : getIsVertical().equals(VERTICAL) ? "vertical" : "horizontal");
 
@@ -1255,31 +1257,29 @@ public class Machine implements Serializable {
 
     private String SLstoString() {
         final StringBuilder sb = new StringBuilder();
-        getSoftwarelist().forEach(list -> sb.append(list.getName() + " | "));
+        getSoftwarelist().forEach(list -> {
+            sb.append(list.getName());
+            sb.append(" | ");
+        });
         return sb.length() > 4 ? sb.substring(0, sb.length() - 2) : "";
     }
 
     private String controlstoString() {
         final StringBuilder sb = new StringBuilder();
-        getInput().getControl().forEach(control -> sb.append(control.getType() + " | "));
+        getInput().getControl().forEach(control -> {
+            sb.append(control.getType());
+            sb.append(" | ");
+        });
         return sb.length() > 4 ? sb.substring(0, sb.length() - 2) : "";
     }
 
     private String diskstoString() {
         final StringBuilder sb = new StringBuilder();
-        getDisk().forEach(disk -> sb.append(disk.getName() + " | "));
+        getDisk().forEach(disk -> {
+            sb.append(disk.getName());
+            sb.append(" | ");
+        });
         return sb.length() > 4 ? sb.substring(0, sb.length() - 2) : "";
-    }
-
-    // TODO find a better place for this
-    public static String doubleQuoteString(String input) {
-        StringBuilder stringBuilder = new StringBuilder("\"");
-        if (input.contains("\"")) {
-            input = input.replace("\"", "''");
-        }
-        stringBuilder.append(input);
-        stringBuilder.append("\"");
-        return stringBuilder.toString();
     }
 
     private static final String COMMA = ",";

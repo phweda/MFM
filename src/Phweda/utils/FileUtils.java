@@ -20,7 +20,6 @@ package Phweda.utils;
 
 import Phweda.MFM.MFM;
 import Phweda.MFM.MFM_Constants;
-import Phweda.MFM.MFM_Data;
 
 import java.awt.*;
 import java.io.*;
@@ -28,6 +27,8 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.TERMINATE;
@@ -48,7 +49,7 @@ public class FileUtils {
 
     /* Used to limit search depth. 20 should be more than sufficient*/
     private static final int maxDepth = 25;
-    public static int MaxDepth = maxDepth;
+    static int MaxDepth = maxDepth;
 
     // This filter only returns directories
     public static FilenameFilter directoryFilenameFilter = new FilenameFilter() {
@@ -111,10 +112,7 @@ public class FileUtils {
         }
 
         public boolean accept(File file, String name) {
-            if (!name.contains(".")) {
-                return false;
-            }
-            return VIDEO_EXT.containsKey(name.toLowerCase().substring(name.lastIndexOf('.')));
+            return name.contains(".") && VIDEO_EXT.containsKey(name.toLowerCase().substring(name.lastIndexOf('.')));
         }
     };
 
@@ -144,7 +142,7 @@ public class FileUtils {
             e.printStackTrace(MFM.logger.Writer());
         } catch (IOException e) {
             e.printStackTrace();
-        } 
+        }
         return fileContents.toString();
     }
 
@@ -240,6 +238,43 @@ public class FileUtils {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static String stripSuffix(String fileName) {
+        // Strip suffix
+        int pos = fileName.lastIndexOf(".");
+        if (pos > 0) {
+            fileName = fileName.substring(0, pos);
+        }
+        return fileName;
+    }
+
+    /**
+     * Double quotes a String
+     * NOTE replaces double quotes in input string with 2 single quotes
+     *
+     * @param input
+     * @return
+     */
+    public static String doubleQuoteString(String input) {
+        StringBuilder stringBuilder = new StringBuilder("\"");
+        if (input.contains("\"")) {
+            input = input.replace("\"", "''");
+        }
+        stringBuilder.append(input);
+        stringBuilder.append("\"");
+        return stringBuilder.toString();
+    }
+
+    public static Set<String> listFromFile(File file) {
+        Set<String> list = null;
+        try (Stream<String> stream = Files.lines(Paths.get(file.getAbsolutePath()))) {
+            list = stream.collect(Collectors.toSet());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public static void openTextFileFromOS(Path file) {

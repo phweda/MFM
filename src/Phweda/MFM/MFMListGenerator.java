@@ -19,6 +19,7 @@
 package Phweda.MFM;
 
 import Phweda.MFM.Utils.ParseFolderINIs;
+import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Machine;
 
 import java.io.FileNotFoundException;
@@ -93,16 +94,8 @@ class MFMListGenerator {
                 set.removeIf(machineName -> !allList.contains(machineName))
         );
         // Remove any empty lists
-        // fixme not removing empty set i.e Swedish
         languagesMap.entrySet().removeIf(set -> set.getValue().isEmpty());
     }
-
-/*
-    private static boolean needsVID(Machine machine) {
-        String category = machine.getCategory();
-        return !vidsExcludeCategoriesList.contains(category);
-    }
-*/
 
     HashMap<String, TreeSet<String>> generateMFMLists(boolean parsing) {
         HashMap<String, TreeSet<String>> lists = null;
@@ -123,6 +116,10 @@ class MFMListGenerator {
                     continue; // Eliminating Devices from all lists with JAXB and all being added
                 } else {
                     allList.add(machineName);
+                }
+
+                if (machine.getIsmechanical().equals(Machine.YES)) {
+                    mechanicalList.add(machineName);
                 }
 
                 // Create System & Arcade lists
@@ -276,7 +273,9 @@ class MFMListGenerator {
             if (!categoriesWithMachineList.isEmpty()) {
                 lists.put(CATEGORIES, categoriesWithMachineList);
             }
-
+            if (!mechanicalList.isEmpty()) {
+                lists.put(MECHANICAL, mechanicalList);
+            }
             MFM_Data.getInstance().setStaticData(MFM_Constants.LISTS, lists);
         }
         return lists;
@@ -298,5 +297,11 @@ class MFMListGenerator {
             }
         }
         return languagesListMap;
+    }
+
+    TreeSet<String> generateListfromDAT(Datafile DAT) {
+        TreeSet<String> list = new TreeSet<String>();
+        DAT.getGame().forEach(game -> list.add(game.getName()));
+        return list;
     }
 }

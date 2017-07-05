@@ -25,21 +25,30 @@ package Phweda.MFM.Utils;
  * Time: 11:47 AM
  */
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFM_Data;
+import Phweda.MFM.*;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.datafile.Disk;
 import Phweda.MFM.datafile.Game;
 import Phweda.MFM.datafile.Header;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Rom;
+import Phweda.utils.FileUtils;
+import Phweda.utils.PersistUtils;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Creates a standard DAT file for a list
@@ -48,9 +57,102 @@ public class MFM_DATmaker {
 
     private static Map<String, Machine> map;
     private static final String NODUMP = "nodump";
+    private static final String LISTS_ZIP_FILE_SUFFIX = "_Lists_DATs.zip";
+    private static URL DATschemaURL;
 
-    public static Datafile generateDAT(String listName, Set list) throws ParserConfigurationException {
+    public MFM_DATmaker() {
+        DATschemaURL = this.getClass().getResource("Resources" + FileUtils.SLASH + "datafile.xsd");
+    }
+
+    public static Datafile generateDAT(String listName, Set<String> list) throws ParserConfigurationException {
         return createDAT(listName, list);
+    }
+
+    /**
+     * @param datafile input DAT
+     * @param list     Machines to retain in modified DAT
+     * @return modified DAT objects
+     */
+    public static Datafile filterDATbyList(Datafile datafile, Set<String> list) {
+        Datafile filteredDatafile = new Datafile();
+        filteredDatafile.setHeader(datafile.getHeader());
+        datafile.getGame().forEach(game ->
+        {
+            if (list.contains(game.getName())) {
+                filteredDatafile.getGame().add(game);
+            }
+        });
+        return filteredDatafile;
+    }
+
+    public static boolean validateDAT(File xmlFile) {
+        try {
+            SchemaFactory factory =
+                    SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(new File(DATschemaURL.getPath()));
+            Validator validator = schema.newValidator();
+            validator.validate(new StreamSource(xmlFile));
+        } catch (IOException | SAXException e) {
+            System.out.println("Exception: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * NAMES:
+     * 186_ALL_DAT.zip
+     * 186_RUNNABLE_DAT.zip
+     * Creates and zips up builtin lists. To support MFM Data Set torrent
+     **/
+    public static void saveBuiltinListsDATs() {
+        List<Datafile> DATfiles = new ArrayList<Datafile>();
+        MFMPlayLists.getInstance().getMFMListNames()
+                .forEach(listName -> {
+                    try {
+                        DATfiles.add(createDAT(listName, MFMPlayLists.getInstance().getPlayList(listName)));
+                    } catch (ParserConfigurationException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        saveDATS(DATfiles);
+    }
+
+    /**
+     * NAMES:
+     * 186_ALL_DAT.zip
+     * 186_RUNNABLE_DAT.zip
+     * Creates and zips up builtin lists. To support MFM Data Set torrent
+     *
+     * @param DATfiles
+     */
+    private static void saveDATS(List<Datafile> DATfiles) {
+        String zipName = getDATzipName();
+        String versionSuffix = "(" + getDataVersionNumber() + ").dat";
+
+        Thread persistDATs = new Thread() {
+            @Override
+            public void run() {
+                if (MFM.isSystemDebug()) {
+                    System.out.println("## Saving DATS");
+                }
+                synchronized (this) {
+                    String logMessage = "Savings MFM DATS: " + DATfiles.size() + "\n\n";
+                    System.out.println(logMessage);
+                    MFM.logger.addToList(logMessage, true);
+
+                    try (ZipOutputStream zipOutputStream =
+                                 new ZipOutputStream(new FileOutputStream(zipName))) {
+                        DATfiles.forEach(DAT -> PersistUtils.saveJAXBtoZip(DAT, zipOutputStream,
+                                DAT.getHeader().getName() + versionSuffix, Datafile.class, true));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        persistDATs.start();
     }
 
     private static Datafile createDAT(String listName, Set<String> list) throws ParserConfigurationException {
@@ -132,17 +234,6 @@ public class MFM_DATmaker {
         return disk;
     }
 
-    /*
-        <header>
-            <name>PD Video Project</name>
-            <description>PD Video Project 09-6-2015</description>
-            <category>Standard DatFile</category>
-		    <version>09-6-2015</version>
-		    <author>phweda</author>
-		    <clrmamepro forcepacking="unzip"/>
-	    </header>
-    */
-
     private static Header createHeader(String listName) {
         Header header = new Header();
         header.setName(listName);
@@ -152,7 +243,33 @@ public class MFM_DATmaker {
         header.setDate(new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
         header.setVersion(MFM_Data.getInstance().getDataVersion());
         header.setAuthor(MFM.APPLICATION_NAME);
-
         return header;
+    }
+
+    // Should really just change the file name format - oh well that's more trouble
+    // 186_Lists_DATs.zip
+    // 186_ALL_Lists_DATs.zip
+    private static String getDATzipName() {
+        StringBuilder sb = new StringBuilder(MFM.MFM_DATA_DIR);
+        String dataVersion = MFMSettings.getInstance().getDataVersion();
+        // OK just for fun. really should be if/else with no String concat
+        sb.append(dataVersion.contains(MFMSettings.ALL_) ?
+                dataVersion.substring(4, dataVersion.length()) + "_" + "ALL" : dataVersion);
+
+        sb.append(LISTS_ZIP_FILE_SUFFIX);
+        return sb.toString();
+    }
+
+    /**
+     * Specifically for MFM version internal string
+     *
+     * @return
+     */
+    private static String getDataVersionNumber() {
+        String version = MFMSettings.getInstance().getDataVersion();
+        if (version.contains(".")) {
+            return version.substring(version.lastIndexOf(".") + 1);
+        }
+        return version;
     }
 }

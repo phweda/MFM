@@ -148,7 +148,7 @@ public class MFM_Data {
                     try (ZipOutputStream zipOutputStream =
                                  new ZipOutputStream(new FileOutputStream(getZipPathString(saveDirectory, all)))) {
                         PersistUtils.saveAnObjecttoZip(permData, zipOutputStream, MFM_CACHE_SER);
-                        PersistUtils.saveJAXBtoZip(mame, zipOutputStream, MFM_MAME_XML, Mame.class);
+                        PersistUtils.saveJAXBtoZip(mame, zipOutputStream, MFM_MAME_XML, Mame.class, false);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

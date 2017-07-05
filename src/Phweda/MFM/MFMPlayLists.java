@@ -107,9 +107,19 @@ public class MFMPlayLists implements Serializable {
         tempSet.remove(CHD);
         tempSet.remove(CLONE);
         tempSet.remove(DEVICES);
-        tempSet.remove(PD_VIDS);
-
         tempSet.addAll(languagesListsMap.keySet());
+        return tempSet;
+    }
+
+    public TreeSet<String> getListEditorKeys() {
+        TreeSet<String> tempSet = new TreeSet<String>(MFMPlayListsTree.keySet());
+        tempSet.remove(ALL);
+        tempSet.remove(BIOS);
+        tempSet.remove(DEVICES);
+        tempSet.addAll(languagesListsMap.keySet());
+        if (myPlayListsTree.size() > 0) {
+            tempSet.addAll(myPlayListsTree.keySet());
+        }
         return tempSet;
     }
 
@@ -136,23 +146,21 @@ public class MFMPlayLists implements Serializable {
         return allTree;
     }
 
-
-    public TreeSet<String> createPlayList(String name, String[] games) {
-        TreeSet<String> treeSet = new TreeSet(Arrays.asList(games));
+    public void createPlayList(String name, String[] machines) {
+        TreeSet<String> treeSet = new TreeSet<String>(Arrays.asList(machines));
         myPlayListsTree.put(name, treeSet);
         persistPlayLists();
         allListsNames.add(name);
         persistPlayLists();
-        return treeSet;
     }
 
-    TreeSet<String> createPlayList(String name, TreeSet<String> games) {
-        TreeSet<String> treeSet = new TreeSet(games);
+    void createPlayList(String name, TreeSet<String> machines) {
+        TreeSet<String> treeSet = new TreeSet<String>(machines);
         myPlayListsTree.put(name, treeSet);
         persistPlayLists();
         allListsNames.add(name);
+        myListsNames.add(name);
         persistPlayLists();
-        return treeSet;
     }
 
     public Object[] PlayListNames() {
@@ -160,7 +168,11 @@ public class MFMPlayLists implements Serializable {
     }
 
     private Set<String> getAllPlayListNames() {
-        return new TreeSet<>(allListsNames);
+        return new TreeSet<String>(allListsNames);
+    }
+
+    public Set<String> getMFMListNames() {
+        return MFMPlayListsTree.keySet();
     }
 
     public String getNextListName(String currentName, boolean next) {
@@ -195,6 +207,16 @@ public class MFMPlayLists implements Serializable {
         return myListsNames.toArray();
     }
 
+    public String[] getListBuilderNames() {
+        ArrayList<String> builderNames = new ArrayList<String>();
+        if (MFMSettings.getInstance().getDataVersion().contains(MFMListBuilder.ALL)) {
+            builderNames.add(MFMListBuilder.RUNNABLE);
+        }
+        builderNames.add(MFMListBuilder.ALL);
+        builderNames.addAll(myListsNames);
+        return builderNames.toArray(new String[builderNames.size()]);
+    }
+
     public TreeSet<String> getPlayList(String name) {
         if (MFMPlayListsTree.containsKey(name)) {
             return MFMPlayListsTree.get(name);
@@ -208,21 +230,21 @@ public class MFMPlayLists implements Serializable {
     public void removePlayList(String name) {
         myPlayListsTree.remove(name);
         allListsNames.remove(name);
+        myListsNames.remove(name);
         persistPlayLists();
     }
 
-    public void addGameToPlayList(String listName, String gameName) {
-        myPlayListsTree.get(listName).add(gameName);
+    public void addMachineToPlayList(String listName, String machineName) {
+        myPlayListsTree.get(listName).add(machineName);
         persistPlayLists();
     }
 
-    public void removeGameFromPlayList(String listName, String gameName) {
-        myPlayListsTree.get(listName).remove(gameName);
+    public void removeMachineFromPlayList(String listName, String machineName) {
+        myPlayListsTree.get(listName).remove(machineName);
         persistPlayLists();
     }
 
     private void loadPlayLists() {
-
         Path path = Paths.get(MFM.MFM_SETTINGS_DIR + "MFM_Playlists.xml");
         if (path.toFile().exists()) {
             try {
@@ -236,7 +258,7 @@ public class MFMPlayLists implements Serializable {
         if (myPlayListsTree == null) {
             myPlayListsTree = new TreeMap<String, TreeSet<String>>();
         }
-        // We retrieve the built in game lists each time
+        // We retrieve the built in Machine lists each time
         // They are persisted by MAMEInfo in MFM_Data
         boolean ALL = MFMSettings.getInstance().getDataVersion().contains("ALL");
         if (allMachineNames == null) {

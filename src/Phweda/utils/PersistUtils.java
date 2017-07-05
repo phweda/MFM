@@ -22,6 +22,8 @@ import Phweda.MFM.datafile.Datafile;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -30,11 +32,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -81,6 +82,7 @@ public class PersistUtils {
 
     /**
      * DO NOT close outputstream so other files may be added to zip from the caller
+     *
      * @param obj
      * @param zipOutputStream
      * @param fileName
@@ -138,13 +140,31 @@ public class PersistUtils {
         }
     }
 
+    /**
+     * Non-validating
+     *
+     * @param path   path to input file
+     * @param _class class of xml root object
+     * @return root object
+     */
     public static Object retrieveJAXB(String path, Class _class) {
         Object obj = null;
+        /*
+            Block parser from reaching out externally see:
+            https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#SAXTransformerFactory
+        */
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(_class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            obj = jaxbUnmarshaller.unmarshal(new File(path));
-        } catch (JAXBException e) {
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+            Source xmlSource = new SAXSource(spf.newSAXParser().getXMLReader(),
+                    new InputSource(new FileReader(new File(path))));
+            JAXBContext jc = JAXBContext.newInstance(_class);
+            Unmarshaller um = jc.createUnmarshaller();
+            obj = um.unmarshal(xmlSource);
+        } catch (JAXBException | FileNotFoundException | SAXException | ParserConfigurationException e) {
             e.printStackTrace();
         }
         return obj;
@@ -154,11 +174,7 @@ public class PersistUtils {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(_class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            // output optimized not readable
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
-//            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.marshal(obj, new File(path));
         } catch (JAXBException e) {
             e.printStackTrace();
@@ -167,17 +183,18 @@ public class PersistUtils {
 
     /**
      * DO NOT close outputstream so other files may be added to zip from the caller
+     *
      * @param obj
      * @param zipOutputStream
      * @param fileName
      * @param _class
      */
-    public static void saveJAXBtoZip(Object obj, ZipOutputStream zipOutputStream, String fileName, Class _class) {
+    public static void saveJAXBtoZip(Object obj, ZipOutputStream zipOutputStream, String fileName, Class _class,
+                                     boolean formatted) {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(_class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-            // output optimized not readable
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formatted);
 
             ZipEntry zipEntry = new ZipEntry(fileName);
             zipOutputStream.putNextEntry(zipEntry);

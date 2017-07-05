@@ -25,24 +25,16 @@ package Phweda.MFM;
  * Time: 2:47 PM
  */
 
-import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.UI.MFMUI_Setup;
+import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Machine;
 import Phweda.utils.PersistUtils;
 import Phweda.utils.QuadState;
 import Phweda.utils.TriState;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -55,7 +47,7 @@ public final class MFMListBuilder {
     public static final String ALL = "ALL";
     public static final String RUNNABLE = "RUNNABLE";
     public static final String NO_IMPERFECT = "NOIMPERFECT";
-    public static final String PD_VIDS = "PD VIDs";
+    public static final String MECHANICAL = "MECHANICAL";
     public static final String CLONE = "CLONE";
     public static final String DEVICES = "DEVICES";
     public static final String NO_CLONE = "NOCLONE";
@@ -69,10 +61,13 @@ public final class MFMListBuilder {
     public static final String RASTER = "RASTER";
     public static final String VECTOR = "VECTOR";
     public static final String LCD = "LCD";
-    public static final String UNKNOWN = "UNKNOWN";
+    public static final String ALL_CONTROLS = "All Controls";
+    public static final String ANY_CONTROLS = "Any Controls";
+    public static final String EXACT_CONTROLS = "Exact Controls";
 
     // TODO fixme bad design!!!
     static final String ALL_LANGUAGES = "All Languages";
+    static final String ALL_YEARS = "All Years";
     static final String BIOS = "BIOS";
     static final String IMPERFECT = "IMPERFECT";
     static final String CHD = "CHD";
@@ -93,13 +88,13 @@ public final class MFMListBuilder {
     static TreeSet<String> runnableList;
     static ArrayList<String> arcadeCategories;
     static ArrayList<String> systemCategories;
+    //======= For use by MFMListGenerator when Parsing MAME ===================
     static TreeSet<String> allList = new TreeSet<String>();
     static TreeSet<String> biosList = new TreeSet<String>();
     static TreeSet<String> devicesList = new TreeSet<String>();
     static TreeSet<String> noClonesList = new TreeSet<String>();
     static TreeSet<String> noImpefectList = new TreeSet<String>();
-    // Remove as VIDs project is dead
-    // static TreeSet<String> VIDsList = new TreeSet<String>();
+    static TreeSet<String> mechanicalList = new TreeSet<String>();
     static TreeSet<String> clonesList = new TreeSet<String>();
     static TreeSet<String> verticalsList = new TreeSet<String>();
     static TreeSet<String> horizontalList = new TreeSet<String>();
@@ -111,6 +106,7 @@ public final class MFMListBuilder {
     static TreeSet<String> rasterDisplayList = new TreeSet<String>();
     static TreeSet<String> vectorDisplayList = new TreeSet<String>();
     static TreeSet<String> lcdDisplayList = new TreeSet<String>();
+//=====================================================================
     static TreeSet<String> categoriesWithMachineList = new TreeSet<String>();
     static TreeMap<String, TreeSet<String>> languagesListsMap;
     private static TreeSet<String> allCategoriesList;
@@ -139,6 +135,9 @@ public final class MFMListBuilder {
             // Populate built in lists
             lists = MFMListGenerator.getInstance().generateMFMLists(parsing);
             languagesListsMap = MFMListGenerator.getInstance().getLanguageLists(parsing);
+            if (MFM.isSystemDebug()) {
+                System.out.println("Mechanical list:\n" + mechanicalList);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             MFM.logger.out("FATAL error is MFMListBuilder. Check your Data Set");
@@ -168,7 +167,7 @@ public final class MFMListBuilder {
         return lists.get(DEVICES);
     }
 
-    static TreeSet<String> getRunnableList() {
+    public static TreeSet<String> getRunnableList() {
         return lists.get(RUNNABLE);
     }
 
@@ -176,15 +175,13 @@ public final class MFMListBuilder {
         return lists.get(NO_IMPERFECT);
     }
 
+    static TreeSet<String> getMechanicalList() {
+        return lists.get(MECHANICAL);
+    }
+
     static TreeSet<String> getNoClonesList() {
         return lists.get(NO_CLONE);
     }
-
-/*
-    static TreeSet<String> getVIDsList() {
-        return lists.get(PD_VIDS);
-    }
-*/
 
     static TreeSet<String> getClonesList() {
         return lists.get(CLONE);
@@ -343,32 +340,7 @@ public final class MFMListBuilder {
 
     }
 
-    public static String importList(Container container) {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_LISTS_DIR);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.showDialog(null, JFileChooser.APPROVE_SELECTION);
-
-        File file = fileChooser.getSelectedFile();
-
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines(file.toPath(), Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String fileName = stripSuffix(file.getName());
-        String[] machines = lines.toArray(new String[lines.size()]);
-        createPlayList(fileName, machines, container);
-
-        return fileName;
-    }
-
-    public static void createPlayList(String name, String[] list, Container container) {
-        boolean ok = MFMListBuilder.checkListName(name, container);
-        if (!ok) {
-            return;
-        }
+    public static void createPlayList(String name, String[] list) {
         MFMPlayLists.getInstance().createPlayList(name, checkList(list));
         MFMUI_Setup.getInstance().updateMenuBar(name);
     }
@@ -383,123 +355,13 @@ public final class MFMListBuilder {
         return newList;
     }
 
-    private static boolean checkListName(String name, Component comp) {
-
-        if (playLists.getALLPlayListsTree().containsKey(name)) {
-            if (playLists.getMyPlayListsTree().containsKey(name)) {
-                int result = JOptionPane.showConfirmDialog(comp,
-                        "That list name already exists. Overwrite it?", "", JOptionPane.YES_NO_OPTION);
-                if (result == JOptionPane.NO_OPTION) {
-                    return false;
-                }
-            } else {
-                JOptionPane.showMessageDialog(comp, "Please rename that is a reserved list name.");
-                return false;
-            }
-        }
-        return true;
+    public static String[] getRunnableArray() {
+        return getRunnableList().toArray(new String[getRunnableList().size()]);
     }
 
-    private static String stripSuffix(String fileName) {
-        // Strip suffix
-        int pos = fileName.lastIndexOf(".");
-        if (pos > 0) {
-            fileName = fileName.substring(0, pos);
-        }
-        return fileName;
-    }
-
-    public static void diffLists(Frame frame) {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_LISTS_DIR);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setMultiSelectionEnabled(true);
-        fileChooser.showDialog(null, JFileChooser.APPROVE_SELECTION);
-
-        File[] files = fileChooser.getSelectedFiles();
-
-        if (files.length < 2) {
-            JOptionPane.showMessageDialog(null, "You must select two files.");
-            return;
-        }
-
-        if (files.length > 2) {
-            JOptionPane.showMessageDialog(null, "Diff will be the first two files returned");
-        }
-
-        String name1 = stripSuffix(files[0].getName());
-        String name2 = stripSuffix(files[1].getName());
-
-        List<String> lines1 = null;
-        List<String> lines2 = null;
-        try {
-            lines1 = Files.readAllLines(files[0].toPath(), Charset.defaultCharset());
-            lines2 = Files.readAllLines(files[1].toPath(), Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        TreeSet<String> list1 = new TreeSet<String>(lines1);
-        TreeSet<String> list2 = new TreeSet<String>(lines2);
-        TreeSet<String> commonList = new TreeSet<String>(list1);
-        commonList.retainAll(list2);
-        list1.removeAll(commonList);
-        list2.removeAll(commonList);
-
-        StringBuilder output = new StringBuilder();
-        output.append("Machines unique to each list are:\n\n");
-        output.append(name1);
-        output.append(" : \n");
-
-        for (String aList1 : list1) {
-            output.append(aList1);
-            output.append("\n");
-        }
-        output.deleteCharAt(output.length() - 2);
-        output.append("\n\n");
-
-        output.append(name2);
-        output.append(" : \n");
-        for (String aList2 : list2) {
-            output.append(aList2);
-            output.append("\n");
-        }
-        // Remove the final newline NOTE very Anal!! ;)
-        // bug ID#34 FIXED
-        output.deleteCharAt(output.length() - 1);
-
-        JTextArea txt = new JTextArea(output.toString());
-        txt.setLineWrap(true);
-        JScrollPane scrollPane = new JScrollPane(txt);
-        JDialog dialog = new JDialog(frame, "Lists Difference");
-        dialog.getContentPane().add(scrollPane);
-        dialog.setMinimumSize(new Dimension(300, 200));
-        dialog.setPreferredSize(new Dimension(400, (int) MFMUI.screenSize.getHeight() / 2));
-        dialog.setMaximumSize(new Dimension(400, (int) MFMUI.screenSize.getHeight() / 2));
-
-        dialog.setLocation(MFMUI.screenSize.width / 2 - 150, MFMUI.screenSize.height / 2 - 100);
-        dialog.pack();
-        dialog.setVisible(true);
-    }
-
-    public static Object[] getRunnableArray() {
-        return getRunnableList().toArray();
-    }
-
-    public static void dumpListData(String list) {
-        File newFile = new File(MFM.MFM_LISTS_DIR + list +
-                MFM_Data.getInstance().getDataVersion() + "_data.csv");
-        TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
-        PrintWriter pw = null;
-        try {
-            pw = new PrintWriter(newFile);
-            pw.println(Machine.CSV_HEADER);
-            for (String machine : machines) {
-                pw.println(MAMEInfo.getMachine(machine).toString());
-            }
-            pw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public static void createListfromDAT(String listName, Datafile DAT) {
+        TreeSet<String> list = MFMListGenerator.getInstance().generateListfromDAT(DAT);
+        MFMPlayLists.getInstance().createPlayList(listName, list);
     }
 
     // TODO Should this NOT be inner class
@@ -508,8 +370,12 @@ public final class MFMListBuilder {
         public static final QuadState orientation = new QuadState(VERTICAL, HORIZONTAL, COCKTAIL, QuadState.ALL);
         public static final QuadState displayType = new QuadState(RASTER, VECTOR, LCD, ALL_DISPLAY_TYPES);
         public static final TriState MAME = new TriState(ARCADE, SYSTEMS, TriState.BOTH);
+        public static final TriState ControlsFilterType = new TriState(ANY_CONTROLS, ALL_CONTROLS, EXACT_CONTROLS);
+
         private static final Builder builder = new Builder();
-        private static final String ALL = "All";
+        // Nasty already defined in outer class!!!!
+        // TODO fixme NOTE find all 'all' across MFM and define once! It's all over the place!
+//        private static final String ALL = "All";
         private static final int million = 1000000;
         private static final String DIAL = "dial";
         private static final String DOUBLEJOY = "doublejoy";
@@ -523,10 +389,11 @@ public final class MFMListBuilder {
         private static final String MOUSE = "mouse";
         private static final String PADDLE = "paddle";
         private static final String PEDAL = "pedal";
-        // positional ????
+        // positional ???? Never needed. see below for hash
         private static final String STICK = "stick";
         private static final String TRACKBALL = "trackball";
         private static final String TRIPLEJOY = "triplejoy";
+        // fixme can't we eliminate this? We short circuit on Pedal since it is compatible with all
         private static final TreeSet<String> pedalControls = new TreeSet<String>(Arrays.asList(new String[]{
                 DIAL, DOUBLEJOY, GAMBLING, HANAFUDA, JOY, KEYBOARD, KEYPAD, LIGHTGUN, MAHJONG, MOUSE,
                 PADDLE, STICK, TRACKBALL, TRIPLEJOY
@@ -618,9 +485,12 @@ public final class MFMListBuilder {
         public static boolean simultaneousOnly = false;
         static boolean noMature = true;
         static boolean noImperfect = false;
+        static boolean noMechanical = false;
         static boolean waysSelected = false;
         static boolean exactMatch = false;
-        static String language = null;
+        static String language = ALL_LANGUAGES;
+        static String year = null;
+        static String baseListName = ALL;
         private static String ways = ALL;
         private static String ways2 = ALL;
         String machineWays = null;
@@ -629,8 +499,6 @@ public final class MFMListBuilder {
         String machineWays2B = null;
         private int joySignature;
         private int doublejoySignature;
-        //private static final String DIAL = "dial";
-
 
         //============================================================================================
         //                              Controls Compatibility
@@ -671,20 +539,35 @@ public final class MFMListBuilder {
         //                              Control Signature Compatibility
 
         /*
-                    -1607713821	doublejoy	2	2
-                    -1607713759	doublejoy	4	2
-                    -1607713757	doublejoy	4	4
-                    -1607713635	doublejoy	8	2
-                    -1607713629	doublejoy	8	8
-                    -1238305841	joy	3 (half4)
-                    -558247347	joy	5 (half8)
-                    -482411992	joy	vertical2
-                    -410698973	doublejoy	vertical2	vertical2
-                    3268317	joy	1
-                    3268318	joy	2
-                    3268320	joy	4
-                    3268324	joy	8
-                    1993708739	doublejoy	5 (half8)	5 (half8)
+        Signature	Type	WAYS	WAYS2	WAYS3
+        -1771213723	gambling
+        -1607713821	doublejoy	2	2
+        -1607713759	doublejoy	4	2
+        -1607713757	doublejoy	4	4
+        -1607713635	doublejoy	8	2
+        -1607713629	doublejoy	8	8
+        -1238305841	joy	3 (half4)
+        -1134657068	keypad
+        -995842198	paddle
+        -558247347	joy	5 (half8)
+        -482411992	joy	vertical2
+        -410698973	doublejoy	vertical2	vertical2
+        -865288	hanafuda
+        3083120	dial
+        3268317	joy	1
+        3268318	joy	2
+        3268320	joy	4
+        3268324	joy	8
+        104086693	mouse
+        106542458	pedal
+        109764752	stick
+        503739367	keyboard
+        730225098	trackball
+        829995282	mahjong
+        991968362	lightgun
+        1198557890	triplejoy	8	8	8
+        1381039892	positional
+        1993708739	doublejoy	5 (half8)	5 (half8)
          */
 
         public static boolean isNoMature() {
@@ -761,6 +644,24 @@ public final class MFMListBuilder {
             language = languageIn;
         }
 
+        public static void setYear(String yearIn) {
+            Builder.year = yearIn;
+        }
+
+        public static void setNoMechanical(boolean noMechanical) {
+            Builder.noMechanical = noMechanical;
+        }
+
+        public static void setBaseListName(String baseListNameIn) {
+            if (MFM.isSystemDebug()) {
+                System.out.println();
+            }
+            Builder.baseListName = baseListNameIn;
+            if (MFM.isSystemDebug()) {
+                System.out.println("Base List is: " + Builder.baseListName);
+            }
+        }
+
         /**
          * This is the core functionality.
          *
@@ -772,13 +673,13 @@ public final class MFMListBuilder {
             TreeSet<String> finalList = new TreeSet<String>();
             calculateWays(); // generates the Control signature from selected values
             /**
-             * Runnable only!!
+             * With 0.9 release we allow the user to select the Base List.
              * Start with base lists: Both or Arcade or Systems
              *  Then filter by orientation: (ALL), Vertical, Horizontal, Cocktail
              *  Then filter by  displayType: (ALL), Raster, Vector, LCD
              *
              */
-            baseList = new TreeSet<String>(runnableList);
+            baseList = new TreeSet<String>(MFMPlayLists.getInstance().getPlayList(baseListName));
             if (MAME.getState().equals(ARCADE)) {
                 baseList.retainAll(getArcadeList());
             } else if (MAME.getState().equals(SYSTEMS)) {
@@ -875,9 +776,38 @@ public final class MFMListBuilder {
                 System.out.println("Expanded Controls are : " + expandedControls);
             }
 
+            // Apply Year and Controls filter
+            boolean checkYear = (year != null && !year.equals(ALL_YEARS));
             for (String machineName : baseList) {
                 Machine machine = allMachines.get(machineName);
-                if (checkControls(machine, expandedControls)
+                // In older MAME these are not guaranteed and it IS now possible to get a null Machine
+                if (machine == null || machine.getDriver() == null || machine.getInput() == null) {
+                    continue;
+                }
+
+                // If year is selected but does not match
+                if (checkYear && (machine.getYear() == null || !machine.getYear().equals(year))) {
+                    continue;
+                }
+
+
+                List<String> machineControls = machine.getInput().getControl().stream().map(
+                        Control::getType).collect(Collectors.toList());
+
+                // Is there an All match of Controls
+                if (ControlsFilterType.getState().equals(EXACT_CONTROLS) &&
+                        !machineControls.containsAll(this.controls)) {
+                    continue;
+                }
+
+                // Is there an Exact match of Controls
+                if (ControlsFilterType.getState().equals(EXACT_CONTROLS) &&
+                        (!machineControls.containsAll(this.controls) ||
+                                machineControls.size() != this.controls.size())) {
+                    continue;
+                }
+
+                if (checkControls(machine, machineControls, expandedControls)
                         && checkButtonsPlayers(machine.getButtons(),
                         Integer.parseInt(machine.getInput().getPlayers()))) {
                     finalList.add(machineName);
@@ -889,14 +819,15 @@ public final class MFMListBuilder {
             return finalList;
         }
 
-        private boolean checkControls(Machine machine, TreeSet<String> expandedControls) {
+        private boolean checkControls(Machine machine, List<String> machineControls,
+                                      TreeSet<String> expandedControls) {
             // If No Controls or ways are selected ignore them
             if (controls.isEmpty() && !waysSelected) {
                 return true;
             }
-            List<String> machineControls = machine.getInput().getControl().stream().map(
-                    Control::getType).collect(Collectors.toList());
+
             machineControls.retainAll(expandedControls);
+
             // TODO test does this resolve buttons??
             if (machineControls.isEmpty()) {
                 return false;
@@ -934,7 +865,6 @@ public final class MFMListBuilder {
                         }
                     }
                 }
-
                 return false;
             }
             return true;

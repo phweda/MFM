@@ -19,6 +19,7 @@
 package Phweda.MFM.UI;
 
 import Phweda.MFM.*;
+import Phweda.MFM.Utils.MFM_DATmaker;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Device;
 import Phweda.MFM.mame.MAME_Stats;
@@ -293,12 +294,34 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         updateUI();
     }
 
+    void showListEditor() {
+        MFMListActions.showListEditor();
+    }
+
     void ListtoFile() {
         MFMListActions.ListtoFile();
     }
 
     void ListtoDAT() {
         MFMListActions.ListtoDAT();
+    }
+
+    void DATtoList() {
+        changeList(MFMListActions.DATtoList());
+    }
+
+    void FilterDATbyList() {
+        MFMListActions.filterDATbyList();
+    }
+
+    void FilterDATbyExternalList() {
+        MFMListActions.filterDATbyExternalList();
+    }
+
+    void importList() {
+        String listName = MFMListActions.importList(getFrame());
+        changeList(listName);
+        MFMUI_Setup.getInstance().updateMenuBar(listName);
     }
 
     void runGame(String command) {
@@ -721,8 +744,12 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             showNextList(false, false);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_COMMA) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_S) && e.isControlDown() && e.isShiftDown()) {
             new MAME_Stats().saveStats();
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_D && e.isControlDown() && e.isShiftDown()) {
+            MFM_DATmaker.saveBuiltinListsDATs();
         }
 
     }
@@ -808,37 +835,21 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         mainFrame.addMouseListener(this);
 
         MFM_Components components = getComps();
-
         machineListTable = components.getMachineListTable();
         folderTree = components.getTree();
 
         extrasTabbedPane = components.ExtrasTabbedPane();
         extrasTabbedPane.addMouseListener(this);
 
-        //===========================================
         extrasTabbedPane.addKeyListener(this);
         machineListTable.addKeyListener(this);
-        //===========================================
 
         MFMPopupMenu = MFM_Components.MFMPopupMenu();
         currentListName = components.CurrentListName();
         infoPanel = MFM_Components.InfoPanel();
         statusBar = MFM_Components.StatusBar();
 
-
         mainFrame.pack();
-
-        // fixme not getting maximized frame with any of these?
-/*      Grabs full screen
-        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
-        graphicsDevice.setFullScreenWindow(mainFrame);
-*/
-        //    mainFrame.setPreferredSize(MFM.screenSize);
-        //    mainFrame.setPreferredSize(mainFrame.getMaximumSize());
-        //    mainFrame.setExtendedState(Frame.NORMAL);
-        //    mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
-
         mainFrame.setVisible(true);
         mainFrame.repaint();
         // Note order must be last!
@@ -936,7 +947,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void ListMachinesDUMP() {
-        MFMListBuilder.dumpListData(pickList(true, "Pick list to export MAME data"));
+        MFMListActions.dumpListData(pickList(true, "Pick list to export MAME data"));
         JOptionPane.showMessageDialog(mainFrame, "Files are in the MFM/Lists folder");
     }
 

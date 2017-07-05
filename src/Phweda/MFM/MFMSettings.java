@@ -52,7 +52,7 @@ public class MFMSettings {
     private static boolean loaded = false;
     // Special case logic
     private static final double DBL_143 = 143d;// removed the decimal for correct comparison e.g. 0.70 is > 0.143
-    static final String ALL_ = "ALL_";
+    public static final String ALL_ = "ALL_";
     // Use this guy to persist
     private static HashMap<String, Object> mfmSettings;
 

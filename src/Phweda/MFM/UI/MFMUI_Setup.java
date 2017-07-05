@@ -49,7 +49,6 @@ public class MFMUI_Setup {
     private static JComponent leftPane;
 
     private MFMUI_Setup() {
-        //    System.out.println("MFMUI_Setup()" + listBuilder.toString());
         MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
     }
 

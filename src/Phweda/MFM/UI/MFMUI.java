@@ -45,7 +45,8 @@ public class MFMUI {
     static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
     private static JFrame settingsFrame;
     private static boolean progressRunning = false;
-    private static JDialog busyDialog = new JDialog((Dialog) null, MFM.MFM_TITLE);
+    private static JDialog busyDialog = new JDialog((Dialog) null,
+            MFM.MFM_TITLE.substring(0, MFM.MFM_TITLE.lastIndexOf(':')));
     private static Thread busyThread = null;
 
     private MFMUI() {
@@ -103,14 +104,9 @@ public class MFMUI {
     }
 
     private static JXBusyLabel createComplexBusyLabel() {
-        JXBusyLabel label = new JXBusyLabel(new Dimension(325, 150));
+        JXBusyLabel label = new JXBusyLabel(new Dimension(340, 150));
         // default is 100
         label.setDelay(100);
-        /*
-        BusyPainter painter = new BusyPainter(
-                new Rectangle2D.Float(0.0f, 0.0f, 8.0f, 8.0f),
-                new Rectangle2D.Float(20.5f, 20.5f, 75.0f, 75.0f));
-*/
         MFMBusyPainter painter = new MFMBusyPainter(
                 new Ellipse2D.Double(0.0d, 0.0d, 15.0d, 15.0d),
                 new Ellipse2D.Double(10.0d, 10.0d, 125.0d, 125.0d));
@@ -121,8 +117,8 @@ public class MFMUI {
         painter.setBaseColor(MFMUI.getMFMcolor());
         painter.setHighlightColor(Color.orange);
 
-        label.setPreferredSize(new Dimension(325, 150));
-        label.setMinimumSize(new Dimension(325, 150));
+        label.setPreferredSize(new Dimension(340, 150));
+        label.setMinimumSize(new Dimension(340, 150));
         label.setIcon(new EmptyIcon(150, 150));
         label.setBusyPainter(painter);
         label.setFont(new Font(label.getFont().getName(), Font.BOLD, 24));

@@ -9,36 +9,34 @@
       <alignmentY value="1.0"/>
       <maximumSize width="1280" height="960"/>
       <minimumSize width="1080" height="750"/>
-      <preferredSize width="1280" height="900"/>
+      <preferredSize width="1280" height="920"/>
     </properties>
     <border type="etched"/>
     <children>
       <grid id="a14f5" binding="buttonPanel" layout-manager="GridBagLayout">
         <constraints>
-          <grid row="4" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
         </constraints>
         <properties>
-          <minimumSize width="709" height="70"/>
-          <preferredSize width="709" height="70"/>
+          <maximumSize width="1000" height="100"/>
+          <minimumSize width="700" height="70"/>
+          <preferredSize width="700" height="70"/>
         </properties>
         <border type="bevel-raised"/>
         <children>
-          <component id="4fd8a" class="javax.swing.JTextField" binding="listNameTF">
+          <hspacer id="d8e5a">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="0" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="28"/>
-              </grid>
-              <gridbag top="5" left="0" bottom="5" right="0" weightx="0.4" weighty="1.0"/>
+              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.025" weighty="0.0"/>
             </constraints>
-            <properties>
-              <margin top="0" left="20" bottom="0" right="30"/>
-              <maximumSize width="255" height="30"/>
-              <minimumSize width="255" height="30"/>
-              <opaque value="true"/>
-              <preferredSize width="255" height="30"/>
-            </properties>
-          </component>
+          </hspacer>
+          <hspacer id="d8d96">
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.1" weighty="0.0"/>
+            </constraints>
+          </hspacer>
           <component id="9b09e" class="javax.swing.JButton" binding="createListButton">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
@@ -48,13 +46,14 @@
             </constraints>
             <properties>
               <label value="Create List"/>
-              <maximumSize width="135" height="32"/>
-              <minimumSize width="135" height="32"/>
-              <preferredSize width="135" height="32"/>
+              <margin top="2" left="16" bottom="2" right="16"/>
+              <maximumSize width="140" height="33"/>
+              <minimumSize width="140" height="33"/>
+              <preferredSize width="140" height="33"/>
               <text value="Create List"/>
             </properties>
           </component>
-          <component id="d817e" class="javax.swing.JLabel" binding="listNameLabel" custom-create="true">
+          <component id="d817e" class="javax.swing.JLabel" binding="listNameLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="2" fill="0" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -69,95 +68,87 @@
               <text value="List Name"/>
             </properties>
           </component>
-          <component id="23d68" class="javax.swing.JButton" binding="gamePickerButton">
+          <component id="4fd8a" class="javax.swing.JTextField" binding="listNameTF">
             <constraints>
-              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="28"/>
               </grid>
-              <gridbag top="5" left="0" bottom="5" right="0" weightx="0.2" weighty="0.8"/>
+              <gridbag top="5" left="0" bottom="5" right="0" weightx="0.4" weighty="1.0"/>
             </constraints>
             <properties>
-              <enabled value="false"/>
-              <hideActionText value="true"/>
-              <maximumSize width="135" height="32"/>
-              <minimumSize width="135" height="32"/>
-              <preferredSize width="135" height="32"/>
-              <text value="Game Picker"/>
+              <margin top="0" left="20" bottom="0" right="30"/>
+              <maximumSize width="255" height="33"/>
+              <minimumSize width="255" height="33"/>
+              <opaque value="true"/>
+              <preferredSize width="255" height="33"/>
             </properties>
           </component>
-          <component id="90709" class="javax.swing.JButton" binding="importListButton">
-            <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="0" bottom="5" right="0" weightx="0.2" weighty="0.8"/>
-            </constraints>
-            <properties>
-              <maximumSize width="135" height="32"/>
-              <minimumSize width="135" height="32"/>
-              <preferredSize width="135" height="32"/>
-              <text value="Import List"/>
-            </properties>
-          </component>
-          <component id="ce412" class="javax.swing.JButton" binding="populateListButton" custom-create="true" default-binding="true">
-            <constraints>
-              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="115" height="28"/>
-              </grid>
-              <gridbag top="5" left="0" bottom="5" right="0" weightx="0.2" weighty="0.8"/>
-            </constraints>
-            <properties>
-              <maximumSize width="135" height="32"/>
-              <minimumSize width="135" height="32"/>
-              <preferredSize width="135" height="32"/>
-              <text value="Copy Resources"/>
-            </properties>
-          </component>
-          <hspacer id="d8e5a">
-            <constraints>
-              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.1" weighty="0.0"/>
-            </constraints>
-          </hspacer>
-          <hspacer id="d8d96">
-            <constraints>
-              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag weightx="0.1" weighty="0.0"/>
-            </constraints>
-          </hspacer>
-          <hspacer id="ca846">
+          <hspacer id="11a12">
             <constraints>
               <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.1" weighty="0.0"/>
             </constraints>
           </hspacer>
-          <component id="ac23f" class="javax.swing.JButton" binding="diffListsButton" default-binding="true">
+          <component id="90709" class="javax.swing.JButton" binding="importListButton">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag top="5" left="0" bottom="5" right="0" weightx="0.2" weighty="0.8"/>
+            </constraints>
+            <properties>
+              <margin top="2" left="16" bottom="2" right="16"/>
+              <maximumSize width="140" height="33"/>
+              <minimumSize width="140" height="33"/>
+              <preferredSize width="140" height="33"/>
+              <text value="Import List"/>
+            </properties>
+          </component>
+          <component id="709ac" class="javax.swing.JButton" binding="saveListToFileButton" custom-create="true" default-binding="true">
             <constraints>
               <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag top="5" left="0" bottom="5" right="0" weightx="0.2" weighty="0.8"/>
             </constraints>
             <properties>
-              <maximumSize width="135" height="32"/>
-              <minimumSize width="135" height="32"/>
-              <preferredSize width="135" height="32"/>
-              <text value="Diff Lists"/>
+              <margin top="2" left="16" bottom="2" right="16"/>
+              <maximumSize width="140" height="33"/>
+              <minimumSize width="140" height="33"/>
+              <preferredSize width="140" height="33"/>
+              <text value="Save List to File"/>
             </properties>
           </component>
-          <component id="709ac" class="javax.swing.JButton" binding="saveListToFileButton" custom-create="true" default-binding="true">
+          <component id="a49bb" class="javax.swing.JComboBox" binding="baseListComboBox" custom-create="true">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-              <gridbag top="5" left="0" bottom="5" right="0" weightx="0.2" weighty="0.8"/>
+              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.2" weighty="0.8"/>
             </constraints>
             <properties>
-              <maximumSize width="135" height="32"/>
-              <minimumSize width="135" height="32"/>
-              <preferredSize width="135" height="32"/>
-              <text value="Save List to File"/>
+              <minimumSize width="135" height="33"/>
+              <preferredSize width="135" height="33"/>
+              <toolTipText value="List to filter"/>
+            </properties>
+          </component>
+          <component id="fb244" class="javax.swing.JLabel" binding="baseListLabel">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="10" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+              <gridbag weightx="0.4" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <enabled value="true"/>
+              <horizontalAlignment value="0"/>
+              <horizontalTextPosition value="2"/>
+              <labelFor value="4fd8a"/>
+              <maximumSize width="135" height="21"/>
+              <minimumSize width="135" height="21"/>
+              <preferredSize width="135" height="21"/>
+              <text value="Set Base List"/>
             </properties>
           </component>
         </children>
       </grid>
       <grid id="7b68" binding="UILeftPanel" layout-manager="GridBagLayout">
         <constraints>
-          <grid row="0" column="0" row-span="4" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="6" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.5" weighty="1.0"/>
         </constraints>
         <properties>
@@ -167,7 +158,7 @@
           <requestFocusEnabled value="true"/>
           <verifyInputWhenFocusTarget value="true"/>
         </properties>
-        <border type="none"/>
+        <border type="line"/>
         <children>
           <grid id="1873" binding="MAMEPanel" layout-manager="GridBagLayout">
             <constraints>
@@ -360,8 +351,8 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <minimumSize width="400" height="80"/>
-              <preferredSize width="400" height="80"/>
+              <minimumSize width="400" height="110"/>
+              <preferredSize width="400" height="110"/>
               <verifyInputWhenFocusTarget value="false"/>
             </properties>
             <border type="etched"/>
@@ -369,7 +360,7 @@
               <component id="da115" class="javax.swing.JCheckBox" binding="noClonesCheckBox" default-binding="true">
                 <constraints/>
                 <properties>
-                  <maximumSize width="200" height="20"/>
+                  <maximumSize width="235" height="20"/>
                   <minimumSize width="200" height="20"/>
                   <preferredSize width="200" height="20"/>
                   <text value="No Clones"/>
@@ -398,6 +389,16 @@
                   <text value="No Imperfect"/>
                 </properties>
               </component>
+              <component id="263b7" class="javax.swing.JCheckBox" binding="noMechanicalCheckBox">
+                <constraints/>
+                <properties>
+                  <horizontalAlignment value="2"/>
+                  <maximumSize width="200" height="20"/>
+                  <minimumSize width="200" height="20"/>
+                  <preferredSize width="200" height="20"/>
+                  <text value="No Mechanical"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="68bef" binding="GameButtonsPanel" layout-manager="GridBagLayout">
@@ -406,7 +407,7 @@
               <gridbag weightx="1.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <maximumSize width="2147483647" height="120"/>
+              <maximumSize width="2147483647" height="130"/>
               <minimumSize width="118" height="50"/>
               <preferredSize width="118" height="50"/>
               <requestFocusEnabled value="true"/>
@@ -566,7 +567,7 @@
               </component>
             </children>
           </grid>
-          <component id="8854d" class="javax.swing.JComboBox" binding="languagesCombobox" custom-create="true">
+          <component id="8854d" class="javax.swing.JComboBox" binding="languagesComboBox" custom-create="true">
             <constraints>
               <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
@@ -575,39 +576,27 @@
               <toolTipText value="Languages Filter"/>
             </properties>
           </component>
+          <component id="e9cc1" class="javax.swing.JComboBox" binding="yearComboBox" custom-create="true">
+            <constraints>
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <minimumSize width="235" height="33"/>
+              <toolTipText value="Year Filter"/>
+            </properties>
+          </component>
+          <vspacer id="b3c7">
+            <constraints>
+              <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+          </vspacer>
         </children>
       </grid>
-      <scrollpane id="ef896" binding="controlsScrollPane" custom-create="true">
-        <constraints>
-          <grid row="0" column="2" row-span="4" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-          <gridbag weightx="0.5" weighty="1.0"/>
-        </constraints>
-        <properties>
-          <maximumSize width="175" height="32767"/>
-          <minimumSize width="175" height="600"/>
-          <preferredSize width="175" height="550"/>
-        </properties>
-        <border type="none"/>
-        <children>
-          <grid id="283f3" binding="controlsCBPanel" custom-create="true" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
-            <constraints/>
-            <properties>
-              <alignmentX value="0.0"/>
-              <alignmentY value="0.0"/>
-              <maximumSize width="32767" height="32767"/>
-              <minimumSize width="175" height="500"/>
-              <opaque value="true"/>
-              <preferredSize width="175" height="550"/>
-              <requestFocusEnabled value="true"/>
-            </properties>
-            <border type="line" title="Controls" title-justification="2"/>
-            <children/>
-          </grid>
-        </children>
-      </scrollpane>
       <grid id="338fe" binding="CategoriesPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints>
-          <grid row="0" column="1" row-span="4" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
+          <grid row="0" column="1" row-span="5" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
             <minimum-size width="520" height="485"/>
             <preferred-size width="520" height="485"/>
             <maximum-size width="520" height="485"/>
@@ -661,7 +650,7 @@
             </properties>
             <border type="none"/>
             <children>
-              <grid id="737bf" binding="categoriesCBpanel" custom-create="true" layout-manager="GridBagLayout">
+              <grid id="737bf" binding="categoriesCBpanel" custom-create="true" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
                 <constraints/>
                 <properties>
                   <minimumSize width="520" height="580"/>
@@ -673,6 +662,76 @@
               </grid>
             </children>
           </scrollpane>
+        </children>
+      </grid>
+      <grid id="de6f9" binding="UIRightPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="0" column="2" row-span="5" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="0.0" weighty="0.0"/>
+        </constraints>
+        <properties>
+          <minimumSize width="210" height="645"/>
+          <preferredSize width="210" height="595"/>
+        </properties>
+        <border type="line"/>
+        <children>
+          <grid id="94230" binding="UIControlsScrollPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="line"/>
+            <children>
+              <scrollpane id="ef896" binding="controlsScrollPane" custom-create="true">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <maximumSize width="175" height="32767"/>
+                  <minimumSize width="175" height="600"/>
+                  <preferredSize width="175" height="550"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <grid id="283f3" binding="controlsCBPanel" custom-create="true" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+                    <constraints/>
+                    <properties>
+                      <alignmentX value="0.0"/>
+                      <alignmentY value="0.0"/>
+                      <maximumSize width="32767" height="32767"/>
+                      <minimumSize width="175" height="500"/>
+                      <opaque value="true"/>
+                      <preferredSize width="175" height="550"/>
+                      <requestFocusEnabled value="true"/>
+                    </properties>
+                    <border type="line" title="Controls" title-justification="2"/>
+                    <children/>
+                  </grid>
+                </children>
+              </scrollpane>
+            </children>
+          </grid>
+          <grid id="9abb4" binding="controlsRBPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints border-constraint="South"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="11a91" class="javax.swing.JRadioButton" binding="anyControlsRB" custom-create="true">
+                <constraints/>
+                <properties>
+                  <text value="Any"/>
+                </properties>
+              </component>
+              <component id="dee9e" class="javax.swing.JRadioButton" binding="allControlsRB" custom-create="true">
+                <constraints/>
+                <properties>
+                  <text value="All"/>
+                </properties>
+              </component>
+              <component id="6bfce" class="javax.swing.JRadioButton" binding="exactControlsRB" custom-create="true">
+                <constraints/>
+                <properties>
+                  <text value="Exact"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
         </children>
       </grid>
     </children>

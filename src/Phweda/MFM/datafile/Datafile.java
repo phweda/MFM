@@ -61,6 +61,7 @@ import java.util.List;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+
 @XmlType(name = "", propOrder = {
         "header",
         "game"
@@ -68,8 +69,13 @@ import java.util.List;
 @XmlRootElement(name = "datafile")
 public class Datafile {
 
-    protected Header header;
     @XmlElement(required = true)
+    protected Header header;
+
+    @XmlElements({
+            @XmlElement(name = "machine", type = Game.class),
+            @XmlElement(name = "game", type = Game.class)
+    })
     protected List<Game> game;
     @XmlAttribute(name = "build")
     protected String build;
