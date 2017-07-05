@@ -311,11 +311,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void FilterDATbyList() {
-        MFMListActions.FilterDATbyList();
+        MFMListActions.filterDATbyList();
     }
 
     void FilterDATbyExternalList() {
-        MFMListActions.FilterDATbyExternalList();
+        MFMListActions.filterDATbyExternalList();
     }
 
     void importList() {

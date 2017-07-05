@@ -39,6 +39,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Stream;
@@ -113,7 +114,7 @@ class MFMListActions {
         MFMPlayLists.getInstance().removeMachineFromPlayList(listName, machine);
         int row = getMachineListTable().getSelectedRow();
 
-        // TODO Refactor with  changeList(listName)
+        // TODO Refactor with changeList(listName)
         MachineListTableModel gltm = (MachineListTableModel) getMachineListTable().getModel();
         gltm.setData(MFMPlayLists.getInstance().getPlayList(listName));
         gltm.fireTableDataChanged();
@@ -200,31 +201,40 @@ class MFMListActions {
         }
     }
 
-    static void FilterDATbyList() {
+    static void filterDATbyList() {
         String list = pickList(true, "Select filter List");
         File inputDATfile = pickDAT();
         if (inputDATfile != null) {
-
-        } else {
-
+            Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputDATfile.getPath(), Datafile.class);
+            if (inputDAT != null ) {
+                saveFilteredDAT(inputDAT, MFMPlayLists.getInstance().getPlayList(list), list);
+            }
         }
     }
 
-    static void FilterDATbyExternalList() {
+    static void filterDATbyExternalList() {
         File externalList = pickListFile();
         if (externalList != null) {
             File inputfile = pickDAT();
             Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputfile.getPath(), Datafile.class);
-            if (inputDAT != null) {
-                try {
-                    Datafile DATFile = MFM_DATmaker.filterDATbyList(inputDAT, FileUtils.listFromFile(externalList));
-                    PersistUtils.saveDATtoFile(DATFile, MFM.MFM_LISTS_DIR + "filtered" + inputfile.getName());
-                } catch (FileNotFoundException | ParserConfigurationException |
-                        TransformerException | JAXBException e) {
-                    e.printStackTrace();
-                }
+            if (inputDAT != null && inputfile.exists()) {
+                Set<String> list = FileUtils.listFromFile(externalList);
+                saveFilteredDAT(inputDAT, list, inputfile.getName());
             }
         }
+    }
+
+    private static void saveFilteredDAT(Datafile inputDAT, Set<String> list, String name) {
+        try {
+            PersistUtils.saveDATtoFile(filterDAT(inputDAT, list), MFM.MFM_LISTS_DIR + name + "-filtered.xml");
+        } catch (FileNotFoundException | ParserConfigurationException |
+                TransformerException | JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Datafile filterDAT(Datafile inputDAT, Set<String> list) {
+        return MFM_DATmaker.filterDATbyList(inputDAT, list);
     }
 
     private static File pickDAT() {
@@ -240,7 +250,7 @@ class MFMListActions {
         return null;
     }
 
-    public static void dumpListData(String list) {
+    static void dumpListData(String list) {
         File newFile = new File(MFM.MFM_LISTS_DIR + list +
                 MFM_Data.getInstance().getDataVersion() + "_data.csv");
         TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
