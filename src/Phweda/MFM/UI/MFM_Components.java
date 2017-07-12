@@ -25,10 +25,7 @@ package Phweda.MFM.UI;
  * Time: 1:16 PM
  */
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFMListBuilder;
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.MFM_Data;
+import Phweda.MFM.*;
 import Phweda.utils.ClockPanel;
 
 import javax.swing.*;
@@ -138,8 +135,15 @@ public class MFM_Components {
 
     Component createStatusBar(int width) {
         statusBar = new StatusBar();
-        ClockPanel clock = new ClockPanel();
-        clock.start();
+        ClockPanel clock = null;
+        ImageIcon flagIcon = MFMUI_Resources.getInstance().getFlagImageIcon(MFM.LOCAL_COUNTRY);
+        JLabel flag = null;
+        if (flagIcon != null) {
+            flag = new JLabel(flagIcon);
+        } else {
+            clock = new ClockPanel();
+            clock.start();
+        }
 
         JLabel versionJL = new JLabel("MAME " + MFMSettings.getInstance().getMAMEVersion() + "   :   DATA " +
                 MFM_Data.getInstance().getDataVersion(), SwingConstants.CENTER);
@@ -148,9 +152,17 @@ public class MFM_Components {
         infoPanel = new MFMInformationPanel();
         infoPanel.showMessage("Main View");
         JLabel workingJL = new JLabel("Runnable " + MAMEInfo.getRunnable(), SwingConstants.CENTER);
-        statusBar.setZones(new String[]{"Version", "currentListName", "Information", "Working", "Clock"},
-                new JComponent[]{versionJL, currentListName, infoPanel, workingJL, clock},
-                new String[]{"20%", "24%", "*", "12%", "6%"});
+
+        if (flag == null) {
+            statusBar.setZones(new String[]{"Version", "currentListName", "Information", "Working", "Clock"},
+                    new JComponent[]{versionJL, currentListName, infoPanel, workingJL, clock},
+                    new String[]{"20%", "24%", "*", "12%", "6%"});
+        } else {
+            statusBar.setZones(new String[]{"Version", "currentListName", "Information", "Working", "Flag"},
+                    new JComponent[]{versionJL, currentListName, infoPanel, workingJL, flag},
+                    new String[]{"20%", "24%", "*", "12%", "6%"});
+        }
+
         statusBar.setPreferredSize(new Dimension(width, 35));
         return statusBar;
     }

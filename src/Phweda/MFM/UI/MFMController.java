@@ -22,7 +22,6 @@ import Phweda.MFM.*;
 import Phweda.MFM.Utils.MFM_DATmaker;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Device;
-import Phweda.MFM.mame.MAME_Stats;
 import Phweda.MFM.mame.Machine;
 import Phweda.utils.*;
 
@@ -712,7 +711,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             changeList(MFMListBuilder.RASTER);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_S) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_S) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) && !e.isShiftDown()) {
             changeList(MFMListBuilder.SIMULTANEOUS);
         }
 

@@ -72,6 +72,11 @@ public class MFMUI_Resources {
     private static final String POSITIONAL_CONTROL_IMG = "Positional_control.png";
     private static final String STICK_CONTROL_IMG = "Stick_control.png";
     private static final String TRACKBALL_CONTROL_IMG = "Trackball_control.png";
+
+    private static final String RESOURCES = "Resources";
+    private static final String FLAGS = "flags";
+    private static final String PNG_SUFFIX = ".png";
+
     private static MFMUI_Resources ourInstance;
     private static HashMap<String, URL> resourceURLs;
     private final String[] resourceNames = {
@@ -102,10 +107,10 @@ public class MFMUI_Resources {
         MFM.logger.addToList("Resources : \n" + testURL, true);
         for (String name : resourceNames) {
             // NOTE works multisystem with slash it is in .jar that way
-            URL url = this.getClass().getResource("Resources" + FileUtils.SLASH + name);
+            URL url = this.getClass().getResource(RESOURCES + FileUtils.SLASH + name);
             if (url != null) {
                 if (MFM.isSystemDebug()) {
-                    MFM.logger.addToList(url.toString() + "\tMFMUI_Resources : 133", true);
+                    MFM.logger.addToList(url.toString(), true);
                 }
                 resourceURLs.put(name, url);
             } else {
@@ -120,6 +125,15 @@ public class MFMUI_Resources {
 
     ImageIcon getImageIcon(String name) {
         return new ImageIcon(resourceURLs.get(name));
+    }
+
+    ImageIcon getFlagImageIcon(String countryCode) {
+        URL url = this.getClass().getResource("Resources" + FileUtils.SLASH +
+                FLAGS + FileUtils.SLASH + countryCode + PNG_SUFFIX);
+        if (url != null) {
+            return new ImageIcon(url);
+        }
+        return null;
     }
 
     String getLabelLocation(String label) {
