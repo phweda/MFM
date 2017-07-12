@@ -207,7 +207,8 @@ class MFMListActions {
         if (inputDATfile != null) {
             Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputDATfile.getPath(), Datafile.class);
             if (inputDAT != null ) {
-                saveFilteredDAT(inputDAT, MFMPlayLists.getInstance().getPlayList(list), list);
+                saveFilteredDAT(inputDAT, MFMPlayLists.getInstance().getPlayList(list), inputDATfile.getName() +
+                        "-" + list);
             }
         }
     }
@@ -219,7 +220,7 @@ class MFMListActions {
             Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputfile.getPath(), Datafile.class);
             if (inputDAT != null && inputfile.exists()) {
                 Set<String> list = FileUtils.listFromFile(externalList);
-                saveFilteredDAT(inputDAT, list, inputfile.getName());
+                saveFilteredDAT(inputDAT, list, inputfile.getName()  + "-" + externalList.getName());
             }
         }
     }
