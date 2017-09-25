@@ -345,7 +345,8 @@ public class ListEditor implements ActionListener {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
         buttonPanel.add(combinationPanel, gbc);
-        unionCB.setFont(new Font(unionCB.getFont().getName(), unionCB.getFont().getStyle(), unionCB.getFont().getSize()));
+        Font unionCBFont = this.$$$getFont$$$(null, -1, -1, unionCB.getFont());
+        if (unionCBFont != null) unionCB.setFont(unionCBFont);
         unionCB.setHorizontalTextPosition(0);
         unionCB.setToolTipText("Add to List");
         unionCB.setVerticalTextPosition(1);
@@ -376,6 +377,25 @@ public class ListEditor implements ActionListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPanel.add(spacer4, gbc);
         machinesList.setNextFocusableComponent(machinesList);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
+        if (currentFont == null) return null;
+        String resultName;
+        if (fontName == null) {
+            resultName = currentFont.getName();
+        } else {
+            Font testFont = new Font(fontName, Font.PLAIN, 10);
+            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
+                resultName = fontName;
+            } else {
+                resultName = currentFont.getName();
+            }
+        }
+        return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
     }
 
     /**
