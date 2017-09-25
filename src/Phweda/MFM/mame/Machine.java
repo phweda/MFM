@@ -65,6 +65,7 @@ import static Phweda.utils.FileUtils.doubleQuoteString;
  *         &lt;element ref="{http://MFM.Phweda/MAME}port" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://MFM.Phweda/MAME}adjuster" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://MFM.Phweda/MAME}driver" minOccurs="0"/>
+ *         &lt;element ref="{}feature" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://MFM.Phweda/MAME}device" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://MFM.Phweda/MAME}slot" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{http://MFM.Phweda/MAME}softwarelist" maxOccurs="unbounded" minOccurs="0"/>
@@ -140,6 +141,7 @@ import static Phweda.utils.FileUtils.doubleQuoteString;
         "port",
         "adjuster",
         "driver",
+        "feature",
         "device",
         "slot",
         "softwarelist",
@@ -254,6 +256,7 @@ public class Machine implements Serializable {
     protected List<Port> port;
     protected List<Adjuster> adjuster;
     protected Driver driver;
+    protected List<Feature> feature;
     protected List<Device> device;
     protected List<Slot> slot;
     protected List<Softwarelist> softwarelist;
@@ -696,6 +699,33 @@ public class Machine implements Serializable {
      */
     public void setDriver(Driver value) {
         this.driver = value;
+    }
+
+    /**
+     * Gets the value of the feature property.
+     * <p>
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the feature property.
+     * <p>
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getFeature().add(newItem);
+     * </pre>
+     * <p>
+     * <p>
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link Feature }
+     */
+    public List<Feature> getFeature() {
+        if (feature == null) {
+            feature = new ArrayList<Feature>();
+        }
+        return this.feature;
     }
 
     /**

@@ -237,6 +237,7 @@ public class MAMEtoJTree extends JPanel {
      * protected List<Port> port;
      * protected List<Adjuster> adjuster;
      * protected Driver driver;
+     * protected List<Feature> feature;
      * protected List<Device> device;
      * protected List<Slot> slot;
      * protected List<Softwarelist> softwarelist;
@@ -469,6 +470,11 @@ public class MAMEtoJTree extends JPanel {
         Driver driver = machine.getDriver();
         if (driver != null) {
             dmtNode.add(createDriverNode(driver));
+        }
+
+        List<Feature> features = machine.getFeature();
+        for (Feature feature : features) {
+            dmtNode.add(createFeatureNode(feature));
         }
 
         List<Device> devices = machine.getDevice();
@@ -855,9 +861,33 @@ public class MAMEtoJTree extends JPanel {
             dmtNode.add(new DefaultMutableTreeNode("tag" + valueDivider + tag));
         }
 
+        List<Diplocation> diplocations = dipswitch.getDiplocation();
+        for (Diplocation location : diplocations) {
+            dmtNode.add(createDiplocationNode(location));
+        }
+
         List<Dipvalue> dipvalues = dipswitch.getDipvalue();
         for (Dipvalue dipvalue : dipvalues) {
             dmtNode.add(createDipvalueNode(dipvalue));
+        }
+
+        return dmtNode;
+    }
+
+    private DefaultMutableTreeNode createDiplocationNode(Diplocation diplocation) {
+        DefaultMutableTreeNode dmtNode = null;
+
+        String name = diplocation.getName();
+        dmtNode = new DefaultMutableTreeNode("Diplocation" + valueDivider + name);
+
+        String number = diplocation.getNumber();
+        if (number != null && !number.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("number" + valueDivider + number));
+        }
+
+        String inverted = diplocation.getInverted();
+        if (inverted != null && !inverted.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("inverted" + valueDivider + inverted));
         }
 
         return dmtNode;
@@ -886,7 +916,7 @@ public class MAMEtoJTree extends JPanel {
         DefaultMutableTreeNode dmtNode = null;
 
         String name = configuration.getName();
-        dmtNode = new DefaultMutableTreeNode("Dipvalue" + valueDivider + name);
+        dmtNode = new DefaultMutableTreeNode("Configuration" + valueDivider + name);
 
         String mask = configuration.getMask();
         if (mask != null && !mask.isEmpty()) {
@@ -898,10 +928,33 @@ public class MAMEtoJTree extends JPanel {
             dmtNode.add(new DefaultMutableTreeNode("tag" + valueDivider + tag));
         }
 
+        List<Conflocation> conflocations = configuration.getConflocation();
+        for (Conflocation conflocation : conflocations ) {
+            dmtNode.add(createConflocationNode(conflocation));
+        }
+
         List<Confsetting> confsettings = configuration.getConfsetting();
-        for (Confsetting confsetting : confsettings
-                ) {
+        for (Confsetting confsetting : confsettings ) {
             dmtNode.add(createConfsettingNode(confsetting));
+        }
+
+        return dmtNode;
+    }
+
+    private DefaultMutableTreeNode createConflocationNode(Conflocation conflocation) {
+        DefaultMutableTreeNode dmtNode = null;
+
+        String name = conflocation.getName();
+        dmtNode = new DefaultMutableTreeNode("Conflocation" + valueDivider + name);
+
+        String number = conflocation.getNumber();
+        if (number != null && !number.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("number" + valueDivider + number));
+        }
+
+        String inverted = conflocation.getInverted();
+        if (inverted != null && !inverted.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("inverted" + valueDivider + inverted));
         }
 
         return dmtNode;
@@ -997,6 +1050,22 @@ public class MAMEtoJTree extends JPanel {
         String savestate = driver.getSavestate();
         if (savestate != null && !savestate.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("savestate" + valueDivider + savestate));
+        }
+
+        return dmtNode;
+    }
+
+    private DefaultMutableTreeNode createFeatureNode(Feature feature) {
+        DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Feature" + valueDivider + feature.getType());
+
+        String status = feature.getStatus();
+        if (status != null && !status.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("status" + valueDivider + status));
+        }
+
+        String overall = feature.getOverall();
+        if (overall != null && !overall.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("overall" + valueDivider + overall));
         }
 
         return dmtNode;
