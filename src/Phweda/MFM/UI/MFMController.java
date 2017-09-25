@@ -751,6 +751,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             MFM_DATmaker.saveBuiltinListsDATs();
         }
 
+        if (e.getKeyCode() == KeyEvent.VK_J && e.isControlDown() && e.isShiftDown()) {
+            listMachinesToJSON();
+        }
+
     }
 
     @Override
@@ -830,6 +834,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void init() {
+        // Semi hack to ensure it exists for certain first run cases
+        // otherwise race condition causes unrecoverable exception
+        MAMEInfo.getInstance(false, false);
+
         mainFrame = getInstance().getFrame();
         mainFrame.addMouseListener(this);
 
@@ -945,8 +953,13 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         JOptionPane.showMessageDialog(mainFrame, "Files are in the MFM/Lists folder");
     }
 
-    void ListMachinesDUMP() {
-        MFMListActions.dumpListData(pickList(true, "Pick list to export MAME data"));
+    void listMachinesToCSV() {
+        MFMListActions.listDataToCSV(pickList(true, "Pick list to export MAME data to CSV"));
+        JOptionPane.showMessageDialog(mainFrame, "Files are in the MFM/Lists folder");
+    }
+
+    void listMachinesToJSON() {
+        MFMListActions.listDataToJSON(pickList(true, "Pick list to export MAME data to JSON"));
         JOptionPane.showMessageDialog(mainFrame, "Files are in the MFM/Lists folder");
     }
 

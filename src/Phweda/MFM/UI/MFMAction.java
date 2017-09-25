@@ -292,7 +292,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case SaveListDataAction:
-                    controller.ListMachinesDUMP();
+                    controller.listMachinesToCSV();
                     break;
 
                 case GOTOcloneofAction:

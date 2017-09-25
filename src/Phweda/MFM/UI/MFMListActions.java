@@ -206,7 +206,7 @@ class MFMListActions {
         File inputDATfile = pickDAT();
         if (inputDATfile != null) {
             Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputDATfile.getPath(), Datafile.class);
-            if (inputDAT != null ) {
+            if (inputDAT != null) {
                 saveFilteredDAT(inputDAT, MFMPlayLists.getInstance().getPlayList(list), inputDATfile.getName() +
                         "-" + list);
             }
@@ -220,7 +220,7 @@ class MFMListActions {
             Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputfile.getPath(), Datafile.class);
             if (inputDAT != null && inputfile.exists()) {
                 Set<String> list = FileUtils.listFromFile(externalList);
-                saveFilteredDAT(inputDAT, list, inputfile.getName()  + "-" + externalList.getName());
+                saveFilteredDAT(inputDAT, list, inputfile.getName() + "-" + externalList.getName());
             }
         }
     }
@@ -251,7 +251,7 @@ class MFMListActions {
         return null;
     }
 
-    static void dumpListData(String list) {
+    static void listDataToCSV(String list) {
         File newFile = new File(MFM.MFM_LISTS_DIR + list +
                 MFM_Data.getInstance().getDataVersion() + "_data.csv");
         TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
@@ -382,6 +382,11 @@ class MFMListActions {
         }
 
     }
+
+    static void listDataToJSON(String list) {
+        // stub for future
+    }
+
 
     /**
      * Scan all resource roots for resources for this list.
