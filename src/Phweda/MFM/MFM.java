@@ -55,8 +55,8 @@ public class MFM {
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
     public static final String VERSION = "Version 0.9";
-    public static final String BUILD = "BUILD 0.9.100";
-    public static final String RELEASE_DATE = "Released : July 2017";
+    public static final String BUILD = "BUILD 0.9.101";
+    public static final String RELEASE_DATE = "Released : Sept 2017";
     public static final String LOCAL_COUNTRY = Locale.getDefault().getCountry();
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION;
 
