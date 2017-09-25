@@ -48,9 +48,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     private static final String CONTROLLERS = "Controllers";
     private static final String CONTROLLERSMACHINES = "ControllerMachines";
 
-    // TODO figure out if we now need this and start to eliminate static calls 3/30/2017
-    private static final ParseAllMachinesInfo PAMI = new ParseAllMachinesInfo();
-
     private static int runnable;
     private static HashMap<String, HashMap<String, String>> commands; // From -showusage
     private static ArrayList<String> allCategories;  // From catver_full.ini or catver.ini
@@ -146,10 +143,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                 exc.printStackTrace();
                 MFM.exit(9);
             }
-            // Removed for 0.85 no longer needed
         }
-        // loadCommands(); // Legacy functionality
-
         if (runnableMachines != null) {
             setRunnable(runnableMachines.size());
         } else {

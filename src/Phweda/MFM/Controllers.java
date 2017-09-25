@@ -57,7 +57,7 @@ public class Controllers implements Serializable {
     public static final String STICK = "stick";
     public static final String TRACKBALL = "trackball";
     public static final String TRIPLEJOY = "triplejoy";
-    private static Controllers ourInstance = new Controllers();
+    private static Controllers ourInstance;
     private static TreeMap<Integer, TreeSet<String>> controlMachinesList;
     private static TreeMap<Integer, Phweda.MFM.mame.Control> controls;
 
@@ -101,6 +101,9 @@ public class Controllers implements Serializable {
     }
 
     public static Controllers getInstance() {
+        if (ourInstance == null) {
+            ourInstance = new Controllers();
+        }
         return ourInstance;
     }
 
