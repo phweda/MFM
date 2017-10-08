@@ -49,67 +49,30 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     private static final String CONTROLLERSMACHINES = "ControllerMachines";
 
     private static int runnable;
-    private static HashMap<String, HashMap<String, String>> commands; // From -showusage
-    private static ArrayList<String> allCategories;  // From catver_full.ini or catver.ini
-    private static HashMap<String, ArrayList<String>> categoryMachines; // From catver_full.ini or catver.ini
+    private static HashMap<String, HashMap<String, String>> commands; // From -showusage LEGACY
+    private static ArrayList<String> allCategories;  // From catver.ini
+    private static HashMap<String, ArrayList<String>> categoryMachines; // From catver.ini
     private static TreeMap<String, ArrayList<String>> categoryHierarchy; // MFM generated for root allCategories
     private static Controllers controllers;
     // Decided to just pre-populate these should really do a doublecheck
     private static String[] numButtons = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"};
-    // Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"));
     private static TreeSet<Integer> numPlayers = new TreeSet<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 8));
 
     // INIfiles containing: Catver, catlist, custom(GoldenAge), favorites, Genre, Mature, Multimonitor,version
-    // - persisted as XML is ~5MB
     private static HashMap<String, Map> INIfiles = new HashMap<String, Map>(); // Parsed from MAME INIfiles directory
-
-    // Added 10/14/15 to differentiate not runnable for those who pull in all
     private static TreeSet<String> runnableMachines;
 
-    // NOTE serialized object is more efficient see below. We'll use that format for the huge objects
-    // NOTE the others we'll put as XML for readability outside the application although XML is slower than .ser
     // NOTE : We only load Playable games unless -all flag is passed in
     // NOTE with addition of ALL MAME data 10/2016 we needed to revert to XML via JAXB
-//    private static transient Map<String, Machine> allMachinesObjectMap;  // From -listxml now all Machines 10/14/15
     private static transient Mame mame;  // From -listxml now all Machines 10/14/15
 
-    /* We should test the above for size and speed
-    *  Is it faster to load by a serialized object or by running -listxml ?
-    *  Initial test 12/04/11 shows serialized object loads at least 10 times faster
-    *  If serializing is significantly faster what is the size of the file?
-    *  ~17MB for MAME 144 - perhaps 35-40MB if we assumed ALL current games become playable
-    *  19,640 KB for MAME 151    8,471 playable
-    *  20,272 KB for MAME 154    8,841
-    *  20,255 KB for MAME 155    8,921
-    *  20,416 KB for MAME 156    8,959
-    *  ==============================
-    *  ADDED MAMEInfo DEC 2014
-    *  ****************
-    *  27,994 KB for MAME 156    8,959
-    *  28,009 KB for MAME 157    8,982
-    *  27,980 KB for MAME 158    8,997
-    *  27,982 KB for MAME 159    9,007
-    *  27,995 KB for MAME 160    9,047
-    *  27,787 KB for MAME 161    9,075
-    *  28,703 KB for MAME 162   10,258
-    *  28,891 KB for MAME 163   10,313
-    *  29,368 KB for MAME 164   10,352  Size a little skewed run with a newer MFM version
-    *  29,434 KB for MAME 165   10,383
-    *  ==============================
-    *  ADDED MESSInfo, SYSINFO & with flag non-runnable systems OCT 2015
-    *  ****************
-    *  43,060 KB for MAME 166   10,494      70,663 KB for MAME 166   32,543 - 22,049 non-runnable
-    *
-    *
-    *
-    *
-    *
-    */
+    private static boolean parsing = false; // Added for first run Parsing with no Data Sets
 
     /**
      * Load persisted objects or if not available generate from MAME
      */
     private MAMEInfo(boolean parse) {
+        parsing = parse;
         if (MFM.isDebug() && allCategories != null) {
             MFM.logger.addToList("Total categories is : " + allCategories.size());
         }
@@ -152,6 +115,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         // Parse MAME special case
         MFM_Data.getInstance().setLoaded();
         loadMameResources();
+        parsing = false;
     }
 
     public static boolean isALL() {
@@ -159,10 +123,15 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     }
 
     public static MAMEInfo getInstance(boolean reset, boolean parse) {
+        if(MFM.isSystemDebug()){ System.out.println("MAMEInfo getInstance " + reset + parse);}
         if (ourInstance == null || reset) {
             ourInstance = new MAMEInfo(parse);
         }
         return ourInstance;
+    }
+
+    public static boolean isParsing() {
+        return parsing;
     }
 
     /**
