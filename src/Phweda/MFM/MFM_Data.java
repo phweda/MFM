@@ -148,7 +148,9 @@ public class MFM_Data {
                     try (ZipOutputStream zipOutputStream =
                                  new ZipOutputStream(new FileOutputStream(getZipPathString(saveDirectory, all)))) {
                         PersistUtils.saveAnObjecttoZip(permData, zipOutputStream, MFM_CACHE_SER);
-                        PersistUtils.saveJAXBtoZip(mame, zipOutputStream, MFM_MAME_XML, Mame.class, false);
+                        if (mame != null) {
+                            PersistUtils.saveJAXBtoZip(mame, zipOutputStream, MFM_MAME_XML, Mame.class, false);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -277,11 +279,6 @@ public class MFM_Data {
             }
             final MFM_Data_Sets.Data_Set dataSet2 = datasets.getDataSet(dataSet);
             if (dataSet2 == null) {
-                /*
-                MFM.logger.addToList("Process finished with exit code 6", true);
-                MFM.exit(6);
-                */
-
                 // If there are Data Set(s) available pick one
                 if (!datasets.getAvailableVersions().isEmpty()) {
                     MFMAction pickDataSet = new MFMAction(MFMAction.LoadDataSetAction, null);
