@@ -54,9 +54,9 @@ public class MFM {
     public static String MFM_CATEGORY_DIR;
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
-    public static final String VERSION = "Version 0.9";
-    public static final String BUILD = "BUILD 0.9.100";
-    public static final String RELEASE_DATE = "Released : July 2017";
+    public static final String VERSION = "Version 0.9.1";
+    public static final String BUILD = "BUILD 0.9.101";
+    public static final String RELEASE_DATE = "Released : Oct 2017";
     public static final String LOCAL_COUNTRY = Locale.getDefault().getCountry();
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION;
 
@@ -351,6 +351,19 @@ public class MFM {
         System.exit(status);
     }
 
+    /**
+     *      Message                             Explanation
+     *   Process finished with exit code 2  User chose to not parse MAME and has no Data Sets(MFMController.java)
+     *   Process finished with exit code 3  Total failure to load MAME info after Parsing attempt. Check MAME runs. (MAMEInfo.java)
+     *   Process finished with exit code 4  User canceled MFM Settings – cannot run without them(MFM_SettingsPanel.java)
+     *   Process finished with exit code 5  Data integrity issue. MFM_cache.ser missing or corrupt.(MFMListBuilder.java)
+     *   Process finished with exit code 6  Data integrity issue. Data Set MFM is set to load is not found.
+                                            Did you delete or alter a Data Set file?(MFM_Data.java)
+     *   Process finished with exit code 7  MFM failed to detect its running directory (MFM.java)
+     *   Process finished with exit code 8  MFM failed to find/create its required directories (MFM.java)
+     *   Process finished with exit code 9  MFM failed to load data set or parse MAME (MFMInfo.java)
+     *   Process finished with exit code 10 MFM failed to find a data set
+     */
     public static void exit() {
         exit(0);
     }
