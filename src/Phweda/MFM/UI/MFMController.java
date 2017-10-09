@@ -47,6 +47,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import static Phweda.MFM.MFM_Constants.*;
 import static Phweda.MFM.UI.MFMListActions.pickList;
@@ -77,7 +78,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     private final JTextPane HTMLtextPane = new MFMHTMLTextPane();
     private String currentMode = PlayList_Mode;
     private boolean firstLoad = true;
-    private static boolean parsing = false;
 
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
@@ -834,9 +834,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void init() {
-        // Semi hack to ensure it exists for certain first run cases
-        // otherwise race condition causes unrecoverable exception
-        MAMEInfo.getInstance(false, false);
 
         mainFrame = getInstance().getFrame();
         mainFrame.addMouseListener(this);
@@ -1035,14 +1032,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             // Special case first run no Data Sets found!
             int dSets = MFM_Data.getInstance().getDataSets().length;
             if (dSets < 1) {
-                int result = getFirstRunNoDataSetsOption();
-                if (result == 1) {
-                    MFM.exit(2);
-                } else {
-                    parsing = true;
-                    parseMAME(false);
-                    return;
+                if (MFM.isSystemDebug()) {
+                    System.out.println("In loadDataSet dSets is : " + dSets);
                 }
+            //    REMOVED FIRST RUN PARSE OPTION Oct 2017
+                showDataSetsURL();
             } else if (dSets == 1 && mainFrame != null) {
                 return; // Already loaded NOTE look for a better way to do this
             } else if (dSets == 1 && mainFrame == null) {
@@ -1113,6 +1107,37 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
     }
 
+    // First run hack No Data Set
+    private void showDataSetsURL() {
+        JDialog urlDialog = new JDialog(getFrame(), "No Data Set");
+        urlDialog.getContentPane().add(LinkEditorPane.getLinkPane( "Download a Data Set",
+                "https://github.com/phweda/MFM/releases"));
+
+        urlDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        urlDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                super.windowClosed(e);
+                System.out.println("Exit No Data Set");
+                MFM.exit(10);
+            }
+        });
+
+        urlDialog.setLocation(MFMUI.screenCenterPoint);
+        urlDialog.setPreferredSize(new Dimension(225,80));
+        urlDialog.setMinimumSize(new Dimension(225,80));
+        urlDialog.pack();
+        urlDialog.setVisible(true);
+
+        try {
+            System.out.println("Waiting to exit No Data Set");
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        MFM.exit(10);
+    }
+
     private int getFirstRunNoDataSetsOption() {
         Object[] options = {"Parse Mame", "Exit"};
         return JOptionPane.showOptionDialog(mainFrame,
@@ -1135,7 +1160,6 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             @Override
             protected Object doInBackground() throws Exception {
                 synchronized (this) {
-                    System.out.println("**** Parsing MAME ****");
                     MAMEInfo.getInstance(true, true);
                 }
                 return null;
