@@ -1168,8 +1168,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             @Override
             protected void done() {
                 MFM_Data.getInstance().rescanSets();
-                mfmSettings.setDataVersion(MFM_Data.getInstance().getDataVersion());
-                loadDataSet(false);
+                String dataSet = MFM_Data.getInstance().getDataVersion();
+                mfmSettings.setDataVersion(dataSet);
+                // Data already loaded during Parse operation just refresh the UI
+                updateuiData(dataSet);
             }
         };
         Thread parseMAME = new Thread(sw);
