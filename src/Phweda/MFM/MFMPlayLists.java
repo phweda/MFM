@@ -151,6 +151,7 @@ public class MFMPlayLists implements Serializable {
         myPlayListsTree.put(name, treeSet);
         persistPlayLists();
         allListsNames.add(name);
+        myListsNames.add(name);
         persistPlayLists();
     }
 
