@@ -4,11 +4,17 @@
 # MFM
 .~lock*
 bak/
+Data/*
+_Data/*
+.idea/*
+Custom.ini
+Genre.ini
+Mature.ini
+Multimonitor.ini
 Lists/*
 !Lists/favs.txt
 Logs
-out/*
-!out/artifacts/MFM_jar/MFM.jar
+out/Production/*
 Settings/*
 !Settings/*.ini
 
@@ -59,3 +65,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+.idea/compiler.xml
+folders/nplayers.ini-special cases.txt
+*.iml
