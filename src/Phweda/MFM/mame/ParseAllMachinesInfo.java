@@ -447,7 +447,7 @@ public class ParseAllMachinesInfo {
         // NOTE leave in to show running in shell window
         System.out.println(categoriesList);
         if (MFM.isDebug()) {
-            MFM.logger.addToList(categoriesList);
+            MFM.logger.addToList(categoriesList.toString());
         }
     }
 
