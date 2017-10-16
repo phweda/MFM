@@ -34,35 +34,6 @@ import static Phweda.MFM.MFMListBuilder.*;
  * Time: 9:35 PM
  */
 class MFMListGenerator {
-    // TODO eliminate this since VIDs project is dead ?
-    // fixme reduce this to only the Arcade exclusions since we now have Systems Categories
-    private static final List<String> vidsExcludeCategoriesList =
-            Arrays.asList(
-                    "3D Printer", "Arcade BIOS", "Astrological Computer", "Audio Sequencer",
-                    "Bridge Machine", "Business Computer / Terminal", "Calculator / Pocket Computer", "Cash Counter",
-                    "Casino", "Casino / Cards", "Casino / Lottery", "Casino / Cards * Mature *",
-                    "Casino * Mature *", "Casino / Multiplay", "Casino / Racing", "Casino / Reels",
-                    "Casino / Reels * Mature *", "Casino / Roulette", "Chess Machine", "Clock",
-                    "Development Computer", "Devices", "Document Processors", "Dot-Matrix Display", "Drum Machine",
-                    "EPROM Programmer", "Electromechanical / Coin pusher",
-                    "Educational Game", "Electronic Game", "Electromechanical / Misc.", "Electromechanical / Pinball",
-                    "Electromechanical / Reels", "Electromechanical / Utilities", "Game Console",
-                    "Handheld Child Computers", "", "Handheld Console", "Home Computer",
-                    "In Circuit Emulator", "Kit Computer", "Laptop / Notebook / Portable",
-                    "Matrix Printer", "Microcomputer", "Multi-cart Board", "Network Processor",
-                    "Not Classified", "Pocket Device / Pad / PDA", "Print Club", "Punched Card Computer",
-                    "Quiz / Music English", "Quiz / Chinese", "Quiz / English", "Quiz / English * Mature *",
-                    "Quiz / French", "Quiz / German", "Quiz / Italian", "Quiz / Japanese",
-                    "Quiz / Japanese * Mature *", "Quiz / Music Japanese", "Quiz / Korean", "Quiz / Spanish",
-                    "Robot Control", "Satellite Receiver", "Single Board Computer", "Speech Synthesiser",
-                    "Synthesiser", "System / BIOS", "System / Device", "Telephone / ComputerPhone",
-                    "Tabletop / Cards", "Tabletop / Go", "Tabletop / Hanafuda",
-                    "Tabletop / Hanafuda * Mature *", "Tabletop / Mahjong", "Tabletop / Mahjong * Mature *",
-                    "Tabletop / Misc.", "Tabletop / Misc. * Mature *", "Tabletop / Multiplay", "Tabletop / Othello",
-                    "Tabletop / Othello * Mature *", "Tabletop / Renju", "Test ROM",
-                    "Training Board", "Utilities / Test", "Utilities / Update",
-                    "VTR Control", "Word-processing Machine", "Workstation / Server"
-            );
     private static MFMListGenerator ourInstance = new MFMListGenerator();
 
     private MFMListGenerator() {
