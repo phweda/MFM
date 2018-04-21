@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -643,7 +643,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         joyComboBox = new JComboBox<String>(Controllers.getJoysticks());
         doubleJoyComboBox = new JComboBox<String>(Controllers.getDoubleJoysticks());
 
-        languagesComboBox = new JComboBox<String>(MFMPlayLists.getInstance().getLanguagesPLsKeys());
+        languagesComboBox = new JComboBox<String>(MFMPlayLists.getInstance().getLanguagesPlayListsKeys());
         languagesComboBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.gray, Color.gray));
 
         yearComboBox = new JComboBox<String>(MFM_Constants.yearsList);
@@ -1269,25 +1269,6 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         controlsRBPanel.add(exactControlsRB);
         listNameLabel.setLabelFor(listNameTF);
         baseListLabel.setLabelFor(listNameTF);
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
-        if (currentFont == null) return null;
-        String resultName;
-        if (fontName == null) {
-            resultName = currentFont.getName();
-        } else {
-            Font testFont = new Font(fontName, Font.PLAIN, 10);
-            if (testFont.canDisplay('a') && testFont.canDisplay('1')) {
-                resultName = fontName;
-            } else {
-                resultName = currentFont.getName();
-            }
-        }
-        return new Font(resultName, style >= 0 ? style : currentFont.getStyle(), size >= 0 ? size : currentFont.getSize());
     }
 
     /**
