@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -76,6 +76,7 @@ public class ParseTextFile {
 
     */
     protected void processLine(String line) {
+        // TODO revamp this as it is really based on CatVer.ini - should be generic
 /* TODO this is horrible waste of resources! */
         //use a second Scanner to parse the content of each line
         Scanner scanner = new Scanner(line);
