@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Machine;
+import Phweda.MFM.mame.softwarelist.Software;
+import Phweda.MFM.mame.softwarelist.Softwarelist;
 import Phweda.utils.PersistUtils;
 import Phweda.utils.QuadState;
 import Phweda.utils.TriState;
@@ -48,6 +50,9 @@ public final class MFMListBuilder {
     public static final String RUNNABLE = "RUNNABLE";
     public static final String NO_IMPERFECT = "NOIMPERFECT";
     public static final String MECHANICAL = "MECHANICAL";
+    public static final String BIOS = "BIOS";
+    static final String IMPERFECT = "IMPERFECT";
+    static final String CHD = "CHD";
     public static final String CLONE = "CLONE";
     public static final String DEVICES = "DEVICES";
     public static final String NO_CLONE = "NOCLONE";
@@ -67,22 +72,20 @@ public final class MFMListBuilder {
 
     // TODO fixme bad design!!!
     static final String ALL_LANGUAGES = "All Languages";
+    static final String ALL_SOFTWARE_LISTS = "All Software Lists";
     static final String ALL_YEARS = "All Years";
-    static final String BIOS = "BIOS";
-    static final String IMPERFECT = "IMPERFECT";
-    static final String CHD = "CHD";
     static final String ALL_DISPLAY_TYPES = "All Displays";
     static final String CATEGORIES = "CATEGORIES";
     static final String CATEGORY_LISTS_HASHMAP = "Category Lists HashMap";
-    static final String ARCADE_CATEGORY_ROOTS = "Arcade Roots";
-    static final String SYSTEM_CATEGORY_ROOTS = "System Roots";
-    static final String MATURE_CATEGORY_ROOTS = "Mature Roots";
-    static final String ALL_CATEGORY_ROOTS = "All Roots";
-    static final String ALL_MATURE_CATEGORIES = "All Mature Categories";
-    static final String ARCADE_CATEGORIES = "Arcade Categories";
-    static final String SYSTEM_CATEGORIES = "System Categories";
-    static final String ARCADE_NOMATURE_CATEGORIES = "Arcade No Mature Categories";
-    static final String SYSTEM_NOMATURE_CATEGORIES = "System No Mature Categories";
+    public static final String ARCADE_CATEGORY_ROOTS = "Arcade Roots";
+    public static final String SYSTEM_CATEGORY_ROOTS = "System Roots";
+    public static final String MATURE_CATEGORY_ROOTS = "Mature Roots";
+    public static final String ALL_CATEGORY_ROOTS = "All Roots";
+    public static final String ALL_MATURE_CATEGORIES = "All Mature Categories";
+    public static final String ARCADE_CATEGORIES = "Arcade Categories";
+    public static final String SYSTEM_CATEGORIES = "System Categories";
+    public static final String ARCADE_NOMATURE_CATEGORIES = "Arcade No Mature Categories";
+    public static final String SYSTEM_NOMATURE_CATEGORIES = "System No Mature Categories";
     private static MFMPlayLists playLists;
     static Map<String, Machine> allMachines;
     static TreeSet<String> runnableList;
@@ -109,6 +112,7 @@ public final class MFMListBuilder {
 //=====================================================================
     static TreeSet<String> categoriesWithMachineList = new TreeSet<String>();
     static TreeMap<String, TreeSet<String>> languagesListsMap;
+    static TreeMap<String, Software> softwareListsMap;
     private static TreeSet<String> allCategoriesList;
     private static TreeMap<String, ArrayList<String>> categoryHierarchy;
     private static ArrayList<String> allCategoryRoots;
@@ -135,6 +139,7 @@ public final class MFMListBuilder {
             // Populate built in lists
             lists = MFMListGenerator.getInstance().generateMFMLists(parsing);
             languagesListsMap = MFMListGenerator.getInstance().getLanguageLists(parsing);
+            softwareListsMap = MFMListGenerator.getInstance().generateSoftwareLists(parsing);
             if (MFM.isSystemDebug()) {
                 System.out.println("Mechanical list:\n" + mechanicalList);
             }
@@ -239,6 +244,10 @@ public final class MFMListBuilder {
         return languagesListsMap;
     }
 
+    public static TreeMap<String, Software> getSoftwareListsMap() {
+        return softwareListsMap;
+    }
+
     public static ArrayList<String> getAllNoMatureCategoryRoots() {
         return noMatureCategoryRoots;
     }
@@ -293,34 +302,19 @@ public final class MFMListBuilder {
         }
     }
 
-    // TODO move this to MAMEInfo ???
     private static void getCategoryLists() {
-        HashMap<String, ArrayList<String>> categoryListsMap =
-                (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().getStaticData(CATEGORY_LISTS_HASHMAP);
-        if (categoryListsMap == null) {
-            MFM.logger.addToList("MFMListBuilder found no cached categories", true);
-            try {
-                categoryListsMap = (HashMap<String, ArrayList<String>>)
-                        PersistUtils.loadAnObjectXML(MFM.MFM_CATEGORY_DIR + MFM.MFM_CATEGORY_DATA_FILE);
-                MFM_Data.getInstance().setStaticData(CATEGORY_LISTS_HASHMAP, categoryListsMap);
-                // TODO fixme also in MAMEInfo need a better way/place
-                // Write out static data set
-                //MFM_Data.getInstance().persistStaticData();
-            } catch (FileNotFoundException e) {
-                MFM.logger.addToList("MFMListBuilder FAILED to load categoryRootsMap from file", true);
-                e.printStackTrace();
-                return;
-            }
-        }
-        allCategoryRoots = categoryListsMap.get(ALL_CATEGORY_ROOTS);
-        arcadeCategoryRoots = categoryListsMap.get(ARCADE_CATEGORY_ROOTS);
-        matureCategoryRoots = categoryListsMap.get(MATURE_CATEGORY_ROOTS);
-        systemCategoryRoots = categoryListsMap.get(SYSTEM_CATEGORY_ROOTS);
-        allMatureCategories = categoryListsMap.get(ALL_MATURE_CATEGORIES);
-        systemCategories = categoryListsMap.get(SYSTEM_CATEGORIES);
-        systemNoMatureCategories = categoryListsMap.get(SYSTEM_NOMATURE_CATEGORIES);
-        arcadeCategories = categoryListsMap.get(ARCADE_CATEGORIES);
-        arcadeNoMatureCategories = categoryListsMap.get(ARCADE_NOMATURE_CATEGORIES);
+        // NOTE moved input from file to MAMEInfo 4/18
+
+        HashMap<String,ArrayList<String>> map = MAMEInfo.getCategoryListsMap();
+        allCategoryRoots = map.get(ALL_CATEGORY_ROOTS);
+        arcadeCategoryRoots = map.get(ARCADE_CATEGORY_ROOTS);
+        matureCategoryRoots = map.get(MATURE_CATEGORY_ROOTS);
+        systemCategoryRoots = map.get(SYSTEM_CATEGORY_ROOTS);
+        allMatureCategories = map.get(ALL_MATURE_CATEGORIES);
+        systemCategories = map.get(SYSTEM_CATEGORIES);
+        systemNoMatureCategories = map.get(SYSTEM_NOMATURE_CATEGORIES);
+        arcadeCategories = map.get(ARCADE_CATEGORIES);
+        arcadeNoMatureCategories = map.get(ARCADE_NOMATURE_CATEGORIES);
 
         noMatureCategoryRoots = new ArrayList<String>(allCategoryRoots);
         noMatureCategoryRoots.removeAll(matureCategoryRoots);
