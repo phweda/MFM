@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -101,8 +101,6 @@ public class MFMUI_Setup {
         }
 
         listBuilder = new MFMListBuilder();
-
-        /* NOTE with 0.85 STATIC Data never changes during run. Removed code*/
 
         comps = new MFM_Components(controller);
         frame.setJMenuBar(comps.getMenuBar());
