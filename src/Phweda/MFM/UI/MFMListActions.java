@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import Phweda.MFM.mame.Machine;
 import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
 import javax.xml.bind.JAXBException;
@@ -383,10 +384,125 @@ class MFMListActions {
 
     }
 
+    /**
+     * Transform Machine data to JSON
+     *
+     * @param list
+     */
     static void listDataToJSON(String list) {
-        // stub for future
-    }
 
+        File newFile = new File(MFM.MFM_LISTS_DIR + list + "_" +
+                MFM_Data.getInstance().getDataVersion() + "_data.json");
+        final TreeSet<String> playList = MFMPlayLists.getInstance().getPlayList(list);
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        SwingWorker sw = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                synchronized (this) {
+                    try {
+                        final PrintWriter pw = new PrintWriter(newFile);
+                        playList.forEach(machine -> {
+                            // Convert Machine to JSON string and pretty print
+                            String jsonInString = null;
+                            try {
+                                jsonInString = objectMapper.writerWithDefaultPrettyPrinter()
+                                        .writeValueAsString(MAMEInfo.getMame().getMachineMap().get(machine));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            pw.println(jsonInString);
+                            if (MFM.isSystemDebug()) {
+                                System.out.println(jsonInString);
+                            }
+                        });
+                        pw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                // JOptionPane.showMessageDialog(mainFrame, "JSON Save Done");
+                infoPanel.showMessage(newFile.getName() + " is in the Lists directory.");
+            }
+        };
+        Thread generateJSON = new Thread(sw);
+        generateJSON.start();
+        infoPanel.showProgress("Generating JSON for " + list);
+
+
+        /*      OK this was a shot at reflection for optional presence of the Jackson jars
+                Just decided to include the classes in the MFM jar - ~1 MB
+
+                URL[] urls = {new URL("jar:file:" + coreJar.getCanonicalPath() + "!/")};
+                URL[] urls2 = {new URL("jar:file:" + databindJar.getCanonicalPath() + "!/")};
+
+                URL[] allURLs = Stream.concat(Arrays.stream(urls), Arrays.stream(urls2))
+                        .toArray(URL[]::new);
+                URLClassLoader cl = URLClassLoader.newInstance(allURLs);
+
+                //no paramater
+                Class noparams[] = {};
+                //String parameter
+                Class[] paramObject = new Class[1];
+                paramObject[0] = Object.class;
+
+                Class<?> mapperClass =
+                        Class.forName("com.fasterxml.jackson.databind.ObjectMapper", true, cl);
+                Object mapper = mapperClass.newInstance();
+
+                Class<?> serializationConfigClass =
+                        Class.forName("com.fasterxml.jackson.databind.SerializationConfig", true, cl);
+                Object serializationConfig = serializationConfigClass.newInstance();
+
+                Method getSerializationConfig =
+                        mapperClass.getDeclaredMethod("getSerializationConfig", noparams);
+
+
+                Class<?> writerClass =
+                        Class.forName("com.fasterxml.jackson.databind.ObjectWriter", true, cl);
+
+                Constructor<?> cons = writerClass.getConstructor(mapperClass, serializationConfigClass);
+
+                Object writer = cons.newInstance(mapper, getSerializationConfig.invoke(noparams));
+
+
+                Method writerWithDefaultPrettyPrinter =
+                        writerClass.getDeclaredMethod("writerWithDefaultPrettyPrinter", noparams);
+                Method writeValueAsString = mapperClass.getDeclaredMethod("writeValueAsString", paramObject);
+
+                playList.forEach(machine -> {
+                    // Convert object to JSON string and pretty print
+                    String jsonInString = null;
+                    try {
+                        writerWithDefaultPrettyPrinter.invoke(mapper, null);
+                        jsonInString = (String) writeValueAsString.invoke(
+                                mapper, MAMEInfo.getMame().getMachineMap().get(machine));
+                    } catch (Exception e) {
+
+                        e.printStackTrace();
+                    }
+                    pw.println(jsonInString);
+                    System.out.println(jsonInString);
+                });
+                pw.close();
+            } catch (IOException | IllegalAccessException | InstantiationException | ClassNotFoundException |
+                    NoSuchMethodException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else {
+            String errorMessage = "JSON output requires jackson jars: " +
+                    "https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.8";
+            if (MFM.isDebug()) {
+                MFM.logger.out(errorMessage);
+            }
+            System.out.println(errorMessage);
+        }   */
+    }
 
     /**
      * Scan all resource roots for resources for this list.
