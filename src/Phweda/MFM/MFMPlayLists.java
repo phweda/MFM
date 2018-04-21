@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 
 package Phweda.MFM;
 
+import Phweda.MFM.mame.softwarelist.Software;
+import Phweda.MFM.mame.softwarelist.Softwarelist;
 import Phweda.utils.PersistUtils;
 
 import java.io.Serializable;
@@ -41,6 +43,7 @@ public class MFMPlayLists implements Serializable {
     private static MFMPlayLists playlists;
     private TreeMap<String, TreeSet<String>> MFMPlayListsTree = null;
     private TreeMap<String, TreeSet<String>> languagesLists = null;
+    private TreeMap<String, Software> softwareLists = null;
     private TreeMap<String, TreeSet<String>> myPlayListsTree = null;
     private ArrayList<String> allListsNames;
     private ArrayList<String> myListsNames;
@@ -65,6 +68,9 @@ public class MFMPlayLists implements Serializable {
     private TreeSet<String> rasterDisplayMachineNames = null;
     private TreeSet<String> vectorDisplayMachineNames = null;
     private TreeSet<String> lcdDisplayMachineNames = null;
+
+    // We originally named an All list which does not include BIOS or DEVICES so everything is that combined list
+    public static String EVERYTHING = "Everything";
 
     private MFMPlayLists() {
         loadPlayLists();
@@ -123,15 +129,26 @@ public class MFMPlayLists implements Serializable {
         return tempSet;
     }
 
-    public String[] getLanguagesPLsKeys() {
+    public String[] getLanguagesPlayListsKeys() {
         ArrayList<String> list = new ArrayList<String>();
         list.add(ALL_LANGUAGES);
         list.addAll(languagesLists.keySet());
         return list.toArray(new String[list.size()]);
     }
 
+    public String[] getSoftwareListsKeys() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add(ALL_SOFTWARE_LISTS);
+        list.addAll(softwareListsMap.keySet());
+        return list.toArray(new String[list.size()]);
+    }
+
     public TreeMap<String, TreeSet<String>> getLanguagesListMap() {
         return languagesListsMap;
+    }
+
+    public TreeMap<String, Software> getSoftwareListsMap() {
+        return softwareListsMap;
     }
 
     public TreeMap<String, TreeSet<String>> getMyPlayListsTree() {
@@ -218,14 +235,29 @@ public class MFMPlayLists implements Serializable {
         return builderNames.toArray(new String[builderNames.size()]);
     }
 
-    public TreeSet<String> getPlayList(String name) {
-        if (MFMPlayListsTree.containsKey(name)) {
-            return MFMPlayListsTree.get(name);
-        } else if (languagesLists.containsKey(name)) {
-            return languagesLists.get(name);
-        } else {
-            return myPlayListsTree.get(name);
+    public TreeSet<String> getPlayList(String listName) {
+        // To support JSON and future DB. Get everything
+        if(listName.equalsIgnoreCase(EVERYTHING)){
+            TreeSet<String> everything = new TreeSet<String>(MFMPlayListsTree.get(MFMListBuilder.ALL));
+            everything.addAll(MFMPlayListsTree.get(MFMListBuilder.BIOS));
+            everything.addAll(MFMPlayListsTree.get(MFMListBuilder.DEVICES));
+            return everything;
         }
+        if (MFMPlayListsTree.containsKey(listName)) {
+            return MFMPlayListsTree.get(listName);
+        } else if (languagesLists.containsKey(listName)) {
+            return languagesLists.get(listName);
+        } else {
+            return myPlayListsTree.get(listName);
+        }
+    }
+
+    public TreeMap<String, Software> getSoftwareLists() {
+        return softwareLists;
+    }
+
+    public Software getSoftwareList(String softwareListName) {
+        return softwareLists.get(softwareListName);
     }
 
     public void removePlayList(String name) {
@@ -337,6 +369,7 @@ public class MFMPlayLists implements Serializable {
         MFMPlayListsTree.put(MFMListBuilder.NO_IMPERFECT, noImperfectMachineNames);
 
         languagesLists = MFMListBuilder.getLanguagesListsMap();
+        softwareLists = MFMListBuilder.getSoftwareListsMap();
     }
 
     public void persistPlayLists() {

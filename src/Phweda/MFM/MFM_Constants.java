@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -120,6 +120,7 @@ public final class MFM_Constants {
     static final String LOGS = "Logs";
     static final String COMMANDS = "Commands";
     static final String ARTWORK = "artwork";
+    public static final String SOFTWARE_LISTS = "Software Lists";
     private static final ArrayList<String> folderNames = new ArrayList<String>(Arrays.asList(new String[]{
             "artwork", "artwork preview", "bkground", "bosses",
             "cabdevs", "cabinets", "chds", "covers_SL", "cpanel", "ctrlr", "devices", "ends",

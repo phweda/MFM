@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,10 @@ package Phweda.MFM;
 import Phweda.MFM.Utils.ParseFolderINIs;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Machine;
+import Phweda.MFM.mame.ParseSoftwareLists;
+import Phweda.MFM.mame.softwarelist.Software;
+import Phweda.MFM.mame.softwarelist.Softwarelist;
+import Phweda.utils.FileUtils;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -34,6 +38,7 @@ import static Phweda.MFM.MFMListBuilder.*;
  * Time: 9:35 PM
  */
 class MFMListGenerator {
+
     private static MFMListGenerator ourInstance = new MFMListGenerator();
 
     private MFMListGenerator() {
@@ -274,5 +279,21 @@ class MFMListGenerator {
         TreeSet<String> list = new TreeSet<String>();
         DAT.getGame().forEach(game -> list.add(game.getName()));
         return list;
+    }
+
+    TreeMap<String, Software> generateSoftwareLists(boolean parsing) {
+        TreeMap<String, Software> softwareLists = null;
+
+        if (!parsing) {
+            softwareLists = (TreeMap<String, Software>) MFM_Data.getInstance()
+                    .getStaticData(MFM_Constants.SOFTWARE_LISTS);
+        }
+
+        if (softwareLists == null) {
+            softwareLists = new TreeMap<String, Software>();
+            ParseSoftwareLists.generateSoftwareLists(softwareLists, MFMSettings.getInstance().MAMEexeDir() +
+                    FileUtils.DIRECTORY_SEPARATOR + "hash");
+        }
+        return softwareLists;
     }
 }
