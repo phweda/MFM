@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -93,6 +93,18 @@ public class FileUtils {
         }
     };
 
+    // This filter only returns .csv files
+    public static javax.swing.filechooser.FileFilter csvFileFilter = new javax.swing.filechooser.FileFilter() {
+        public boolean accept(File file) {
+            return file.isDirectory() || file.getName().toLowerCase().endsWith(".csv");
+        }
+
+        @Override
+        public String getDescription() {
+            return "*.csv";
+        }
+    };
+
     // This filter only returns video files
     // TODO really is not needed
     public static FilenameFilter VideoFilenameFilter = new FilenameFilter() {
@@ -173,9 +185,9 @@ public class FileUtils {
     }
 
     /*
-    *
-    *
-    *
+     *
+     *
+     *
      */
     public static void copyFile(File file, String destinationDir, boolean replace) throws IOException {
         Path destinationDirPath = Paths.get(destinationDir, file.getName());
@@ -187,9 +199,9 @@ public class FileUtils {
     }
 
     /*
-    *
-    *
-    *
+     *
+     *
+     *
      */
     public static void copyFile(Path file, String destinationDir, boolean replace) throws IOException {
         Path destinationDirPath = Paths.get(destinationDir, file.getFileName().toString());
@@ -225,11 +237,11 @@ public class FileUtils {
 
     /* TODO  java.nio version */
     /*
-   * Searches for this fileName from this directory path
-   *
-   *
-   * returns false if this directory does not exist
-    */
+     * Searches for this fileName from this directory path
+     *
+     *
+     * returns false if this directory does not exist
+     */
 
     public static boolean fileExists(String path, String name) {
         try {
