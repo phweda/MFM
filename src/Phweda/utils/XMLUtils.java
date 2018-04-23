@@ -96,21 +96,17 @@ public class XMLUtils {
         return docEle.getElementsByTagName(element);
     }
 
-    private void populateObjectList(NodeList nl, Object obj) {
-        //  ChipDocument
-
-        if (nl != null && nl.getLength() > 0) {
-            for (int i = 0; i < nl.getLength(); i++) {
-                //get the employee element
-                Element el = (Element) nl.item(i);
-                //get the Employee object
-                //   Employee e = getEmployee(el);
-
-                //add it to list
-                //   myEmpls.add(e);
-            }
+    public static boolean validate(File inputFile) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setValidating(true); //default value is false
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            db.parse(inputFile);
+        } catch (SAXException | ParserConfigurationException | IOException exc ) {
+            exc.printStackTrace();
+            return false;
         }
-
+        return true;
     }
 
 }
