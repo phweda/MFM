@@ -44,7 +44,7 @@ public class ParseAllMachinesInfo {
     private static Mame mame = new Mame();
     private static TreeSet<String> runnable = new TreeSet<String>();
     private static HashMap<String, ArrayList<String>> CategoryMachineListMap = new HashMap<String, ArrayList<String>>();
-    private static HashMap<String, Map> FolderINIfiles = null;
+    private static HashMap<String, Map<String, String>> FolderINIfiles = null;
 
     private static String build;
     private static ArrayList<String> categoriesList;
@@ -66,8 +66,17 @@ public class ParseAllMachinesInfo {
         String message = "Parsing with ALL flag: " + all;
         System.out.println(message);
         MFM.logger.addToList(message + "\nMAME exe is: " + MFMSettings.getInstance().fullMAMEexePath());
-        // Note as of 0.85 we handle all Mame -listxml versions the same
-        mame = loadAllMachinesInfoJAXB();
+
+        try {
+            // Note as of 0.85 we handle all Mame -listxml versions the same
+            mame = loadAllMachinesInfoJAXB();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (mame == null) {
+                return null;
+            }
+        }
+
         // Set data version here. 0.85 change to handle older Mame versions
         if (mame.getBuild() != null && !mame.getBuild().isEmpty()) {
             mfmSettings.generateDataVersion(mame.getBuild());
@@ -105,7 +114,7 @@ public class ParseAllMachinesInfo {
      * @return Map of all Machines
      * @deprecated 0.85 release handles all Mame versions with -listxml (from 0.70)
      */
-
+    @Deprecated
     private static void loadAllMachinesInfoDOM(Set<String> prefixes) {
         machineList = new ArrayList<String>();
         Document dom = null;
@@ -486,7 +495,7 @@ public class ParseAllMachinesInfo {
      */
     private static void loadFoldersINIs(HashSet<File> files) {
         try {
-            FolderINIfiles = new HashMap<String, Map>();
+            FolderINIfiles = new HashMap<String, Map<String, String>>();
 
             for (File file : files) {
                 if (MFM.isDebug()) {
@@ -495,10 +504,10 @@ public class ParseAllMachinesInfo {
                 if (!file.getName().contains(MFM_Constants.CATVER_INI_FILENAME) &&
                         !file.getName().contains(MFM_Constants.CATVER_FULL_INI_FILENAME) &&
                         !file.getName().contains(MFM_Constants.NPLAYERS_INI_FILENAME)) {
-                        /* LinkedHashMap returns the order elements are added
-                         * TreeMap gives us the Natural order
-                         * At least two common INI files are not ordered - Catlist.ini & Genre.ini
-                         */
+                    /* LinkedHashMap returns the order elements are added
+                     * TreeMap gives us the Natural order
+                     * At least two common INI files are not ordered - Catlist.ini & Genre.ini
+                     */
                     LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
                     new ParseFolderINIs(file.getAbsolutePath(), map).processFile();
                     String name = file.getName().substring(0, file.getName().lastIndexOf('.'));
@@ -513,7 +522,7 @@ public class ParseAllMachinesInfo {
     }
 
     // TODO check can we ever get here without it being initialized??
-    public static HashMap<String, Map> INIfiles(HashSet<File> files) {
+    public static HashMap<String, Map<String, String>> INIfiles(HashSet<File> files) {
         if (FolderINIfiles == null) {
             loadFoldersINIs(files);
         }
