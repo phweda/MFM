@@ -29,18 +29,14 @@ package Phweda.MFM.mame;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -65,13 +61,13 @@ import java.util.TreeSet;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "machine"
+        "machine",
+        "unknownElements"
 })
 @XmlRootElement(name = "mame")
-public class Mame implements Serializable {
+public class Mame {
 
-    private static final long serialVersionUID = -2353256163229379894L;
-
+    // Map game & machine to this class. MAME changed game to machine and this allows for both
     @XmlElements({
             @XmlElement(name = "machine", type = Machine.class),
             @XmlElement(name = "game", type = Machine.class)
@@ -86,6 +82,12 @@ public class Mame implements Serializable {
     protected String mameconfig;
     @XmlTransient
     protected Map<String, Machine> machineMap;
+
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
 
     /**
      * Gets the value of the machine property.

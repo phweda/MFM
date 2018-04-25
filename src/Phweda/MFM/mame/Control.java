@@ -29,14 +29,14 @@ package Phweda.MFM.mame;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
+import java.util.List;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -68,9 +68,7 @@ import java.io.Serializable;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "control")
-public class Control implements Serializable {
-
-    private static final long serialVersionUID = 4579069383521454573L;
+public class Control {
 
     @XmlAttribute(name = "type", required = true)
     protected String type;
@@ -97,6 +95,12 @@ public class Control implements Serializable {
     protected String ways2;
     @XmlAttribute(name = "ways3")
     protected String ways3;
+
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
 
     /**
      * Gets the value of the type property.

@@ -27,14 +27,14 @@
 package Phweda.MFM.mame;
 
 import javax.xml.bind.annotation.*;
-import java.io.Serializable;
+import java.util.List;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;simpleContent>
@@ -47,17 +47,22 @@ import java.io.Serializable;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "value"
+        "value",
+        "unknownElements"
 })
 @XmlRootElement(name = "ramoption")
-public class Ramoption implements Serializable {
-
-    private static final long serialVersionUID = 9004394253023759247L;
+public class Ramoption {
 
     @XmlValue
     protected String value;
     @XmlAttribute(name = "default")
     protected String _default;
+
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
 
     /**
      * Gets the value of the value property.

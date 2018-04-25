@@ -31,7 +31,6 @@ import Phweda.MFM.MFM;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,9 +39,9 @@ import static Phweda.utils.FileUtils.doubleQuoteString;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -145,12 +144,11 @@ import static Phweda.utils.FileUtils.doubleQuoteString;
         "device",
         "slot",
         "softwarelist",
-        "ramoption"
+        "ramoption",
+        "unknownElements"
 })
 @XmlRootElement(name = "machine")
-public class Machine implements Serializable {
-
-    private static final long serialVersionUID = -4771053482371649224L;
+public class Machine {
 
     //========================= MFM ===================================
 
@@ -181,6 +179,12 @@ public class Machine implements Serializable {
     private String orientation; // MAME older versions. vertical|horizontal
     @XmlAttribute(name = "screen")
     private String screen; // MAME older versions. raster|vector
+
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
 
     // @XmlAttribute and @XmlElement Strings for manual parsing in ParseAllMachineInfo
     public static final String NAME = "name";

@@ -29,18 +29,21 @@ package Phweda.MFM.mame;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
+import java.util.List;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element ref="{}condition" minOccurs="0"/>
+ *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="default" default="no">
@@ -57,12 +60,14 @@ import java.io.Serializable;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
+@XmlType(name = "", propOrder = {
+        "condition",
+        "unknownElements"
+})
 @XmlRootElement(name = "dipvalue")
-public class Dipvalue implements Serializable {
+public class Dipvalue {
 
-    private static final long serialVersionUID = 4797506983829442440L;
-
+    protected Condition condition;
     @XmlAttribute(name = "name", required = true)
     protected String name;
     @XmlAttribute(name = "value", required = true)
@@ -70,6 +75,32 @@ public class Dipvalue implements Serializable {
     @XmlAttribute(name = "default")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String _default;
+
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
+
+    /**
+     * Gets the value of the condition property.
+     *
+     * @return possible object is
+     * {@link Condition }
+     */
+    public Condition getCondition() {
+        return condition;
+    }
+
+    /**
+     * Sets the value of the condition property.
+     *
+     * @param value allowed object is
+     *              {@link Condition }
+     */
+    public void setCondition(Condition value) {
+        this.condition = value;
+    }
 
     /**
      * Gets the value of the name property.

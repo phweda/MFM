@@ -27,21 +27,21 @@
 package Phweda.MFM.mame;
 
 import javax.xml.bind.annotation.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element ref="{}condition" minOccurs="0"/>
  *         &lt;element ref="{}conflocation" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{}confsetting" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
@@ -55,16 +55,16 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+        "condition",
         "conflocation",
-        "confsetting"
+        "confsetting",
+        "unknownElements"
 })
 @XmlRootElement(name = "configuration")
-public class Configuration implements Serializable {
+public class Configuration {
 
-    private static final long serialVersionUID = 8704457911607810317L;
-
+    protected Condition condition;
     protected List<Conflocation> conflocation;
-
     protected List<Confsetting> confsetting;
     @XmlAttribute(name = "name", required = true)
     protected String name;
@@ -72,6 +72,32 @@ public class Configuration implements Serializable {
     protected String tag;
     @XmlAttribute(name = "mask", required = true)
     protected String mask;
+
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
+
+    /**
+     * Gets the value of the condition property.
+     *
+     * @return possible object is
+     * {@link Condition }
+     */
+    public Condition getCondition() {
+        return condition;
+    }
+
+    /**
+     * Sets the value of the condition property.
+     *
+     * @param value allowed object is
+     *              {@link Condition }
+     */
+    public void setCondition(Condition value) {
+        this.condition = value;
+    }
 
     /**
      * Gets the value of the conflocation property.

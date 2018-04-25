@@ -27,21 +27,21 @@
 package Phweda.MFM.mame;
 
 import javax.xml.bind.annotation.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element ref="{}condition" minOccurs="0"/>
  *         &lt;element ref="{}diplocation" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;element ref="{}dipvalue" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
@@ -55,16 +55,16 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+        "condition",
         "diplocation",
-        "dipvalue"
+        "dipvalue",
+        "unknownElements"
 })
 @XmlRootElement(name = "dipswitch")
-public class Dipswitch implements Serializable {
+public class Dipswitch {
 
-    private static final long serialVersionUID = 6261385906005183871L;
-
+    protected Condition condition;
     protected List<Diplocation> diplocation;
-
     protected List<Dipvalue> dipvalue;
 
     @XmlAttribute(name = "name", required = true)
@@ -74,27 +74,51 @@ public class Dipswitch implements Serializable {
     @XmlAttribute(name = "mask", required = true)
     protected String mask;
 
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
+
+    /**
+     * Gets the value of the condition property.
+     *
+     * @return possible object is
+     * {@link Condition }
+     */
+    public Condition getCondition() {
+        return condition;
+    }
+
+    /**
+     * Sets the value of the condition property.
+     *
+     * @param value allowed object is
+     *              {@link Condition }
+     */
+    public void setCondition(Condition value) {
+        this.condition = value;
+    }
+
     /**
      * Gets the value of the diplocation property.
-     *
+     * <p>
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the diplocation property.
-     *
+     * <p>
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getDiplocation().add(newItem);
      * </pre>
-     *
-     *
+     * <p>
+     * <p>
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Diplocation }
-     *
-     *
      */
     public List<Diplocation> getDiplocation() {
         if (diplocation == null) {

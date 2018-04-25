@@ -27,23 +27,22 @@
 package Phweda.MFM.mame;
 
 import javax.xml.bind.annotation.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://MFM.Phweda/MAME}instance" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://MFM.Phweda/MAME}extension" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{}instance" minOccurs="0"/>
+ *         &lt;element ref="{}extension" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="tag" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -60,11 +59,9 @@ import java.util.List;
         "extension"
 })
 @XmlRootElement(name = "device")
-public class Device implements Serializable {
+public class Device {
 
-    private static final long serialVersionUID = 4530920753520337482L;
-
-    protected List<Instance> instance;
+    protected Instance instance;
     protected List<Extension> extension;
     @XmlAttribute(name = "type", required = true)
     protected String type;
@@ -75,31 +72,30 @@ public class Device implements Serializable {
     @XmlAttribute(name = "interface")
     protected String _interface;
 
+    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
+    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
+    // Addition of Elements and Attributes should be handled with code updates.
+    @XmlAnyElement(lax = true)
+    private List<Object> unknownElements;
+
     /**
      * Gets the value of the instance property.
-     * <p>
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the instance property.
-     * <p>
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getInstance().add(newItem);
-     * </pre>
-     * <p>
-     * <p>
-     * <p>
-     * Objects of the following type(s) are allowed in the list
+     *
+     * @return possible object is
      * {@link Instance }
      */
-    public List<Instance> getInstance() {
-        if (instance == null) {
-            instance = new ArrayList<Instance>();
-        }
-        return this.instance;
+    public Instance getInstance() {
+        return instance;
+    }
+
+    /**
+     * Sets the value of the instance property.
+     *
+     * @param value allowed object is
+     *              {@link Instance }
+     */
+    public void setInstance(Instance value) {
+        this.instance = value;
     }
 
     /**

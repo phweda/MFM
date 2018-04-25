@@ -80,6 +80,13 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Condition }
+     */
+    public Condition createCondition() {
+        return new Condition();
+    }
+
+    /**
      * Create an instance of {@link Confsetting }
      */
     public Confsetting createConfsetting() {
