@@ -56,7 +56,8 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "instance",
-        "extension"
+        "extension",
+        "unknownElements"
 })
 @XmlRootElement(name = "device")
 public class Device {

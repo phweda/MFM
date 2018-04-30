@@ -27,7 +27,6 @@
 package Phweda.MFM.mame;
 
 import javax.xml.bind.annotation.*;
-import java.util.List;
 
 
 /**
@@ -47,8 +46,7 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "value",
-        "unknownElements"
+        "value"
 })
 @XmlRootElement(name = "ramoption")
 public class Ramoption {
@@ -58,11 +56,8 @@ public class Ramoption {
     @XmlAttribute(name = "default")
     protected String _default;
 
-    // Catchall for any unknown Elements. As MAME DTD changes this will allow for
-    // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
-    // Addition of Elements and Attributes should be handled with code updates.
-    @XmlAnyElement(lax = true)
-    private List<Object> unknownElements;
+    // NO catchall for unknown Elements because this Object has a Value
+    // "If a class has @XmlElement property, it cannot have @XmlValue property."
 
     /**
      * Gets the value of the value property.

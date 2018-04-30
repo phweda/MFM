@@ -61,7 +61,8 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-        "condition"
+        "condition",
+        "unknownElements"
 })
 @XmlRootElement(name = "confsetting")
 public class Confsetting {
