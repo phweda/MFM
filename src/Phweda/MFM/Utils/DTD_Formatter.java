@@ -19,12 +19,8 @@
 package Phweda.MFM.Utils;
 
 import Phweda.utils.XMLUtils;
-import org.xml.sax.SAXException;
 
 import javax.swing.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -49,7 +45,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * Backs up raw DTD file then formats for human readability *
- *
  */
 public class DTD_Formatter {
 
@@ -62,7 +57,7 @@ public class DTD_Formatter {
     public DTD_Formatter(File fileIn) {
         inputFile = fileIn;
         boolean valid = XMLUtils.validate(inputFile);
-        if(!valid){
+        if (!valid) {
             JOptionPane.showMessageDialog(null, "DTD_Formatter received a non-valid XML document\n" +
                     "File: " + inputFile.getAbsolutePath(), "XML Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -91,13 +86,13 @@ public class DTD_Formatter {
                     // System.out.println(scanner.next());
                     if (line.startsWith("<!ELEMENT")) {
                         String currentElement = processElement(line);
-                        for (int i = 0; i < ((Integer) elements.get(currentElement)); i++) {
+                        for (int i = 0; i < elements.get(currentElement); i++) {
                             pw.print("\t");
                         }
                         pw.println(line);
                     } else if (line.startsWith("<!ATTLIST")) {
                         // output +1 tab past current element
-                        for (int i = 0; i < ((Integer) elements.get(getElementName((line)))) + 1; i++) {
+                        for (int i = 0; i < elements.get(getElementName((line))) + 1; i++) {
                             pw.print("\t");
                         }
                         pw.println(line);
