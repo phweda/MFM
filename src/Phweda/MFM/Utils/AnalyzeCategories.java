@@ -21,14 +21,13 @@ package Phweda.MFM.Utils;
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MFM;
 import Phweda.MFM.MFMListBuilder;
+import Phweda.MFM.MFM_Constants;
 import Phweda.MFM.mame.Machine;
 import Phweda.utils.PersistUtils;
-import com.sun.imageio.stream.StreamFinalizer;
 
 import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,18 +37,15 @@ import java.util.stream.Collectors;
  */
 
 /**
- * TODO major refactor, cleanup, future additional capabilities??
- * <p>
- * Uses catver.ini and arcade.ini to update MFM Category files
+ * Uses catver.ini and arcade.ini to update MFM Category file
  * This is NOT a complete automated solution. Still requires human tweaks and reimport
  * Need to see if I can get a definitive statement on future catver.ini changes. If yes may be able
- * to assure no roots tweaking
+ * to assure no roots tweaking (May 2018)
  */
 public class AnalyzeCategories {
 
-    HashMap<String, ArrayList<String>> categoryGames;
-    ArrayList<String> allCategories;
-    ArrayList<String> allCategories2;
+    private HashMap<String, ArrayList<String>> categoryGames;
+    private ArrayList<String> allCategories;
 
     private static ArrayList<String> rootCategories;
     private static ArrayList<String> arcadeRoots;
@@ -61,9 +57,6 @@ public class AnalyzeCategories {
     private static ArrayList<String> arcadeNoMatureCategories;
     private static ArrayList<String> systemNoMatureCategories;
 
-    final static TreeSet<String> categoriesSet = new TreeSet<String>();
-    final static TreeSet<String> categoriesRootsSet = new TreeSet<String>();
-
     private static HashMap<String, String> Version = new HashMap<String, String>();
     private static HashMap<String, String> MachinetoCategoryMap = new HashMap<String, String>();
     private static HashMap<String, Set<String>> CategorytoMachinesMap = new HashMap<String, Set<String>>();
@@ -71,13 +64,11 @@ public class AnalyzeCategories {
     private static Map<String, String> arcadeCategoriesMap = new HashMap<String, String>();
 
     private static final String SEPARATOR = "~";
-    private static final String DOUBLEQUOTE = "\"";
 
-    private static String savePath = "E:\\test\\CategoryMFM\\CategoryListsMapNEW.xml";
+    private static String savePath = MFM.MFM_CATEGORY_DIR;
 
-
-    Map CatverINImap = new HashMap();
-    TreeMap<String, ArrayList<String>> categoryHierarchy = new TreeMap<String, ArrayList<String>>();
+    private Map<String, HashMap<String, String>> CatverINImap = new HashMap<String, HashMap<String, String>>();
+    private TreeMap<String, ArrayList<String>> categoryHierarchy = new TreeMap<String, ArrayList<String>>();
 
     /* Hashmap of Arraylists for CategoryListsMap.xml
         All Roots
@@ -90,8 +81,7 @@ public class AnalyzeCategories {
         Mature Roots
         System No Mature Categories
     */
-    static HashMap<String, ArrayList<String>> categoryListsMap = new HashMap<String, ArrayList<String>>();
-
+    private static HashMap<String, ArrayList<String>> categoryListsMap = new HashMap<String, ArrayList<String>>();
 
     public AnalyzeCategories() {
         parseInputFiles();
@@ -104,29 +94,17 @@ public class AnalyzeCategories {
 
     private void parseInputFiles() {
         try {
-            // new ParseRootOnlyINI("E:\\Games\\EXTRAs\\folders\\arcade.ini", arcadeCategoriesMap).processFile();
-
-            //    new ParseFolderINIs( "E:\\Games\\EXTRAs\\folders\\catlist.ini" , CategorytoMachinesMap).processFile();
-            //    TreeSet<String> sortedSet = new TreeSet<String>(CategorytoMachinesMap.keySet());
-            //    allCategories = new ArrayList<String>(sortedSet);
 
             CatverINImap.put("category", MachinetoCategoryMap);
             CatverINImap.put("version", Version);
-            new ParseCatverINI("E:\\Games\\EXTRAs\\folders\\catver.ini", CatverINImap).processFile();
-            new ParseRootOnlyINI("E:\\Games\\EXTRAs\\folders\\arcade.ini", arcadeCategoriesMap).processFile();
+            new ParseCatverINI(MFM.MFM_FOLDERS_DIR + MFM_Constants.CATVER_INI_FILENAME, CatverINImap).processFile();
+            new ParseRootOnlyINI(MFM.MFM_FOLDERS_DIR + MFM_Constants.ARCADE_INI_FILENAME, arcadeCategoriesMap).processFile();
 
             TreeSet<String> sortedSet = new TreeSet<String>(MachinetoCategoryMap.values());
             allCategories = new ArrayList<String>(sortedSet);
-
-            //   getCategoriesFromMachinetoCategoryMap();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    private void getCategoriesFromMachinetoCategoryMap() {
-        TreeSet<String> catSet = new TreeSet<String>(MachinetoCategoryMap.values());
-        allCategories2 = new ArrayList<String>(catSet);
     }
 
     private void analyzeFile() {
@@ -135,7 +113,9 @@ public class AnalyzeCategories {
             ArrayList<String> list = categoryGames.get(key);
             if (!list.isEmpty()) {
                 allCategories.add(key);
-                // System.out.println(key);
+                if (MFM.isSystemDebug()) {
+                    System.out.println(key);
+                }
             }
         }
     }
@@ -157,7 +137,7 @@ public class AnalyzeCategories {
                     list.add(subKey);
                     categoryHierarchy.put(key, list);
                 }
-            } else { // with newest catver.ini ... circa 189-190 we shouldn't need this
+            } else { // with newest catver.ini ... circa 191 we shouldn't need this
                 // If we haven't previously added it
                 if (!categoryHierarchy.containsKey(entry)) {
                     categoryHierarchy.put(entry, new ArrayList<String>());
@@ -176,9 +156,13 @@ public class AnalyzeCategories {
                 matureRoots.add(key);
             }
             for (String subKey : categoryHierarchy.get(key)) {
-                //      System.out.println("\t" + ++countSub + ". " + subKey);
+                if (MFM.isSystemDebug()) {
+                    System.out.println("\t" + ++countSub + ". " + subKey);
+                }
             }
-            //  System.out.println("");
+            if (MFM.isSystemDebug()) {
+                System.out.println("");
+            }
         }
         categoryListsMap.put(MFMListBuilder.ALL_CATEGORY_ROOTS, rootCategories);
         categoryListsMap.put(MFMListBuilder.MATURE_CATEGORY_ROOTS, matureRoots);
@@ -200,7 +184,7 @@ public class AnalyzeCategories {
                 if (category.contains("/")) {
                     category = category.substring(0, category.indexOf('/')).trim();
                 }
-                // we always add here as some categories are also roots e.g. Ball
+                // we always add here as some categories are also roots e.g. Ball NOTE not with newest 191+
                 arcadeRootSet.add(category);
             }
         });
@@ -216,7 +200,11 @@ public class AnalyzeCategories {
         // Generate System Roots -- TODO figure out correct single lamda
         TreeSet<String> sysRoots = new TreeSet<String>();
         systemCategories.forEach(category ->
-                sysRoots.add(category.substring(0, category.indexOf('/')).trim()));
+        {
+            if (category.indexOf('/') > 0) {
+                sysRoots.add(category.substring(0, category.indexOf('/')).trim());
+            }
+        });
         systemRoots = new ArrayList<String>(sysRoots);
 
         categoryListsMap.put(MFMListBuilder.ARCADE_CATEGORIES, new ArrayList<String>(arcadeCategories));
@@ -225,9 +213,15 @@ public class AnalyzeCategories {
         categoryListsMap.put(MFMListBuilder.SYSTEM_CATEGORY_ROOTS, systemRoots);
     }
 
+    @SuppressWarnings("unchecked")
     public AnalyzeCategories(String filePath) {
         try {
-            categoryGames = (HashMap<String, ArrayList<String>>) PersistUtils.loadAnObjectXML(filePath);
+            Object obj = PersistUtils.loadAnObjectXML(filePath);
+            if (obj.getClass().isAssignableFrom(HashMap.class)) {
+                categoryGames = (HashMap<String, ArrayList<String>>) obj;
+            } else {
+                throw new ClassCastException("Input file must be XML of HashMap<String, ArrayList<String>> Object");
+            }
             analyzeFile();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -239,7 +233,7 @@ public class AnalyzeCategories {
         systemNoMatureCategories = new ArrayList<String>();
         TreeSet<String> matureCategories = new TreeSet<String>();
 
-        arcadeCategories.stream().forEach(category -> {
+        arcadeCategories.forEach(category -> {
             if (!Pattern.compile(Pattern.quote("mature"), Pattern.CASE_INSENSITIVE).matcher(category).find()) {
                 arcadeNoMatureCategories.add(category);
             } else {
@@ -247,7 +241,7 @@ public class AnalyzeCategories {
             }
         });
 
-        systemCategories.stream().forEach(category -> {
+        systemCategories.forEach(category -> {
             if (!Pattern.compile(Pattern.quote("mature"), Pattern.CASE_INSENSITIVE).matcher(category).find()) {
                 systemNoMatureCategories.add(category);
             } else {
@@ -261,22 +255,23 @@ public class AnalyzeCategories {
     }
 
     private static void persistCategoriestoFile(String path) {
-        PersistUtils.saveAnObjectXML(categoryListsMap, path);
+        PersistUtils.saveAnObjectXML(categoryListsMap, path + "categoryListsMapNEW.xml");
         outputToCSV();
     }
 
     private static void outputToCSV() {
         PrintWriter pw;
         try {
-            pw = new PrintWriter(new File("E:\\test\\CategoryMFM\\categories.csv"));
+            pw = new PrintWriter(new File(MFM.MFM_CATEGORY_DIR + "categories.csv"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
         }
 
-        final String header = "All Roots" + SEPARATOR + "Arcade Roots" + SEPARATOR + "System Roots" + SEPARATOR + "Mature Roots" + SEPARATOR + "" +
-                "Arcade Categories" + SEPARATOR + "System Categories" + SEPARATOR + "All Mature Categories" + SEPARATOR + "" +
-                "Arcade No Mature Categories" + SEPARATOR + "System No Mature Categories";
+        final String header = "All Roots" + SEPARATOR + "Arcade Roots" + SEPARATOR + "System Roots" + SEPARATOR +
+                "Mature Roots" + SEPARATOR + "" + "Arcade Categories" + SEPARATOR + "System Categories" + SEPARATOR +
+                "All Mature Categories" + SEPARATOR + "" + "Arcade No Mature Categories" + SEPARATOR +
+                "System No Mature Categories";
 
         pw.println(header);
 
@@ -296,34 +291,41 @@ public class AnalyzeCategories {
         int max = Arrays.stream(sizes).max().getAsInt();
         for (int i = 0; i < max; i++) {
             StringBuilder line = new StringBuilder();
-            if (categoryListsMap.get(MFMListBuilder.ALL_CATEGORY_ROOTS).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.ALL_CATEGORY_ROOTS).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
-            if (categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORY_ROOTS).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORY_ROOTS).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
-            if (categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORY_ROOTS).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORY_ROOTS).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
-            if (categoryListsMap.get(MFMListBuilder.MATURE_CATEGORY_ROOTS).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.MATURE_CATEGORY_ROOTS).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
-            if (categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORIES).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORIES).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
-            if (categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORIES).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORIES).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
+            if (categoryListsMap.get(MFMListBuilder.ALL_CATEGORY_ROOTS).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.ALL_CATEGORY_ROOTS).get(i));
+            }
+            line.append(SEPARATOR);
+            if (categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORY_ROOTS).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORY_ROOTS).get(i));
+            }
+            line.append(SEPARATOR);
+            if (categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORY_ROOTS).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORY_ROOTS).get(i));
+            }
+            line.append(SEPARATOR);
+            if (categoryListsMap.get(MFMListBuilder.MATURE_CATEGORY_ROOTS).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.MATURE_CATEGORY_ROOTS).get(i));
+            }
+            line.append(SEPARATOR);
+            if (categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORIES).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.ARCADE_CATEGORIES).get(i));
+            }
+            line.append(SEPARATOR);
+            if (categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORIES).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.SYSTEM_CATEGORIES).get(i));
+            }
+            line.append(SEPARATOR);
             if (categoryListsMap.get(MFMListBuilder.ALL_MATURE_CATEGORIES) != null &&
-                    categoryListsMap.get(MFMListBuilder.ALL_MATURE_CATEGORIES).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.ALL_MATURE_CATEGORIES).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
-            if (categoryListsMap.get(MFMListBuilder.ARCADE_NOMATURE_CATEGORIES).size() > i)
-                line.append(categoryListsMap.get(MFMListBuilder.ARCADE_NOMATURE_CATEGORIES).get(i) + SEPARATOR);
-            else line.append(SEPARATOR);
+                    categoryListsMap.get(MFMListBuilder.ALL_MATURE_CATEGORIES).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.ALL_MATURE_CATEGORIES).get(i));
+            }
+            line.append(SEPARATOR);
+            if (categoryListsMap.get(MFMListBuilder.ARCADE_NOMATURE_CATEGORIES).size() > i) {
+                line.append(categoryListsMap.get(MFMListBuilder.ARCADE_NOMATURE_CATEGORIES).get(i));
+            }
+            line.append(SEPARATOR);
             if (categoryListsMap.get(MFMListBuilder.SYSTEM_NOMATURE_CATEGORIES).size() > i)
                 line.append(categoryListsMap.get(MFMListBuilder.SYSTEM_NOMATURE_CATEGORIES).get(i));
-            else line.append(SEPARATOR);
             pw.println(line.toString());
         }
         pw.close();
@@ -339,20 +341,22 @@ public class AnalyzeCategories {
 
         ArrayList<String> arcadeCategories = new ArrayList<String>();
         systemCategories = new ArrayList<String>();
+        ArrayList<String> allMatureCategories = new ArrayList<String>();
         arcadeNoMatureCategories = new ArrayList<String>();
         systemNoMatureCategories = new ArrayList<String>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             // NOTE Why doesn't this work!!
-            //   String line1 = br.readLine(); // Throw out header;
+            //   String line = br.readLine(); // Throw out header
             String line = null;
             while ((line = br.readLine()) != null) {
-                if(line.contains("All Roots")){
+                // Throw out header
+                if (line.contains("All Roots")) {
                     continue;
                 }
                 String[] entries = line.split(SEPARATOR);
                 if (MFM.isSystemDebug()) {
-                    //   System.out.println("" + entries[0] + " , name=" + entries[1] + "");
+                    System.out.println("" + entries[0] + " , name=" + entries[1] + "");
                 }
 
                 rootCategories.add(entries[0]);
@@ -361,23 +365,25 @@ public class AnalyzeCategories {
                 matureRoots.add(entries[3]);
                 arcadeCategories.add(entries[4]);
                 // Some spreadsheets do not output all columns
-                // We start here since Arcade Categories will always be the longest list
+                // We start to check here since Arcade Categories will always be the longest list
                 if (entries.length > 5) systemCategories.add(entries[5]);
-                if (entries.length > 6) arcadeNoMatureCategories.add(entries[6]);
-                if (entries.length > 7) systemNoMatureCategories.add(entries[7]);
+                if (entries.length > 6) allMatureCategories.add(entries[6]);
+                if (entries.length > 7) arcadeNoMatureCategories.add(entries[7]);
+                if (entries.length > 8) systemNoMatureCategories.add(entries[8]);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Remove empty strings showing two different methods
+        // Remove empty strings showing two different methods to accomplish it
         rootCategories.removeIf(item -> item == null || "".equals(item));
         arcadeRoots.removeIf(item -> item == null || "".equals(item));
         systemRoots.removeIf(item -> item == null || "".equals(item));
         matureRoots.removeAll(Collections.singleton(""));
         arcadeCategories.removeAll(Collections.singleton(""));
         systemCategories.removeAll(Collections.singleton(""));
+        allMatureCategories.removeAll(Collections.singleton(""));
         arcadeNoMatureCategories.removeAll(Collections.singleton(""));
         systemNoMatureCategories.removeAll(Collections.singleton(""));
 
@@ -391,31 +397,10 @@ public class AnalyzeCategories {
 
         categoryListsMap.put(MFMListBuilder.ARCADE_CATEGORIES, arcadeCategories);
         categoryListsMap.put(MFMListBuilder.SYSTEM_CATEGORIES, systemCategories);
+        categoryListsMap.put(MFMListBuilder.ALL_MATURE_CATEGORIES, allMatureCategories);
         categoryListsMap.put(MFMListBuilder.ARCADE_NOMATURE_CATEGORIES, arcadeNoMatureCategories);
         categoryListsMap.put(MFMListBuilder.SYSTEM_NOMATURE_CATEGORIES, systemNoMatureCategories);
 
         persistCategoriestoFile(MFM.MFM_CATEGORY_DIR + name);
     }
-
-/*  we already have this in MFM
-
-    public void discoverCategories(File catverFile) {
-        allCategories = new ArrayList<String>();
-
-        try {
-            Files.lines(catverFile.toPath())
-                    .forEach(line -> {
-                        if (line.contains("=")) {
-                            String category = line.substring(line.indexOf('=') + 1);
-                            if (!category.contains(".") && !allCategories.contains(category)) {
-                                allCategories.add(category);
-                            }
-                        }
-                    });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-*/
-
 }
