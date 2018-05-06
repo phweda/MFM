@@ -47,11 +47,11 @@ class MachineListTableModel extends AbstractTableModel {
     private String[] list;
 
     /* How wide for each column? Not worth the extra time to calculate each time
-      *   "Machine", "Category", "Year", "Manufacturer", "Status", "Cloneof"
-      *    16(13)               6                         12        16
-      *    Above are character sizes = columns are in pixels
-      *
-      * */
+     *   "Machine", "Category", "Year", "Manufacturer", "Status", "Cloneof"
+     *    16(13)               6                         12        16
+     *    Above are character sizes = columns are in pixels
+     *
+     * */
 
     public void setData(TreeSet<String> list) {
         loadMachineList(list);

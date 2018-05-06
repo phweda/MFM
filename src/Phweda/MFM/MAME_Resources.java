@@ -40,7 +40,6 @@ import java.util.*;
 
 /**
  * MAME_Resources detects and stores the ROMs CHDs and Extras files from the User's entered sets
- *
  */
 public class MAME_Resources {
 

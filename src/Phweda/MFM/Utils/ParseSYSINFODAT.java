@@ -21,7 +21,6 @@ package Phweda.MFM.Utils;
 import Phweda.utils.ParseTextFile;
 
 import java.util.Map;
-import java.util.Scanner;
 
 /**
  * Created by IntelliJ IDEA.

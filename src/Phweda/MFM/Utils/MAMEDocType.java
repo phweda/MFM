@@ -45,10 +45,8 @@ import java.util.Scanner;
  */
 
 /**
- *
  * Extracts MAME DTD from the -listxml output Doctype node and writes it, unformatted, to file.
  * See @Phweda.MFM.Utils.DTD_Formatter
- *
  */
 public class MAMEDocType {
     private File outputdir;
@@ -78,7 +76,7 @@ public class MAMEDocType {
 
     private void saveDTD(Path file) {
         String version = getMameVersion(file);
-    //    System.out.println(version);
+        //    System.out.println(version);
         Path parent = file.getParent();
         File xmlFile = null;
         ArrayList<String> args = mameArgs(file);
@@ -111,7 +109,7 @@ public class MAMEDocType {
             try {
                 Document doc = getMameDoc(xmlFile);
                 DocumentType doctype = doc.getDoctype();
-            //    System.out.println(version + "," + doctype.getInternalSubset().hashCode());
+                //    System.out.println(version + "," + doctype.getInternalSubset().hashCode());
                 outputData.append(version);
                 outputData.append(",");
                 outputData.append(doctype.getInternalSubset().hashCode());

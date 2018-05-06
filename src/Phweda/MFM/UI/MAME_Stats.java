@@ -132,7 +132,7 @@ class MAME_Stats {
     private String getTotalPercentsLine() {
         StringBuilder stringBuilder = new StringBuilder();
         stats.keySet().forEach(key -> {
-            stringBuilder.append(percentFormater.format(stats.get(key).floatValue()/stats.get("Total").floatValue()));
+            stringBuilder.append(percentFormater.format(stats.get(key).floatValue() / stats.get("Total").floatValue()));
             stringBuilder.append(",");
         });
         return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
@@ -141,7 +141,7 @@ class MAME_Stats {
     private String getAllPercentsLine() {
         StringBuilder stringBuilder = new StringBuilder();
         stats.keySet().forEach(key -> {
-            stringBuilder.append(percentFormater.format(stats.get(key).floatValue()/stats.get("All").floatValue()));
+            stringBuilder.append(percentFormater.format(stats.get(key).floatValue() / stats.get("All").floatValue()));
             stringBuilder.append(",");
         });
         return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));

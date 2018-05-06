@@ -74,13 +74,13 @@ public class MFMFileOps {
     }
 
     /*
-    * Scans and updates files for a playlist. After a MAME and/or
-    * Extras update should update all Machine related files if they
-    * have been added or changed
-    *
-    * NOTE are we OK assuming existing files can be determined to have changed
-    * based solely on file timestamp???
-    */
+     * Scans and updates files for a playlist. After a MAME and/or
+     * Extras update should update all Machine related files if they
+     * have been added or changed
+     *
+     * NOTE are we OK assuming existing files can be determined to have changed
+     * based solely on file timestamp???
+     */
     // TODO implement
     protected static boolean updatePlayListResources(String listName) {
 
@@ -88,10 +88,10 @@ public class MFMFileOps {
     }
 
     /*
-    * TODO refactor this - too big and needs tightening up
-    * Find all files for each game in a playlist.
-    * Copy them to the appropriate Play directory if it exists
-    */
+     * TODO refactor this - too big and needs tightening up
+     * Find all files for each game in a playlist.
+     * Copy them to the appropriate Play directory if it exists
+     */
     // TODO Need to convert to a set of search roots see copyListResources
     // Done logic moved to MAME_Resources
     public static boolean populatePlayList(TreeSet treeSet) {
@@ -410,8 +410,8 @@ public class MFMFileOps {
     }
 
     /*
-    * Find all MAME directories i.e. roms, chds, samples, snaps etc
-    */
+     * Find all MAME directories i.e. roms, chds, samples, snaps etc
+     */
     public static HashMap<String, String> findMAMEdirectories(Path root, String[] dirNames) {
         HashMap map = null;
         try {
@@ -426,8 +426,8 @@ public class MFMFileOps {
     }
 
     /*
-    * Find a single file
-    */
+     * Find a single file
+     */
     public static String findMAMEfile(Path root, Path name) {
         String path = null;
         try {
@@ -444,8 +444,8 @@ public class MFMFileOps {
     }
 
     /* TODO is this needed??
-    * Find a single directory
-    */
+     * Find a single directory
+     */
     protected static Path findMAMEdirectory(Path root, String name) {
         return Paths.get("");
     }

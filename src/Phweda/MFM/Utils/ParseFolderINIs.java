@@ -20,9 +20,8 @@ package Phweda.MFM.Utils;
 
 import Phweda.utils.ParseTextFile;
 
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,10 +40,10 @@ public class ParseFolderINIs extends ParseTextFile {
     }
 
     /*
-    * We just do all the work here
-    *
-    * TODO figure out how to handle files like Favorites.ini that do not have any [] after ROOT_FOLDER
-    */
+     * We just do all the work here
+     *
+     * TODO figure out how to handle files like Favorites.ini that do not have any [] after ROOT_FOLDER
+     */
     @Override
     protected void processLine(String line) {
 
@@ -57,7 +56,7 @@ public class ParseFolderINIs extends ParseTextFile {
             /* TODO figure out the Regex : match left square bracket followed by zero
              * or more alpha and or numeric characters followed by right square bracket
              * That would greatly reduce the following
-            */
+             */
             //scanner.next(Pattern.compile("[\[\d*?\w\*?]]"))
             if (line.contains("[") && !line.contains("FOLDER_SETTINGS")) {
 

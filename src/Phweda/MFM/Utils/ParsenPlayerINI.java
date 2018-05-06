@@ -18,10 +18,8 @@
 
 package Phweda.MFM.Utils;
 
-import Phweda.MFM.MFM;
 import Phweda.utils.ParseTextFile;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 

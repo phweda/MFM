@@ -31,7 +31,7 @@ import java.util.TreeSet;
 
 /**
  * Legacy class replaced by Machine class
- *
+ * <p>
  * NOTE this class follows the Java Beans Spec to enable saving object as XML
  * NOTE that Serialization does not require this
  */
@@ -118,8 +118,8 @@ public class MFMMachine implements Serializable {
     private int width = 0;
 
 
-/*
-    */
+    /*
+     */
 
     /**
      * Used by MachineListTableModel
