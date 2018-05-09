@@ -20,6 +20,7 @@ package Phweda.MFM.UI;
 
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.mame.Machine;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -27,6 +28,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 
 /**
  * Created by IntelliJ IDEA.
@@ -60,9 +62,9 @@ class MachineListTable extends JTable {
 
             //Implement table cell tool tips.
             @Override
-            public String getToolTipText(MouseEvent e) {
+            public String getToolTipText(@NotNull MouseEvent e) {
                 String tip = null;
-                java.awt.Point p = e.getPoint();
+                java.awt.Point p = Objects.requireNonNull(e).getPoint();
                 int rowIndex = rowAtPoint(p);
                 int colIndex = columnAtPoint(p);
 
@@ -213,37 +215,39 @@ class MachineListTable extends JTable {
         columnModel.getColumn(index).setMinWidth(95);
         columnModel.getColumn(index).setMaxWidth(150);
 
-        this.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+        this.setDefaultRenderer(Object.class,
+                new DefaultTableCellRenderer() {
 
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus, int row, int column) {
-                final JComponent comp = (JComponent) super.getTableCellRendererComponent(
-                        table, value, isSelected, hasFocus, row, column);
+                    @Override
+                    public Component getTableCellRendererComponent(JTable table, Object value,
+                                                                   boolean isSelected, boolean hasFocus, int row, int column) {
+                        final JComponent comp = (JComponent) super.getTableCellRendererComponent(
+                                table, value, isSelected, hasFocus, row, column);
 
-                comp.setBackground(row % 2 == 0 ? Color.GREEN : MFMUI.getMFMLightGreen());
-                comp.setForeground(Color.BLACK);
+                        comp.setBackground(row % 2 == 0 ? Color.GREEN : MFMUI.getMFMLightGreen());
+                        comp.setForeground(Color.BLACK);
 
-                int newRow = ourInstance.convertRowIndexToModel(row);
-                final String machineName = (String) ourInstance.getModel().getValueAt(newRow, keyColumn);
+                        int newRow = ourInstance.convertRowIndexToModel(row);
+                        final String machineName = (String) ourInstance.getModel().getValueAt(newRow, keyColumn);
 
-                if (!MAMEInfo.getRunnableMachines().contains(machineName)) {
-                    comp.setBackground(MFMUI.getMFMLightRed());
-                }
-                if (isRowSelected(row)) {
-                    int top = (row > 0 && isRowSelected(row - 1)) ? 1 : 2;
-                    int left = column == 0 ? 2 : 0;
-                    int bottom = (row < getRowCount() - 1 && isRowSelected(row + 1)) ? 1 : 2;
-                    int right = column == getColumnCount() - 1 ? 2 : 0;
+                        if (!MAMEInfo.getRunnableMachines().contains(machineName) &&
+                                !MFMController.checkRunnableSoftware(machineName)) {
+                            comp.setBackground(MFMUI.getMFMLightRed());
+                        }
+                        if (isRowSelected(row)) {
+                            int top = (row > 0 && isRowSelected(row - 1)) ? 1 : 2;
+                            int left = column == 0 ? 2 : 0;
+                            int bottom = (row < getRowCount() - 1 && isRowSelected(row + 1)) ? 1 : 2;
+                            int right = column == getColumnCount() - 1 ? 2 : 0;
 
-                    if (comp.getBackground() == MFMUI.getMFMLightRed()) {
-                        comp.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, Color.yellow));
-                    } else {
-                        comp.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, Color.blue));
+                            if (comp.getBackground() == MFMUI.getMFMLightRed()) {
+                                comp.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, Color.yellow));
+                            } else {
+                                comp.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, Color.blue));
+                            }
+                        }
+                        return this;
                     }
-                }
-                return this;
-            }
-        });
+                });
     }
 }

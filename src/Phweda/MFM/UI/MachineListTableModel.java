@@ -21,6 +21,7 @@ package Phweda.MFM.UI;
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MFM;
 import Phweda.MFM.mame.Machine;
+import Phweda.MFM.mame.softwarelist.Software;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -44,6 +45,7 @@ class MachineListTableModel extends AbstractTableModel {
     private ArrayList<String[]> data = new ArrayList<String[]>();
     private ArrayList<String[]> tempdata = new ArrayList<String[]>();
 
+    private String listName;
     private String[] list;
 
     /* How wide for each column? Not worth the extra time to calculate each time
@@ -53,13 +55,14 @@ class MachineListTableModel extends AbstractTableModel {
      *
      * */
 
-    public void setData(TreeSet<String> list) {
-        loadMachineList(list);
+    void setData(TreeSet<String> list, String listName) {
+        loadMachineList(list, listName);
     }
 
     /* TODO Hide and show columns */
-    private void loadMachineList(TreeSet<String> list) {
-        this.list = list.toArray(new String[list.size()]);
+    private void loadMachineList(TreeSet<String> list, String listName) {
+        this.listName = listName;
+        this.list = list.toArray(new String[0]);
         fireTableDataChanged();
     }
 
@@ -77,24 +80,44 @@ class MachineListTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if (list == null || rowIndex < 0) {
-            return "No DATA!";
+
+        // Put softwarelist first to avoid name collisions with Arcade games
+        Software software = MAMEInfo.getSoftware(list[rowIndex], listName);
+        if (software != null) {
+            switch (columnIndex) {
+
+                case 0:
+                    return software.getDescription() != null ? software.getDescription() : "";
+                case 1:
+                    return software.getName() != null ? software.getName() : ""; // uneeded ??
+                // Note no manufacturer for Softwarelists
+                case 3:
+                    return software.getYear() != null ? software.getYear() : "";
+                case 5:
+                    return software.getSupported() != null ? software.getSupported() : "";
+                case 6:
+                    return software.getCloneof() != null ? software.getCloneof() : "";
+                default: {
+                    return "";
+                }
+            }
         }
 
         Machine machine = MAMEInfo.getMachine(list[rowIndex]);
+        if (machine != null) {
+            return machine.getValueOf(columnNames[columnIndex]);
+        }
         // Expected for some lists
-        if (machine == null) {
+        else {
             if (columnIndex == MachineListTable.keyColumn) {
                 String message = "MachineListTableModel.java:88 machine is null " + list[rowIndex];
                 if (MFM.isSystemDebug()) {
                     System.out.println(message);
                 }
-                MFM.logger.out(message);
                 return list[rowIndex];
             }
-            return "No DATA!";
+            return "";
         }
-        return machine.getValueOf(columnNames[columnIndex]);
     }
 
     /**
@@ -136,7 +159,7 @@ class MachineListTableModel extends AbstractTableModel {
     private void update() {
         data = tempdata;
         fireTableDataChanged();
-        tempdata = new ArrayList<String[]>();
+        tempdata = new ArrayList<>();
     }
 
     private class TableSwingWorker extends SwingWorker<MachineListTableModel, String[]> {
@@ -150,7 +173,7 @@ class MachineListTableModel extends AbstractTableModel {
         }
 
         @Override
-        protected MachineListTableModel doInBackground() throws Exception {
+        protected MachineListTableModel doInBackground() {
             if (MFM.isSystemDebug()) {
                 System.out.println("Start list populating");
             }
