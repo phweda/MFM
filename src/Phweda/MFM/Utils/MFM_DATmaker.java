@@ -26,13 +26,13 @@ package Phweda.MFM.Utils;
  */
 
 import Phweda.MFM.*;
+import Phweda.MFM.UI.MFMUI_Resources;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.datafile.Disk;
 import Phweda.MFM.datafile.Game;
 import Phweda.MFM.datafile.Header;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Rom;
-import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
 import org.xml.sax.SAXException;
 
@@ -45,7 +45,6 @@ import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipOutputStream;
@@ -58,11 +57,7 @@ public class MFM_DATmaker {
     private static Map<String, Machine> map;
     private static final String NODUMP = "nodump";
     private static final String LISTS_ZIP_FILE_SUFFIX = "_Lists_DATs.zip";
-    private static URL DATschemaURL;
-
-    public MFM_DATmaker() {
-        DATschemaURL = this.getClass().getResource("Resources" + FileUtils.SLASH + "datafile.xsd");
-    }
+    private static File DATschemaFile = MFMUI_Resources.getInstance().getDATSchema();
 
     public static Datafile generateDAT(String listName, Set<String> list) throws ParserConfigurationException {
         return createDAT(listName, list);
@@ -85,15 +80,18 @@ public class MFM_DATmaker {
         return filteredDatafile;
     }
 
+
     public static boolean validateDAT(File xmlFile) {
         try {
-            SchemaFactory factory =
-                    SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(new File(DATschemaURL.getPath()));
+            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = factory.newSchema(DATschemaFile);
             Validator validator = schema.newValidator();
             validator.validate(new StreamSource(xmlFile));
         } catch (IOException | SAXException e) {
-            System.out.println("Exception: " + e.getMessage());
+            if (MFM.isSystemDebug()) {
+                System.out.println("Exception: " + e.getMessage());
+            }
+            e.printStackTrace();
             return false;
         }
         return true;

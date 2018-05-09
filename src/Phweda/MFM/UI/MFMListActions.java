@@ -117,7 +117,7 @@ class MFMListActions {
 
         // TODO Refactor with changeList(listName)
         MachineListTableModel gltm = (MachineListTableModel) getMachineListTable().getModel();
-        gltm.setData(MFMPlayLists.getInstance().getPlayList(listName));
+        gltm.setData(MFMPlayLists.getInstance().getPlayList(listName), listName);
         gltm.fireTableDataChanged();
         // TODO test removal of first and last rows
         getMachineListTable().getSelectionModel().setSelectionInterval(row, row);
@@ -192,15 +192,33 @@ class MFMListActions {
     }
 
     static String DATtoList() {
-        File inputDATfile = pickDAT();
+        File inputDATfile = pickValidateDAT();
         if (inputDATfile != null) {
             Datafile DATfile = (Datafile) PersistUtils.retrieveJAXB(inputDATfile.getAbsolutePath(), Datafile.class);
             MFMListBuilder.createListfromDAT(inputDATfile.getName(), DATfile);
             return inputDATfile.getName();
-        } else {
-            return "";
         }
+        return "";
     }
+
+    static File pickValidateDAT() {
+        File file = pickDAT();
+        if (ValidateDAT(file)) {
+            return file;
+        }
+        return null;
+    }
+
+    public static boolean ValidateDAT(File inputFile) {
+        boolean good = MFM_DATmaker.validateDAT(inputFile);
+        if (!good) {
+            JOptionPane.showMessageDialog(mainFrame, "DAT file is invalid. Check the MFM error file for details.",
+                    "Invalid DAT File", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
 
     static void filterDATbyList() {
         String list = pickList(true, "Select filter List");

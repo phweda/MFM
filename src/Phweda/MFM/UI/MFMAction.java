@@ -69,6 +69,7 @@ public class MFMAction extends AbstractAction {
     static final String ListEditorAction = "List Editor";
     static final String ListtoDATAction = "Create DAT from List";
     static final String DATtoListAction = "Create List from DAT";
+    static final String ValidateDATAction = "Validate DAT";
     static final String FilterDATbyListAction = "Filter DAT by List";
     static final String FilterDATbyExternalListAction = "Filter DAT by External List";
     static final String MAME_TREEAction = "Show MAME tree";
@@ -283,6 +284,10 @@ public class MFMAction extends AbstractAction {
                     controller.DATtoList();
                     break;
 
+                case ValidateDATAction:
+                    controller.ValidateDAT();
+                    break;
+
                 case FilterDATbyListAction:
                     controller.FilterDATbyList();
                     break;
@@ -340,7 +345,8 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case MAMEControlsDUMPAction:
-                    controller.MAMEControlsDUMP();
+                    // TODO should wire this into Parsing?
+                    // controller.MAMEControlsDUMP();
                     break;
 
                 case CleanLogsAction:

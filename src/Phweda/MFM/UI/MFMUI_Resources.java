@@ -23,6 +23,7 @@ import Phweda.MFM.MFM;
 import Phweda.utils.FileUtils;
 
 import javax.swing.*;
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -136,6 +137,14 @@ public class MFMUI_Resources {
         return null;
     }
 
+    public File getDATSchema() {
+        URL url = this.getClass().getResource("Resources" + FileUtils.SLASH + "datafile2018.xsd");
+        if (url != null) {
+            return new File(url.getFile());
+        }
+        return null;
+    }
+
     String getLabelLocation(String label) {
         String location = "";
         switch (label) {
@@ -187,11 +196,7 @@ public class MFMUI_Resources {
             case Controllers.TRACKBALL:
                 location = resourceURLs.get(TRACKBALL_CONTROL_IMG).toString();
                 break;
-            case Controllers.TRIPLEJOY:
-                // location = resourceURLs.get(JOYSTICK_CONTROL_IMG).toString();
-                break;
-            default:
-                location = "";
+
         }
         return location;
     }
