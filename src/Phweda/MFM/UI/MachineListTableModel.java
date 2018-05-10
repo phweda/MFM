@@ -89,10 +89,12 @@ class MachineListTableModel extends AbstractTableModel {
                 case 0:
                     return software.getDescription() != null ? software.getDescription() : "";
                 case 1:
-                    return software.getName() != null ? software.getName() : ""; // uneeded ??
-                // Note no manufacturer for Softwarelists
+                    return software.getName() != null ? software.getName() : "";
+                case 2:
+                    return software.getPublisher() != null ? software.getPublisher() : "";
                 case 3:
                     return software.getYear() != null ? software.getYear() : "";
+                // Note no Category for Softwarelists
                 case 5:
                     return software.getSupported() != null ? software.getSupported() : "";
                 case 6:
