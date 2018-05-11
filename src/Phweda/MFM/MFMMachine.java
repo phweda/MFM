@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-/**
+/*
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 11/25/11
@@ -35,6 +35,7 @@ import java.util.TreeSet;
  * NOTE this class follows the Java Beans Spec to enable saving object as XML
  * NOTE that Serialization does not require this
  */
+@Deprecated
 public class MFMMachine implements Serializable {
 
     // All lower case string means from MAME XML and we match its values
@@ -117,79 +118,12 @@ public class MFMMachine implements Serializable {
     private int height = 0;
     private int width = 0;
 
-
-    /*
-     */
-
-    /**
-     * Used by MachineListTableModel
-     *
-     * @param paramName table column header
-     * @return value for table column
-     *//*
-
-    public String getValueOf(String paramName) {
-        String value = "";
-
-        //NOTE Bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7071246
-        // can not put () around case Strings
-
-        // For display column mapping see @MachineListTableModel
-        switch (paramName) {
-            case MACHINE_NAME:
-                return getName();
-            case MACHINE_FULL_NAME:
-                return getDescription();
-            case CATEGORY_CAPS:
-                return getCategory();
-            case MAMEVERSIONADDED:
-                return getMAMEVersionAdded();
-            case YEAR_CAPS:
-                return getYear();
-            case MANUFACTURER_CAPS:
-                return getManufacturer();
-            case CLONEOF_CAPS:
-                return getCloneof();
-            case ROMOF:
-                return getROMof();
-            case STATUS:
-                return getStatus();
-            case CHD:
-                return hasCHD() ? "Yes" : "";
-
-            // These are never shown in MachineList
-            case HISTORY:
-                return getHistory();
-            case INFO:
-                return getInfo();
-        }
-        return value;
-    }
-*/
     public MFMMachine() {
     }
 
     public MFMMachine(String name) {
         this.name = name;
     }
-
-/*
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean hasCHD() {
-        return hasCHD;
-    }
-*/
 
     public void setHasCHD(boolean hasCHD) {
         this.hasCHD = hasCHD;

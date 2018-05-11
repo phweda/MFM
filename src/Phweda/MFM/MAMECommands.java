@@ -121,11 +121,11 @@ public class MAMECommands {
     }
 
     // fixme should return Dimension
-    public static int scale(MFMMachine machine) {
-        AtomicInteger width = new AtomicInteger(machine.getWidth());
-        AtomicInteger height = new AtomicInteger(machine.getHeight());
+    public static int scale(Machine machine) {
+        AtomicInteger width = new AtomicInteger(Integer.parseInt(machine.getWidth()));
+        AtomicInteger height = new AtomicInteger(Integer.parseInt(machine.getHeight()));
         // Swap if vertical
-        if (machine.isVertical()) {
+        if (machine.getIsVertical().equalsIgnoreCase(Machine.YES)) {
             width.set(height.getAndSet(width.intValue()));
         }
 
