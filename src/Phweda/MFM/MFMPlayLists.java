@@ -19,7 +19,7 @@
 package Phweda.MFM;
 
 import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.MFM.mame.softwarelist.Softwarelist;
+import Phweda.MFM.mame.softwarelist.Softwarelists;
 import Phweda.utils.PersistUtils;
 
 import java.io.Serializable;
@@ -29,7 +29,7 @@ import java.util.*;
 
 import static Phweda.MFM.MFMListBuilder.*;
 
-/**
+/*
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 11/30/11
@@ -43,7 +43,7 @@ public class MFMPlayLists implements Serializable {
     private static MFMPlayLists playlists;
     private TreeMap<String, TreeSet<String>> MFMPlayListsTree = null;
     private TreeMap<String, TreeSet<String>> languagesLists = null;
-    private TreeMap<String, Software> softwareLists = null;
+    private Softwarelists softwareLists = null;
     private TreeMap<String, TreeSet<String>> myPlayListsTree = null;
     private ArrayList<String> allListsNames;
     private ArrayList<String> myListsNames;
@@ -85,7 +85,7 @@ public class MFMPlayLists implements Serializable {
         allListsNames = new ArrayList<>(MFMPlayListsTree.keySet());
         allListsNames.addAll(myPlayListsTree.keySet());
         allListsNames.addAll(languagesLists.keySet());
-        myListsNames = new ArrayList<String>(myPlayListsTree.keySet());
+        myListsNames = new ArrayList<>(myPlayListsTree.keySet());
     }
 
     public static MFMPlayLists getInstance() {
@@ -96,7 +96,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     public TreeMap<String, TreeSet> getMFMplaylistsTree() {
-        TreeMap<String, TreeSet> tempMap = new TreeMap<String, TreeSet>();
+        TreeMap<String, TreeSet> tempMap = new TreeMap<>();
         for (String key : MFMPlayListsTree.keySet()) {
             if (MFMPlayListsTree.get(key).size() > 0) {
                 tempMap.put(key, MFMPlayListsTree.get(key));
@@ -106,7 +106,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     public TreeSet<String> getListBuilderPlaylistsKeys() {
-        TreeSet<String> tempSet = new TreeSet<String>(MFMPlayListsTree.keySet());
+        TreeSet<String> tempSet = new TreeSet<>(MFMPlayListsTree.keySet());
         // Remove non-buildable lists ALL == New see MFM_Menubar
         tempSet.remove(ALL);
         tempSet.remove(BIOS);
@@ -118,7 +118,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     public TreeSet<String> getListEditorKeys() {
-        TreeSet<String> tempSet = new TreeSet<String>(MFMPlayListsTree.keySet());
+        TreeSet<String> tempSet = new TreeSet<>(MFMPlayListsTree.keySet());
         tempSet.remove(ALL);
         tempSet.remove(BIOS);
         tempSet.remove(DEVICES);
@@ -130,25 +130,15 @@ public class MFMPlayLists implements Serializable {
     }
 
     public String[] getLanguagesPlayListsKeys() {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         list.add(ALL_LANGUAGES);
         list.addAll(languagesLists.keySet());
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
-    public String[] getSoftwareListsKeys() {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add(ALL_SOFTWARE_LISTS);
-        list.addAll(softwareListsMap.keySet());
-        return list.toArray(new String[list.size()]);
-    }
 
     public TreeMap<String, TreeSet<String>> getLanguagesListMap() {
         return languagesListsMap;
-    }
-
-    public TreeMap<String, Software> getSoftwareListsMap() {
-        return softwareListsMap;
     }
 
     public TreeMap<String, TreeSet<String>> getMyPlayListsTree() {
@@ -156,7 +146,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     public TreeMap<String, TreeSet<String>> getALLPlayListsTree() {
-        TreeMap<String, TreeSet<String>> allTree = new TreeMap<String, TreeSet<String>>();
+        TreeMap<String, TreeSet<String>> allTree = new TreeMap<>();
         allTree.putAll(MFMPlayListsTree);
         allTree.putAll(myPlayListsTree);
         allTree.putAll(languagesLists);
@@ -164,7 +154,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     public void createPlayList(String name, String[] machines) {
-        TreeSet<String> treeSet = new TreeSet<String>(Arrays.asList(machines));
+        TreeSet<String> treeSet = new TreeSet<>(Arrays.asList(machines));
         myPlayListsTree.put(name, treeSet);
         persistPlayLists();
         allListsNames.add(name);
@@ -173,7 +163,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     void createPlayList(String name, TreeSet<String> machines) {
-        TreeSet<String> treeSet = new TreeSet<String>(machines);
+        TreeSet<String> treeSet = new TreeSet<>(machines);
         myPlayListsTree.put(name, treeSet);
         persistPlayLists();
         allListsNames.add(name);
@@ -186,7 +176,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     private Set<String> getAllPlayListNames() {
-        return new TreeSet<String>(allListsNames);
+        return new TreeSet<>(allListsNames);
     }
 
     public Set<String> getMFMListNames() {
@@ -226,19 +216,20 @@ public class MFMPlayLists implements Serializable {
     }
 
     public String[] getListBuilderNames() {
-        ArrayList<String> builderNames = new ArrayList<String>();
+        ArrayList<String> builderNames = new ArrayList<>();
         if (MFMSettings.getInstance().getDataVersion().contains(MFMListBuilder.ALL)) {
             builderNames.add(MFMListBuilder.RUNNABLE);
         }
         builderNames.add(MFMListBuilder.ALL);
         builderNames.addAll(myListsNames);
-        return builderNames.toArray(new String[builderNames.size()]);
+        return builderNames.toArray(new String[0]);
     }
 
     public TreeSet<String> getPlayList(String listName) {
+        // TODO determine if we want Softwarelists included in this output or is it separate?
         // To support JSON and future DB. Get everything
-        if(listName.equalsIgnoreCase(EVERYTHING)){
-            TreeSet<String> everything = new TreeSet<String>(MFMPlayListsTree.get(MFMListBuilder.ALL));
+        if (listName.equalsIgnoreCase(EVERYTHING)) {
+            TreeSet<String> everything = new TreeSet<>(MFMPlayListsTree.get(MFMListBuilder.ALL));
             everything.addAll(MFMPlayListsTree.get(MFMListBuilder.BIOS));
             everything.addAll(MFMPlayListsTree.get(MFMListBuilder.DEVICES));
             return everything;
@@ -247,17 +238,22 @@ public class MFMPlayLists implements Serializable {
             return MFMPlayListsTree.get(listName);
         } else if (languagesLists.containsKey(listName)) {
             return languagesLists.get(listName);
-        } else {
+        } else if (myPlayListsTree.containsKey(listName)) {
             return myPlayListsTree.get(listName);
+        } else if (softwareLists.getSoftwarelistsMap().containsKey(listName)) {
+            return getSoftwareListEntries(listName);
         }
+        return null;
     }
 
-    public TreeMap<String, Software> getSoftwareLists() {
-        return softwareLists;
-    }
-
-    public Software getSoftwareList(String softwareListName) {
-        return softwareLists.get(softwareListName);
+    private TreeSet<String> getSoftwareListEntries(String softwareListName) {
+        // Softwarelists are list of programs for a given system
+        TreeSet<String> programs = new TreeSet<>();
+        List<Software> softwares = softwareLists.getSoftwarelistsMap().get(softwareListName).getSoftware();
+        for (Software software : softwares) {
+            programs.add(software.getName());
+        }
+        return programs;
     }
 
     public void removePlayList(String name) {
@@ -289,13 +285,12 @@ public class MFMPlayLists implements Serializable {
             }
         }
         if (myPlayListsTree == null) {
-            myPlayListsTree = new TreeMap<String, TreeSet<String>>();
+            myPlayListsTree = new TreeMap<>();
         }
         // We retrieve the built in Machine lists each time
         // They are persisted by MAMEInfo in MFM_Data
         boolean ALL = MFMSettings.getInstance().getDataVersion().contains("ALL");
         if (allMachineNames == null) {
-            // fixme How did we get here without MFMListBuilder existing? NOTE as of May 2017 no repro
             if (MFMListBuilder.getAllList() == null) {
                 MFM.logger.addToList("MFMListBuilder is null in MFMPlayLists");
                 MFM.logger.addToList(Arrays.toString(Thread.currentThread().getStackTrace()));
@@ -322,7 +317,7 @@ public class MFMPlayLists implements Serializable {
             CHDMachineNames = MFMListBuilder.getCHDList();
             noImperfectMachineNames = MFMListBuilder.getNoImperfectList();
         }
-        MFMPlayListsTree = new TreeMap<String, TreeSet<String>>();
+        MFMPlayListsTree = new TreeMap<>();
         MFMPlayListsTree.put(MFMListBuilder.ALL, allMachineNames);
         // NOTE as of 0.85 we have multiple built in lists that DO NOT exist
         if (biosMachineNames != null && !biosMachineNames.isEmpty()) {
@@ -369,7 +364,7 @@ public class MFMPlayLists implements Serializable {
         MFMPlayListsTree.put(MFMListBuilder.NO_IMPERFECT, noImperfectMachineNames);
 
         languagesLists = MFMListBuilder.getLanguagesListsMap();
-        softwareLists = MFMListBuilder.getSoftwareListsMap();
+        softwareLists = MAMEInfo.getSoftwareLists();
     }
 
     public void persistPlayLists() {

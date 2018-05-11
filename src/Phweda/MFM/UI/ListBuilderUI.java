@@ -607,14 +607,12 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         anyControlsRB.setSelected(true);
 
 //****************************************************
-        // In case somebody deletes or renames the controllers.ini file
-        // fixme a little convoluted
         // TreeSet to apply natural ordering
         TreeSet<String> controllersLabels = null;
         if (Controllers.getControllerMAMEtoLabel() != null) {
             controllersLabels = new TreeSet<String>(Controllers.getControllerMAMEtoLabel().values());
         } else {
-            controllersLabels = new TreeSet<String>(MFMListBuilder.getControllersList());
+            JOptionPane.showMessageDialog(null, "MAME_Controllers.ini file missing!");
         }
 
         controlsCBPanel = new DynamicCBpanel(new ArrayList<String>(controllersLabels), 1);

@@ -21,10 +21,6 @@ package Phweda.MFM;
 import Phweda.MFM.Utils.ParseFolderINIs;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.ParseSoftwareLists;
-import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.MFM.mame.softwarelist.Softwarelist;
-import Phweda.utils.FileUtils;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -53,7 +49,7 @@ class MFMListGenerator {
             if (MFM.isDebug()) {
                 MFM.logger.addToList("In loadLanguagesINI");
             }
-            TreeMap<String, TreeSet<String>> languagesMap = new TreeMap<String, TreeSet<String>>();
+            TreeMap<String, TreeSet<String>> languagesMap = new TreeMap<>();
             new ParseFolderINIs(MFMSettings.getInstance().getLanguageINI(), languagesMap).processFile();
             filterLanguagesMap(languagesMap);
             MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesMap);
@@ -257,6 +253,7 @@ class MFMListGenerator {
         return lists;
     }
 
+    @SuppressWarnings("unchecked")
     TreeMap<String, TreeSet<String>> getLanguageLists(boolean parsing) {
         TreeMap<String, TreeSet<String>> languagesListMap;
         if (!parsing) {
@@ -268,32 +265,15 @@ class MFMListGenerator {
             MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesListMap);
             if (languagesListMap == null && MFM.isSystemDebug()) {
                 System.out.println("In MFMListGenerator failed to generate Languages lists");
-            } else {
-
             }
         }
         return languagesListMap;
     }
 
     TreeSet<String> generateListfromDAT(Datafile DAT) {
-        TreeSet<String> list = new TreeSet<String>();
+        TreeSet<String> list = new TreeSet<>();
         DAT.getGame().forEach(game -> list.add(game.getName()));
         return list;
     }
 
-    TreeMap<String, Software> generateSoftwareLists(boolean parsing) {
-        TreeMap<String, Software> softwareLists = null;
-
-        if (!parsing) {
-            softwareLists = (TreeMap<String, Software>) MFM_Data.getInstance()
-                    .getStaticData(MFM_Constants.SOFTWARE_LISTS);
-        }
-
-        if (softwareLists == null) {
-            softwareLists = new TreeMap<String, Software>();
-            ParseSoftwareLists.generateSoftwareLists(softwareLists, MFMSettings.getInstance().MAMEexeDir() +
-                    FileUtils.DIRECTORY_SEPARATOR + "hash");
-        }
-        return softwareLists;
-    }
 }

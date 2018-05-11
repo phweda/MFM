@@ -29,13 +29,9 @@ import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.MFM.mame.softwarelist.Softwarelist;
-import Phweda.utils.PersistUtils;
 import Phweda.utils.QuadState;
 import Phweda.utils.TriState;
 
-import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,27 +88,26 @@ public final class MFMListBuilder {
     static ArrayList<String> arcadeCategories;
     static ArrayList<String> systemCategories;
     //======= For use by MFMListGenerator when Parsing MAME ===================
-    static TreeSet<String> allList = new TreeSet<String>();
-    static TreeSet<String> biosList = new TreeSet<String>();
-    static TreeSet<String> devicesList = new TreeSet<String>();
-    static TreeSet<String> noClonesList = new TreeSet<String>();
-    static TreeSet<String> noImpefectList = new TreeSet<String>();
-    static TreeSet<String> mechanicalList = new TreeSet<String>();
-    static TreeSet<String> clonesList = new TreeSet<String>();
-    static TreeSet<String> verticalsList = new TreeSet<String>();
-    static TreeSet<String> horizontalList = new TreeSet<String>();
-    static TreeSet<String> cocktailList = new TreeSet<String>();
-    static TreeSet<String> simultaneousList = new TreeSet<String>();
-    static TreeSet<String> arcadeList = new TreeSet<String>();
-    static TreeSet<String> systemList = new TreeSet<String>();
-    static TreeSet<String> CHDList = new TreeSet<String>();
-    static TreeSet<String> rasterDisplayList = new TreeSet<String>();
-    static TreeSet<String> vectorDisplayList = new TreeSet<String>();
-    static TreeSet<String> lcdDisplayList = new TreeSet<String>();
-//=====================================================================
-    static TreeSet<String> categoriesWithMachineList = new TreeSet<String>();
+    static TreeSet<String> allList = new TreeSet<>();
+    static TreeSet<String> biosList = new TreeSet<>();
+    static TreeSet<String> devicesList = new TreeSet<>();
+    static TreeSet<String> noClonesList = new TreeSet<>();
+    static TreeSet<String> noImpefectList = new TreeSet<>();
+    static TreeSet<String> mechanicalList = new TreeSet<>();
+    static TreeSet<String> clonesList = new TreeSet<>();
+    static TreeSet<String> verticalsList = new TreeSet<>();
+    static TreeSet<String> horizontalList = new TreeSet<>();
+    static TreeSet<String> cocktailList = new TreeSet<>();
+    static TreeSet<String> simultaneousList = new TreeSet<>();
+    static TreeSet<String> arcadeList = new TreeSet<>();
+    static TreeSet<String> systemList = new TreeSet<>();
+    static TreeSet<String> CHDList = new TreeSet<>();
+    static TreeSet<String> rasterDisplayList = new TreeSet<>();
+    static TreeSet<String> vectorDisplayList = new TreeSet<>();
+    static TreeSet<String> lcdDisplayList = new TreeSet<>();
+    //=====================================================================
+    static TreeSet<String> categoriesWithMachineList = new TreeSet<>();
     static TreeMap<String, TreeSet<String>> languagesListsMap;
-    static TreeMap<String, Software> softwareListsMap;
     private static TreeSet<String> allCategoriesList;
     private static TreeMap<String, ArrayList<String>> categoryHierarchy;
     private static ArrayList<String> allCategoryRoots;
@@ -133,20 +128,19 @@ public final class MFMListBuilder {
             allMachines = MAMEInfo.getMame().getMachineMap();
             allCategoriesList = MAMEInfo.getAllCategories();
             categoryHierarchy = MAMEInfo.getCategoryHierarchy();
-            runnableList = new TreeSet<String>(MAMEInfo.getRunnableMachines());
+            runnableList = new TreeSet<>(MAMEInfo.getRunnableMachines());
             getCategoryLists();
 
             // Populate built in lists
             lists = MFMListGenerator.getInstance().generateMFMLists(parsing);
             languagesListsMap = MFMListGenerator.getInstance().getLanguageLists(parsing);
-            softwareListsMap = MFMListGenerator.getInstance().generateSoftwareLists(parsing);
             if (MFM.isSystemDebug()) {
                 System.out.println("Mechanical list:\n" + mechanicalList);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            MFM.logger.out("FATAL error is MFMListBuilder. Check your Data Set");
-            System.exit(5);
+            MFM.logger.out("FATAL error in MFMListBuilder. Check your Data Set");
+            MFM.exit(5);
         }
 
         if (playLists != null) {
@@ -236,16 +230,8 @@ public final class MFMListBuilder {
         return lists.get(CATEGORIES);
     }
 
-    public static ArrayList<String> getControllersList() {
-        return Controllers.getControllersList();
-    }
-
     public static TreeMap<String, TreeSet<String>> getLanguagesListsMap() {
         return languagesListsMap;
-    }
-
-    public static TreeMap<String, Software> getSoftwareListsMap() {
-        return softwareListsMap;
     }
 
     public static ArrayList<String> getAllNoMatureCategoryRoots() {
@@ -305,7 +291,7 @@ public final class MFMListBuilder {
     private static void getCategoryLists() {
         // NOTE moved input from file to MAMEInfo 4/18
 
-        HashMap<String,ArrayList<String>> map = MAMEInfo.getCategoryListsMap();
+        HashMap<String, ArrayList<String>> map = MAMEInfo.getCategoryListsMap();
         allCategoryRoots = map.get(ALL_CATEGORY_ROOTS);
         arcadeCategoryRoots = map.get(ARCADE_CATEGORY_ROOTS);
         matureCategoryRoots = map.get(MATURE_CATEGORY_ROOTS);
@@ -316,16 +302,21 @@ public final class MFMListBuilder {
         arcadeCategories = map.get(ARCADE_CATEGORIES);
         arcadeNoMatureCategories = map.get(ARCADE_NOMATURE_CATEGORIES);
 
-        noMatureCategoryRoots = new ArrayList<String>(allCategoryRoots);
+        noMatureCategoryRoots = new ArrayList<>(allCategoryRoots);
         noMatureCategoryRoots.removeAll(matureCategoryRoots);
 
-        arcadeNoMatureCategoryRoots = new ArrayList<String>(arcadeCategoryRoots);
+        arcadeNoMatureCategoryRoots = new ArrayList<>(arcadeCategoryRoots);
         arcadeNoMatureCategoryRoots.removeAll(matureCategoryRoots);
 
-        systemNoMatureCategoryRoots = new ArrayList<String>(systemCategoryRoots);
+        systemNoMatureCategoryRoots = new ArrayList<>(systemCategoryRoots);
         systemNoMatureCategoryRoots.removeAll(matureCategoryRoots);
 
-        noMatureCategories = new ArrayList<String>(allCategoriesList);
+        // NOTE believe this is a bootstrap parse only condition
+        if (allCategoriesList == null) {
+            allCategoriesList = new TreeSet<>(arcadeCategories);
+            allCategoriesList.addAll(systemCategories);
+        }
+        noMatureCategories = new ArrayList<>(allCategoriesList);
         noMatureCategories.removeAll(allMatureCategories);
 
         if (MFM.isSystemDebug()) {
@@ -340,7 +331,7 @@ public final class MFMListBuilder {
     }
 
     private static TreeSet<String> checkList(String[] list) {
-        TreeSet<String> newList = new TreeSet<String>();
+        TreeSet<String> newList = new TreeSet<>();
         for (String machine : list) {
             if (lists.get(ALL).contains(machine)) {
                 newList.add(machine);
@@ -350,7 +341,7 @@ public final class MFMListBuilder {
     }
 
     public static String[] getRunnableArray() {
-        return getRunnableList().toArray(new String[getRunnableList().size()]);
+        return getRunnableList().toArray(new String[0]);
     }
 
     public static void createListfromDAT(String listName, Datafile DAT) {
@@ -367,9 +358,6 @@ public final class MFMListBuilder {
         public static final TriState ControlsFilterType = new TriState(ANY_CONTROLS, ALL_CONTROLS, EXACT_CONTROLS);
 
         private static final Builder builder = new Builder();
-        // Nasty already defined in outer class!!!!
-        // TODO fixme NOTE find all 'all' across MFM and define once! It's all over the place!
-//        private static final String ALL = "All";
         private static final int million = 1000000;
         private static final String DIAL = "dial";
         private static final String DOUBLEJOY = "doublejoy";
@@ -388,31 +376,17 @@ public final class MFMListBuilder {
         private static final String TRACKBALL = "trackball";
         private static final String TRIPLEJOY = "triplejoy";
         // fixme can't we eliminate this? We short circuit on Pedal since it is compatible with all
-        private static final TreeSet<String> pedalControls = new TreeSet<String>(Arrays.asList(new String[]{
+        private static final TreeSet<String> pedalControls = new TreeSet<>(Arrays.asList(
                 DIAL, DOUBLEJOY, GAMBLING, HANAFUDA, JOY, KEYBOARD, KEYPAD, LIGHTGUN, MAHJONG, MOUSE,
                 PADDLE, STICK, TRACKBALL, TRIPLEJOY
-        }));
-        private static final TreeSet<String> paddleControls = new TreeSet<String>(Arrays.asList(new String[]{
-                DIAL
-        }));
-        private static final TreeSet<String> dialControls = new TreeSet<String>(Arrays.asList(new String[]{
-                PADDLE
-        }));
-        private static final TreeSet<String> hanafudaControls = new TreeSet<String>(Arrays.asList(new String[]{
-                KEYBOARD
-        }));
-        private static final TreeSet<String> keypadControls = new TreeSet<String>(Arrays.asList(new String[]{
-                KEYBOARD
-        }));
-        private static final TreeSet<String> lightgunControls = new TreeSet<String>(Arrays.asList(new String[]{
-                MOUSE
-        }));
-        private static final TreeSet<String> mouseControls = new TreeSet<String>(Arrays.asList(new String[]{
-                TRACKBALL
-        }));
-        private static final TreeSet<String> trackballControls = new TreeSet<String>(Arrays.asList(new String[]{
-                MOUSE
-        }));
+        ));
+        private static final TreeSet<String> paddleControls = new TreeSet<>(Collections.singletonList(DIAL));
+        private static final TreeSet<String> dialControls = new TreeSet<>(Collections.singletonList(PADDLE));
+        private static final TreeSet<String> hanafudaControls = new TreeSet<>(Collections.singletonList(KEYBOARD));
+        private static final TreeSet<String> keypadControls = new TreeSet<>(Collections.singletonList(KEYBOARD));
+        private static final TreeSet<String> lightgunControls = new TreeSet<>(Collections.singletonList(MOUSE));
+        private static final TreeSet<String> mouseControls = new TreeSet<>(Collections.singletonList(TRACKBALL));
+        private static final TreeSet<String> trackballControls = new TreeSet<>(Collections.singletonList(MOUSE));
         private static final int JOY1 = 3268317;
         private static final int JOY2 = 3268318;
         private static final int JOY3_half4 = -1238305841;
@@ -428,47 +402,39 @@ public final class MFMListBuilder {
         private static final int DOUBLEJOY5_half8 = 1993708739;
         private static final int DOUBLEJOYV2_V2 = -410698973;
         //  3268318
-        private static final TreeSet<Integer> joy2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
+        private static final TreeSet<Integer> joy2 = new TreeSet<>(Collections.singletonList(3268317));
         //  -1238305841
-        private static final TreeSet<Integer> joy3_half4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
+        private static final TreeSet<Integer> joy3_half4 = new TreeSet<>(Collections.singletonList(3268317));
         //  -558247347
-        private static final TreeSet<Integer> joy5_half8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
+        private static final TreeSet<Integer> joy5_half8 = new TreeSet<>(Collections.singletonList(3268317));
         //  3268320
-        private static final TreeSet<Integer> joy4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+        private static final TreeSet<Integer> joy4 = new TreeSet<>(Arrays.asList(
                 3268317, 3268318, -1238305841, -558247347, -482411992
-        }));
+        ));
         //  3268324
-        private static final TreeSet<Integer> joy8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+        private static final TreeSet<Integer> joy8 = new TreeSet<>(Arrays.asList(
                 3268317, 3268318, 3268320, -1238305841, -558247347, -482411992
-        }));
+        ));
         //  -482411992
-        private static final TreeSet<Integer> joyvertical2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
-                3268317
-        }));
+        private static final TreeSet<Integer> joyvertical2 = new TreeSet<>(Collections.singletonList(3268317));
         //  -1607713629
-        private static final TreeSet<Integer> doublejoy8_8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+        private static final TreeSet<Integer> doublejoy8_8 = new TreeSet<>(Arrays.asList(
                 -1607713821, -1607713759, -410698973, 1993708739, -1607713757
-        }));
+        ));
         //  -1607713759
-        private static final TreeSet<Integer> doublejoy4_2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+        private static final TreeSet<Integer> doublejoy4_2 = new TreeSet<>(Arrays.asList(new Integer[]{
 
         }));
         //  -1607713757
-        private static final TreeSet<Integer> doublejoy4_4 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+        private static final TreeSet<Integer> doublejoy4_4 = new TreeSet<>(Arrays.asList(
                 -1607713821, -1607713759, -410698973, 1993708739
-        }));
+        ));
         //  -410698973
-        private static final TreeSet<Integer> doublejoyvertical2_vertical2 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+        private static final TreeSet<Integer> doublejoyvertical2_vertical2 = new TreeSet<>(Arrays.asList(new Integer[]{
 
         }));
         //  1993708739
-        private static final TreeSet<Integer> doublejoy5_half8 = new TreeSet<Integer>(Arrays.asList(new Integer[]{
+        private static final TreeSet<Integer> doublejoy5_half8 = new TreeSet<>(Arrays.asList(new Integer[]{
 
         }));
         public static int buttons = 0;
@@ -564,52 +530,8 @@ public final class MFMListBuilder {
         1993708739	doublejoy	5 (half8)	5 (half8)
          */
 
-        public static boolean isNoMature() {
-            return noMature;
-        }
-
         public static void setNoMature(boolean noMature) {
             Builder.noMature = noMature;
-        }
-
-        public static boolean isOrLessButtons() {
-            return orLessButtons;
-        }
-
-        public static void setOrLessButtons(boolean orLessButtons) {
-            Builder.orLessButtons = orLessButtons;
-        }
-
-        public static boolean isOrLessPlayers() {
-            return orLessPlayers;
-        }
-
-        public static void setOrLessPlayers(boolean orLessPlayers) {
-            Builder.orLessPlayers = orLessPlayers;
-        }
-
-        public static boolean isNoClones() {
-            return noClones;
-        }
-
-        public static void setNoClones(boolean noClones) {
-            Builder.noClones = noClones;
-        }
-
-        public static boolean isNoImperfect() {
-            return noImperfect;
-        }
-
-        public static void setNoImperfect(boolean noImperfect) {
-            Builder.noImperfect = noImperfect;
-        }
-
-        public static boolean isSimultaneousOnly() {
-            return simultaneousOnly;
-        }
-
-        public static void setSimultaneousOnly(boolean simultaneousOnly) {
-            Builder.simultaneousOnly = simultaneousOnly;
         }
 
         public static void setWays(String ways) {
@@ -664,16 +586,16 @@ public final class MFMListBuilder {
         public final TreeSet<String> generateList() {
             // fixme probably should just use single list
             TreeSet<String> baseList;
-            TreeSet<String> finalList = new TreeSet<String>();
+            TreeSet<String> finalList = new TreeSet<>();
             calculateWays(); // generates the Control signature from selected values
-            /**
+            /*
              * With 0.9 release we allow the user to select the Base List.
              * Start with base lists: Both or Arcade or Systems
              *  Then filter by orientation: (ALL), Vertical, Horizontal, Cocktail
              *  Then filter by  displayType: (ALL), Raster, Vector, LCD
              *
              */
-            baseList = new TreeSet<String>(MFMPlayLists.getInstance().getPlayList(baseListName));
+            baseList = new TreeSet<>(MFMPlayLists.getInstance().getPlayList(baseListName));
             if (MAME.getState().equals(ARCADE)) {
                 baseList.retainAll(getArcadeList());
             } else if (MAME.getState().equals(SYSTEMS)) {
@@ -755,7 +677,7 @@ public final class MFMListBuilder {
                     categories.removeAll(allMatureCategories);
                 }
 
-                TreeSet<String> tempList = new TreeSet<String>();
+                TreeSet<String> tempList = new TreeSet<>();
                 for (String machineName : baseList) {
                     Machine machine = allMachines.get(machineName);
                     if (categories.contains(machine.getCategory())) {
@@ -808,7 +730,7 @@ public final class MFMListBuilder {
                 }
             }
 
-            controls = new TreeSet<String>();
+            controls = new TreeSet<>();
             categories = null;
             return finalList;
         }
@@ -840,9 +762,7 @@ public final class MFMListBuilder {
                     }
 
                     if (controls.contains(Controllers.DOUBLEJOY)) {
-                        if (Controllers.getInstance().signatureHasMachine(doublejoySignature, machine.getName())) {
-                            return true;
-                        }
+                        return Controllers.getInstance().signatureHasMachine(doublejoySignature, machine.getName());
                     }
                 } else {
                     if (controls.contains(Controllers.JOY)) {
@@ -853,10 +773,8 @@ public final class MFMListBuilder {
                     }
 
                     if (controls.contains(Controllers.DOUBLEJOY)) {
-                        if (Controllers.getInstance().signaturesHasMachine(
-                                expandJoys(doublejoySignature), machine.getName())) {
-                            return true;
-                        }
+                        Controllers.getInstance().signaturesHasMachine(
+                                expandJoys(doublejoySignature), machine.getName());
                     }
                 }
                 return false;
@@ -867,7 +785,7 @@ public final class MFMListBuilder {
         // If simultaneous is selected ignore Players settings
         private boolean checkButtonsPlayers(int machineButtons, int machinePlayers) {
 
-            /** NOTE agreement with Obiwantje for Games where the number of Players for Simultaneous
+            /* NOTE agreement with Obiwantje for Games where the number of Players for Simultaneous
              *  is different than the number of Players. So we just ignore number of Players
              */
             if (simultaneousOnly) {
@@ -880,17 +798,16 @@ public final class MFMListBuilder {
                 return true;
             } else if (orLessButtons && machineButtons <= buttons && machinePlayers == players) {
                 return true;
-            } else if (orLessPlayers && machinePlayers <= players &&
-                    (machineButtons == buttons || (buttons == million && machineButtons >= 9))) {
-                return true;
+            } else {
+                return orLessPlayers && machinePlayers <= players &&
+                        (machineButtons == buttons || (buttons == million && machineButtons >= 9));
             }
-            return false;
         }
 
         private void calculateWays() {
             machineWays = ways.equalsIgnoreCase(ALL) ? "" : ways;
-            joySignature = Controllers.getInstance().getSignature(new ArrayList<String>(
-                    Arrays.asList(new String[]{Controllers.JOY, machineWays})));
+            joySignature = Controllers.getInstance().getSignature(new ArrayList<>(
+                    Arrays.asList(Controllers.JOY, machineWays)));
 
             machineWays2 = ways2.equalsIgnoreCase(ALL) ? "" : ways2;
             machineWays2A = null;
@@ -902,8 +819,8 @@ public final class MFMListBuilder {
                 machineWays2A = machineWays2B = machineWays2;
             }
 
-            doublejoySignature = Controllers.getInstance().getSignature(new ArrayList<String>(
-                    Arrays.asList(new String[]{Controllers.DOUBLEJOY, machineWays2A, machineWays2B})));
+            doublejoySignature = Controllers.getInstance().getSignature(new ArrayList<>(
+                    Arrays.asList(Controllers.DOUBLEJOY, machineWays2A, machineWays2B)));
         }
 
         public void setCategories(TreeSet<String> categories) {
@@ -919,7 +836,7 @@ public final class MFMListBuilder {
             TreeSet<String> set = new TreeSet<>();
             for (String category : categories) {
                 if (allCategoryRoots.contains(category)) {
-                    List children = categoryHierarchy.get(category);
+                    List<String> children = categoryHierarchy.get(category);
                     if (children != null) {
                         set.addAll(children);
                     } else {
@@ -931,7 +848,7 @@ public final class MFMListBuilder {
         }
 
         private TreeSet<Integer> expandJoys(int joySignature) {
-            TreeSet<Integer> expandedJoys = new TreeSet<Integer>();
+            TreeSet<Integer> expandedJoys = new TreeSet<>();
             expandedJoys.add(joySignature);
             switch (joySignature) {
 
@@ -983,7 +900,7 @@ public final class MFMListBuilder {
         }
 
         private TreeSet<String> expandControls(TreeSet<String> controls) {
-            TreeSet<String> expandedControls = new TreeSet<String>(controls);
+            TreeSet<String> expandedControls = new TreeSet<>(controls);
             for (String control : controls) {
 
                 switch (control) {
