@@ -47,6 +47,7 @@ public final class MFM_Constants {
     // MFM external resource files - catver and nplayers included with MFM package
     public static final String CATVER_FULL_INI_FILENAME = "catver_full.ini";
     public static final String CATVER_INI_FILENAME = "catver.ini";
+    public static final String ARCADE_INI_FILENAME = "arcade.ini"; // added for parsing categories/updating categories map
     public static final String NPLAYERS_INI_FILENAME = "nplayers.ini";
     public static final String LANGUAGES_INI_FILENAME = "languages.ini";
     public static final String MAME_FOLDER_DIRECTORY = "MAMEFoldersDir";
@@ -150,7 +151,7 @@ public final class MFM_Constants {
         yearsList = new String[finalYear - 1974];
         yearsList[0] = MFMListBuilder.ALL_YEARS; // bad design fixme maybe should be here
         int k = 1;
-        for(int i = 1975; i < finalYear; i++){
+        for (int i = 1975; i < finalYear; i++) {
             yearsList[k++] = String.valueOf(i);
         }
     }
