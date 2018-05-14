@@ -25,10 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -161,7 +158,7 @@ public class ZipUtils {
 
         if (file.isDirectory()) {
             String[] files = file.list();
-            for (String filename : files) {
+            for (String filename : Objects.requireNonNull(files)) {
                 if (!filename.endsWith(".zip")) {
                     generateFileList(new File(file, filename));
                 }
