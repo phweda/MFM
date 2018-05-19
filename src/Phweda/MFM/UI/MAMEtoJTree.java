@@ -262,7 +262,7 @@ public class MAMEtoJTree extends JPanel {
      * protected String sampleof;
      */
 
-    protected void copytoClipboard(String nodeValue) {
+    void copytoClipboard(String nodeValue) {
         nodeValue = nodeValue.contains(valueDivider) ?
                 nodeValue.split(valueDivider)[1].trim() :
                 nodeValue.split(machineDivider)[1].trim();
@@ -929,12 +929,12 @@ public class MAMEtoJTree extends JPanel {
         }
 
         List<Conflocation> conflocations = configuration.getConflocation();
-        for (Conflocation conflocation : conflocations ) {
+        for (Conflocation conflocation : conflocations) {
             dmtNode.add(createConflocationNode(conflocation));
         }
 
         List<Confsetting> confsettings = configuration.getConfsetting();
-        for (Confsetting confsetting : confsettings ) {
+        for (Confsetting confsetting : confsettings) {
             dmtNode.add(createConfsettingNode(confsetting));
         }
 
@@ -1094,11 +1094,16 @@ public class MAMEtoJTree extends JPanel {
             dmtNode.add(createExtensionNode(extension));
         }
 
-        List<Instance> instances = device.getInstance();
-        for (Instance instance : instances) {
+        // MAME as of 191 reverted to only 1 instance - NOTE left this in case there is any issue with older sets.
+    /*    List<Instance> instances = device.getInstance();
+          for (Instance instance : instances) {
             dmtNode.add(createInstanceNode(instance));
         }
-
+*/
+        Instance instance = device.getInstance();
+        if (instance != null) {
+            dmtNode.add(createInstanceNode(instance));
+        }
         return dmtNode;
     }
 
