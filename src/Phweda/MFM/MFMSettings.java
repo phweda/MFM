@@ -19,6 +19,7 @@
 package Phweda.MFM;
 
 import Phweda.MFM.UI.MFMAction;
+import Phweda.MFM.UI.MFMUI;
 import Phweda.MFM.UI.MFM_Components;
 import Phweda.MFM.Utils.MFMFileOps;
 import Phweda.utils.FileUtils;
@@ -43,18 +44,16 @@ public class MFMSettings {
 
     private static HashMap<String, String> fullSetExtrasDirectories;
     private static HashMap<String, String> playSetDirectories;
-    // key == extras folder name, value zip file path
-    private static HashMap<String, File> extrasZipFilesMap; // Added 9/2016 to handle zipped extras
     private static HashMap<String, String> extrasZips;
+    private static HashMap<String, File> extrasZipFilesMap;
 
     private static boolean exeChanged = false;
-    private static boolean fullXMLcompatible = false; // hopefully guaranteed to work with old code
     private static boolean loaded = false;
     // Special case logic
     private static final double DBL_143 = 143d;// removed the decimal for correct comparison e.g. 0.70 is > 0.143
     public static final String ALL_ = "ALL_";
     // Use this guy to persist
-    private static HashMap<String, Object> mfmSettings;
+    private static HashMap<String, Object> mfmSettings = new HashMap<>(15);
 
     public static MFMSettings getInstance() {
         if (ourInstance == null) {
@@ -65,7 +64,7 @@ public class MFMSettings {
     }
 
     TreeMap<String, String> getResourceRoots() {
-        TreeMap<String, String> roots = new TreeMap<String, String>();
+        TreeMap<String, String> roots = new TreeMap<>();
 
         if (mfmSettings.get(MFM_Constants.ROMS_FULL_SET_DIRECTORY) != null) {
             roots.put(MFM_Constants.ROMS_FULL_SET_DIRECTORY,
@@ -163,11 +162,6 @@ public class MFMSettings {
         mfmSettings.put(MFM_Constants.MAME_EXE_DIRECTORY, MAMEexeDir);
     }
 
-    private void initMySettings() {
-        mfmSettings = new HashMap<String, Object>(15);
-        MFMFontSize(MFM_Constants.NORMAL);
-    }
-
     public String MAMEexeName() {
         return (String) mfmSettings.get(MFM_Constants.MAME_EXE_NAME);
     }
@@ -254,9 +248,13 @@ public class MFMSettings {
     }
 
     public HashMap<String, File> getExtrasZipFilesMap() {
-        extrasZipFilesMap = new HashMap<String, File>();
-        for (String key : extrasZips.keySet()) {
-            extrasZipFilesMap.put(key, new File(extrasZips.get(key)));
+        // key == extras folder name, value zip file path
+        // Added 9/2016 to handle zipped extras
+        if (extrasZipFilesMap == null) {
+            extrasZipFilesMap = new HashMap<>();
+            for (String key : extrasZips.keySet()) {
+                extrasZipFilesMap.put(key, new File(extrasZips.get(key)));
+            }
         }
         return extrasZipFilesMap;
     }
@@ -276,7 +274,7 @@ public class MFMSettings {
     }
 
     public String MFMFontSize() {
-        if (mfmSettings == null) {
+        if (mfmSettings == null || mfmSettings.get(MFM_Constants.FONTSIZE) == null) {
             return MFM_Constants.NORMAL;
         }
         return (String) mfmSettings.get(MFM_Constants.FONTSIZE);
@@ -323,8 +321,8 @@ public class MFMSettings {
     }
 
     /*
-    * We require these folders to exist. Create them if missing
-    */
+     * We require these folders to exist. Create them if missing
+     */
     private void mkDirs() {
         String[] folders = MFM_Constants.MAME_FOLDER_NAMES_ARRAY;
 
@@ -409,8 +407,8 @@ public class MFMSettings {
     /**
      * Updated to handle oldest versions
      *
-     * @param version
-     * @return
+     * @param version MAME version
+     * @return String version number only
      */
     private String trimMAMEVersion(String version) {
         if (version.contains("M.A.M.E.") || version.contains("MAME")) {
@@ -436,7 +434,7 @@ public class MFMSettings {
         // strip *. for Double comparison
         Double dataVersionDouble = Double.valueOf(dataVersion.substring(dataVersion.indexOf('.') + 1));
 
-        if (!dataVersion.contains(ALL_) && (MFM.isProcessAll() || Double.valueOf(dataVersionDouble) <= DBL_143)) {
+        if (!dataVersion.contains(ALL_) && (MFM.isProcessAll() || dataVersionDouble <= DBL_143)) {
             mfmSettings.put(MFM_Constants.DATA_VERSION, ALL_ + dataVersion);
         } else {
             mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
@@ -447,6 +445,7 @@ public class MFMSettings {
     }
 
     // Supports parsing
+    @Deprecated
     boolean isPreMAME143exe() {
         String version = (String) mfmSettings.get(MFM_Constants.MAME_EXE_VERSION);
         // Not sure we need this but ...
@@ -494,10 +493,9 @@ public class MFMSettings {
             MFM.logger.separateLine();
             MFM.logger.addToList("NO SETTINGS FOUND", true);
             MFM.logger.separateLine();
-            initMySettings();
         }
 
-        // Need a better check than this - TODO test this thing is it correct just look for settings
+        // Need a better check than this - TODO test this thing is it correct just look for settings?
         if ((mfmSettings.size() <= 1) && (getPlaySetDir() != null && RomsFullSetDir() != null)) {
             updateDirectoriesResourceFiles();
             loaded = true;
@@ -510,7 +508,7 @@ public class MFMSettings {
         }
 
         // Get version first run special case
-        if (this.getDataVersion() == null) {
+        if (this.getDataVersion() == null && !MFM.isParse()) {
             // First run special case
             // Wait for Data Set scan
             while (MFM_Data.isScanningDataSets()) {
@@ -520,12 +518,20 @@ public class MFMSettings {
                     e.printStackTrace();
                 }
             }
-            // Zero and 1 are special cases handled by MFMController
+            // 0 is an error unless bootstrap parse is set
+            // 1 is a special cases handled by MFMController
             if (MFM_Data.getInstance().getDataSets().length == 0) {
                 System.out.println("NO DATA SETS");
             } else if (MFM_Data.getInstance().getDataSets().length > 1) {
                 setDataVersion(pickVersion());
             }
+        } else if (MFM.isParse()) {
+            // NOTE maybe not needed
+            if (mfmSettings == null) {
+                // first run must acquire base settings before continuing
+                MFMUI.getSettings();
+            }
+            MAMEInfo.getInstance(true, true);
         }
     }
 
@@ -535,7 +541,7 @@ public class MFMSettings {
 
     public void updateDirectoriesResourceFiles() {
 
-        fullSetExtrasDirectories = new HashMap<String, String>();
+        fullSetExtrasDirectories = new HashMap<>();
         fullSetExtrasDirectories.putAll(MFMFileOps.findMAMEdirectories(Paths.get(getExtrasFullSetDir()),
                 MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
         // Add it for persistence
@@ -611,19 +617,14 @@ public class MFMSettings {
 
         mkDirs();
         persistMySettings();
-/*
-            }
-        };
-        thread.start();
-*/
     }
 
     private HashMap<String, String> findExtrasZips() {
-        HashMap<String, String> map = new HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<>();
         File extrasDir = new File(this.getExtrasFullSetDir());
         if (extrasDir.exists()) {
             TreeSet<String> extrasFolderNames =
-                    new TreeSet<String>(Arrays.asList(MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
+                    new TreeSet<>(Arrays.asList(MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
             File[] files = extrasDir.listFiles();
             if (files != null) {
                 for (File file : files) {
@@ -660,7 +661,8 @@ public class MFMSettings {
      */
     @Deprecated
     private void checkFullXMLCompatible() {
-        fullXMLcompatible = MAME_Compatible.versionNew(getMAMEVersion());
+        // hopefully guaranteed to work with old code
+        boolean fullXMLcompatible = MAME_Compatible.versionNew(getMAMEVersion());
         mfmSettings.put(MFM_Constants.COMPATIBLE, fullXMLcompatible);
     }
 }
