@@ -26,6 +26,8 @@
 
 package Phweda.MFM.mame.softwarelist;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +35,9 @@ import java.util.List;
 
 /**
  * <p>Java class for anonymous complex type.
- * <p>
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
+ *
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -55,7 +57,7 @@ import java.util.List;
         "software"
 })
 @XmlRootElement(name = "softwarelist")
-public class Softwarelist {
+public class Softwarelist implements Comparable {
 
     @XmlElement(required = true)
     protected List<Software> software;
@@ -86,7 +88,7 @@ public class Softwarelist {
      */
     public List<Software> getSoftware() {
         if (software == null) {
-            software = new ArrayList<Software>();
+            software = new ArrayList<>();
         }
         return this.software;
     }
@@ -131,4 +133,20 @@ public class Softwarelist {
         this.description = value;
     }
 
+    /**
+     * Compares this object with the specified object for order.  Returns a
+     * negative integer, zero, or a positive integer as this object is less
+     * than, equal to, or greater than the specified object.
+     *
+     * @param o the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object
+     * is less than, equal to, or greater than the specified object.
+     * @throws NullPointerException if the specified object is null
+     * @throws ClassCastException   if the specified object's type prevents it
+     *                              from being compared to this object.
+     */
+    @Override
+    public int compareTo(@NotNull Object o) {
+        return this.getName().compareTo(((Softwarelist) o).getName());
+    }
 }

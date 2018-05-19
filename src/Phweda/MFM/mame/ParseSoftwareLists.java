@@ -18,13 +18,15 @@
 
 package Phweda.MFM.mame;
 
+import Phweda.MFM.mame.softwarelist.Softwarelist;
+import Phweda.MFM.mame.softwarelist.Softwarelists;
 import Phweda.utils.PersistUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,27 +37,28 @@ import java.util.Map;
 public class ParseSoftwareLists {
 
     /**
-     * Import all Software Lists and populate into this Map
+     * Import all Software Lists and populate into Softwarelists
      *
-     * @param map
+     * @param softwarelists
      * @param directory
      */
-    public static void generateSoftwareLists(Map map, String directory) {
+    public static void generateSoftwareLists(Softwarelists softwarelists, String directory) {
+        TreeSet<Softwarelist> set = new TreeSet<>();
+
         try {
             Files.list(Paths.get(directory))
                     .forEach((Path file) -> {
                         if (file.toString().endsWith(".xml")) {
-                            Phweda.MFM.mame.softwarelist.Softwarelist softwareList =
+                            Softwarelist softwareList =
                                     (Phweda.MFM.mame.softwarelist.Softwarelist) PersistUtils.retrieveJAXB(
-                                    file.toAbsolutePath().toString(), Phweda.MFM.mame.softwarelist.Softwarelist.class);
-                            map.put(softwareList.getName(), softwareList);
+                                            file.toAbsolutePath().toString(), Phweda.MFM.mame.softwarelist.Softwarelist.class);
+                            set.add(softwareList);
                         }
                     });
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
+        softwarelists.setSoftwarelists(set);
     }
 
 }
