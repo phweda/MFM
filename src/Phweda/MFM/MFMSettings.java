@@ -38,7 +38,6 @@ import java.util.TreeSet;
  * Date: 11/22/11
  * Time: 2:19 PM
  */
-//TODO fixme mixed static with singleton
 public class MFMSettings {
     private static MFMSettings ourInstance = null;
 
@@ -188,7 +187,8 @@ public class MFMSettings {
     }
 
     public boolean isnonMerged() {
-        return mfmSettings.get(MFM_Constants.NONMERGED) != null && (boolean) mfmSettings.get(MFM_Constants.NONMERGED);
+        return mfmSettings.get(MFM_Constants.NONMERGED) != null &&
+                Boolean.parseBoolean(mfmSettings.get(MFM_Constants.NONMERGED).toString());
     }
 
     public String CHDsFullSetDir() {
@@ -245,6 +245,15 @@ public class MFMSettings {
 
     private void setCatverINI(String catverINI) {
         mfmSettings.put(MFM_Constants.CATVER_INI_FILE, catverINI);
+    }
+
+    public boolean isShowXML() {
+        return mfmSettings.get(MFM_Constants.SHOW_XML) != null &&
+                Boolean.valueOf(mfmSettings.get(MFM_Constants.SHOW_XML).toString());
+    }
+
+    public void setShowXML(boolean showXML) {
+        mfmSettings.put(MFM_Constants.SHOW_XML, showXML);
     }
 
     public HashMap<String, File> getExtrasZipFilesMap() {
@@ -428,7 +437,7 @@ public class MFMSettings {
 
     public void generateDataVersion(String dataVersion) {
         if (MFM.isSystemDebug()) {
-            System.out.println("MFMSettings.setDataVersion dataVersion IN is: " + dataVersion);
+            System.out.println("MFMSettings.generateDataVersion dataVersion IN is: " + dataVersion);
         }
         dataVersion = trimMAMEVersion(dataVersion);
         // strip *. for Double comparison
@@ -440,7 +449,7 @@ public class MFMSettings {
             mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
         }
         if (MFM.isSystemDebug()) {
-            System.out.println("MFMSettings.setDataVersion dataVersion OUT is: " + dataVersion);
+            System.out.println("MFMSettings.generateDataVersion dataVersion OUT is: " + dataVersion);
         }
     }
 
