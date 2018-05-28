@@ -22,7 +22,10 @@ import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.mame.softwarelist.*;
 
 import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -38,7 +41,7 @@ import java.util.List;
  * Time: 7:39 PM
  */
 
-// TODO fixme? NOTE does this even make sense? Will anbody really want to see this as a tree?
+// TODO fixme? NOTE does this even make sense? Will anybody really want to see this as a tree?
 public class SoftwareListtoJTree extends JPanel {
     private static final String COPY = "Copy";
     private static final int FRAME_WIDTH = MFMUI.screenSize.width / 5;

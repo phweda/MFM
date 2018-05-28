@@ -81,7 +81,7 @@ public class Mame {
     @XmlAttribute(name = "mameconfig", required = true)
     protected String mameconfig;
     @XmlTransient
-    protected Map<String, Machine> machineMap;
+    private Map<String, Machine> machineMap;
 
     // Catchall for any unknown Elements. As MAME DTD changes this will allow for
     // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
@@ -188,7 +188,7 @@ public class Mame {
     }
 
     private Map<String, Machine> generateMachineMap() {
-        Map map = new HashMap<String, Machine>();
+        Map<String, Machine> map = new HashMap<String, Machine>();
         this.getMachine().forEach((machine) -> {
             map.put(machine.getName(), machine);
         });

@@ -113,14 +113,14 @@ class MFMListActions {
 
     static void removefromList(String machine, String listName) {
         MFMPlayLists.getInstance().removeMachineFromPlayList(listName, machine);
-        int row = getMachineListTable().getSelectedRow();
+        int row = getListTable().getSelectedRow();
 
         // TODO Refactor with changeList(listName)
-        MachineListTableModel gltm = (MachineListTableModel) getMachineListTable().getModel();
+        MachineListTableModel gltm = (MachineListTableModel) getListTable().getModel();
         gltm.setData(MFMPlayLists.getInstance().getPlayList(listName), listName);
         gltm.fireTableDataChanged();
         // TODO test removal of first and last rows
-        getMachineListTable().getSelectionModel().setSelectionInterval(row, row);
+        getListTable().getSelectionModel().setSelectionInterval(row, row);
         showListInfo(listName);
     }
 
