@@ -20,14 +20,14 @@ package Phweda.MFM.mame;
 
 import Phweda.MFM.*;
 import Phweda.MFM.Utils.ParseFolderINIs;
-import org.w3c.dom.Document;
+import Phweda.MFM.mame.softwarelist.Softwarelists;
+import Phweda.utils.FileUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -42,21 +42,17 @@ import static Phweda.MFM.mame.Machine.*;
 public class ParseAllMachinesInfo {
     //   private static Map<String, Machine> allMachinesInfo = new TreeMap<String, Machine>();
     private static Mame mame = new Mame();
-    private static TreeSet<String> runnable = new TreeSet<String>();
-    private static HashMap<String, ArrayList<String>> CategoryMachineListMap = new HashMap<String, ArrayList<String>>();
+    private static Softwarelists softwarelists;
+    private static TreeSet<String> runnable = new TreeSet<>();
+    private static HashMap<String, ArrayList<String>> CategoryMachineListMap = new HashMap<>();
     private static HashMap<String, Map<String, String>> FolderINIfiles = null;
 
-    private static String build;
     private static ArrayList<String> categoriesList;
     private static Controllers controllers = Controllers.getInstance();
-
-    private static ArrayList<String> machineList;
-    private static int machineCount = 0;
-
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
     /**
-     * NOTE : Unless MFM arg -all flag is present we only load Playable games as determined by :
+     * NOTE : If not parsing All we only load Playable games as determined by :
      * <driver status="good" or
      * <driver status="imperfect"
      * see MAME source info.c - info_xml_creator::output_driver()
@@ -70,6 +66,7 @@ public class ParseAllMachinesInfo {
         try {
             // Note as of 0.85 we handle all Mame -listxml versions the same
             mame = loadAllMachinesInfoJAXB();
+            softwarelists = generateSoftwareLists();
         } catch (Exception e) {
             e.printStackTrace();
             if (mame == null) {
@@ -101,35 +98,8 @@ public class ParseAllMachinesInfo {
     private static void removeNotRunnable() {
         // NOTE This does leave us Devices and BIOS since they have no driver
         mame.getMachine()
-                .removeIf(machine -> {
-                    return machine.getDriver() != null &&
-                            machine.getDriver().getStatus().equals(Machine.PRELIMINARY);
-                });
-    }
-
-    /**
-     * Original version. Replaced by JAXB marshalling
-     * Retained for versions prior to MAME 173 which is the last change in MAME DTD
-     *
-     * @return Map of all Machines
-     * @deprecated 0.85 release handles all Mame versions with -listxml (from 0.70)
-     */
-    @Deprecated
-    private static void loadAllMachinesInfoDOM(Set<String> prefixes) {
-        machineList = new ArrayList<String>();
-        Document dom = null;
-        for (String str : prefixes) {
-            //  getMachineInfo(dom, str);
-            dom = null;
-            // TODO figure out which version it is
-            if (MAMEInfo.getVersionDouble() < 0.139d) {
-                break;
-            }
-        }
-
-        System.out.print("\nTotal Machines : " + machineCount + "\n\n");
-        MFM.logger.addToList("\nTotal Machines : " + machineCount + "\n\n", true);
-
+                .removeIf(machine -> machine.getDriver() != null &&
+                        machine.getDriver().getStatus().equals(Machine.PRELIMINARY));
     }
 
     private static Mame loadAllMachinesInfoJAXB() {
@@ -155,261 +125,25 @@ public class ParseAllMachinesInfo {
         return mame;
     }
 
+    private static Softwarelists generateSoftwareLists() {
+        Softwarelists softwareLists = new Softwarelists();
+        ParseSoftwareLists.generateSoftwareLists(softwareLists, MFMSettings.getInstance().MAMEexeDir() +
+                FileUtils.DIRECTORY_SEPARATOR + "hash");
+        MFM_Data.getInstance().setSoftwarelists(softwareLists);
+
+        return softwareLists;
+    }
+
+    public static Softwarelists getSoftwarelists() {
+        return softwarelists;
+    }
+
     public static TreeSet<String> getRunnable() {
         return runnable;
     }
 
-    private static TreeSet<String> getGamesPrefixes() throws IOException {
-        return new MAME_Game_Prefixes().getPrefixes();
-    }
+    /*************** NON MAME INFORMATION SOURCES *************************************************************/
 
- /* NOTE removed with 0.85 version we exclusively use JAXB
-    private static void getMachineInfo(Document dom, String chars) {
-        // TODO we should extract this to a method see other calls for -listxml MAME_Compatible
-        ArrayList<String> fullListargs = new ArrayList<String>();
-        fullListargs.add("-listxml");
-        fullListargs.add(chars + "*");
-        Process process = null;
-        try {
-            process = MAMEexe.run(fullListargs);
-        } catch (MAMEexe.MAME_Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            dom = XMLUtils.parseXmlFile(process.getInputStream());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        Element root = dom.getDocumentElement();
-
-        NodeList machineNodes = root.getElementsByTagName(Machine.MACHINE);
-        // Legacy xml dtd value is "game"
-        if (machineNodes.getLength() < 2) {
-            machineNodes = root.getElementsByTagName(GAME);
-        }
-
-        *//* *//*
-        // Get a total count of Machine nodes in XML - 2/2/2016 trying to rectify count with coccola
-        // NOTE assumption machines are only returned once is incorrect - think it is device_refs 10/21/2016
-        // machineCount += machineNodes.getLength();
-
-        for (int i = 0; i < machineNodes.getLength(); i++) {
-            Element machineNode = (Element) machineNodes.item(i);
-            // Ensure there are children
-            if (machineNode.hasChildNodes()) {
-                String bios = machineNode.getAttribute(Machine.ISBIOS);
-                *//* if playable *//*
-                Element driver = (Element) machineNode.getElementsByTagName(DRIVER).item(0);
-                if (driver != null) {
-                    String status = driver.getAttribute(STATUS);
-                    if (!machineList.contains(machineNode.getAttribute(Machine.NAME))) {
-                        machineList.add(machineNode.getAttribute(Machine.NAME));
-                        machineCount++;
-                        if (MFM.isProcessAll()) {
-                            loadMachineInfo(machineNode, status, bios);
-                        }  //   NOTE 10/13/2015 to include all see loadMachineInfo
-                        else if (status.equalsIgnoreCase(GOOD) || status.equalsIgnoreCase(IMPERFECT)) {
-                            // the real work
-                            // Already have Status so might as well pass it in
-                            loadMachineInfo(machineNode, status, bios);
-                        }
-                    }
-
-                }
-            }
-        }
-    }
-
-    *//*
-     * Huge rewrite to JAXB objects Oct 2016
-     *
-     *//*
-    private static void loadMachineInfo(Element machineElement, String status, String isBios) {
-        Machine machine = new Machine();
-
-        // local to reduce calls within method
-        String machineName = machineElement.getAttribute(Machine.NAME);
-        machine.setName(machineName);
-
-        Element driverEL = (Element) machineElement.getElementsByTagName(Machine.DRIVER).item(0);
-        Driver driver = new Driver();
-        driver.setStatus(status);
-        if (driverEL != null) {
-            if (!driverEL.getAttribute(Machine.COCKTAIL).isEmpty()) {
-                driver.setCocktail(driverEL.getAttribute(Machine.COCKTAIL));
-            }
-        }
-        machine.setDriver(driver);
-        machine.setIsbios(isBios);
-
-        // Leave in to show progress in command window
-        if (MFM.isDebug()) {
-            System.out.println(machineName);
-            MFM.logger.addToList(machineName);
-        }
-
-        *//* We know there is one and only one description*//*
-        machine.setDescription(machineElement.getElementsByTagName(Machine.DESCRIPTION).item(0).getTextContent());
-
-        *//* We may not get these *//*
-        Element yearEL = (Element) machineElement.getElementsByTagName(Machine.YEAR).item(0);
-        if (yearEL != null) {
-            machine.setYear(yearEL.getTextContent());
-        }
-
-        Element manufacturerEL = (Element) machineElement.getElementsByTagName(Machine.MANUFACTURER).item(0);
-        if (manufacturerEL != null) {
-            machine.setManufacturer(manufacturerEL.getTextContent());
-        }
-
-        NodeList disks = machineElement.getElementsByTagName(Machine.DISK);
-        if (disks != null && disks.item(0) != null) {
-            for (int k = 0; k < disks.getLength(); k++) {
-                Disk disk = new Disk();
-                disk.setName(((Element) disks.item(k)).getAttribute(Machine.NAME));
-                machine.getDisk().add(disk);
-                // System.out.println(machine.getName() + " disk : " + ((Element)disks.item(k)).getAttribute(Machine.NAME));
-            }
-        }
-
-        NodeList softwarelists = machineElement.getElementsByTagName(Machine.SOFTWARELIST);
-        if (softwarelists != null && softwarelists.item(0) != null) {
-            for (int k = 0; k < softwarelists.getLength(); k++) {
-                Softwarelist sList = new Softwarelist();
-                sList.setName(((Element) softwarelists.item(k)).getAttribute(Machine.NAME));
-                machine.getSoftwarelist().add(sList);
-                if (MFM.isSystemDebug()) {
-                    System.out.println(machine.getName() + " softwarelist : " + sList.getName());
-                }
-            }
-        }
-
-        // Early MAME versions it was video
-        Element displayEL = (Element) machineElement.getElementsByTagName(Machine.DISPLAY).item(0);
-        if (displayEL != null) {
-            Display display = new Display();
-            display.setType(displayEL.getAttribute(Machine.TYPE));
-            display.setRotate(displayEL.getAttribute(Machine.ROTATE));
-            display.setHeight(displayEL.getAttribute(Machine.HEIGHT));
-            display.setWidth(displayEL.getAttribute(Machine.WIDTH));
-            machine.getDisplay().add(display);
-        } else {
-            Element videoEL = (Element) machineElement.getElementsByTagName(Machine.VIDEO).item(0);
-            Display display = new Display();
-            if (videoEL != null) {
-                // vertical raster
-                machine.setScreentype(videoEL.getAttribute(Machine.SCREEN));
-                machine.setIsVertical(videoEL.getAttribute(Machine.ORIENTATION));
-                display.setHeight(videoEL.getAttribute(Machine.HEIGHT));
-                display.setWidth(videoEL.getAttribute(Machine.WIDTH));
-            }
-            machine.getDisplay().add(display);
-        }
-
-        String cloneof = machineElement.getAttribute(Machine.CLONEOF);
-        if (cloneof.length() > 0) {
-            machine.setCloneof(cloneof);
-        }
-
-        String romof = machineElement.getAttribute(Machine.ROMOF);
-        if (romof.length() > 0) {
-            machine.setRomof(romof);
-        }
-
-        String sourceFile = machineElement.getAttribute(Machine.SOURCEFILE);
-        machine.setSourcefile(sourceFile);
-
-        NodeList roms = machineElement.getElementsByTagName(Machine.ROM);
-        // TODO - isn't this extraneous check?
-        if (roms.getLength() > 0) {
-            for (int i = 0; i < roms.getLength(); i++) {
-                Element romEL = ((Element) roms.item(i));
-                Rom rom = new Rom();
-                rom.setName(romEL.getAttribute(Machine.NAME));
-                rom.setSize(romEL.getAttribute(Machine.SIZE));
-                rom.setSha1(romEL.getAttribute(Machine.SHA1));
-                rom.setCrc(romEL.getAttribute(Machine.CRC));
-                machine.getRom().add(rom);
-            }
-        }
-
-        // Need to get device_refs may be 0 to N of them
-        NodeList deviceRefs = machineElement.getElementsByTagName(Machine.DEVICE_REF);
-        if (deviceRefs.getLength() > 0) {
-            for (int i = 0; i < deviceRefs.getLength(); i++) {
-                DeviceRef deviceRef = new DeviceRef();
-                deviceRef.setName(((Element) deviceRefs.item(i)).getAttribute(Machine.NAME));
-                machine.getDeviceRef().add(deviceRef);
-            }
-        }
-
-        Element inputEL = (Element) machineElement.getElementsByTagName(Machine.INPUT).item(0);
-        if (inputEL != null) {
-            Input input = new Input();
-//      NOTE XML changed ~173
-            boolean boolButtons = false;
-            String buttons = inputEL.getAttribute(Machine.BUTTONS);
-            if (!buttons.isEmpty()) {
-                input.setButtons(buttons);
-                boolButtons = true;
-            }
-
-            String players = inputEL.getAttribute(Machine.PLAYERS);
-            if (!players.isEmpty()) {
-                input.setPlayers(players);
-            }
-
-            NodeList nodeList = inputEL.getElementsByTagName(Machine.CONTROL);
-            String type;
-            int buttonsInt = 0;
-            ArrayList<String> controlArgs = new ArrayList<String>(5);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                int tempInt = 0;
-                Element currentNode = (Element) nodeList.item(i);
-                // Extraneous but to be safe
-                if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-                    type = currentNode.getAttribute(Controllers.TYPE);
-                    String tempButtonStr;
-                    if (currentNode.getAttribute(Controllers.WAYS).isEmpty()) {
-                        controllers.addMachine(type, machine.getName());
-                        tempButtonStr = currentNode.getAttribute(Controllers.BUTTONS);
-                        if (!tempButtonStr.isEmpty()) {
-                            tempInt = Integer.parseInt(tempButtonStr);
-                        }
-                    } else {
-                        controlArgs.add(type);
-                        tempButtonStr = currentNode.getAttribute(Controllers.BUTTONS);
-                        if (!tempButtonStr.isEmpty()) {
-                            tempInt = Integer.parseInt(tempButtonStr);
-                        }
-                        controlArgs.add(currentNode.getAttribute(Controllers.WAYS));
-                        controlArgs.add(currentNode.getAttribute(Controllers.WAYS2));
-                        controlArgs.add(currentNode.getAttribute(Controllers.WAYS3));
-                        controllers.addMachine(controlArgs, machine.getName());
-                        controlArgs.clear();
-                    }
-                    Control control = new Control();
-                    control.setType(type);
-                    input.getControl().add(control);
-                }
-                buttonsInt = Math.max(tempInt, buttonsInt);
-            }
-            if (!boolButtons) {
-                machine.setButtons(buttonsInt);
-            }
-            machine.setInput(input);
-        }
-
-/*//************** NON MAME INFORMATION SOURCES *************************************************************
-     addNonMAMEinfo(machine, machineName);
-     /*/
-    /**********************************************************************************************
-
-     mame.getMachine().add(machine);
-     }
-     */
     private static void addNonMAMEinfo(Machine machine, String machineName) {
         machine.setHistory(LoadNonMAMEresources.getHistoryDAT().get(machineName));
         machine.setInfo(LoadNonMAMEresources.getMAMEInfoDAT().get(machineName));
@@ -421,7 +155,7 @@ public class ParseAllMachinesInfo {
         if (MachinetoCategoryMap.containsKey(machineName)) {
             machine.setCategory(MachinetoCategoryMap.get(machineName));
             if (!CategoryMachineListMap.containsKey(MachinetoCategoryMap.get(machineName))) {
-                CategoryMachineListMap.put(MachinetoCategoryMap.get(machineName), new ArrayList<String>());
+                CategoryMachineListMap.put(MachinetoCategoryMap.get(machineName), new ArrayList<>());
             }
             CategoryMachineListMap.get(MachinetoCategoryMap.get(machineName)).add(machineName);
         }
@@ -443,14 +177,14 @@ public class ParseAllMachinesInfo {
     }
 
     private static void findCategories() {
-        categoriesList = new ArrayList<String>();
+        categoriesList = new ArrayList<>();
         // Machines are the key with Category the value in MachinetoCategoryMap
         Map<String, String> MachinetoCategoryMap = LoadNonMAMEresources.getMachinetoCategoryMap();
         for (String game : MachinetoCategoryMap.keySet()) {
             if (!categoriesList.contains(MachinetoCategoryMap.get(game))) {
                 String key = MachinetoCategoryMap.get(game);
                 categoriesList.add(key);
-                CategoryMachineListMap.put(key, new ArrayList<String>());
+                CategoryMachineListMap.put(key, new ArrayList<>());
             }
         }
         // NOTE leave in to show running in shell window
@@ -458,8 +192,6 @@ public class ParseAllMachinesInfo {
         if (MFM.isDebug()) {
             MFM.logger.addToList(categoriesList.toString());
         }
-
-        // Now we check Categories Hierarchy TODO limit by version?
     }
 
     private static void findControls(Machine machine) {
@@ -471,7 +203,7 @@ public class ParseAllMachinesInfo {
                 if (control.getWays() == null || control.getWays().isEmpty()) {
                     controllers.addMachine(type, machine.getName());
                 } else {
-                    ArrayList<String> controlArgs = new ArrayList<String>(5);
+                    ArrayList<String> controlArgs = new ArrayList<>(5);
                     controlArgs.add(type);
                     controlArgs.add(control.getWays());
                     if (control.getWays2() != null) {
@@ -495,7 +227,7 @@ public class ParseAllMachinesInfo {
      */
     private static void loadFoldersINIs(HashSet<File> files) {
         try {
-            FolderINIfiles = new HashMap<String, Map<String, String>>();
+            FolderINIfiles = new HashMap<>();
 
             for (File file : files) {
                 if (MFM.isDebug()) {
@@ -508,11 +240,11 @@ public class ParseAllMachinesInfo {
                      * TreeMap gives us the Natural order
                      * At least two common INI files are not ordered - Catlist.ini & Genre.ini
                      */
-                    LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+                    LinkedHashMap<String, String> map = new LinkedHashMap<>();
                     new ParseFolderINIs(file.getAbsolutePath(), map).processFile();
                     String name = file.getName().substring(0, file.getName().lastIndexOf('.'));
                     // Convert to TreeMap for order see above
-                    TreeMap<String, String> orderedMap = new TreeMap<String, String>(map);
+                    TreeMap<String, String> orderedMap = new TreeMap<>(map);
                     FolderINIfiles.put(name, orderedMap);
                 }
             }
