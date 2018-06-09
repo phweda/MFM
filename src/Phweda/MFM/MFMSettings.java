@@ -443,7 +443,7 @@ public class MFMSettings {
         // strip *. for Double comparison
         Double dataVersionDouble = Double.valueOf(dataVersion.substring(dataVersion.indexOf('.') + 1));
 
-        if (!dataVersion.contains(ALL_) && (MFM.isProcessAll() || dataVersionDouble <= DBL_143)) {
+        if (!dataVersion.contains(ALL_) && (MAMEInfo.isProcessAll() || dataVersionDouble <= DBL_143)) {
             mfmSettings.put(MFM_Constants.DATA_VERSION, ALL_ + dataVersion);
         } else {
             mfmSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
@@ -540,7 +540,7 @@ public class MFMSettings {
                 // first run must acquire base settings before continuing
                 MFMUI.getSettings();
             }
-            MAMEInfo.getInstance(true, true);
+            MAMEInfo.getInstance(true, true, false);
         }
     }
 
