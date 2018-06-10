@@ -185,7 +185,7 @@ final class MFM_SettingsPanel extends JPanel {
                     }
 
 
-                    if (!MFM_Data.getInstance().isLoaded() && (mameexe.length() < 6)) {
+                    if (MFM_Data.getInstance().notLoaded() && (mameexe.length() < 6)) {
                         JOptionPane.showMessageDialog(frame,
                                 "MFM Data not detected MAME.exe must be entered.");
                         return;
@@ -220,7 +220,7 @@ final class MFM_SettingsPanel extends JPanel {
                     }
 
                     mfmSettings.isLoaded(true);
-                    mfmSettings.getInstance().updateDirectoriesResourceFiles();
+                    mfmSettings.updateDirectoriesResourceFiles();
                     if (!MFM.isFirstRun()) {
                         MAMEInfo.loadINIs();
                     }
@@ -232,7 +232,7 @@ final class MFM_SettingsPanel extends JPanel {
                     MFM.logger.separateLine();
                 } else if (((JButton) e.getSource()).getName().equals("Cancel")) {
                     frame.dispose();
-                    if (!mfmSettings.getInstance().isLoaded()) {
+                    if (!mfmSettings.isLoaded()) {
                         MFM.logger.addToList("User canceled Settings", true);
                         System.exit(4);
                     }
@@ -308,7 +308,7 @@ final class MFM_SettingsPanel extends JPanel {
         this.add(new JLabel());
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(saveB);
-        //fixme get the spacing in an appropriate way
+        //fixme get the spacing in an appropriate way NOTE believe would need to switch to GridBagLayout
         buttonPanel.add(new JLabel("           "));
         buttonPanel.add(cancelB);
         buttonPanel.setBackground(MFMUI.getMFMSettingsBGcolor());
