@@ -20,13 +20,16 @@ package Phweda.MFM.UI;
 
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MFM;
+import Phweda.MFM.MFM_Constants;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.softwarelist.Software;
+import Phweda.utils.FileUtils;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
 
@@ -78,11 +81,26 @@ class MachineListTableModel extends AbstractTableModel {
         return columnNames.length;
     }
 
+    /**
+     * Decision for 0.9.5 is to NOT have a separate TableModel for Software. Trying to support mixed lists.
+     * Let's see what happens. If not users would need to create 2 lists: Arcade & Software.
+     *
+     * @param rowIndex
+     * @param columnIndex
+     * @return
+     */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
 
         // Put softwarelist first to avoid name collisions with Arcade games
-        Software software = MAMEInfo.getSoftware(list[rowIndex], listName);
+        String name = list[rowIndex];
+        String listName2 = listName;
+        if(name.contains(MFM_Constants.SOFTWARE_LIST_SEPARATER)){
+            String[] split = name.split(MFM_Constants.SOFTWARE_LIST_SEPARATER);
+            listName2 = split[0];
+            name = split[1];
+        }
+        Software software = MAMEInfo.getSoftware(name, listName2);
         if (software != null) {
             switch (columnIndex) {
 
@@ -94,7 +112,9 @@ class MachineListTableModel extends AbstractTableModel {
                     return software.getPublisher() != null ? software.getPublisher() : "";
                 case 3:
                     return software.getYear() != null ? software.getYear() : "";
-                // Note no Category for Softwarelists
+                // Note no Category for Softwarelists but we use it to display softwarelist Name
+                case 4:
+                    return listName2;
                 case 5:
                     return software.getSupported() != null ? software.getSupported() : "";
                 case 6:
@@ -105,7 +125,7 @@ class MachineListTableModel extends AbstractTableModel {
             }
         }
 
-        Machine machine = MAMEInfo.getMachine(list[rowIndex]);
+        Machine machine = MAMEInfo.getMachine(name);
         if (machine != null) {
             return machine.getValueOf(columnNames[columnIndex]);
         }

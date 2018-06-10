@@ -38,6 +38,7 @@ import java.util.Objects;
  */
 class MachineListTable extends JTable {
     static int keyColumn = 0;
+    static int categoryColumn = 4;
     private static MachineListTable ourInstance;
     private static int fullNameColumn = 0;
 
@@ -149,19 +150,11 @@ class MachineListTable extends JTable {
         this.getInputMap().put(KeyStroke.getKeyStroke("F10"), MFMAction.ListBuilderAction);
         this.getActionMap().put(MFMAction.ListBuilderAction, ListBuilderAction);
 
-/*      // Legacy capability
-        MFMAction EditVidAction = new MFMAction(MFMAction.CropAVIAction, null);
-        VidAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.EditVideoAction);
-        this.getInputMap().put(KeyStroke.getKeyStroke("F11"), MFMAction.EditVideoAction);
-        this.getActionMap().put(MFMAction.EditVideoAction, EditVidAction);
-*/
-
         MFMAction ConvertVideoAction = new MFMAction(MFMAction.ConvertCommandAction, null);
         VidAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.ConvertCommandAction);
         this.getInputMap().put(KeyStroke.getKeyStroke("F12"), MFMAction.ConvertCommandAction);
         this.getActionMap().put(MFMAction.ConvertCommandAction, ConvertVideoAction);
 
-        //    this.add(((JPopupMenu)new MFM_Components()));
         this.setRowHeight(25);
         this.setAutoCreateRowSorter(true);
         this.getRowSorter().toggleSortOrder(0);
@@ -228,12 +221,19 @@ class MachineListTable extends JTable {
                         comp.setForeground(Color.BLACK);
 
                         int newRow = ourInstance.convertRowIndexToModel(row);
-                        final String machineName = (String) ourInstance.getModel().getValueAt(newRow, keyColumn);
+                        String itemName = (String) ourInstance.getModel().getValueAt(newRow, keyColumn);
+                        String systemName = (String) ourInstance.getModel().getValueAt(newRow, categoryColumn);
+                        if (!MAMEInfo.isSoftwareList(systemName)) {
+                            systemName = null;
+                        }
 
-                        if (!MAMEInfo.getRunnableMachines().contains(machineName) &&
-                                !MFMController.checkRunnableSoftware(machineName)) {
+                        // Overly complex logic due to support of mixed lists fixme
+                        if (!(systemName != null && MFMController.checkRunnableSoftware(itemName, systemName)) &&
+                                !MAMEInfo.getRunnableMachines().contains(itemName) &&
+                                !MFMController.checkRunnableSoftware(itemName)) {
                             comp.setBackground(MFMUI.getMFMLightRed());
                         }
+
                         if (isRowSelected(row)) {
                             int top = (row > 0 && isRowSelected(row - 1)) ? 1 : 2;
                             int left = column == 0 ? 2 : 0;
