@@ -19,6 +19,7 @@
 package Phweda.MFM.UI;
 
 import Phweda.MFM.MAMEInfo;
+import Phweda.MFM.MFM_Constants;
 import Phweda.MFM.mame.softwarelist.*;
 
 import javax.swing.*;
@@ -120,12 +121,14 @@ public class SoftwareListtoJTree extends JPanel {
     DefaultMutableTreeNode getSoftwareNode(String softwareName) {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) jTree.getModel().getRoot();
         Enumeration<DefaultMutableTreeNode> children = root.children();
+
+        softwareName = softwareName.split(MFM_Constants.SOFTWARE_LIST_SEPARATER)[1];
         while (children.hasMoreElements()) {
             DefaultMutableTreeNode node = children.nextElement();
 
             String nodeString = node.getUserObject().toString();
-            String nodeMachine = nodeString.substring(nodeString.lastIndexOf(' ') + 1, nodeString.length());
-            if (nodeMachine.equals(softwareName)) {
+            String nodeSoftware = nodeString.substring(nodeString.lastIndexOf(' ') + 1, nodeString.length());
+            if (nodeSoftware.equals(softwareName)) {
                 return node;
             }
         }
@@ -202,7 +205,8 @@ public class SoftwareListtoJTree extends JPanel {
     private DefaultMutableTreeNode getInfoNode(Software software) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Info");
         for (Info info : software.getInfo()) {
-            dmtNode.add(new DefaultMutableTreeNode(info.getName() + valueDivider + info.getValue()));
+            String value = info.getValue() != null ? info.getValue() : "";
+            dmtNode.add(new DefaultMutableTreeNode(info.getName() + valueDivider + value));
         }
         return dmtNode;
     }
@@ -210,8 +214,8 @@ public class SoftwareListtoJTree extends JPanel {
     private DefaultMutableTreeNode getSharedfeatNode(Software software) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Sharedfeat");
         for (Sharedfeat sharedfeat : software.getSharedfeat()) {
-            dmtNode.add(new DefaultMutableTreeNode(sharedfeat.getName() + valueDivider +
-                    sharedfeat.getValue()));
+            String value = sharedfeat.getValue() != null ? sharedfeat.getValue() : "";
+            dmtNode.add(new DefaultMutableTreeNode(sharedfeat.getName() + valueDivider + value));
         }
         return dmtNode;
     }
@@ -227,10 +231,18 @@ public class SoftwareListtoJTree extends JPanel {
     private DefaultMutableTreeNode getPart(Part part) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Part" + softwareDivider + part.getName());
         dmtNode.add(new DefaultMutableTreeNode("Interface" + valueDivider + part.getInterface()));
-        dmtNode.add(getDataarea(part.getDataarea()));
-        dmtNode.add(getDipswitch(part.getDipswitch()));
-        dmtNode.add(getDiskarea(part.getDiskarea()));
-        dmtNode.add(getFeature(part.getFeature()));
+        if (part.getDataarea().size() > 0) {
+            dmtNode.add(getDataarea(part.getDataarea()));
+        }
+        if (part.getDipswitch().size() > 0) {
+            dmtNode.add(getDipswitch(part.getDipswitch()));
+        }
+        if (part.getDiskarea().size() > 0) {
+            dmtNode.add(getDiskarea(part.getDiskarea()));
+        }
+        if (part.getFeature().size() > 0) {
+            dmtNode.add(getFeature(part.getFeature()));
+        }
 
         return dmtNode;
     }
@@ -243,6 +255,7 @@ public class SoftwareListtoJTree extends JPanel {
             dataareaNode.add(new DefaultMutableTreeNode("Width" + valueDivider + dataarea.getWidth()));
             dataareaNode.add(new DefaultMutableTreeNode("Endianness" + valueDivider + dataarea.getEndianness()));
             dataareaNode.add(getRoms(dataarea.getRom()));
+            dmtNode.add(dataareaNode);
         }
         return dmtNode;
     }
@@ -275,8 +288,9 @@ public class SoftwareListtoJTree extends JPanel {
     private DefaultMutableTreeNode getFeature(List<Feature> features) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Feature(s)");
         for (Feature feature : features) {
+            String value = feature.getValue() != null ? feature.getValue() : "";
             DefaultMutableTreeNode featureNode = new DefaultMutableTreeNode(feature.getName() + valueDivider +
-                    feature.getValue());
+                    value);
             dmtNode.add(featureNode);
         }
         return dmtNode;
