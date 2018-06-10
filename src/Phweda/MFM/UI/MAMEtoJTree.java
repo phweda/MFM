@@ -20,6 +20,7 @@ package Phweda.MFM.UI;
 
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MAMEexe;
+import Phweda.MFM.MFMSettings;
 import Phweda.MFM.mame.*;
 
 import javax.swing.*;
@@ -59,7 +60,12 @@ public class MAMEtoJTree extends JPanel {
     private final String valueDivider = " \u00bb ";
     private final String machineDivider = " \u00A8 ";
 
-    private MAMEtoJTree() {
+    private MAMEtoJTree(boolean load) {
+        // 0.9.5 we do not automatically load XML
+        if (!load) {
+            return;
+        }
+
         if (root == null) {
             root = MAMEInfo.getMame();
         }
@@ -121,7 +127,7 @@ public class MAMEtoJTree extends JPanel {
     public static MAMEtoJTree getInstance(boolean refresh) {
         if (ourInstance == null || refresh) {
             root = null; // ensure full refresh of Data
-            ourInstance = new MAMEtoJTree();
+            ourInstance = new MAMEtoJTree(MFMSettings.getInstance().isShowXML());
         }
         return ourInstance;
     }
@@ -165,7 +171,7 @@ public class MAMEtoJTree extends JPanel {
             exit();
         }
 
-        frame.getContentPane().add(new MAMEtoJTree(), BorderLayout.CENTER);
+        frame.getContentPane().add(new MAMEtoJTree(true), BorderLayout.CENTER);
         frame.validate();
         frame.setVisible(true);
     }
@@ -200,6 +206,10 @@ public class MAMEtoJTree extends JPanel {
     DefaultMutableTreeNode getMachineNode(String machineName) {
         if (machineName == null || machineName.isEmpty()) {
             return null;
+        }
+        // As of 0.9.5 tree may not exist
+        else if (jTree == null) {
+            return createMachineNode(MAMEInfo.getMachine(machineName));
         }
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) jTree.getModel().getRoot();
         Enumeration<DefaultMutableTreeNode> children = root.children();
