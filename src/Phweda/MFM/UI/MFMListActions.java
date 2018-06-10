@@ -76,11 +76,11 @@ class MFMListActions {
     }
 
     /**
-     * Add selected to list or create a new list with this machine
+     * Add selected to list or create a new list with this item
      *
-     * @param machine selected machine to add to listg
+     * @param item selected item to add to list
      */
-    static void addtoList(String machine) {
+    static void addtoList(String item) {
         MFMPlayLists playLists = MFMPlayLists.getInstance();
         Object[] objs = Stream.concat(
                 Arrays.stream(new Object[]{MFM_Constants.NEW_LIST}), Arrays.stream(playLists.myPlayListNames()))
@@ -104,15 +104,15 @@ class MFMListActions {
             if (newName == null || newName.isEmpty()) {
                 return;
             }
-            MFMPlayLists.getInstance().createPlayList(newName, new String[]{machine});
+            MFMPlayLists.getInstance().createPlayList(newName, new String[]{item});
             MFMUI_Setup.getInstance().updateMenuBar(newName);
             return;
         }
-        playLists.addMachineToPlayList(listName, machine);
+        playLists.addMachineToPlayList(listName, item);
     }
 
-    static void removefromList(String machine, String listName) {
-        MFMPlayLists.getInstance().removeMachineFromPlayList(listName, machine);
+    static void removefromList(String item, String listName) {
+        MFMPlayLists.getInstance().removeMachineFromPlayList(listName, item);
         int row = getListTable().getSelectedRow();
 
         // TODO Refactor with changeList(listName)
