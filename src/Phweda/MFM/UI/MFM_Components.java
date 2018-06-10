@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import static Phweda.MFM.UI.MFMAction.*;
+
 /**
  * Build UI components
  * Major refactor 9/30/2016 moved Menubar creation to separate class MFM_Menubar
@@ -46,7 +48,8 @@ public class MFM_Components {
     private static final JScrollPane leftTreeScrollPane = new JScrollPane();
     static MFMUI_Resources resources = MFMUI_Resources.getInstance();
     private static MFMController MFMController;
-    private static JPopupMenu MFMPopupMenu;
+    private static JPopupMenu MachinePopupMenu;
+    private static JPopupMenu SoftwarePopupMenu;
     private static JPanel MFMListPanel;
     private static JTabbedPane ExtrasTabbedPane;
     private static JTable machineListTable;
@@ -58,6 +61,15 @@ public class MFM_Components {
     private static JPanel fillPanel;
     private JTree tree;
 
+    // 0.9.5 adding Strings for Tab Titles - used for discovering images for ExtrasTabbedPane pane
+    static final String CABINET_COVER = "Cabinet/Cover";
+    static final String CPANEL = "CPanel";
+    static final String FLYERS = "Flyers";
+    static final String MARQUEES = "Marquees";
+    static final String PCB = "PCB";
+    static final String SNAP = "Snap";
+    static final String TITLES = "Titles";
+
     MFM_Components(MFMController controller) {
         MFMController = controller;
         createUIComponents();
@@ -67,8 +79,12 @@ public class MFM_Components {
         return infoPanel;
     }
 
-    static JPopupMenu MFMPopupMenu() {
-        return MFMPopupMenu;
+    static JPopupMenu getListPopupMenu() {
+        return MachinePopupMenu;
+    }
+
+    static JPopupMenu getSoftwarelistPopupMenuPopupMenu() {
+        return SoftwarePopupMenu;
     }
 
     static JPanel getMFMFolderTreeScrollPane() {
@@ -188,19 +204,20 @@ public class MFM_Components {
     }
 
     void updateListMenu() {
-        MFM_Menubar.getInstance().updateListMenu();
+        MFM_MenuBar.getInstance().updateListMenu();
     }
 
     private void createUIComponents() {
 
         setMachineListTable();
         createExtrasTabbedPane();
-        menuBar = MFM_Menubar.getJMenubar();
+        menuBar = MFM_MenuBar.getJMenubar();
         createFolderTree();
         createFillPanel();
         createListChooserPanel();
-        // What order?? Popup needs machineListTable
-        createPopup();
+
+        createMachinePopup();
+        createSoftwarePopup();
     }
 
     private void createFillPanel() {
@@ -243,13 +260,13 @@ public class MFM_Components {
     private void createExtrasTabbedPane() {
         ExtrasTabbedPane = new JTabbedPane();
         Image defaultImage = getResources().getImageIcon(MFMUI_Resources.MFM_Image_PNG).getImage();
-        ExtrasTabbedPane.addTab("Cabinets", new ImagePanel(defaultImage)); // Cabs/Systems
-        ExtrasTabbedPane.addTab("CPanel", new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab("Flyers", new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab("Marquees", new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab("PCB", new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab("Snap", new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab("Titles", new ImagePanel(defaultImage));
+        ExtrasTabbedPane.addTab(CABINET_COVER, new ImagePanel(defaultImage)); // Cabs/Systems
+        ExtrasTabbedPane.addTab(CPANEL, new ImagePanel(defaultImage));
+        ExtrasTabbedPane.addTab(FLYERS, new ImagePanel(defaultImage));
+        ExtrasTabbedPane.addTab(MARQUEES, new ImagePanel(defaultImage));
+        ExtrasTabbedPane.addTab(PCB, new ImagePanel(defaultImage));
+        ExtrasTabbedPane.addTab(SNAP, new ImagePanel(defaultImage));
+        ExtrasTabbedPane.addTab(TITLES, new ImagePanel(defaultImage));
 
         ExtrasTabbedPane.addChangeListener(MFMController);
 
@@ -267,9 +284,9 @@ public class MFM_Components {
         machineListTable.getSelectionModel().addListSelectionListener(MFMController);
     }
 
-    private void createPopup() {
-        MFMPopupMenu = new JPopupMenu(null);
-        MFMPopupMenu.setBorder(new BevelBorder(BevelBorder.LOWERED,
+    private void createMachinePopup() {
+        MachinePopupMenu = new JPopupMenu(null);
+        MachinePopupMenu.setBorder(new BevelBorder(BevelBorder.LOWERED,
                 new Color(74, 37, 19), new Color(117, 70, 53)));
 //==================================================================
         JSeparator separator = new JSeparator();
@@ -284,31 +301,51 @@ public class MFM_Components {
         separator3.setPreferredSize(new Dimension(50, 2));
         separator3.setBorder(new BevelBorder(BevelBorder.RAISED));
 //==================================================================
-        MFMPopupMenu.add(new MFMAction(MFMAction.AddtoListAction, null));
-        MFMPopupMenu.add(new MFMAction(MFMAction.RemovefromListAction, null));
-        MFMPopupMenu.add(separator);
-        MFMPopupMenu.add(new MFMAction("Record", null));
-        MFMPopupMenu.add(new MFMAction(MFMAction.PlayVideoAction, null));
-        MFMPopupMenu.add(getVideoOps());
+        MachinePopupMenu.add(new MFMAction(AddtoListAction, null));
+        MachinePopupMenu.add(new MFMAction(RemovefromListAction, null));
+        MachinePopupMenu.add(separator);
+        MachinePopupMenu.add(new MFMAction(RecordMachineAction, null));
+        MachinePopupMenu.add(new MFMAction(PlayVideoAction, null));
+        MachinePopupMenu.add(getVideoOps());
 
-        MFMPopupMenu.add(separator2);
-        MFMPopupMenu.add(new MFMAction("Show History", null));
-        MFMPopupMenu.add(new MFMAction("Show Manual", null));
-        MFMPopupMenu.add(new MFMAction("Show Info", null));
-        MFMPopupMenu.add(new MFMAction(MFMAction.MACHINE_TREEAction, null));
-        MFMPopupMenu.add(new MFMAction(MFMAction.ShowControlsDevicesAction, null));
-        MFMPopupMenu.add(new MFMAction(MFMAction.GOTOcloneofAction, null));
-        MFMPopupMenu.add(new MFMAction("Open Image", null));
-        MFMPopupMenu.add(separator3);
-        MFMPopupMenu.add(new MFMAction("Exit", null));
+        MachinePopupMenu.add(separator2);
+        MachinePopupMenu.add(new MFMAction(ShowHistoryAction, null));
+        MachinePopupMenu.add(new MFMAction(ShowManualAction, null));
+        MachinePopupMenu.add(new MFMAction(ShowInfoAction, null));
+        MachinePopupMenu.add(new MFMAction(MACHINE_XMLAction, null));
+
+        MachinePopupMenu.add(separator3);
+        MachinePopupMenu.add(new MFMAction(ShowControlsDevicesAction, null));
+        MachinePopupMenu.add(new MFMAction(GOTOcloneofAction, null));
+        MachinePopupMenu.add(new MFMAction(OpenImageAction, null));
+    }
+
+    private void createSoftwarePopup() {
+        SoftwarePopupMenu = new JPopupMenu(null);
+        SoftwarePopupMenu.setBorder(new BevelBorder(BevelBorder.LOWERED,
+                new Color(74, 37, 19), new Color(117, 70, 53)));
+//==================================================================
+        JSeparator separator = new JSeparator();
+        separator.setPreferredSize(new Dimension(50, 2));
+        separator.setBorder(new BevelBorder(BevelBorder.RAISED));
+//==================================================================
+
+
+        SoftwarePopupMenu.add(new MFMAction(AddtoListAction, null));
+        SoftwarePopupMenu.add(new MFMAction(RemovefromListAction, null));
+        SoftwarePopupMenu.add(separator);
+        SoftwarePopupMenu.add(new MFMAction(ShowManualAction, null));
+        SoftwarePopupMenu.add(new MFMAction(SOFTWARE_XMLAction, null));
+        SoftwarePopupMenu.add(new MFMAction(GOTOcloneofAction, null));
+        SoftwarePopupMenu.add(new MFMAction(OpenImageAction, null));
     }
 
     private JMenu getVideoOps() {
         JMenu videoOps = new JMenu("VideoOps");
-        videoOps.add(new MFMAction(MFMAction.PlayGametoAVIAction, null));
-        videoOps.add(new MFMAction(MFMAction.PlaybacktoAVIAction, null));
-        videoOps.add(new MFMAction(MFMAction.EditVideoAction, null));
-        videoOps.add(new MFMAction(MFMAction.CropAVIAction, null));
+        videoOps.add(new MFMAction(PlayGametoAVIAction, null));
+        videoOps.add(new MFMAction(PlaybacktoAVIAction, null));
+        videoOps.add(new MFMAction(EditVideoAction, null));
+        videoOps.add(new MFMAction(CropAVIAction, null));
         return videoOps;
     }
 
