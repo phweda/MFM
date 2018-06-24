@@ -24,10 +24,11 @@ import Phweda.MFM.mame.Mame;
 import Phweda.MFM.mame.ParseAllMachinesInfo;
 import Phweda.MFM.mame.softwarelist.Software;
 import Phweda.MFM.mame.softwarelist.Softwarelist;
+import Phweda.MFM.mame.softwarelist.Softwarelists;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
-import javafx.collections.transformation.SortedList;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -63,27 +64,27 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     private static Controllers controllers;
     // Decided to just pre-populate these should really do a doublecheck
     private static String[] numButtons = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"};
-    private static TreeSet<Integer> numPlayers = new TreeSet<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6, 8));
+    private static TreeSet<Integer> numPlayers = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 8));
 
     // INIfiles containing: Catver, catlist, custom(GoldenAge), favorites, Genre, Mature, Multimonitor,version
-    private static HashMap<String, Map> INIfiles = new HashMap<String, Map>(); // Parsed from MAME INIfiles directory
+    private static HashMap<String, Map<String, String>> INIfiles = new HashMap<>(); // Parsed from MAME INIfiles directory
     private static TreeSet<String> runnableMachines;
 
     private static HashMap<String, ArrayList<String>> categoryListsMap;
 
-    // NOTE : We only load Playable games unless -all flag is passed in
-    // NOTE with addition of ALL MAME data 10/2016 we needed to revert to XML via JAXB
+    // NOTE with addition of ALL MAME data 10/2016 reverted to XML via JAXB
     private static transient Mame mame;  // From -listxml now all Machines 10/14/15
 
-    private static TreeMap<String, Software> softwareLists = null;
-
+    private static Softwarelists softwareLists = null;
+    private static boolean processAll = false; //hold the current state selected by user
     private static boolean parsing = false; // Added for first run Parsing with no Data Sets
 
     /**
      * Load persisted objects or if not available generate from MAME
      */
-    private MAMEInfo(boolean parse) {
+    private MAMEInfo(boolean parse, boolean all) {
         parsing = parse;
+        processAll = all;
         if (MFM.isDebug() && allCategories != null) {
             MFM.logger.addToList("Total categories is : " + allCategories.size());
         }
@@ -93,20 +94,30 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                 categoryListsMap = null; // Force reload of <MFM Root>/Category/CategoryListsMap.xml
             } else {
                 mame = loadMame();
+                softwareLists = loadSoftwareLists();
+                // Shouldn't happen but just in case
+                if (mame == null) {
+                    MFM.exit(9);
+                }
             }
-            if (mame == null || parse) {
+            if (parse) {
                 System.out.println("**** Parsing MAME ****");
                 // With 0.85 Parse MAME if one is set, or Quit
                 MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
-                generateAllMameData(isALL());
+                boolean success = generateAllMameData();
+                if (!success) {
+                    JOptionPane.showMessageDialog(null, "MAME Parsing failed check the error log"
+                            , "Parsing Failed!!", JOptionPane.ERROR_MESSAGE);
+                    return; // Try to recover to previous state
+                }
                 mame = loadMame();
+                softwareLists = loadSoftwareLists();
             }
 
             loadCaches();
             loadINIs();
             loadCategoriesMap();
             MFMListBuilder.initLists(parse);
-            softwareLists = loadSoftwareLists();
             MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, true);
         } catch (Exception exc) {
             if (MFM.isDebug()) {
@@ -132,22 +143,22 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         parsing = false;
     }
 
-    public static boolean isALL() {
-        return MFM.isProcessAll() | MFMSettings.getInstance().isPreMAME143exe();
-    }
-
-    public static MAMEInfo getInstance(boolean reset, boolean parse) {
+    public static MAMEInfo getInstance(boolean reset, boolean parse, boolean all) {
         if (MFM.isSystemDebug()) {
-            System.out.println("MAMEInfo getInstance " + reset + parse);
+            System.out.println("MAMEInfo getInstance " + reset + " : " + parse);
         }
         if (ourInstance == null || reset) {
-            ourInstance = new MAMEInfo(parse);
+            ourInstance = new MAMEInfo(parse, all);
         }
         return ourInstance;
     }
 
     public static boolean isParsing() {
         return parsing;
+    }
+
+    public static boolean isProcessAll() {
+        return processAll;
     }
 
     /**
@@ -159,8 +170,8 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return MFM_Data.getInstance().getMame();
     }
 
-    private static TreeMap<String, Software> loadSoftwareLists() {
-        return MFMPlayLists.getInstance().getSoftwareLists();
+    private static Softwarelists loadSoftwareLists() {
+        return MFM_Data.getInstance().getSoftwarelists();
     }
 
     /**
@@ -173,21 +184,27 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return ParseAllMachinesInfo.loadAllMachinesInfo(all);
     }
 
-    private void generateAllMameData(boolean all) {
+    private boolean generateAllMameData() {
         MFMSettings.getInstance();// Ensure it is loaded. ?? TODO needed?
 
         StringBuilder message = new StringBuilder("Parsing MAME: ");
         message.append(MFMSettings.getInstance().getMAMEVersion());
         message.append(" - All flag is ");
-        message.append(all);
+        message.append(isProcessAll());
 
         MFM.logger.addToList(message.toString(), true);
-        System.out.println(message.toString());
+        if (MFM.isSystemDebug()) {
+            System.out.println(message.toString());
+        }
 
         loadINIs();
         // NOTE order makes a difference!!
-        mame = generateMame(all);
+        mame = generateMame(isProcessAll());
+        if (mame == null) {
+            return false;
+        }
         getParsedData();
+        MFM_Data.getInstance().setSoftwarelists(softwareLists);
 
         if (mame != null) {
             // Persist it
@@ -197,7 +214,8 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             MFM_Data.getInstance().setStaticData(CATEGORYHIERARCHY, categoryHierarchy);
 
             if (controllers != null) {
-                MFM_Data.getInstance().setStaticData(CONTROLLERS, controllers.getControls());
+                // NOTE removing the Controls from being persisted.
+                //    MFM_Data.getInstance().setStaticData(CONTROLLERS, controllers.getControls());
                 MFM_Data.getInstance().setStaticData(CONTROLLERSMACHINES, controllers.getControlMachinesList());
             }
 
@@ -211,10 +229,10 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                             "Check your MAME setup and ensure it is running properly", true);
             System.exit(3);
         }
+        return true;
     }
 
     /**
-     * TODO further refactor needed this is messy
      * Extract parsed Runnable list, Categories info, Controllers
      */
     private static void getParsedData() {
@@ -225,25 +243,31 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         }
         categoryMachines = ParseAllMachinesInfo.getCategoryGamesList();
         controllers = ParseAllMachinesInfo.getControllers();
+        softwareLists = ParseAllMachinesInfo.getSoftwarelists();
     }
 
     /**
      * Get MAME Command list and descriptions
+     * <p>
+     * Retain this code for possible future use
+     * <p>
      * >mame64 -showusage
      */
     private static void loadCommands() {
+        //noinspection unchecked
         commands = (HashMap<String, HashMap<String, String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.COMMANDS);
 
         if (commands == null || commands.isEmpty()) {
-            commands = new HashMap<String, HashMap<String, String>>(75, 0.5f);
+            commands = new HashMap<>(75, 0.5f);
             // Get it
-            ArrayList<String> fullListargs = new ArrayList<String>();
+            ArrayList<String> fullListargs = new ArrayList<>();
             fullListargs.add("-showusage");
 
             // TODO in memory only File via Path from Files.createtempfile
             File showusageFile = new File(MFM.MFM_SETTINGS_DIR + "commands.txt");
             try {
                 // Added to overwrite if this text file previously existed
+                //noinspection ResultOfMethodCallIgnored
                 showusageFile.createNewFile();
                 Process process = MAMEexe.run(fullListargs, showusageFile);
                 process.waitFor();
@@ -263,6 +287,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            //noinspection ResultOfMethodCallIgnored
             showusageFile.delete();
         }
     }
@@ -279,6 +304,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                     System.out.println("\nMAME Resources load starting: " + new Date(millis));
                 }
                 // TODO why is this taking so long?
+                //noinspection ResultOfMethodCallIgnored
                 MAME_Resources.getInstance(); // load and initialize
                 if (MFM.isSystemDebug()) {
                     System.out.println("MAME Resources load took: " +
@@ -289,8 +315,9 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         loadMameResources.start();
     }
 
+    @SuppressWarnings("unchecked")
     private static void loadCaches() {
-        INIfiles = (HashMap<String, Map>) MFM_Data.getInstance().getUserInis();
+        INIfiles = (HashMap<String, Map<String, String>>) MFM_Data.getInstance().getUserInis();
         runnableMachines = (TreeSet<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
         allCategories = (ArrayList<String>) MFM_Data.getInstance().getStaticData(CATEGORIES);
         categoryMachines = (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().
@@ -301,10 +328,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                 (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().getStaticData(CATEGORY_LISTS_HASHMAP);
 
         controllers = Controllers.getInstance();
-        Controllers.setControls((TreeMap<Integer, Phweda.MFM.mame.Control>)
-                MFM_Data.getInstance().getStaticData(CONTROLLERS));
-
-        Controllers.setControlMachinesList((TreeMap<Integer, TreeSet<String>>)
+        controllers.setControlMachinesList((TreeMap<Integer, TreeSet<String>>)
                 MFM_Data.getInstance().getStaticData(CONTROLLERSMACHINES));
     }
 
@@ -312,9 +336,9 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return new TreeSet<String>(allCategories);
     }
 
+    @SuppressWarnings("unchecked")
     private static void loadCategoriesMap() {
-        if (categoryListsMap == null)
-        {
+        if (categoryListsMap == null) {
             MFM.logger.addToList("MAMEInfo reloading categoryListsMap", true);
             try {
                 categoryListsMap = (HashMap<String, ArrayList<String>>)
@@ -323,7 +347,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             } catch (FileNotFoundException e) {
                 MFM.logger.addToList("categoryListsMap FAILED to load from file", true);
                 e.printStackTrace();
-                return;
             }
         }
     }
@@ -336,8 +359,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
      * @deprecated since 0.85 with multiple Data sets
      */
     public static String getVersion() {
-        // Bug with this. Older Mame versions do not have the build Attribute
-        //    return MFMSettings.trimMAMEVersion(MFM_Data.getInstance().getMame().getBuild());
         return MFMSettings.getInstance().getDataVersion();
     }
 
@@ -347,7 +368,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     }
 
     public static Integer[] getNumPlayers() {
-        return numPlayers.toArray(new Integer[numPlayers.size()]);
+        return numPlayers.toArray(new Integer[0]);
     }
 
     // Future when we read live
@@ -419,15 +440,36 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return mame.getMachineMap().get(machineName);
     }
 
-    public static HashMap<String, Map> getINIfiles() {
-        return INIfiles;
+    public static Software getSoftware(String softwareName, String softwareListName) {
+        if (softwareLists.getSoftwarelistsMap().containsKey(softwareListName)) {
+            return getSoftware(softwareLists.getSoftwarelistsMap().get(softwareListName), softwareName);
+        }
+        return null;
     }
 
-    public static TreeMap<String, Software> getSoftwareLists() {
+    private static Software getSoftware(Softwarelist softwareList, String softwareName) {
+        List<Software> softwares = softwareList.getSoftware();
+        for (Software software : softwares) {
+            if (software.getName().equalsIgnoreCase(softwareName)) {
+                return software;
+            }
+        }
+        return null;
+    }
+
+    public static Softwarelists getSoftwareLists() {
         return softwareLists;
     }
 
-    public static HashMap<String, ArrayList<String>> getCategoryListsMap() {
+    public static boolean isSoftwareList(String listName) {
+        return softwareLists.getSoftwarelistsMap().containsKey(listName);
+    }
+
+    public static HashMap<String, Map<String, String>> getINIfiles() {
+        return INIfiles;
+    }
+
+    static HashMap<String, ArrayList<String>> getCategoryListsMap() {
         return categoryListsMap;
     }
 
@@ -436,14 +478,13 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         if (MFM.isDebug()) {
             MFM.logger.addToList("Categories count is : " + categories.size());
         }
-        categoryHierarchy = new TreeMap<String, ArrayList<String>>();
+        categoryHierarchy = new TreeMap<>();
         for (String entry : categories) {
             if (MFM.isDebug()) {
                 MFM.logger.addToList("Entry is : " + entry);
             }
             if (entry.contains("/")) {
                 String key = entry.substring(0, entry.indexOf('/') - 1);
-                int index = entry.indexOf("/") + 1;
                 // String subKey = entry.substring(index);
                 if (MFM.isDebug()) {
                     MFM.logger.addToList("Key : " + key + "\tSub category : " + entry);
@@ -479,7 +520,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             File folder = new File(folderDir);
             // Quit if it is not a directory
             if (folder.isDirectory()) {
-                files = new HashSet<File>(Arrays.asList(folder.listFiles(FileUtils.iniFilenameFilter)));
+                files = new HashSet<>(Arrays.asList(folder.listFiles(FileUtils.iniFilenameFilter)));
                 if (MFM.isSystemDebug()) {
                     System.out.println("Folders files are : " + files.toString());
                 }
@@ -495,7 +536,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
 
 
     public static void dumpManuDriverList() {
-        TreeMap<String, TreeSet<String>> driversToManufacturers = new TreeMap<String, TreeSet<String>>();
+        TreeMap<String, TreeSet<String>> driversToManufacturers = new TreeMap<>();
         Map<String, Machine> map = mame.getMachineMap();
 
         map.values().forEach(machine -> {
@@ -508,7 +549,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             if (driversToManufacturers.containsKey(driver)) {
                 driversToManufacturers.get(driver).add("\"" + manufacturer + "\"," + machine.getName());
             } else {
-                TreeSet<String> treeSet = new TreeSet<String>();
+                TreeSet<String> treeSet = new TreeSet<>();
                 treeSet.add(manufacturer + "," + machine.getName());
                 driversToManufacturers.put(driver, treeSet);
             }

@@ -18,19 +18,18 @@
 
 package Phweda.MFM.UI;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMListBuilder;
-import Phweda.MFM.MFMPlayLists;
-import Phweda.MFM.MFM_Constants;
+import Phweda.MFM.*;
 import Phweda.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import static Phweda.MFM.UI.MFMAction.HelpAction;
+import static Phweda.MFM.UI.MFMAction.ShowListAction;
 import static Phweda.MFM.UI.MFM_Components.getResources;
 
 /**
@@ -39,17 +38,17 @@ import static Phweda.MFM.UI.MFM_Components.getResources;
  * Date: 9/30/2016
  * Time: 10:55 AM
  */
-class MFM_Menubar {
-    private static MFM_Menubar ourInstance = new MFM_Menubar();
+class MFM_MenuBar {
+    private static MFM_MenuBar ourInstance = new MFM_MenuBar();
     // For recreating this menu when user's lists changes
     private JMenu myListMenu = null;
     private MFMAction mfmActionShowList = new MFMAction("Show List", null);
     private MFMAction mfmActionListBuilder = new MFMAction(MFMAction.ListBuilderAction, null);
 
-    private MFM_Menubar() {
+    private MFM_MenuBar() {
     }
 
-    public static MFM_Menubar getInstance() {
+    public static MFM_MenuBar getInstance() {
         return ourInstance;
     }
 
@@ -61,7 +60,7 @@ class MFM_Menubar {
         JMenuBar MenuBar = new JMenuBar();
         MenuBar.add(createMFMmenu());
         MenuBar.add(createLogsmenu());
-        // MenuBar.add(createCommandmenu()); // Legacy capability
+        // MenuBar.add(createCommandmenu()); // Legacy capability nOTE retain for possible future reinstatement
         MenuBar.add(createVideomenu());
         MenuBar.add(createDATmenu());
         MenuBar.add(createResourcesmenu());
@@ -112,7 +111,7 @@ class MFM_Menubar {
             item = logsMenu.add(MFMPostToPastie);
             item.setMnemonic(KeyEvent.VK_P);
 
-            item = logsMenu.add(MAMEControlsDUMP);
+            logsMenu.add(MAMEControlsDUMP);
         }
 
         logsMenu.add(new JSeparator());
@@ -131,8 +130,7 @@ class MFM_Menubar {
         MFMAction MAMECommandBuilder = new MFMAction(MFMAction.MAMECommandBuilderAction,
                 MFM_Components.getResources().getImageIcon(MFMUI_Resources.MAME_LOGO_SMALL));
 
-        JMenuItem item;
-        item = commandMenu.add(MAMECommandBuilder);
+        commandMenu.add(MAMECommandBuilder);
         commandMenu.add(new JSeparator());
         commandMenu.setMargin(new Insets(0, 20, 0, 0));
 
@@ -153,17 +151,37 @@ class MFM_Menubar {
 
         MFMAction openDataSet = new MFMAction(MFMAction.LoadDataSetAction, null);
         MFMAction parseMAME = new MFMAction(MFMAction.ParseMAMEAction, null);
+        MFMAction parseMAMEAll = new MFMAction(MFMAction.ParseMAME_AllAction, null);
 
         MFMAction exit = new MFMAction("Exit",
                 getResources().getImageIcon(MFMUI_Resources.EX_PNG));
 
+        // This makes the JMenu widen fixme
+        JCheckBoxMenuItem jcbmi = new JCheckBoxMenuItem("Show XML");
+        jcbmi.setAction(new MFMAction(MFMAction.MAME_XMLAction, null));
+        jcbmi.setSelected(MFMSettings.getInstance().isShowXML());
+        jcbmi.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                MFMUI_Setup.getInstance().refreshLeftPane();
+                MFMSettings.getInstance().setShowXML(((AbstractButton)e.getItemSelectable()).isSelected());
+            }
+        });
+
+        jcbmi.setHorizontalTextPosition(JButton.CENTER);
+        jcbmi.setIconTextGap(8);
+        jcbmi.setMargin(new Insets(0,0,0,0));
+
         JMenuItem item;
-        item = MFMMenu.add(openFile);
+        MFMMenu.add(openFile);
         item = MFMMenu.add(settings);
         item.setMnemonic(KeyEvent.VK_S);
         MFMMenu.add(new JSeparator());
-        item = MFMMenu.add(openDataSet);
-        item = MFMMenu.add(parseMAME);
+        MFMMenu.add(openDataSet);
+        MFMMenu.add(jcbmi);
+        MFMMenu.add(new JSeparator());
+        MFMMenu.add(parseMAME);
+        MFMMenu.add(parseMAMEAll);
         MFMMenu.add(new JSeparator());
         item = MFMMenu.add(exit);
         item.setMnemonic(KeyEvent.VK_E);
@@ -184,8 +202,7 @@ class MFM_Menubar {
         MFMAction ListtoFile = new MFMAction(MFMAction.SaveListtoFileAction, null);
         MFMAction ListDatatoFile = new MFMAction(MFMAction.SaveListDataAction, null);
 
-        JMenuItem item;
-        item = listMenu.add(createListbuildermenu());
+        listMenu.add(createListbuildermenu());
         listMenu.add(ListEditor);
         listMenu.add(new JSeparator());
         listMenu.add(createMyListmenu());
@@ -234,8 +251,7 @@ class MFM_Menubar {
         MFMAction AVIImagesList = new MFMAction(MFMAction.AVIImagesAction, null);
         AVIImagesList.setEnabled(false);
 
-        JMenuItem item;
-        item = videoMenu.add(VDub);
+        videoMenu.add(VDub);
         videoMenu.add(FFmpeg);
         videoMenu.add(new JSeparator());
         videoMenu.add(GIFImagesList);
@@ -252,15 +268,17 @@ class MFM_Menubar {
 
         MFMAction ListtoDAT = new MFMAction(MFMAction.ListtoDATAction, null);
         MFMAction DATtoList = new MFMAction(MFMAction.DATtoListAction, null);
+        MFMAction ValidateDAT = new MFMAction(MFMAction.ValidateDATAction, null);
         MFMAction FilterDATbyList = new MFMAction(MFMAction.FilterDATbyListAction, null);
         MFMAction FilterDATbyExternalList = new MFMAction(MFMAction.FilterDATbyExternalListAction, null);
 
-        JMenuItem item;
-        item = dataMenu.add(ListtoDAT);
-        item = dataMenu.add(DATtoList);
+        dataMenu.add(ListtoDAT);
+        dataMenu.add(DATtoList);
         dataMenu.add(new JSeparator());
-        item = dataMenu.add(FilterDATbyList);
-        item = dataMenu.add(FilterDATbyExternalList);
+        dataMenu.add(ValidateDAT);
+        dataMenu.add(new JSeparator());
+        dataMenu.add(FilterDATbyList);
+        dataMenu.add(FilterDATbyExternalList);
         dataMenu.setMargin(new Insets(0, 20, 0, 0));
 
         return dataMenu;
@@ -296,10 +314,19 @@ class MFM_Menubar {
         JMenuItem item;
         TreeMap<String, TreeSet> builtinPL = MFMPlayLists.getInstance().getMFMplaylistsTree();
 
+        JMenu softwareLists = new JMenu("Software Lists");
+        MenuScroller.setScrollerFor(softwareLists, 20, 50, 3, 3);
+        for (String name : MAMEInfo.getSoftwareLists().getSoftwarelistsMap().keySet()) {
+            item = softwareLists.add(mfmActionShowList);
+            item.setActionCommand(ShowListAction);
+            item.setText(name);
+        }
+        mfmList.add(softwareLists);
+
         JMenu languageList = new JMenu("Language Lists");
         for (String name : MFMListBuilder.getLanguagesListsMap().keySet()) {
             item = languageList.add(mfmActionShowList);
-            item.setActionCommand("Show List");
+            item.setActionCommand(ShowListAction);
             item.setText(name);
         }
         mfmList.add(languageList);
@@ -307,7 +334,7 @@ class MFM_Menubar {
 
         for (String name : builtinPL.keySet()) {
             item = mfmList.add(mfmActionShowList);
-            item.setActionCommand("Show List");
+            item.setActionCommand(ShowListAction);
             item.setText(name);
         }
         return mfmList;
@@ -328,8 +355,7 @@ class MFM_Menubar {
                 getResources().getImageIcon(MFMUI_Resources.Minus_PNG));
 
         JMenuItem item;
-        item = FontMenu.add(VeryLarge);
-//        item.setMnemonic(KeyEvent.VK_I);
+        FontMenu.add(VeryLarge);
         item = FontMenu.add(Large);
         item.setMnemonic(KeyEvent.VK_D);
         item = FontMenu.add(Normal);
@@ -371,23 +397,23 @@ class MFM_Menubar {
     }
 
     private JMenu createHelpmenu() {
-        JMenu helpMenu = new JMenu("Help");
-        MFMAction ma = new MFMAction("Help", null);
+        JMenu helpMenu = new JMenu(HelpAction);
+        MFMAction ma = new MFMAction(HelpAction, null);
         JMenuItem item;
         item = helpMenu.add(ma);
         item.setMnemonic('h');
 
         item.setText("MFM User Guide");
-        item.setActionCommand("Help");
+        item.setActionCommand(HelpAction);
         item = helpMenu.add(ma);
         item.setText("About");
-        item.setActionCommand("Help");
+        item.setActionCommand(HelpAction);
         item = helpMenu.add(ma);
         item.setText("MFM Copyright");
-        item.setActionCommand("Help");
+        item.setActionCommand(HelpAction);
         item = helpMenu.add(ma);
         item.setText("GNU GPL");
-        item.setActionCommand("Help");
+        item.setActionCommand(HelpAction);
 
         helpMenu.setMargin(new Insets(0, 20, 0, 0));
 
