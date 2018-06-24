@@ -192,8 +192,8 @@ final class MFM_SettingsPanel extends JPanel {
                     }
 
                     if (!mameexe.isEmpty() && mameexe.length() > 5 && mameexe.contains(FileUtils.DIRECTORY_SEPARATOR)) {
-                        mfmSettings.MAMEexeName(MAMEExePath.getText().substring(
-                                MAMEExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
+                        mfmSettings.MAMEexeName(mameexe.substring(
+                                mameexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
                         mfmSettings.MAMEexeDir(MAMEExePath.getText().substring(0,
                                 MAMEExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
 
