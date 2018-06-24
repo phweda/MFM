@@ -18,6 +18,7 @@
 
 package Phweda.MFM.mame;
 
+import Phweda.MFM.MFM;
 import Phweda.MFM.mame.softwarelist.Softwarelist;
 import Phweda.MFM.mame.softwarelist.Softwarelists;
 import Phweda.utils.PersistUtils;
@@ -34,7 +35,7 @@ import java.util.TreeSet;
  * Date: 10/26/2017
  * Time: 5:26 PM
  */
-public class ParseSoftwareLists {
+class ParseSoftwareLists {
 
     /**
      * Import all Software Lists and populate into Softwarelists
@@ -42,9 +43,13 @@ public class ParseSoftwareLists {
      * @param softwarelists
      * @param directory
      */
-    public static void generateSoftwareLists(Softwarelists softwarelists, String directory) {
+    static void generateSoftwareLists(Softwarelists softwarelists, String directory) {
         TreeSet<Softwarelist> set = new TreeSet<>();
-
+        // Older versions have no software lists
+        if(!Files.exists(Paths.get(directory))){
+            MFM.logger.addToList("No MAME Hash directory found. Softwarelists not parsed.", true);
+            return;
+        }
         try {
             Files.list(Paths.get(directory))
                     .forEach((Path file) -> {
