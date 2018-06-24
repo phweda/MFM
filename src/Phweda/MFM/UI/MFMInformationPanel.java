@@ -38,7 +38,6 @@ public class MFMInformationPanel extends JPanel {
 
     MFMInformationPanel() {
         super();
-        //    progressBar.setPreferredSize(new Dimension(400, 75));
         progressPanel.add(progressBar);
         CardLayout cl = new CardLayout();
         cl.addLayoutComponent(message, MESSAGE);
@@ -59,7 +58,6 @@ public class MFMInformationPanel extends JPanel {
         runProgress();
     }
 
-
     public void showProgress(String message, int fontSize) {
         progressBar.setFont(new Font("Arial", Font.BOLD, fontSize));
         showProgress(message);
@@ -75,50 +73,10 @@ public class MFMInformationPanel extends JPanel {
         ((CardLayout) this.getLayout()).first(this);
     }
 
-
     private void runProgress() {
         // JOptionPane.showMessageDialog(null, "We are in runProgress()");
         progressBar.setIndeterminate(true);
         progressBar.setStringPainted(true);
     }
 
-
-/*
-    void runProgress() {
-
-        final int x, y;
-        final int radius = 12;
-        x = progressPanel.getLocation().x + radius;
-        y = progressPanel.getLocation().y + radius;
-
-        final Graphics2D g = (Graphics2D) progressPanel.getGraphics();
-        if (g == null) {
-            System.out.println("g == null");
-            return;
-        }
-
-        final Color bgC = progressPanel.getBackground();
-        final Color clear = new Color(bgC.getRed(), bgC.getGreen(), bgC.getBlue(), 75);
-            g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-
-            int delay = 500; //milliseconds
-            ActionListener taskPerformer = new ActionListener()
-            {
-                double i = -Math.PI / 2;
-                public void actionPerformed(ActionEvent evt) {
-                    int x1, y1;
-                    //    System.out.println(radius * Math.cos(i) + "  ->  " + radius * Math.sin(i));
-                    g.setColor(clear);
-                    g.fillRect(0, 0, 110, 110);
-                    g.setColor(Color.red);
-                    x1 = (int) (x + (radius * Math.cos(i)));
-                    y1 = (int) (y + (radius * Math.sin(i)));
-                    g.drawLine(x, y, x1, y1);
-                    i += .8;
-                }
-            };
-            timer =  new Timer(delay, taskPerformer);
-            timer.start();
-    }
-*/
 }
