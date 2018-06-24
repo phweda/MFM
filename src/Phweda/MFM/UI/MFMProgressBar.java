@@ -32,14 +32,13 @@ import static java.lang.Thread.sleep;
 public class MFMProgressBar extends JProgressBar implements Runnable {
     MFMProgressBar() {
         super(0, 100);
-        //    this.setString(title);
-        this.setBackground(Color.black);
+        this.setBackground(Color.white);
         this.setForeground(Color.green);
         this.setPreferredSize(new Dimension(600, 30));
         this.setIndeterminate(true);
     }
 
-    void increment(int newValue) {
+    private void increment(int newValue) {
         this.setIndeterminate(false);
         this.setValue(newValue);
         repaint();
@@ -47,7 +46,7 @@ public class MFMProgressBar extends JProgressBar implements Runnable {
 
     @Override
     public void run() {
-
+        // Progress bar is stopped by deletion
         while (true) {
             increment(this.getValue() + 5);
             try {
