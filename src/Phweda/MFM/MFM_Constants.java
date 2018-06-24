@@ -74,6 +74,7 @@ public final class MFM_Constants {
     public static final String PNG_EXT = ".png";
     public static final String FLV_EXT = ".flv";
     public static final String MANUALS = "manuals";
+    public static final String MANUALS_SL = "manuals_SL";
     public static final String VERYLARGE = "Very Large";
     public static final String LARGE = "Large";
     public static final String NORMAL = "Normal";
@@ -121,14 +122,16 @@ public final class MFM_Constants {
     static final String LOGS = "Logs";
     static final String COMMANDS = "Commands";
     static final String ARTWORK = "artwork";
-    public static final String SOFTWARE_LISTS = "Software Lists";
-    private static final ArrayList<String> folderNames = new ArrayList<String>(Arrays.asList(new String[]{
-            "artwork", "artwork preview", "bkground", "bosses",
-            "cabdevs", "cabinets", "chds", "covers_SL", "cpanel", "ctrlr", "devices", "ends",
-            "flyers", "folders", "gameover", "howto",
+    static final String SOFTWARE_LISTS = "Software Lists";
+    public static final String SOFTWARE_LIST_SEPARATER = "\u00A8";
+    static final String SHOW_XML = "Show XML";
+
+    private static final ArrayList<String> folderNames = new ArrayList<String>(Arrays.asList(
+            "artwork", "artwork preview", "bkground", "bosses", "cabdevs", "cabinets", "chds",
+            "covers_SL", "cpanel", "ctrlr", "devices", "ends", "flyers", "folders", "gameover", "howto",
             "icons", "ini", "logo", "manuals", "manuals_SL", "marquees",
             "pcb", "roms", "samples", "scores", "select", "snap", "snap_SL", "snaps",
-            "Software Lists", "titles", "titles_SL", "versus", "video", "videosnaps"}));
+            "Software Lists", "titles", "titles_SL", "versus", "video", "videosnaps"));
     // TODO now this is dynamic should move WHERE?
     public static String[] MAME_FOLDER_NAMES_ARRAY;
     public static String[] yearsList;
@@ -143,7 +146,7 @@ public final class MFM_Constants {
                 e.printStackTrace();
             }
         } else {
-            MAME_FOLDER_NAMES_ARRAY = folderNames.toArray(new String[folderNames.size()]);
+            MAME_FOLDER_NAMES_ARRAY = folderNames.toArray(new String[0]);
         }
 
         int offset = 4;

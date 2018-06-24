@@ -22,6 +22,7 @@ import Phweda.MFM.mame.DeviceRef;
 import Phweda.MFM.mame.Disk;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Softwarelist;
+import Phweda.MFM.mame.softwarelist.Software;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
 import Phweda.utils.ZipUtils;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,6 +51,8 @@ public class MAME_Resources {
     private static final String EXTRASRESOURCECACHE = "EXTRAS_RESOURCE_CACHE";
     private static final String ZIPEXTRASRESOURCECACHE = "ZIP_EXTRAS_RESOURCE_CACHE";
     private static final Map<String, Machine> machines = MAMEInfo.getMame().getMachineMap();
+    private static final TreeMap<String, Phweda.MFM.mame.softwarelist.Softwarelist> softwarelistsMap =
+            MAMEInfo.getSoftwareLists().getSoftwarelistsMap();
     private static final FileUtils.MFMcacheResourceFiles cacheResourceFiles = new FileUtils.MFMcacheResourceFiles();
     private static MAME_Resources ourInstance = new MAME_Resources();
     private static TreeMap<String, Object> persistCaches;
@@ -141,23 +145,39 @@ public class MAME_Resources {
         return files;
     }
 
-    private static void getMachineResources(String machineName, TreeMap<String, Object> resources) {
-
-        Machine machine = machines.get(machineName);
+    private static void getMachineResources(String itemName, TreeMap<String, Object> resources) {
+        Machine machine = machines.get(itemName);
+        Software software = null;
         if (machine == null) {
-            // Should not get here!!
-            MFM.logger.addToList("MAME_Resources.getMachineResources FAILED to find machine: " + machineName, true);
-            return;
+            if (itemName.contains(MFM_Constants.SOFTWARE_LIST_SEPARATER)) {
+                String[] split = itemName.split(MFM_Constants.SOFTWARE_LIST_SEPARATER);
+                String listName = split[0];
+                String nameMatch = itemName = split[1];
+                software = softwarelistsMap.get(listName).getSoftware()
+                        .stream()
+                        .filter(software1 -> software1.getName().equalsIgnoreCase(nameMatch))
+                        .collect(Collectors.reducing((a, b) -> null))
+                        .get();
+
+                if (software == null) {
+                    // Should not get here!!
+                    MFM.logger.addToList("MAME_Resources.getMachineResources FAILED to find machine: " + itemName, true);
+                    return;
+                }
+                getSoftwareResources(listName, software, resources);
+                return;
+            }
+
         }
 
         try {
-            // Should be 1 and only 1 ROM .7z file // or zip now with 182 PD sets
-            File romFile = getMachineROMFile(machineName);
+            // Should be 1 and only 1 ROM zip now with 182 PD sets
+            File romFile = getMachineROMFile(itemName);
             if (romFile != null) {
                 ((TreeSet<File>) resources.get(MFM_Constants.ROMS)).add(romFile);
             } else {
                 listResourceLog.append("FAILED to find ROM for Machine ");
-                listResourceLog.append(machineName);
+                listResourceLog.append(itemName);
                 listResourceLog.append(FileUtils.NEWLINE);
             }
 
@@ -178,9 +198,14 @@ public class MAME_Resources {
             getExtrasFiles(machine, resources);
         } catch (Exception e) {
             e.printStackTrace();
-            MFM.logger.addToList("MAME_Resources.getMachineResources EXCEPTION processing Machine " + machineName);
+            MFM.logger.addToList("MAME_Resources.getMachineResources EXCEPTION processing Machine " + itemName);
         }
     }
+
+    private static void getSoftwareResources(String listName, Software software, TreeMap<String, Object> resources) {
+        // TODO
+    }
+
 
     private static File getMachineROMFile(String machineName) {
         TreeMap<String, File> romFiles = roms_chdsCache.get(MFM_Constants.ROMS_FULL_SET_DIRECTORY);
