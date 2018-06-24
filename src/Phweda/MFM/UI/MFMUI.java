@@ -90,6 +90,7 @@ public class MFMUI {
 
                     busyDialog.add(busyLabel);
                     busyLabel.setBusy(true);
+                    busyDialog.setIconImage(MFMUI_Setup.getMFMIcon().getImage());
                     busyDialog.pack();
                     busyDialog.setVisible(true);
                 }
