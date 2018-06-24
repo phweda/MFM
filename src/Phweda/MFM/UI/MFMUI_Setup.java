@@ -170,14 +170,18 @@ public class MFMUI_Setup {
     private static void setLeftPane() {
         if (MFM_Components.getMFMFolderTreeScrollPane() != null) {
             leftPane = MFM_Components.getMFMFolderTreeScrollPane();
-        } else {
+        } else if (MFMSettings.getInstance().isShowXML()) {
             leftPane = new JScrollPane(MAMEtoJTree.getInstance(false).getMAMEjTree());
+        } else {
+            MFMmainPane.setDividerLocation(0); // Minimize Pane instead of revalidating whole UI
         }
         MFMmainPane.setLeftComponent(leftPane);
     }
 
     void refreshLeftPane() {
-        leftPane.removeAll();
+        if (leftPane != null) {
+            leftPane.removeAll();
+        }
         setLeftPane();
         MFMmainPane.validate();
     }
