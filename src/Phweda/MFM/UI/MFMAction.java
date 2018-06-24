@@ -38,6 +38,7 @@ public class MFMAction extends AbstractAction {
     static final String LogAction = "Log";
     static final String GCLogAction = "GC Log";
     static final String CleanLogsAction = "Clean Logs";
+    static final String RecordMachineAction = "Record Machine";
     static final String PlaybacktoAVIAction = "Playback to AVI";
     static final String PlayGametoAVIAction = "Play & Record to AVI";
     static final String PlaybackGameAction = "Playback getMachine";
@@ -48,7 +49,9 @@ public class MFMAction extends AbstractAction {
     static final String GIFImagesAction = "Extract GIF Images";
     static final String AVIImagesAction = "Extract AVI Images";
     static final String AddtoListAction = "Add to List";
+    static final String ShowListAction = "Show List";
     static final String RemovefromListAction = "Remove from List";
+    static final String HelpAction = "Help";
     static final String GOTOcloneofAction = "GOTO cloneof";
     static final String EditVideoAction = "Edit Video";
     static final String MAMECommandBuilderAction = "MAME Command Builder";
@@ -72,11 +75,20 @@ public class MFMAction extends AbstractAction {
     static final String ValidateDATAction = "Validate DAT";
     static final String FilterDATbyListAction = "Filter DAT by List";
     static final String FilterDATbyExternalListAction = "Filter DAT by External List";
-    static final String MAME_TREEAction = "Show MAME tree";
-    static final String MACHINE_TREEAction = "Show Machine tree";
+    static final String MAME_XMLAction = "Show MAME XML";
+    static final String MACHINE_XMLAction = "Show Machine XML";
+    static final String SOFTWARE_XMLAction = "Show Software XML";
+
+    static final String ShowInfoAction = "Show Info";
+    static final String ShowManualAction = "Show Manual";
+    static final String ShowHistoryAction = "Show History";
+    static final String OpenImageAction = "Open Image";
     static final String OpenFileAction = "Open File";
+
+    //    static final String OpenFileAction = "Open File";
     public static final String LoadDataSetAction = "Load Data Set";
-    static final String ParseMAMEAction = "Parse MAME";
+    static final String ParseMAME_AllAction = "Parse MAME All";
+    static final String ParseMAMEAction = "Parse MAME Runnable";
 
     private static MFMController controller = MFMUI_Setup.getInstance().getController();
     private final String ExitAction = "Exit";
@@ -92,7 +104,7 @@ public class MFMAction extends AbstractAction {
             if (MFM.isDebug()) {
                 MFM.logger.addToList("MFMAction action command is: " + e.getActionCommand());
             }
-            // First run condition
+            // First run condition fixme ?? no longer needed?
             if (controller == null) {
                 return;
             }
@@ -102,22 +114,22 @@ public class MFMAction extends AbstractAction {
                     MFMFileOps.fileOps(((JMenuItem) e.getSource()).getText());
                     break;
 
-                case "Help":
+                case HelpAction:
                     controller.showHelp(((JMenuItem) e.getSource()).getText());
                     break;
 
-                case "Show List":
+                case ShowListAction:
                     // Get the Play List name from JMenuItem text
                     controller.changeList(((JMenuItem) e.getSource()).getText());
                     break;
 
                 case "Run Machine":
-                    if (MFMController.getMachineListTable().hasFocus()) {
+                    if (MFMController.getListTable().hasFocus()) {
                         controller.runGame("");
                     }
                     break;
 
-                case "Record Machine":
+                case RecordMachineAction:
                     controller.runGame(MAMECommands.RECORD);
                     break;
 
@@ -190,15 +202,15 @@ public class MFMAction extends AbstractAction {
                     MFMSettings.getInstance().MFMFontSize(MFM_Constants.NORMAL);
                     break;
 
-                case "Show History":
+                case ShowHistoryAction:
                     controller.showHistory();
                     break;
 
-                case "Show Manual":
+                case ShowManualAction:
                     controller.showManual();
                     break;
 
-                case "Show Info":
+                case ShowInfoAction:
                     controller.showInfo();
                     break;
 
@@ -206,7 +218,7 @@ public class MFMAction extends AbstractAction {
                     controller.showControlsDevices();
                     break;
 
-                case "Open Image":
+                case OpenImageAction:
                     controller.openImage();
                     break;
 
@@ -227,6 +239,10 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case ParseMAMEAction:
+                    controller.parseMAME(false);
+                    break;
+
+                case ParseMAME_AllAction:
                     controller.parseMAME(true);
                     break;
 
@@ -240,7 +256,6 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case CopyResourcesAction:
-                    // controller.populateList();
                     controller.copyResources(true);
                     break;
 
@@ -312,12 +327,16 @@ public class MFMAction extends AbstractAction {
 
                     break;
 
-                case MAME_TREEAction:
+                case MAME_XMLAction:
                     controller.showMAMEtree();
                     break;
 
-                case MACHINE_TREEAction:
-                    controller.showMachinetree();
+                case MACHINE_XMLAction:
+                    controller.showItemXML();
+                    break;
+
+                case SOFTWARE_XMLAction:
+                    controller.showItemXML();
                     break;
 
                 case LogAction:
