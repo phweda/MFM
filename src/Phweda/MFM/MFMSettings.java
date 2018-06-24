@@ -167,6 +167,10 @@ public class MFMSettings {
 
     public void MAMEexeName(String MAMEexeName) {
         exeChanged = true;
+        // How in the hell did I get null mfmsettings here? Original obj GCed? But Settings Panel has a ref??
+        if(mfmSettings == null){
+            mfmSettings =  new HashMap<>(15);
+        }
         mfmSettings.put(MFM_Constants.MAME_EXE_NAME, MAMEexeName);
     }
 
@@ -502,6 +506,7 @@ public class MFMSettings {
             MFM.logger.separateLine();
             MFM.logger.addToList("NO SETTINGS FOUND", true);
             MFM.logger.separateLine();
+            return;
         }
 
         // Need a better check than this - TODO test this thing is it correct just look for settings?
