@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2017.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import Phweda.utils.FileUtils;
 import Phweda.utils.MemoryMonitor;
 import Phweda.utils.SwingUtils;
 
+import javax.swing.*;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -54,9 +55,9 @@ public class MFM {
     public static String MFM_CATEGORY_DIR;
     public static final String MFM_User_Guide = "MAME File Manager User Guide.pdf";
     // Update these with each release
-    public static final String VERSION = "Version 0.9.1";
-    public static final String BUILD = "BUILD 0.9.101";
-    public static final String RELEASE_DATE = "Released : Oct 2017";
+    public static final String VERSION = "Version 0.9.5";
+    public static final String BUILD = "BUILD 0.9.500";
+    public static final String RELEASE_DATE = "Released : June 2018";
     public static final String LOCAL_COUNTRY = Locale.getDefault().getCountry();
     public static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION;
 
@@ -67,11 +68,12 @@ public class MFM {
     static final String MAME_CONTROLLERS = "MAME_Controllers.ini";
     static final String MAME_FOLDER_NAMES_FILE = "MAME_folders.ini";
     private static final String OS_version = System.getProperty("os.name");
-    private static final String m = "-m"; // Memory Monitor
-    private static final String doDebug = "-d"; // Debug
-    private static final String list = "-list"; // UI flag for List only view
-    private static final String allMachines = "-all"; // Parse and cache all Machines -- include not Playable
-    private static final String system = "-s"; // System Out Debug
+    private static final String M = "-m"; // Memory Monitor
+    private static final String DO_DEBUG = "-d"; // Debug
+    private static final String LIST = "-list"; // UI flag for List only view
+    private static final String PARSE = "-p"; // Bootstrap parsing
+    private static final String SYSTEM = "-s"; // System Out Debug
+
     public static String TEMP_DIR = System.getProperty("java.io.tmpdir");
     public static Debug logger;
     public static File Log;
@@ -83,11 +85,10 @@ public class MFM {
 
     // Flag for UI type
     private static boolean listOnly = false;
-    // Flag to process ALL machines as opposed to just Playable
-    private static boolean processAll = false;
     private static boolean debug = false;
     private static boolean firstRun = false;
     private static boolean systemoutDebug = false;
+    private static boolean parse = false;
 
     static {
         File dir = new File(".");
@@ -131,8 +132,8 @@ public class MFM {
 
     private static void loadSettingsAndInfo() {
         try {
-            // MFMSettings initiates MFM_Data and Data Set scan if needed
             MS = MFMSettings.getInstance();
+            // TODO should this be moved into MFMSettings?
             if (!MS.isLoaded()) {
                 setFirstRun(true); // Note needed to trigger .ini scan initiated in MFM_SettingsPanel
                 // first run must acquire base settings before continuing
@@ -146,10 +147,11 @@ public class MFM {
                     e.printStackTrace();
                 }
             }
+
             // Load Data Set
             MFMUI_Setup.getInstance().loadDataSet();
             // Wait for Data Set load
-            while (!MFM_Data.getInstance().isLoaded()) {
+            while (MFM_Data.getInstance().notLoaded()) {
                 try {
                     Thread.sleep(25);
                 } catch (InterruptedException e) {
@@ -161,24 +163,24 @@ public class MFM {
         }
     }
 
-    private static void loadSwitches(List switches) {
+    private static void loadSwitches(List<String> switches) {
         /*
           Command line switches
         */
         logger.out("MFM starting");
         logger.out("MFM switches are: " + switches);
 
-        if (switches.contains(doDebug)) {
+        if (switches.contains(DO_DEBUG)) {
             logger.out("Running in debug mode.");
             debug = true;
         }
 
-        if (switches.contains(list)) {
+        if (switches.contains(LIST)) {
             logger.out("Running List Only view.");
             listOnly = true;
         }
 
-        if (switches.contains(m)) {
+        if (switches.contains(M)) {
             logger.out("Running with Memory Monitor.");
             // 10 minutes in milliseconds
             MemoryMonitor mm = new MemoryMonitor(600000, logger.getOutputStream());
@@ -186,15 +188,17 @@ public class MFM {
             mmThread.start();
         }
 
-        if (switches.contains(allMachines)) {
-            logger.out("Running with -all machines set. Only applies if you parse your own MAME");
-            processAll = true;
+        // Undocumented bootstrap parse
+        if (switches.contains(PARSE)) {
+            logger.out("Running bootstrap parsing");
+            parse = true;
         }
 
-        if (switches.contains(system)) {
+        if (switches.contains(SYSTEM)) {
             logger.out("Running in system out debug mode.");
             systemoutDebug = true;
         }
+
     }
 
     private static void logEnvironment() {
@@ -211,6 +215,8 @@ public class MFM {
             for (String envName : env.keySet()) {
                 if (envName.contains("PROCESSOR")) {
                     logger.out(envName + " : " + env.get(envName));
+                } else if (isSystemDebug()) {
+                    // logger.out(envName + " : " + env.get(envName)); // NOTE Comment out to protect users' configs
                 }
             }
         }
@@ -317,12 +323,12 @@ public class MFM {
         return debug;
     }
 
-    public static boolean isProcessAll() {
-        return processAll;
-    }
-
     public static boolean isSystemDebug() {
         return systemoutDebug;
+    }
+
+    public static boolean isParse() {
+        return parse;
     }
 
     public static boolean isFirstRun() {
@@ -339,6 +345,20 @@ public class MFM {
         }
     }
 
+    /**
+     * Message                             Explanation
+     * Process finished with exit code 2  User chose to not parse MAME and has no Data Sets(MFMController.java)
+     * Process finished with exit code 3  Total failure to load MAME info after Parsing attempt. Check MAME runs. (MAMEInfo.java)
+     * Process finished with exit code 4  User canceled MFM Settings – cannot run without them(MFM_SettingsPanel.java)
+     * Process finished with exit code 5  Data integrity issue. MFM_cache.ser missing or corrupt.(MFMListBuilder.java)
+     * Process finished with exit code 6  Data integrity issue. Data Set MFM is set to load is not found.
+     * Did you delete or alter a Data Set file?(MFM_Data.java)
+     * Process finished with exit code 7  MFM failed to detect its running directory (MFM.java)
+     * Process finished with exit code 8  MFM failed to find/create its required directories (MFM.java)
+     * Process finished with exit code 9  MFM failed to load data set or parse MAME (MFMInfo.java)
+     * Process finished with exit code 10 MFM failed to find a data set(MFMController.java)
+     * Process finished with exit code 11 MFM settings file corrupted?? MFM_Data.java)
+     */
     public static void exit(int status) {
         MFM_Data.getInstance().persistSettings(); // Capture and persist any user driven settings: UI & Current List
         // Wait for final exit if a Data Set is writing to disk
@@ -347,23 +367,12 @@ public class MFM {
         if (status != 0) {
             System.err.println("Process finished with exit code " + status);
             logger.addToList("Process finished with exit code " + status, true);
+            JOptionPane.showMessageDialog(null, "Fatal error #" + status, "MFM Closing",
+                    JOptionPane.ERROR_MESSAGE);
         }
         System.exit(status);
     }
 
-    /**
-     *      Message                             Explanation
-     *   Process finished with exit code 2  User chose to not parse MAME and has no Data Sets(MFMController.java)
-     *   Process finished with exit code 3  Total failure to load MAME info after Parsing attempt. Check MAME runs. (MAMEInfo.java)
-     *   Process finished with exit code 4  User canceled MFM Settings – cannot run without them(MFM_SettingsPanel.java)
-     *   Process finished with exit code 5  Data integrity issue. MFM_cache.ser missing or corrupt.(MFMListBuilder.java)
-     *   Process finished with exit code 6  Data integrity issue. Data Set MFM is set to load is not found.
-                                            Did you delete or alter a Data Set file?(MFM_Data.java)
-     *   Process finished with exit code 7  MFM failed to detect its running directory (MFM.java)
-     *   Process finished with exit code 8  MFM failed to find/create its required directories (MFM.java)
-     *   Process finished with exit code 9  MFM failed to load data set or parse MAME (MFMInfo.java)
-     *   Process finished with exit code 10 MFM failed to find a data set
-     */
     public static void exit() {
         exit(0);
     }
