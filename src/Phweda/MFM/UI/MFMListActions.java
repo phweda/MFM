@@ -215,6 +215,8 @@ class MFMListActions {
             JOptionPane.showMessageDialog(mainFrame, "DAT file is invalid. Check the MFM error file for details.",
                     "Invalid DAT File", JOptionPane.ERROR_MESSAGE);
             return false;
+        } else {
+            JOptionPane.showMessageDialog(mainFrame, inputFile.getName() + " is a valid DAT file.");
         }
         return true;
     }
