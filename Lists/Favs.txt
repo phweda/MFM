@@ -2,6 +2,7 @@
 arkanoid
 asteroid
 btime
+canyon
 centiped
 defender
 depthch
@@ -13,6 +14,7 @@ invaders
 klax
 llander
 missile
+nibbler
 pacman
 polepos2
 qbert
