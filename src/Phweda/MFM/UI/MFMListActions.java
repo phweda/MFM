@@ -209,10 +209,10 @@ class MFMListActions {
         return null;
     }
 
-    public static boolean ValidateDAT(File inputFile) {
-        boolean good = MFM_DATmaker.validateDAT(inputFile);
-        if (!good) {
-            JOptionPane.showMessageDialog(mainFrame, "DAT file is invalid. Check the MFM error file for details.",
+    private static boolean ValidateDAT(File inputFile) {
+        String result = new MFM_DATmaker().validateDAT(inputFile);
+        if (!result.equalsIgnoreCase(MFM_DATmaker.GOOD)) {
+            JOptionPane.showMessageDialog(mainFrame, "DAT file is invalid\n" + result,
                     "Invalid DAT File", JOptionPane.ERROR_MESSAGE);
             return false;
         } else {

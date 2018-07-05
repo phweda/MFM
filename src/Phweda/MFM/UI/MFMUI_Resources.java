@@ -23,7 +23,6 @@ import Phweda.MFM.MFM;
 import Phweda.utils.FileUtils;
 
 import javax.swing.*;
-import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -133,14 +132,6 @@ public class MFMUI_Resources {
                 FLAGS + FileUtils.SLASH + countryCode + PNG_SUFFIX);
         if (url != null) {
             return new ImageIcon(url);
-        }
-        return null;
-    }
-
-    public File getDATSchema() {
-        URL url = this.getClass().getResource("Resources" + FileUtils.SLASH + "datafile2018.xsd");
-        if (url != null) {
-            return new File(url.getFile());
         }
         return null;
     }

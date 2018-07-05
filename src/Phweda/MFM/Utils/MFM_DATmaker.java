@@ -26,7 +26,6 @@ package Phweda.MFM.Utils;
  */
 
 import Phweda.MFM.*;
-import Phweda.MFM.UI.MFMUI_Resources;
 import Phweda.MFM.datafile.Datafile;
 import Phweda.MFM.datafile.Disk;
 import Phweda.MFM.datafile.Game;
@@ -57,7 +56,8 @@ public class MFM_DATmaker {
     private static Map<String, Machine> map;
     private static final String NODUMP = "nodump";
     private static final String LISTS_ZIP_FILE_SUFFIX = "_Lists_DATs.zip";
-    private static File DATschemaFile = MFMUI_Resources.getInstance().getDATSchema();
+    private static File DATschemaFile = new File(MFM.MFM_SETTINGS_DIR + "datafile2018.xsd");
+    public static final String GOOD = "Good";
 
     public static Datafile generateDAT(String listName, Set<String> list) throws ParserConfigurationException {
         return createDAT(listName, list);
@@ -81,20 +81,25 @@ public class MFM_DATmaker {
     }
 
 
-    public static boolean validateDAT(File xmlFile) {
+    public String validateDAT(File xmlFile) {
         try {
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = factory.newSchema(DATschemaFile);
-            Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(xmlFile));
+            if (DATschemaFile.exists()) {
+                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Schema schema = factory.newSchema(DATschemaFile);
+                Validator validator = schema.newValidator();
+                validator.validate(new StreamSource(xmlFile));
+            } else {
+                MFM.logger.addToList("Failed to find datafile!!! ", true);
+                return "Failed to find datafile.xsd shoulf be in <MFM root>/Settings";
+            }
         } catch (IOException | SAXException e) {
             if (MFM.isSystemDebug()) {
                 System.out.println("Exception: " + e.getMessage());
             }
             e.printStackTrace();
-            return false;
+            return e.getMessage();
         }
-        return true;
+        return GOOD;
     }
 
     /**
