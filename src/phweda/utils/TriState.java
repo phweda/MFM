@@ -16,24 +16,24 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 10/12/2015
  * Time: 2:28 PM
  */
 
 /**
- * TriState encapsulates settings that need an either or, or both state
+ * TriState encapsulates settings that need an either or, or BOTHINT state
  */
 public class TriState {
 
     public static final String BOTH = "all";
-    private static final int first = 0;
-    private static final int second = 1;
-    private static final int both = 2;
+    private static final int FIRST = 0;
+    private static final int SECOND = 1;
+    private static final int BOTHINT = 2;
     private final String firstName;
     private final String secondName;
     private int state;
@@ -45,11 +45,11 @@ public class TriState {
     }
 
     public String getState() {
-        if (state == first) {
+        if (state == FIRST) {
             return firstName;
-        } else if (state == second) {
+        } else if (state == SECOND) {
             return secondName;
-        } else if (state == both) {
+        } else if (state == BOTHINT) {
             return BOTH;
         }
         // NOTE Error condition.
@@ -58,13 +58,11 @@ public class TriState {
 
     public void setState(String stateIn) {
         if (stateIn.equals(firstName)) {
-            state = first;
+            state = FIRST;
         } else if (stateIn.equals(secondName)) {
-            state = second;
+            state = SECOND;
         } else if (stateIn.equals(BOTH)) {
-            state = both;
-        } else {
-            // NOTE never get here!!!
+            state = BOTHINT;
         }
     }
 }

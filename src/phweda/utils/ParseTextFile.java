@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,20 +26,18 @@ import java.util.Scanner;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 11/24/11
  * Time: 3:16 PM
  */
 public class ParseTextFile {
 
-    // fixme Fix these do not work as expected!!!
     protected static final String ALPHANUM_REGEX = "^[a-zA-Z0-9]";
     protected static final String NUM_REGEX = "^[0-9]";
     protected static final String ALPHA_REGEX = "^[a-zA-Z]";
     protected Scanner scanner;
     protected Map map;
-    private File file = null;
-
+    private File file;
 
     /**
      * Constructor.
@@ -76,27 +74,26 @@ public class ParseTextFile {
 
     */
     protected void processLine(String line) {
-        // TODO revamp this as it is really based on CatVer.ini - should be generic
-/* TODO this is horrible waste of resources! */
         //use a second Scanner to parse the content of each line
-        Scanner scanner = new Scanner(line);
-        scanner.useDelimiter("=");
-        if (scanner.hasNext()) {
-            String key = scanner.next();
-            String value = "";
+        try (Scanner scanner = new Scanner(line)) {
+            scanner.useDelimiter("=");
             if (scanner.hasNext()) {
-                value = scanner.next();
+                String key = scanner.next();
+                String value = "";
+                if (scanner.hasNext()) {
+                    value = scanner.next();
+                }
+                log("Key is : " + quote(key.trim()) + ", and Value is : " + quote(value.trim()));
+            } else {
+                log("Empty or invalid line. Unable to process.");
             }
-            log("Key is : " + quote(key.trim()) + ", and Value is : " + quote(value.trim()));
-        } else {
-            log("Empty or invalid line. Unable to process.");
         }
         //no need to call scanner.close(), since the source is a String
     }
 
     private String quote(String text) {
-        String QUOTE = "'";
-        return QUOTE + text + QUOTE;
+        String singleQuote = "'";
+        return singleQuote + text + singleQuote;
     }
 
 }

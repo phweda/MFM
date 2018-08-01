@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 3/27/2017
  * Time: 5:06 PM
  */
@@ -34,17 +34,23 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Create and verify File Hashes
  */
+@SuppressWarnings("unused")
 public class Hasher {
-    private static MessageDigest SHA256digest;
-    private static MessageDigest SHA1digest;
+    private static MessageDigest sha256Digest;
+    private static MessageDigest sha1Digest;
 
-    private static final int bufferSize = 1048576;// 2^20
+    private static final int BUFFER_SIZE = 1048576;// 2^20
+
+    private Hasher() {
+    }
 
     static {
         try {
-            SHA256digest = MessageDigest.getInstance("SHA-256");
-            SHA1digest = MessageDigest.getInstance("SHA-1");
-            if(SHA256digest == null || SHA1digest == null){System.out.println("Message Digest is null");}
+            sha256Digest = MessageDigest.getInstance("SHA-256");
+            sha1Digest = MessageDigest.getInstance("SHA-1");
+            if (sha256Digest == null || sha1Digest == null) {
+                System.out.println("Message Digest is null");
+            }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -59,16 +65,16 @@ public class Hasher {
     public static String getSHA256(File file) {
         try (FileInputStream inputStream = new FileInputStream(file)) {
 
-            byte[] bytesBuffer = new byte[bufferSize];
-            int bytesRead = -1;
+            byte[] bytesBuffer = new byte[BUFFER_SIZE];
+            int bytesRead;
 
             while ((bytesRead = inputStream.read(bytesBuffer)) != -1) {
-                SHA256digest.update(bytesBuffer, 0, bytesRead);
+                sha256Digest.update(bytesBuffer, 0, bytesRead);
             }
 
-            byte[] hashedBytes = SHA256digest.digest();
+            byte[] hashedBytes = sha256Digest.digest();
             // Clear digest for next usage
-            SHA256digest.reset();
+            sha256Digest.reset();
             return byteArrayToHex(hashedBytes);
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -83,21 +89,21 @@ public class Hasher {
      * @return Hexadecimal string of the file hash
      */
     public static String getSHA1(File file) {
-        if(!file.exists()){
+        if (!file.exists()) {
             return "File not found";
         }
         try (FileInputStream inputStream = new FileInputStream(file)) {
 
-            byte[] bytesBuffer = new byte[bufferSize];
-            int bytesRead = -1;
+            byte[] bytesBuffer = new byte[BUFFER_SIZE];
+            int bytesRead;
 
             while ((bytesRead = inputStream.read(bytesBuffer)) != -1) {
-                SHA1digest.update(bytesBuffer, 0, bytesRead);
+                sha1Digest.update(bytesBuffer, 0, bytesRead);
             }
 
-            byte[] hashedBytes = SHA1digest.digest();
+            byte[] hashedBytes = sha1Digest.digest();
             // Clear digest for next usage
-            SHA1digest.reset();
+            sha1Digest.reset();
             return byteArrayToHex(hashedBytes);
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import javax.media.*;
 import javax.media.control.FrameGrabbingControl;
@@ -31,66 +31,65 @@ import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 3/31/2015
  * Time: 8:29 PM
  */
 
 public class VideoSource implements ControllerListener {
-    public static final int NOT_READY = 1;
-    public static final int READY = 2;
-    public static final int ERROR = 3;
-    Player _player;
-    String _videoFilename;
-    FramePositioningControl _framePositioningControl;
-    FrameGrabbingControl _frameGrabbingControl;
-    private int _state;
+    private static final int NOT_READY = 1;
+    private static final int READY = 2;
+    private static final int ERROR = 3;
+    private Player player;
+    private String videoFilename;
+    private FramePositioningControl framePositioningControl;
+    private FrameGrabbingControl frameGrabbingControl;
+    private int state;
 
-    public VideoSource(String videoFilename) {
-        _videoFilename = videoFilename;
-        _state = NOT_READY;
+    VideoSource(String videoFilename) {
+        this.videoFilename = videoFilename;
+        state = NOT_READY;
     }
 
     /*
      * Create Player object and start realizing it
      */
-    public void initialize() {
+    void initialize() {
         try {
-            _player = Manager.createPlayer(new URL(_videoFilename));
-            _player.addControllerListener(this);
+            player = Manager.createPlayer(new URL(videoFilename));
+            player.addControllerListener(this);
             // realize call will launch a chain of events,
             // see controllerUpdate()
-            _player.realize();
+            player.realize();
         } catch (Exception e) {
             System.out.println("Could not create VideoSource!");
             e.printStackTrace();
             setState(ERROR);
-            return;
         }
     }
 
     /*
      * Returns the current state
      */
-    public int getState() {
-        return _state;
+    private int getState() {
+        return state;
     }
 
     // for setting the state internally
     private void setState(int nextState) {
-        _state = nextState;
+        state = nextState;
     }
 
     /*
      * Returns the number of frames for current video if
      * the VideoSource is ready, in any other case returns -1.
      */
-    public int getFrameCount() {
+    private int getFrameCount() {
         if (getState() != READY) {
             return -1;
         }
-        return _framePositioningControl.
-                mapTimeToFrame(_player.getDuration());
+        return framePositioningControl.
+                mapTimeToFrame(player.getDuration());
     }
 
     /*
@@ -98,12 +97,12 @@ public class VideoSource implements ControllerListener {
      * If VideoSource is not ready or index is out of bounds,
      *  returns null.
      */
-    public BufferedImage getFrame(int index) {
+    private BufferedImage getFrame(int index) {
         if (getState() != READY || index < 0 || index > getFrameCount()) {
             return null;
         }
-        _framePositioningControl.seek(index);
-        Buffer buffer = _frameGrabbingControl.grabFrame();
+        framePositioningControl.seek(index);
+        Buffer buffer = frameGrabbingControl.grabFrame();
         Image img = new BufferToImage((VideoFormat) buffer.
                 getFormat()).createImage(buffer);
         // image creation may also fail!
@@ -120,19 +119,19 @@ public class VideoSource implements ControllerListener {
     // callback for ControllerListener
     public void controllerUpdate(ControllerEvent event) {
         if (event instanceof RealizeCompleteEvent) {
-            _player.prefetch();
+            player.prefetch();
         } else if (event instanceof PrefetchCompleteEvent) {
             // get controls
-            _framePositioningControl = (FramePositioningControl) _player.
+            framePositioningControl = (FramePositioningControl) player.
                     getControl("javax.media.control.FramePositioningControl");
-            if (_framePositioningControl == null) {
+            if (framePositioningControl == null) {
                 System.out.println("Error: FramePositioningControl!");
                 setState(ERROR);
                 return;
             }
-            _frameGrabbingControl = (FrameGrabbingControl) _player.
+            frameGrabbingControl = (FrameGrabbingControl) player.
                     getControl("javax.media.control.FrameGrabbingControl");
-            if (_frameGrabbingControl == null) {
+            if (frameGrabbingControl == null) {
                 System.out.println("Error: FrameGrabbingControl!");
                 setState(ERROR);
                 return;
@@ -141,29 +140,28 @@ public class VideoSource implements ControllerListener {
         }
     }
 
-    public ArrayList<BufferedImage> getFrames() {
+    ArrayList<BufferedImage> getFrames() {
+        ArrayList<BufferedImage> frames = new ArrayList<>();
         if (getState() == ERROR) {
-            return null;
+            return frames;
         }
 
         int counter = 1;
         while (getState() == NOT_READY) {
-            //todo figure out if we need to break this? Or a timeout?
-            //NOTE HACK!!!!!!!!
             counter++;
             if (counter % 10000000 == 1) {
                 System.out.println(System.currentTimeMillis() + " WAITING " + counter);
             }
             if (counter > 1400000000) {
-                return null;
+                return frames;
             }
         }
         int count = getFrameCount();
         // NOTE extraneous but just in case
         if (count < 0) {
-            return null;
+            return frames;
         }
-        ArrayList<BufferedImage> frames = new ArrayList<BufferedImage>(count);
+        frames = new ArrayList<>(count);
         int index = 0;
         do {
             count--; //CORRECT? 0 based should be

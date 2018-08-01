@@ -16,13 +16,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.UI.ImagesViewer;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
+import phweda.mfm.MFM;
+import phweda.mfm.MFMSettings;
+import phweda.mfm.UI.ImagesViewer;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 3/30/2015
  * Time: 9:41 PM
  */
@@ -45,10 +45,13 @@ public class VideoUtils {
 
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
+    private VideoUtils() {
+    }
+
     public static final FileFilter GIFfilter = new FileFilter() {
         @Override
         public boolean accept(File f) {
-            return f.isDirectory() | f.getName().toLowerCase().endsWith(".gif");
+            return f.getName().toLowerCase().endsWith(".gif");
         }
 
         @Override
@@ -56,10 +59,11 @@ public class VideoUtils {
             return "GIF files";
         }
     };
+
     public static final FileFilter AVIfilter = new FileFilter() {
         @Override
         public boolean accept(File f) {
-            return f.isDirectory() | f.getName().toLowerCase().endsWith(".avi");
+            return f.getName().toLowerCase().endsWith(".avi");
         }
 
         @Override
@@ -79,8 +83,8 @@ public class VideoUtils {
     }
 
 
-    static ArrayList<BufferedImage> getFrames(File gif) throws IOException {
-        ArrayList<BufferedImage> frames = new ArrayList<BufferedImage>();
+    private static ArrayList<BufferedImage> getFrames(File gif) throws IOException {
+        ArrayList<BufferedImage> frames = new ArrayList<>();
         ImageReader ir = new GIFImageReader(new GIFImageReaderSpi());
         ir.setInput(ImageIO.createImageInputStream(gif));
         for (int i = 0; i < ir.getNumImages(true); i++) {
@@ -95,29 +99,29 @@ public class VideoUtils {
     //TODO Separate thread!!! WELL maybe not
     public static void showAVIimages(File file) {
         if (file.exists()) {
-            String URLpath = "file://" + file.getAbsolutePath();
-            System.out.println(URLpath);
-            VideoSource vs = new VideoSource(URLpath);
+            String urlpath = "file://" + file.getAbsolutePath();
+            System.out.println(urlpath);
+            VideoSource vs = new VideoSource(urlpath);
             vs.initialize();
             ArrayList<BufferedImage> frames = null;
             try {
                 frames = vs.getFrames();
-            } catch (Error error) {
-                error.printStackTrace();
-                if (error.getMessage().contains("OutOfMemoryError")) {
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                if (exc.getMessage().contains("OutOfMemoryError")) {
                     JOptionPane.showMessageDialog(null, "Not enough Memory!\n"
                             + "Try a smaller file or increase the heap size,\n" +
-                            "-Xmx256m to -Xmx2048m, in your MFM.bat file?");
+                            "-Xmx256m to -Xmx2048m, in your mfm.bat file?");
                 }
             }
-            if (frames == null) {
+            if (frames == null || frames.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "AVI failed to load try again.\n"
                         + "Try a smaller file and did you increase the heap size,\n" +
-                        "-Xmx256m to -Xmx2048m (or more), in your MFM.bat file?");
+                        "-Xmx256m to -Xmx2048m (or more), in your mfm.bat file?");
                 return;
             }
             frames.trimToSize();
-            if (frames.size() > 0) {
+            if (!frames.isEmpty()) {
                 final ImagesViewer imagesViewer = new ImagesViewer(frames, file);
             }
             // Release for Garbage Collection
@@ -128,7 +132,7 @@ public class VideoUtils {
 
     public static void runVirtualDub(String filePath) {
         if (mfmSettings.VDubexe() == null || mfmSettings.VDubexe().equals("")) {
-            // JOptionPane.showMessageDialog(null, "MFM needs your VirtualDub executable");
+            // JOptionPane.showMessageDialog(null, "mfm needs your VirtualDub executable");
 
             JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_ONLY);

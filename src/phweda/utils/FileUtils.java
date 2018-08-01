@@ -16,10 +16,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFM_Constants;
+import phweda.mfm.MFM;
+import phweda.mfm.MFM_Constants;
 
 import java.awt.*;
 import java.io.*;
@@ -27,6 +27,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,10 +37,11 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 11/28/11
  * Time: 5:41 PM
  */
+@SuppressWarnings({"SameParameterValue", "unused", "WeakerAccess"})
 public class FileUtils {
     // Slash for Resource URLs
     public static final char SLASH = '/';
@@ -48,53 +50,44 @@ public class FileUtils {
     public static final String ZIPSUFFIX = ".zip";
 
     /* Used to limit search depth. 20 should be more than sufficient*/
-    private static final int maxDepth = 25;
-    static int MaxDepth = maxDepth;
+    private static final int MAX_DEPTH = 25;
+    private static int maxDepth = MAX_DEPTH;
+
+    private static final HashMap<String, String> videoExtensionsMap = new HashMap<>();
+
+    private FileUtils() {
+    }
+
+    static {
+        videoExtensionsMap.put(".avi", ".avi");
+        videoExtensionsMap.put(".flv", ".flv");
+        videoExtensionsMap.put(".mov", ".mov");
+        videoExtensionsMap.put(".mp4", ".mp4");
+        videoExtensionsMap.put(".mpeg", ".mpeg");
+        videoExtensionsMap.put(".mpg", ".mpg");
+        //    videoExtensionsMap.put(".", ".");
+    }
 
     // This filter only returns directories
-    public static FilenameFilter directoryFilenameFilter = new FilenameFilter() {
-        public boolean accept(File file, String name) {
-            return file.isDirectory();
-        }
-    };
+    public static final FilenameFilter directoryFilenameFilter = (file, name) -> file.isDirectory();
 
     // This filter only returns .zip files
-    public static FilenameFilter zipFilenameFilter = new FilenameFilter() {
-        public boolean accept(File file, String name) {
-            return name.toLowerCase().endsWith(".zip");
-        }
-    };
+    public static final FilenameFilter zipFilenameFilter = (file, name) -> name.toLowerCase().endsWith(".zip");
 
     // This filter only returns .jar files
-    public static FilenameFilter jarFilenameFilter = new FilenameFilter() {
-        public boolean accept(File file, String name) {
-            return name.toLowerCase().endsWith(".jar");
-        }
-    };
+    public static final FilenameFilter jarFilenameFilter = (file, name) -> name.toLowerCase().endsWith(".jar");
 
     // This filter only returns .ini files
-    public static FilenameFilter iniFilenameFilter = new FilenameFilter() {
-        public boolean accept(File file, String name) {
-            return name.toLowerCase().endsWith(".ini");
-        }
-    };
+    public static final FilenameFilter iniFilenameFilter = (file, name) -> name.toLowerCase().endsWith(".ini");
 
     // This filter only returns .gif files
-    public static FilenameFilter GIFFilenameFilter = new FilenameFilter() {
-        public boolean accept(File file, String name) {
-            return name.toLowerCase().endsWith(".gif");
-        }
-    };
+    public static final FilenameFilter GIFFilenameFilter = (file, name) -> name.toLowerCase().endsWith(".gif");
 
     // This filter only returns .avi files
-    public static FilenameFilter AVIFilenameFilter = new FilenameFilter() {
-        public boolean accept(File file, String name) {
-            return name.toLowerCase().endsWith(".avi");
-        }
-    };
+    public static final FilenameFilter AVIFilenameFilter = (file, name) -> name.toLowerCase().endsWith(".avi");
 
     // This filter only returns .csv files
-    public static javax.swing.filechooser.FileFilter csvFileFilter = new javax.swing.filechooser.FileFilter() {
+    public static final javax.swing.filechooser.FileFilter csvFileFilter = new javax.swing.filechooser.FileFilter() {
         public boolean accept(File file) {
             return file.isDirectory() || file.getName().toLowerCase().endsWith(".csv");
         }
@@ -106,25 +99,11 @@ public class FileUtils {
     };
 
     // This filter only returns video files
-    // TODO really is not needed
-    public static FilenameFilter VideoFilenameFilter = new FilenameFilter() {
-        HashMap<String, String> tempMap = new HashMap<String, String>();
-        private final Map<String, String> VIDEO_EXT = Collections.unmodifiableMap(tempMap);
-
-        {
-            tempMap.put(".avi", ".avi");
-            tempMap.put(".flv", ".flv");
-            tempMap.put(".mov", ".mov");
-            tempMap.put(".mp4", ".mp4");
-            tempMap.put(".mpeg", ".mpeg");
-            tempMap.put(".mpg", ".mpg");
-            //    tempMap.put(".", ".");
-            //    tempMap.put(".", ".");
-            //    tempMap.put(".", ".");
-        }
+    public static final FilenameFilter VideoFilenameFilter = new FilenameFilter() {
+        private final Map<String, String> videoExtensions = Collections.unmodifiableMap(videoExtensionsMap);
 
         public boolean accept(File file, String name) {
-            return name.contains(".") && VIDEO_EXT.containsKey(name.toLowerCase().substring(name.lastIndexOf('.')));
+            return name.contains(".") && videoExtensions.containsKey(name.toLowerCase().substring(name.lastIndexOf('.')));
         }
     };
 
@@ -139,19 +118,18 @@ public class FileUtils {
             file = new File((String) path);
         }
 
-        if (!file.exists()) {
+        if (file == null || !file.exists()) {
             return null;
         }
 
         StringBuilder fileContents = new StringBuilder((int) file.length());
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
             while ((line = br.readLine()) != null) {
                 fileContents.append(line);
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace(MFM.logger.Writer());
+            e.printStackTrace(MFM.logger.writer());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -159,27 +137,30 @@ public class FileUtils {
     }
 
     /* TODO  java.nio version */
-    public static void copyDirectoryTree(File source, File destination) throws IOException {
+    public static void copyDirectoryTree(File source, File destination) {
 
         /* We only want a Directory this is just a sanity check */
         if (source.isDirectory()) {
 
             //if directory does not exists, create it
             if (!destination.exists()) {
-                destination.mkdir();
-                System.out.println("Directory copied from "
-                        + source + "  to " + destination);
+                boolean success = destination.mkdir();
+                if (success) {
+                    System.out.println("Directory copied from " + source + "  to " + destination);
+                }
             }
 
             //list all the directory child directories
-            String files[] = source.list(directoryFilenameFilter);
+            String[] files = source.list(directoryFilenameFilter);
 
-            for (String file : files) {
-                //construct the src and dest file structure
-                File srcFile = new File(source, file);
-                File destFile = new File(destination, file);
-                //recursive copy
-                copyDirectoryTree(srcFile, destFile);
+            if (files != null) {
+                for (String file : files) {
+                    //construct the src and dest file structure
+                    File srcFile = new File(source, file);
+                    File destFile = new File(destination, file);
+                    //recursive copy
+                    copyDirectoryTree(srcFile, destFile);
+                }
             }
         }
     }
@@ -205,27 +186,28 @@ public class FileUtils {
      */
     public static void copyFile(Path file, String destinationDir, boolean replace) throws IOException {
         Path destinationDirPath = Paths.get(destinationDir, file.getFileName().toString());
-        try {
-            if (replace) {
-                Files.copy(file, destinationDirPath, REPLACE_EXISTING);
-            } else {
-                Files.copy(file, destinationDirPath);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (replace) {
+            Files.copy(file, destinationDirPath, REPLACE_EXISTING);
+        } else {
+            Files.copy(file, destinationDirPath);
         }
     }
 
     public static void copyDirectory(Path directory, String destinationDir, boolean replace) throws IOException {
-        if (Files.isDirectory(directory)) {
+        if (directory.toFile().isDirectory()) {
             File newDir = new File(destinationDir + DIRECTORY_SEPARATOR + directory.getFileName());
             if (!newDir.exists()) {
-                newDir.mkdir();
+                boolean success = newDir.mkdir();
+                if (!success) {
+                    throw new FileNotFoundException("Failed to create directory : " + directory.toString());
+                }
             }
             String newDestDir = newDir.getAbsolutePath();
             File[] files = directory.toFile().listFiles();
-            for (File file : files) {
-                copyFile(file.toPath(), newDestDir, replace);
+            if (files != null) {
+                for (File file : files) {
+                    copyFile(file.toPath(), newDestDir, replace);
+                }
             }
         }
     }
@@ -238,23 +220,16 @@ public class FileUtils {
     /* TODO  java.nio version */
     /*
      * Searches for this fileName from this directory path
-     *
-     *
      * returns false if this directory does not exist
      */
 
     public static boolean fileExists(String path, String name) {
-        try {
-            return new FileExists().find(path, name);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return new FileExists().find(path, name);
     }
 
     public static String stripSuffix(String fileName) {
         // Strip suffix
-        int pos = fileName.lastIndexOf(".");
+        int pos = fileName.lastIndexOf('.');
         if (pos > 0) {
             fileName = fileName.substring(0, pos);
         }
@@ -265,8 +240,8 @@ public class FileUtils {
      * Double quotes a String
      * NOTE replaces double quotes in input string with 2 single quotes
      *
-     * @param input
-     * @return
+     * @param input a String
+     * @return converted string
      */
     public static String doubleQuoteString(String input) {
         StringBuilder stringBuilder = new StringBuilder("\"");
@@ -335,40 +310,42 @@ public class FileUtils {
     private static class FileExists {
         boolean exists = false;
 
-        private boolean find(String path, String fileName) throws IOException {
+        private boolean find(String path, String fileName) {
             File testFile = new File(path);
             // TODO can we simplify the logic? We're testing isDirectory() twice!!
             if (!testFile.isDirectory() && testFile.getName().equalsIgnoreCase(fileName)) {
-                exists = true;
-                return exists;
+                return true;
             } else if (testFile.isDirectory()) {
                 // System.out.println("Searching through Directory " + path);
                 //list all the directory children
-                String files[] = testFile.list();
-                for (String file : files) {
-                    // We found it break out
-                    if (exists) {
-                        break;
+                String[] files = testFile.list();
+                if (files != null) {
+                    for (String file : files) {
+                        // We found it break out
+                        if (exists) {
+                            break;
+                        }
+                        find(testFile.getAbsolutePath() + DIRECTORY_SEPARATOR + file, fileName);
                     }
-                    find(testFile.getAbsolutePath() + DIRECTORY_SEPARATOR + file, fileName);
                 }
             }
             return exists;
         }
     }
 
+    @SuppressWarnings({"squid:S2696", "RedundantThrows"})
     public static class MFMcacheResourceFiles extends SimpleFileVisitor<Path> {
 
-        static final TreeSet<String> extrasDirectories = new TreeSet<String>(
+        static final TreeSet<String> extrasDirectories = new TreeSet<>(
                 Arrays.asList(MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
-        static TreeMap<String, File> cache;
+        static NavigableMap<String, File> cache;
         static TreeMap<String, TreeMap<String, File>> extrasCache;
         static boolean directoryOnly = false;
         static boolean extras = false;
-        static boolean SLCHDs = false;
+        static boolean softwarelistCHDs = false;
 
         // NO Directories?
-        public void cacheAllFiles(Path root, TreeMap<String, File> cacheIn, boolean directoryOnlyIn) {
+        public void cacheAllFiles(Path root, NavigableMap<String, File> cacheIn, boolean directoryOnlyIn) {
             if (root.toString().isEmpty()) {
                 return;
             }
@@ -377,16 +354,16 @@ public class FileUtils {
             walkTree(root);
         }
 
-        public void cacheSoftwarelistCHDsFiles(Path root, TreeMap<String, File> cacheIn) {
-            SLCHDs = true;
+        public void cacheSoftwarelistCHDsFiles(Path root, NavigableMap<String, File> cacheIn) {
+            softwarelistCHDs = true;
             cacheAllFiles(root, cacheIn, true);
-            SLCHDs = false;
+            softwarelistCHDs = false;
         }
 
-        public TreeMap<String, TreeMap<String, File>> cacheExtrasFiles(Path root) {
+        public NavigableMap<String, TreeMap<String, File>> cacheExtrasFiles(Path root) {
             extras = true;
             directoryOnly = false;
-            extrasCache = new TreeMap<String, TreeMap<String, File>>();
+            extrasCache = new TreeMap<>();
 
             try {
                 walkTree(root);
@@ -399,7 +376,7 @@ public class FileUtils {
         private void walkTree(Path root) {
             try {
                 Files.walkFileTree(root, EnumSet.noneOf(FileVisitOption.class),
-                        FileUtils.MaxDepth, this);
+                        FileUtils.maxDepth, this);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -441,8 +418,8 @@ public class FileUtils {
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
             File directory = dir.toFile();
             if (!extras && directory.exists()) {
-                String key = null;
-                if (SLCHDs) {
+                String key;
+                if (softwarelistCHDs) {
                     key = directory.getName() + ':' + directory.getParentFile().getName();
                 } else {
                     return CONTINUE;
@@ -457,10 +434,8 @@ public class FileUtils {
         private void cacheExtraFile(File file) {
             if (file.isDirectory()) {
                 String name = file.getName().toLowerCase(); // Just in case somebody plays with Capitals
-                if (extrasDirectories.contains(name)) {
-                    if (!extrasCache.containsKey(name)) {
-                        extrasCache.put(name, new TreeMap<String, File>());
-                    }
+                if (extrasDirectories.contains(name) && !extrasCache.containsKey(name)) {
+                    extrasCache.put(name, new TreeMap<>());
                 }
             } else {
                 String fileName = file.getName();
@@ -493,28 +468,12 @@ public class FileUtils {
                 }
             }
         }
-
-        /**
-         * Not needed? TODO
-         *
-         * @param file
-         * @return
-         */
-        private String extrasKey(File file) {
-            String path = file.getAbsolutePath();
-
-            return null;
-        }
-
     }
 
-    /*
-     * TODO convert to singleton??
-     *
-     * */
-    /*For java.nio MFM only!! */
-    public static class MFM_FindFile extends SimpleFileVisitor<Path> {
-        /*    For MFM :
+    /*For java.nio mfm only!! */
+    @SuppressWarnings({"squid:S2696", "squid:S3010"})
+    public static final class MFMFindFile extends SimpleFileVisitor<Path> {
+        /*    For mfm :
          * We want to support finding multiple files of one name - Extras for a single Machine
          * And finding multiple Directories of multiple names on a single pass
          * Try to do everything on a single pass of a directory tree
@@ -526,7 +485,6 @@ public class FileUtils {
         private static boolean matchDirectory = false;
 
         private static boolean exists = false;
-        private static Path startFile = null;
         private static Path file = null;
 
         /*
@@ -534,35 +492,33 @@ public class FileUtils {
          * files with the same rootName
          */
         private static ArrayList<Path> files = new ArrayList<>(15);
-        private static HashMap<String, String> directories = new HashMap<String, String>(15);
+        private static HashMap<String, String> directories = new HashMap<>(15);
 
         /*
          * Use with true matchWithoutSuffix for getting more than one file result
          * Use with true matchDirectory for getting Directory(ies)
          */
-        public MFM_FindFile(Path directory, Path fileName, boolean matchWithoutSuffix,
-                            boolean matchDirectory) throws IOException {
-            MFM_FindFile.fileName = fileName;
+        public MFMFindFile(Path directory, Path fileName, boolean matchWithoutSuffix,
+                           boolean matchDirectory) throws IOException {
+            MFMFindFile.fileName = fileName;
             if (matchDirectory) {
-                MFM_FindFile.directoryNames = new String[]{fileName.getFileName().toString()};
+                MFMFindFile.directoryNames = new String[]{fileName.getFileName().toString()};
             }
-            MFM_FindFile.matchWithoutSuffix = matchWithoutSuffix;
-            MFM_FindFile.matchDirectory = matchDirectory;
-            startFile = Files.walkFileTree(directory, EnumSet.noneOf(FileVisitOption.class),
-                    FileUtils.MaxDepth, this);
+            MFMFindFile.matchWithoutSuffix = matchWithoutSuffix;
+            MFMFindFile.matchDirectory = matchDirectory;
+            Files.walkFileTree(directory, EnumSet.noneOf(FileVisitOption.class), FileUtils.maxDepth, this);
         }
 
-        public MFM_FindFile(Path directory, String[] fileNames, boolean matchWithoutSuffix,
-                            boolean matchDirectory) throws IOException {
-            MFM_FindFile.directoryNames = fileNames;
-            MFM_FindFile.matchWithoutSuffix = matchWithoutSuffix;
-            MFM_FindFile.matchDirectory = matchDirectory;
-            startFile = Files.walkFileTree(directory, EnumSet.noneOf(FileVisitOption.class),
-                    FileUtils.MaxDepth, this);
+        public MFMFindFile(Path directory, String[] fileNames, boolean matchWithoutSuffix,
+                           boolean matchDirectory) throws IOException {
+            MFMFindFile.directoryNames = fileNames;
+            MFMFindFile.matchWithoutSuffix = matchWithoutSuffix;
+            MFMFindFile.matchDirectory = matchDirectory;
+            Files.walkFileTree(directory, EnumSet.noneOf(FileVisitOption.class), FileUtils.maxDepth, this);
         }
 
-        public MFM_FindFile(Path directory, Path fileName) throws IOException {
-            new MFM_FindFile(directory, fileName, matchWithoutSuffix, false);
+        public MFMFindFile(Path directory, Path fileName) throws IOException {
+            new MFMFindFile(directory, fileName, matchWithoutSuffix, false);
         }
 
         /*
@@ -581,24 +537,24 @@ public class FileUtils {
 
         */
 
-        // TODO Do not need?? See outerclass FileUtils
         public static boolean exists() {
             return exists;
         }
 
-        public static Path File() {
+        public static Path file() {
             return file;
         }
 
-        public static ArrayList<Path> Files() {
+        @SuppressWarnings("unchecked")
+        public static List<Path> files() {
             return (ArrayList<Path>) files.clone();
         }
 
-        public static HashMap<String, String> directories() {
+        @SuppressWarnings("unchecked")
+        public static Map<String, String> directories() {
             return (HashMap<String, String>) directories.clone();
         }
 
-        // TODO break this up to multiple methods
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
             // NOTE if we are searching for Directories also file may be NULL ??
@@ -609,7 +565,7 @@ public class FileUtils {
             if (file.getFileName().equals(fileName)) {
                 System.out.println("Located file: " + file);
                 if (!matchWithoutSuffix) {
-                    MFM_FindFile.file = file;
+                    MFMFindFile.file = file;
                     exists = true;
                     return TERMINATE;
                 }
@@ -642,7 +598,7 @@ public class FileUtils {
         //is thrown.
         @Override
         public FileVisitResult visitFileFailed(Path file, IOException exc) {
-            System.err.println(exc);
+            System.err.println(exc.getMessage());
             return CONTINUE;
         }
 
@@ -656,7 +612,7 @@ public class FileUtils {
             if (fileIn == null || fileNameIn == null) {
                 return false;
             }
-            // TODO This is ugly and wasteful - StringBuilder ??
+
             String name = fileNameIn.toString();
             String file;
             if (name.contains(".")) {
@@ -671,7 +627,6 @@ public class FileUtils {
         public void clear() {
             files.clear();
             directories.clear();
-            // TODO figure out if we need this
             file = null;
         }
     }

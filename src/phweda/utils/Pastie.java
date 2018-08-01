@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,13 +30,12 @@ import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 11/25/2015
  * Time: 4:23 PM
  */
 public class Pastie {
 
-    private static String PASTIE_BASE_URL = "http://pastie.org/private/";
     private static Pattern pattern = Pattern.compile("download\\?key=(.+?)\"");
 
     public String postText(String text) throws IOException {
@@ -45,7 +44,8 @@ public class Pastie {
         String response = shareAndGetResponse(text, 6);
         String pastedCodeFragmentUniqueKey = extractKeyFrom(response);
 
-        return PASTIE_BASE_URL + pastedCodeFragmentUniqueKey;
+        String pastieBaseUrl = "http://pastie.org/private/";
+        return pastieBaseUrl + pastedCodeFragmentUniqueKey;
     }
 
     private String shareAndGetResponse(String selection, int languageDropdownId) throws IOException {
@@ -61,12 +61,12 @@ public class Pastie {
         writer.flush();
         writer.close();
 
-        StringBuffer answer = loadResponse(conn);
+        StringBuilder answer = loadResponse(conn);
         return answer.toString();
     }
 
-    private StringBuffer loadResponse(URLConnection conn) throws IOException {
-        StringBuffer answer = new StringBuffer();
+    private StringBuilder loadResponse(URLConnection conn) throws IOException {
+        StringBuilder answer = new StringBuilder();
         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null) {

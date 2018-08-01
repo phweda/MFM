@@ -16,15 +16,16 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
-import Phweda.MFM.datafile.Datafile;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import phweda.mfm.datafile.Datafile;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -46,31 +47,28 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 12/4/11
  * Time: 3:47 PM
  */
+@SuppressWarnings("unused")
 public class PersistUtils {
 
+    private PersistUtils() {
+    }
+
     public static void saveAnObject(Object obj, String path) {
-        try {
-            FileOutputStream fos = new FileOutputStream(path);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+        try (FileOutputStream fos = new FileOutputStream(path); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(obj);
             oos.flush();
-            oos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static Object loadAnObject(String path) throws IOException {
-        try {
-            FileInputStream fis = new FileInputStream(path);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            Object obj = ois.readObject();
-            ois.close();
-            return obj;
+        try (FileInputStream fis = new FileInputStream(path); ObjectInputStream ois = new ObjectInputStream(fis)) {
+            return ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();
             throw e;
@@ -83,9 +81,9 @@ public class PersistUtils {
     /**
      * DO NOT close outputstream so other files may be added to zip from the caller
      *
-     * @param obj
-     * @param zipOutputStream
-     * @param fileName
+     * @param obj             Object to save
+     * @param zipOutputStream Stream to save to
+     * @param fileName        Name of the file to put into the zip
      */
     public static void saveAnObjecttoZip(Object obj, ZipOutputStream zipOutputStream, String fileName) {
         try {
@@ -99,10 +97,8 @@ public class PersistUtils {
     }
 
     public static Object loadAnObjectFromZip(String zipPath, String fileName) throws IOException {
-        try {
+        try (ZipFile zipFile = new ZipFile(zipPath)) {
             ZipEntry zipEntry = new ZipEntry(fileName);
-            ZipFile zipFile = new ZipFile(zipPath);
-
             ObjectInputStream ois = new ObjectInputStream(zipFile.getInputStream(zipEntry));
             Object obj = ois.readObject();
             ois.close();
@@ -147,6 +143,7 @@ public class PersistUtils {
      * @param _class class of xml root object
      * @return root object
      */
+    @SuppressWarnings("squid:S00117")
     public static Object retrieveJAXB(String path, Class _class) {
         Object obj = null;
         /*
@@ -170,6 +167,7 @@ public class PersistUtils {
         return obj;
     }
 
+    @SuppressWarnings("squid:S00117")
     public static void saveJAXB(Object obj, String path, Class _class) {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(_class);
@@ -184,11 +182,12 @@ public class PersistUtils {
     /**
      * DO NOT close outputstream so other files may be added to zip from the caller
      *
-     * @param obj
-     * @param zipOutputStream
-     * @param fileName
-     * @param _class
+     * @param obj             Object to save
+     * @param zipOutputStream Stream to save to
+     * @param fileName        Zip file name
+     * @param _class          @Class of file
      */
+    @SuppressWarnings("squid:S00117")
     public static void saveJAXBtoZip(Object obj, ZipOutputStream zipOutputStream, String fileName, Class _class,
                                      boolean formatted) {
         try {
@@ -205,15 +204,13 @@ public class PersistUtils {
         }
     }
 
+    @SuppressWarnings("squid:S00117")
     public static Object retrieveJAXBfromZip(String zipPath, String fileName, Class _class) {
         Object obj = null;
-        try {
+        try (ZipFile zipFile = new ZipFile(zipPath)) {
             ZipEntry zipEntry = new ZipEntry(fileName);
-            ZipFile zipFile = new ZipFile(zipPath);
-
             JAXBContext jaxbContext = JAXBContext.newInstance(_class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
             obj = jaxbUnmarshaller.unmarshal(zipFile.getInputStream(zipEntry));
         } catch (JAXBException | IOException e) {
             e.printStackTrace();
@@ -225,6 +222,7 @@ public class PersistUtils {
             throws TransformerException {
         // Save DOM XML doc to File
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transformerFactory.newTransformer();
 
         doc.setXmlVersion("1.0");
@@ -235,9 +233,8 @@ public class PersistUtils {
         transformer.transform(new DOMSource(doc), new StreamResult(new File(path)));
     }
 
-    // TODO do not like the mixed methodologies here // FIXME: 11/25/2016
     public static void saveDATtoFile(Datafile datafile, String path)
-            throws ParserConfigurationException, JAXBException, TransformerException, FileNotFoundException {
+            throws ParserConfigurationException, JAXBException, TransformerException {
 
         JAXBContext jc = JAXBContext.newInstance(Datafile.class);
 
@@ -249,25 +246,15 @@ public class PersistUtils {
 
         // Marshal the Object to a Document formatted so human readable
         Marshaller marshaller = jc.createMarshaller();
-/*
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, docType.getSystemId());
-*/
-
         marshaller.marshal(datafile, document);
         document.setXmlStandalone(true);
         // NOTE could output with marshaller but cannot set DTD document type
-/*
-        OutputStream os = new FileOutputStream(path);
-        marshaller.marshal(datafile, os);
-*/
 
         // Output the Document
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        //    transformerFactory.setAttribute("indent-number", "4");
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        //   transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "8");
         transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, docType.getPublicId());
@@ -280,10 +267,9 @@ public class PersistUtils {
     private static DocumentType getDocumentType(Document doc) {
         DOMImplementation domImpl = doc.getImplementation();
         // <!DOCTYPE datafile PUBLIC "-//Logiqx//DTD ROM Management Datafile//EN" "http://www.logiqx.com/Dats/datafile.dtd">
-        DocumentType doctype = domImpl.createDocumentType("datafile",
+        return domImpl.createDocumentType("datafile",
                 "-//Logiqx//DTD ROM Management Datafile//EN",
                 "http://www.logiqx.com/Dats/datafile.dtd");
-        return doctype;
     }
 
 }

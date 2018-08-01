@@ -16,20 +16,21 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Calendar;
 
 public class ClockPanel extends JPanel implements Runnable {
-    Thread thread;
+    private transient Thread thread;
 
     public ClockPanel() {
         setPreferredSize(new Dimension(60, 30));
         //   setFont(new Font("Arial", Font.BOLD, 16));
     }
 
+    @Override
     public void paintComponent(Graphics g) {
         g.setColor(super.getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
@@ -37,7 +38,7 @@ public class ClockPanel extends JPanel implements Runnable {
         g.drawString(timeNow(), 20, 25);
     }
 
-    public String timeNow() {
+    private String timeNow() {
         Calendar now = Calendar.getInstance();
         int hrs = now.get(Calendar.HOUR_OF_DAY);
         int min = now.get(Calendar.MINUTE);
@@ -45,7 +46,7 @@ public class ClockPanel extends JPanel implements Runnable {
         return zero(hrs) + ":" + zero(min) + ":" + zero(sec);
     }
 
-    public String zero(int num) {
+    private String zero(int num) {
         return (num < 10) ? ("0" + num) : ("" + num);
     }
 
@@ -61,6 +62,7 @@ public class ClockPanel extends JPanel implements Runnable {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 System.err.println("Clock thread InterruptedException");
+                Thread.currentThread().interrupt();
             }
 
         }

@@ -16,11 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -32,20 +30,19 @@ import java.io.InputStream;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 11/18/11
  * Time: 4:27 PM
  */
+@SuppressWarnings({"SameParameterValue", "unused"})
 public class XMLUtils {
 
-    private static DocumentBuilderFactory dbf;
     private static DocumentBuilder db;
-    private static String element;
 
     /* Static initializer for class fields  */
     static {
         /* get the XML Document factory */
-        dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         /* Use factory to get an instance of document builder */
         try {
             db = dbf.newDocumentBuilder();
@@ -88,25 +85,16 @@ public class XMLUtils {
         return dom;
     }
 
-    private NodeList getNamedElementList(Document dom, String element) {
-        //get the root element
-        Element docEle = dom.getDocumentElement();
-
-        //return a nodelist of elements
-        return docEle.getElementsByTagName(element);
-    }
-
     public static boolean validate(File inputFile) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setValidating(true); //default value is false
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             db.parse(inputFile);
-        } catch (SAXException | ParserConfigurationException | IOException exc ) {
+        } catch (SAXException | ParserConfigurationException | IOException exc) {
             exc.printStackTrace();
             return false;
         }
         return true;
     }
-
 }

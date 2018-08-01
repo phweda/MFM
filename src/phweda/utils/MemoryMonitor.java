@@ -16,16 +16,15 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
-import java.util.Date;
 
 /*
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: Aug 19, 2003
  * Time: 8:36:38 PM
  *
@@ -40,11 +39,11 @@ import java.util.Date;
  */
 public class MemoryMonitor implements Runnable {
 
-    private static int millis;
-    private static PrintWriter printWriter;
+    private int millis;
+    private PrintWriter printWriter;
 
     public MemoryMonitor(int millis, OutputStream outputStream) {
-        MemoryMonitor.millis = millis;
+        this.millis = millis;
         printWriter = new PrintWriter(outputStream);
     }
 
@@ -60,12 +59,6 @@ public class MemoryMonitor implements Runnable {
      * @see Thread#run()
      */
     public void run() {
-        Thread thread = Thread.currentThread();
-
-        //    SimpleDateFormat sdateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss.S");
-        String time = null;
-        Date now = null;
-
         //noinspection InfiniteLoopStatement
         while (true) {
 
@@ -80,21 +73,24 @@ public class MemoryMonitor implements Runnable {
             double usedMemoryMB = (usedMemory / div) / div;
 
             DecimalFormat format = new DecimalFormat("###,###,###,###,###.##");
-
+            String bytesAmoersand = " bytes & ";
+            String mBendline = " MB\r\n";
             printWriter.append("\n---------------------------------------------------------------------------\r\n");
             printWriter.append("freeMemory  is : ");
             printWriter.append(format.format(freeMemory));
-            printWriter.append(" bytes & ");
-            printWriter.append(format.format(freeMemoryMB) + " MB\r\n");
+            printWriter.append(bytesAmoersand);
+            printWriter.append(format.format(freeMemoryMB));
+            printWriter.append(mBendline);
             printWriter.append("totalMemory is : ");
             printWriter.append(format.format(totalMemory));
-            printWriter.append(" bytes & ");
+            printWriter.append(bytesAmoersand);
             printWriter.append(format.format(totalMemoryMB));
-            printWriter.append(" MB\r\n");
+            printWriter.append(mBendline);
             printWriter.append("usedMemory  is : ");
             printWriter.append(format.format(usedMemory));
-            printWriter.append(" bytes & ");
-            printWriter.append(format.format(usedMemoryMB) + " MB\r\n");
+            printWriter.append(bytesAmoersand);
+            printWriter.append(format.format(usedMemoryMB));
+            printWriter.append(mBendline);
             printWriter.append("***************************************************************************\n");
 
             printWriter.flush();
@@ -102,6 +98,7 @@ public class MemoryMonitor implements Runnable {
                 Thread.sleep(millis);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }

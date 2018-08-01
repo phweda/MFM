@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
-import Phweda.MFM.MFM;
+import phweda.mfm.MFM;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -29,64 +29,55 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 12/12/11
  * Time: 8:00 PM
  */
+@SuppressWarnings("unused")
 public class SwingUtils {
-    static UIManager.LookAndFeelInfo[] LnFinfo;
-    private static ArrayList<String> LookandFeelNames;
-    private static HashMap<String, String> LookandFeelClasses;
+    private static ArrayList<String> lookandFeelNames;
+    private static HashMap<String, String> lookandFeelClasses;
 
-    public static HashMap<String, String> getLookandFeelClasses() {
-        return LookandFeelClasses;
+    private SwingUtils() {
     }
 
-    public static ArrayList LandFNames() {
-        if (LookandFeelNames != null) {
-            return LookandFeelNames;
+    public static Map<String, String> getLookandFeelClasses() {
+        return lookandFeelClasses;
+    }
+
+    public static List<String> lookandFeelNames() {
+        if (lookandFeelNames != null) {
+            return lookandFeelNames;
         } else {
-            LookandFeelNames = new ArrayList<String>();
-            LookandFeelClasses = new HashMap<String, String>();
-            LnFinfo = UIManager.getInstalledLookAndFeels();
+            lookandFeelNames = new ArrayList<>();
+            lookandFeelClasses = new HashMap<>();
+            UIManager.LookAndFeelInfo[] lookAndFeelInfos = UIManager.getInstalledLookAndFeels();
             //   System.out.println(UIManager.getLookAndFeelDefaults().toString());
-            for (UIManager.LookAndFeelInfo info : LnFinfo) {
-                LookandFeelNames.add(info.getName());
-                LookandFeelClasses.put(info.getName(), info.getClassName());
+            for (UIManager.LookAndFeelInfo info : lookAndFeelInfos) {
+                lookandFeelNames.add(info.getName());
+                lookandFeelClasses.put(info.getName(), info.getClassName());
             }
-            LookandFeelNames.trimToSize();
+            lookandFeelNames.trimToSize();
         }
-        // System.out.println(LookandFeelNames);
-        // System.out.println(LookandFeelClasses);
-        return LookandFeelNames;
+        // System.out.println(lookandFeelNames);
+        // System.out.println(lookandFeelClasses);
+        return lookandFeelNames;
     }
 
     public static void changeLandF(final String name, final Container container) {
-        //    System.out.println("LF : " + name);
-
-        // Find which one has this classname
-        // NOTE we should always have it since we provided the list
-        // TODO now we save state so this is not always safe 7/8/13
-
         // NOTE should always be on the EDT thread
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(LookandFeelClasses.get(name));
-                    SwingUtilities.updateComponentTreeUI(container);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedLookAndFeelException e) {
-                    e.printStackTrace();
-                }
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(lookandFeelClasses.get(name));
+                SwingUtilities.updateComponentTreeUI(container);
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                    UnsupportedLookAndFeelException e) {
+                e.printStackTrace();
             }
         });
     }
@@ -109,14 +100,12 @@ public class SwingUtils {
      */
 
     public static void load3rdPartyLFs(String jarsDir) {
-        UIManager.LookAndFeelInfo[] LnFs = UIManager.getInstalledLookAndFeels();
+        UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
 
-        ArrayList<UIManager.LookAndFeelInfo> newLnFs = new ArrayList<UIManager.LookAndFeelInfo>
-                (Arrays.asList(LnFs));
+        ArrayList<UIManager.LookAndFeelInfo> newLnFs = new ArrayList<>
+                (Arrays.asList(lookAndFeels));
 
-/*      NOTE must add Jars to MANIFEST
-
-*/
+        /*      NOTE must add Jars to MANIFEST       */
         // NOTE separate try/catch for each different jar so we can load whichever we have
         try {
             // JGoodies     http://www.jgoodies.com/
@@ -193,7 +182,7 @@ public class SwingUtils {
         // MAC OS only  MacOS
         try {
             // Quaqua  <http://www.randelshofer.ch/quaqua/>
-            if (new File(jarsDir + "quaqua.jar").exists() && // MFM.OS_version.contains("MacOS") &&
+            if (new File(jarsDir + "quaqua.jar").exists() && // mfm.OS_version.contains("MacOS") &&
                     null != SwingUtils.class.getClassLoader().loadClass(
                             "ch.randelshofer.quaqua.QuaquaLookAndFeel")) {
                 newLnFs.add(new UIManager.LookAndFeelInfo("Quaqua",
@@ -235,102 +224,84 @@ public class SwingUtils {
         }
 
 
-        if (newLnFs.size() > LnFs.length) {
-            UIManager.setInstalledLookAndFeels((newLnFs.toArray(new UIManager
-                    .LookAndFeelInfo[newLnFs.size()])));
-
-            LookandFeelNames = null;
-            LandFNames();
-
+        if (newLnFs.size() > lookAndFeels.length) {
+            UIManager.setInstalledLookAndFeels((newLnFs.toArray(new UIManager.LookAndFeelInfo[0])));
+            lookandFeelNames = null;
+            lookandFeelNames();
         }
     }
 
     /**
      * Better change font Hack
      *
-     * @param component
-     * @param fontSize
+     * @param component component to change font
+     * @param fontSize  new fontsize
      */
     public static void changeFont(final Component component, final int fontSize) {
         // NOTE should always be on the EDT thread
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    if (component == null || fontSize < 4) {
-                        return;
-                    }
-
-                    Font f = component.getFont();
-                    component.setFont(new Font(f.getName(), f.getStyle(), fontSize));
-                    if (component instanceof JTree) {
-                        updateIcons((JTree) component);
-                    }
-                    if (MFM.isSystemDebug()) {
-                        // System.out.println(component.getClass().toString() + " : changed font");
-                    }
-                    if (component instanceof Container) {
-                        for (Component child : ((Container) component).getComponents()) {
-                            changeFont(child, fontSize);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+        SwingUtilities.invokeLater(() -> {
+            try {
+                if (component == null || fontSize < 4) {
+                    return;
                 }
-            }
 
+                Font f = component.getFont();
+                component.setFont(new Font(f.getName(), f.getStyle(), fontSize));
+                if (component instanceof JTree) {
+                    updateIcons((JTree) component);
+                }
+
+                if (component instanceof Container) {
+                    for (Component child : ((Container) component).getComponents()) {
+                        changeFont(child, fontSize);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
     /**
      * NOTE MAJOR HACK
      */
-
     public static void resizeFonts(final int num) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    Font regularFont = null;
-                    Font acceleratorFont = null;
-                    UIDefaults uiLFd = UIManager.getLookAndFeel().getDefaults();
-                    Set<Object> keys = uiLFd.keySet();
-                    for (Object key : keys) {
-                        if (key.toString().endsWith(".font")) {
-                            if (regularFont == null) {
-                                // fixme throws cast exception
-                                FontUIResource font = (FontUIResource) uiLFd.get(key);
-                                float flt = (font.getSize() + num);
-                                if (MFM.isSystemDebug()) {
-                                    System.out.println("flt is : " + flt);
-                                }
-                                regularFont = font.deriveFont(flt);
-                            }
-                            UIManager.put(key, new FontUIResource(regularFont));
+        SwingUtilities.invokeLater(() -> {
+            try {
+                Font regularFont = null;
+                Font acceleratorFont = null;
+                UIDefaults uiLFd = UIManager.getLookAndFeel().getDefaults();
+                Set<Object> keys = uiLFd.keySet();
+                for (Object key : keys) {
+                    if (key.toString().endsWith(".font")) {
+                        if (regularFont == null) {
+                            FontUIResource font = (FontUIResource) uiLFd.get(key);
+                            float flt = (font.getSize() + num);
                             if (MFM.isSystemDebug()) {
-                                // System.out.println(key + " set to font size : " + regularFont.getSize());
+                                System.out.println("flt is : " + flt);
                             }
-                        } else if (key.toString().endsWith(".acceleratorFont")) {
-                            if (acceleratorFont == null) {
-                                FontUIResource font = (FontUIResource) uiLFd.get(key);
-                                float flt = (font.getSize() + num);
-                                if (MFM.isSystemDebug()) {
-                                    System.out.println("flt is : " + flt);
-                                }
-                                acceleratorFont = font.deriveFont(flt);
-                            }
-                            UIManager.put(key, new FontUIResource(acceleratorFont));
-                            if (MFM.isSystemDebug()) {
-                                // System.out.println(key + " set to font size : " + acceleratorFont.getSize());
-                            }
+                            regularFont = font.deriveFont(flt);
                         }
+                        UIManager.put(key, new FontUIResource(regularFont));
+                    } else if (key.toString().endsWith(".acceleratorFont")) {
+                        if (acceleratorFont == null) {
+                            FontUIResource font = (FontUIResource) uiLFd.get(key);
+                            float flt = (font.getSize() + num);
+                            if (MFM.isSystemDebug()) {
+                                System.out.println("flt is : " + flt);
+                            }
+                            acceleratorFont = font.deriveFont(flt);
+                        }
+                        UIManager.put(key, new FontUIResource(acceleratorFont));
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
-    static Icon scale(Icon icon, double scaleFactor, JTree tree) {
+    private static Icon scale(Icon icon, double scaleFactor, JTree tree) {
         int width = icon.getIconWidth();
         int height = icon.getIconHeight();
 

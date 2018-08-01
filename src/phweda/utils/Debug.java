@@ -16,23 +16,22 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings({"SameParameterValue"})
+@SuppressWarnings({"SameParameterValue", "unused"})
 public class Debug {
-    private static boolean listBool = false;
-    private static PrintWriter writer;
-    // TODO should switch this to a lightweight queue
-    private static LinkedList<String> list = new LinkedList<String>();
-    private static SimpleDateFormat sdateFormat = new SimpleDateFormat("d MMM HH:mm:ss.S");
+    private boolean listBool = false;
+    private PrintWriter writer;
+    private ArrayList<String> list = new ArrayList<>();
+    private SimpleDateFormat sdateFormat = new SimpleDateFormat("d MMM HH:mm:ss.S");
     private char separateChar = '*';
     private String separateString = "********************************************************************************";
     private OutputStream outputStream = System.out;
@@ -55,7 +54,7 @@ public class Debug {
     }
 
     /* Make PrintWriter available for outputting stacktraces to log */
-    public PrintWriter Writer() {
+    public PrintWriter writer() {
         // Clear out the list
         flushList();
         out(""); // Force date time stamp output before printing stacktrace
@@ -85,7 +84,10 @@ public class Debug {
     }
 
     public void addToList(String output, boolean flush) {
-        out(output);
+        if (flush) {
+            flushList();
+            out(output);
+        }
     }
 
     private void flushList() {
@@ -111,20 +113,20 @@ public class Debug {
         }
     }
 
-    public void setSeparateLineChar(char ch) {
+    private void setSeparateLineChar(char ch) {
         separateChar = ch;
         this.separateString = makeSeparateLineString();
     }
 
     private String makeSeparateLineString() {
-        StringBuffer buf = new StringBuffer(80);
-        for (int i = 0; i < buf.length(); i++) {
-            buf.append(separateChar);
+        StringBuilder stringBuilder = new StringBuilder(80);
+        for (int i = 0; i < stringBuilder.length(); i++) {
+            stringBuilder.append(separateChar);
         }
-        return buf.toString();
+        return stringBuilder.toString();
     }
 
-    public void setOutput(OutputStream outputStream, boolean flush) {
+    private void setOutput(OutputStream outputStream, boolean flush) {
         this.outputStream = outputStream;
         writer = new PrintWriter(outputStream, flush);
     }
@@ -134,10 +136,10 @@ public class Debug {
     }
 
     public void setListBool(boolean listBool) {
-        Debug.listBool = listBool;
+        this.listBool = listBool;
     }
 
-    // Best place in MFM code to put this
+    // Best place in mfm code to put this
     public static String formatMillis(long nanos) {
         return String.format("%02d:%02d:%02d.%03d", TimeUnit.NANOSECONDS.toHours(nanos),
                 TimeUnit.NANOSECONDS.toMinutes(nanos) % TimeUnit.HOURS.toMinutes(1),

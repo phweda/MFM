@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,12 +26,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public abstract class ClickListener extends MouseAdapter implements ActionListener {
-    private final static int clickInterval = 500;
+    private static final int CLICK_INTERVAL = 500;
     private MouseEvent lastEvent;
     private Timer timer;
 
     public ClickListener() {
-        this(clickInterval);
+        this(CLICK_INTERVAL);
     }
 
     private ClickListener(int delay) {

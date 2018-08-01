@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
-import Phweda.MFM.MFM;
+import phweda.mfm.MFM;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,15 +34,15 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 11/25/2015
  * Time: 2:30 PM
  */
-
+@SuppressWarnings({"SameParameterValue", "unused"})
 public class ZipUtils {
 
-    List<String> fileList = new ArrayList<String>();
-    String sourceFolder;
+    private List<String> fileList = new ArrayList<>();
+    private String sourceFolder;
 
     /**
      * Extracts and copies single file from ZIP
@@ -50,14 +50,13 @@ public class ZipUtils {
      * @param zipFile    the source
      * @param fileName   file to extract
      * @param outputFile destination
-     * @throws IOException
      */
-    public static boolean extractFile(Path zipFile, String fileName, Path outputFile) throws IOException {
+    public static boolean extractFile(Path zipFile, String fileName, Path outputFile) {
         // Wrap the file system in a try-with-resources statement
         // to auto-close it when finished and prevent a memory leak
         try (FileSystem fileSystem = FileSystems.newFileSystem(zipFile, null)) {
             Path fileToExtract = fileSystem.getPath(fileName);
-            if (!Files.exists(fileToExtract)) { // LinkOption.NOFOLLOW_LINKS
+            if (!fileToExtract.toFile().exists()) { // LinkOption.NOFOLLOW_LINKS
                 if (MFM.isSystemDebug()) {
                     System.out.println("Zip file not found is: " + fileToExtract);
                 }
@@ -84,7 +83,7 @@ public class ZipUtils {
                     .filter(isFile)
                     .collect(Collectors.toList());
 
-            zipFileNames = new TreeMap<String, String>();
+            zipFileNames = new TreeMap<>();
             zipEntries.forEach(entry -> zipFileNames.put(
                     entry.getName().substring(0, entry.getName().lastIndexOf('.')), entry.getName()));
             return zipFileNames;
@@ -94,11 +93,9 @@ public class ZipUtils {
         return null;
     }
 
-    public static TreeMap<String, TreeMap<String, String>> getZipEntryNames(HashMap<String, File> extrasZipFilesMap) {
-        final TreeMap<String, TreeMap<String, String>> zipEntries = new TreeMap<String, TreeMap<String, String>>();
-        extrasZipFilesMap.forEach((key, file) -> {
-            zipEntries.put(key, getZipEntries(file.getAbsolutePath()));
-        });
+    public static SortedMap<String, TreeMap<String, String>> getZipEntryNames(Map<String, File> extrasZipFilesMap) {
+        final TreeMap<String, TreeMap<String, String>> zipEntries = new TreeMap<>();
+        extrasZipFilesMap.forEach((key, file) -> zipEntries.put(key, getZipEntries(file.getAbsolutePath())));
         return zipEntries;
     }
 
@@ -115,28 +112,22 @@ public class ZipUtils {
 
         byte[] buffer = new byte[1048576]; // 2^20
 
-        try {
-            FileOutputStream fos = new FileOutputStream(zipFile);
-            ZipOutputStream zos = new ZipOutputStream(fos);
-
+        try (FileOutputStream fos = new FileOutputStream(zipFile); ZipOutputStream zos = new ZipOutputStream(fos)) {
             System.out.println("Output to Zip : " + zipFile);
-
             for (String file : this.fileList) {
                 System.out.println("\t" + file);
                 ZipEntry ze = new ZipEntry(file);
                 zos.putNextEntry(ze);
 
-                FileInputStream in = new FileInputStream(this.sourceFolder + file);
-                int len;
-                while ((len = in.read(buffer)) > 0) {
-                    zos.write(buffer, 0, len);
+                try (FileInputStream in = new FileInputStream(this.sourceFolder + file)) {
+                    int len;
+                    while ((len = in.read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
                 }
-                in.close();
             }
 
             zos.closeEntry();
-            //remember close it
-            zos.close();
             System.out.println("Zipping Done");
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -173,7 +164,7 @@ public class ZipUtils {
      * @return Formatted file path
      */
     private String generateZipEntry(String file) {
-        return file.substring(sourceFolder.length() - 1, file.length());
+        return file.substring(sourceFolder.length() - 1);
     }
 
 

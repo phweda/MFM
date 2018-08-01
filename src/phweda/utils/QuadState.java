@@ -16,20 +16,20 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package phweda.utils;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Phweda
+ * User: phweda
  * Date: 10/26/2015
  * Time: 12:19 PM
  */
 public class QuadState {
     public static final String ALL = "All";
-    public final int all = 0;
-    private final int first = 1;
-    private final int second = 2;
-    private final int third = 3;
+    private static final int ALL_THREE = 0;
+    private static final int FIRST = 1;
+    private static final int SECOND = 2;
+    private static final int THIRD = 3;
     private final String firstName;
     private final String secondName;
     private final String thirdName;
@@ -43,13 +43,13 @@ public class QuadState {
     }
 
     public String getState() {
-        if (state == first) {
+        if (state == FIRST) {
             return firstName;
-        } else if (state == second) {
+        } else if (state == SECOND) {
             return secondName;
-        } else if (state == third) {
+        } else if (state == THIRD) {
             return thirdName;
-        } else if (state == all) {
+        } else if (state == ALL_THREE) {
             return ALL;
         }
         // NOTE Error condition.
@@ -58,16 +58,13 @@ public class QuadState {
 
     public void setState(String stateIn) {
         if (stateIn.equals(firstName)) {
-            state = first;
+            state = FIRST;
         } else if (stateIn.equals(secondName)) {
-            state = second;
+            state = SECOND;
         } else if (stateIn.equals(thirdName)) {
-            state = third;
+            state = THIRD;
         } else if (stateIn.equals(ALL)) {
-            state = all;
-        } else {
-            // NOTE never get here!!!
+            state = ALL_THREE;
         }
     }
-
 }
