@@ -24,7 +24,7 @@
 //
 
 
-package Phweda.MFM.datafile;
+package phweda.mfm.datafile;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -74,6 +74,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "comment",
@@ -141,7 +142,7 @@ public class Game {
      */
     public List<String> getComment() {
         if (comment == null) {
-            comment = new ArrayList<String>();
+            comment = new ArrayList<>();
         }
         return this.comment;
     }
@@ -228,7 +229,7 @@ public class Game {
      */
     public List<Release> getRelease() {
         if (release == null) {
-            release = new ArrayList<Release>();
+            release = new ArrayList<>();
         }
         return this.release;
     }
@@ -255,7 +256,7 @@ public class Game {
      */
     public List<Biosset> getBiosset() {
         if (biosset == null) {
-            biosset = new ArrayList<Biosset>();
+            biosset = new ArrayList<>();
         }
         return this.biosset;
     }
@@ -282,7 +283,7 @@ public class Game {
      */
     public List<Rom> getRom() {
         if (rom == null) {
-            rom = new ArrayList<Rom>();
+            rom = new ArrayList<>();
         }
         return this.rom;
     }
@@ -309,7 +310,7 @@ public class Game {
      */
     public List<Disk> getDisk() {
         if (disk == null) {
-            disk = new ArrayList<Disk>();
+            disk = new ArrayList<>();
         }
         return this.disk;
     }
@@ -336,7 +337,7 @@ public class Game {
      */
     public List<Sample> getSample() {
         if (sample == null) {
-            sample = new ArrayList<Sample>();
+            sample = new ArrayList<>();
         }
         return this.sample;
     }
@@ -363,7 +364,7 @@ public class Game {
      */
     public List<Archive> getArchive() {
         if (archive == null) {
-            archive = new ArrayList<Archive>();
+            archive = new ArrayList<>();
         }
         return this.archive;
     }

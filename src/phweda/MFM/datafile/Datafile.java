@@ -24,7 +24,7 @@
 //
 
 
-package Phweda.MFM.datafile;
+package phweda.mfm.datafile;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -60,6 +60,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 
 @XmlType(name = "", propOrder = {
@@ -125,7 +126,7 @@ public class Datafile {
      */
     public List<Game> getGame() {
         if (game == null) {
-            game = new ArrayList<Game>();
+            game = new ArrayList<>();
         }
         return this.game;
     }

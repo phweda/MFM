@@ -24,7 +24,7 @@
 //
 
 
-package Phweda.MFM.datafile;
+package phweda.mfm.datafile;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -57,6 +57,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "release")
@@ -72,6 +73,7 @@ public class Release {
     protected String date;
     @XmlAttribute(name = "default")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @SuppressWarnings("squid:S00116")
     protected String _default;
 
     /**

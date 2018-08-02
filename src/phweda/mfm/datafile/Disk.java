@@ -24,7 +24,7 @@
 //
 
 
-package Phweda.MFM.datafile;
+package phweda.mfm.datafile;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -59,6 +59,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "disk")
@@ -182,16 +183,16 @@ public class Disk {
 
 
     /**
-     * To support creating MFM List DATs
+     * To support creating mfm List DATs
      * Disks need comparison since a parent may refer to the same disk
      *
-     * @param obj
-     * @return
-     * @see Phweda.MFM.Utils.MFM_DATmaker
+     * @param obj Object to compare
+     * @return true if the same
+     * @see phweda.mfm.utils.MFM_DATmaker
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         }
         if (!Disk.class.isAssignableFrom(obj.getClass())) {
@@ -204,4 +205,8 @@ public class Disk {
         return ((this.sha1 == null) ? (other.sha1 == null) : this.sha1.equals(other.sha1));
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
