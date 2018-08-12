@@ -24,7 +24,7 @@
 //
 
 
-package phweda.mfm.datafile;
+package Phweda.MFM.datafile;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -188,7 +188,7 @@ public class Disk {
      *
      * @param obj Object to compare
      * @return true if the same
-     * @see phweda.mfm.utils.MFM_DATmaker
+     * @see Phweda.MFM.utils.MFM_DATmaker
      */
     @Override
     public boolean equals(Object obj) {

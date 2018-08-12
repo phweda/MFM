@@ -24,7 +24,7 @@
 //
 
 
-package phweda.mfm.datafile;
+package Phweda.MFM.datafile;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
