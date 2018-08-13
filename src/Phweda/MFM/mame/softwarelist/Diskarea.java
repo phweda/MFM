@@ -82,7 +82,7 @@ public class Diskarea {
      */
     public List<Disk> getDisk() {
         if (disk == null) {
-            disk = new ArrayList<Disk>();
+            disk = new ArrayList<>();
         }
         return this.disk;
     }

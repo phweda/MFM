@@ -90,9 +90,7 @@ public class Softwarelists {
 
     private TreeMap<String, Softwarelist> generateSoftwarelistsMap() {
         TreeMap<String, Softwarelist> map = new TreeMap<>();
-        this.getSoftwarelists().forEach((softwarelist) -> {
-            map.put(softwarelist.getName(), softwarelist);
-        });
+        this.getSoftwarelists().forEach(softwarelist -> map.put(softwarelist.getName(), softwarelist));
         return map;
     }
 

@@ -66,6 +66,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "description",
@@ -177,7 +178,7 @@ public class Software {
      */
     public List<Info> getInfo() {
         if (info == null) {
-            info = new ArrayList<Info>();
+            info = new ArrayList<>();
         }
         return this.info;
     }
@@ -204,7 +205,7 @@ public class Software {
      */
     public List<Sharedfeat> getSharedfeat() {
         if (sharedfeat == null) {
-            sharedfeat = new ArrayList<Sharedfeat>();
+            sharedfeat = new ArrayList<>();
         }
         return this.sharedfeat;
     }
@@ -231,7 +232,7 @@ public class Software {
      */
     public List<Part> getPart() {
         if (part == null) {
-            part = new ArrayList<Part>();
+            part = new ArrayList<>();
         }
         return this.part;
     }

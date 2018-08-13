@@ -53,6 +53,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings({"WeakerAccess", "squid:S00116"})
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "feature",
@@ -94,7 +95,7 @@ public class Part {
      */
     public List<Feature> getFeature() {
         if (feature == null) {
-            feature = new ArrayList<Feature>();
+            feature = new ArrayList<>();
         }
         return this.feature;
     }
@@ -121,7 +122,7 @@ public class Part {
      */
     public List<Dataarea> getDataarea() {
         if (dataarea == null) {
-            dataarea = new ArrayList<Dataarea>();
+            dataarea = new ArrayList<>();
         }
         return this.dataarea;
     }
@@ -148,7 +149,7 @@ public class Part {
      */
     public List<Diskarea> getDiskarea() {
         if (diskarea == null) {
-            diskarea = new ArrayList<Diskarea>();
+            diskarea = new ArrayList<>();
         }
         return this.diskarea;
     }
@@ -175,7 +176,7 @@ public class Part {
      */
     public List<Dipswitch> getDipswitch() {
         if (dipswitch == null) {
-            dipswitch = new ArrayList<Dipswitch>();
+            dipswitch = new ArrayList<>();
         }
         return this.dipswitch;
     }

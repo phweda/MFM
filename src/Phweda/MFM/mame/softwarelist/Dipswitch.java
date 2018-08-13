@@ -51,6 +51,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "dipvalue"
@@ -88,7 +89,7 @@ public class Dipswitch {
      */
     public List<Dipvalue> getDipvalue() {
         if (dipvalue == null) {
-            dipvalue = new ArrayList<Dipvalue>();
+            dipvalue = new ArrayList<>();
         }
         return this.dipvalue;
     }

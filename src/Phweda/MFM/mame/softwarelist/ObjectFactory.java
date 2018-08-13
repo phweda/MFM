@@ -48,14 +48,15 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Year_QNAME = new QName("", "year");
-    private final static QName _Description_QNAME = new QName("", "description");
-    private final static QName _Publisher_QNAME = new QName("", "publisher");
+    private static final QName _Year_QNAME = new QName("", "year");
+    private static final QName _Description_QNAME = new QName("", "description");
+    private static final QName _Publisher_QNAME = new QName("", "publisher");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: generated
      */
     public ObjectFactory() {
+        // For new instances
     }
 
     /**
@@ -147,7 +148,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "year")
     public JAXBElement<String> createYear(String value) {
-        return new JAXBElement<String>(_Year_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Year_QNAME, String.class, null, value);
     }
 
     /**
@@ -155,7 +156,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "description")
     public JAXBElement<String> createDescription(String value) {
-        return new JAXBElement<String>(_Description_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Description_QNAME, String.class, null, value);
     }
 
     /**
@@ -163,7 +164,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "publisher")
     public JAXBElement<String> createPublisher(String value) {
-        return new JAXBElement<String>(_Publisher_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Publisher_QNAME, String.class, null, value);
     }
 
 }

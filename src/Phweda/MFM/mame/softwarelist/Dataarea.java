@@ -70,6 +70,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "rom"
@@ -111,7 +112,7 @@ public class Dataarea {
      */
     public List<Rom> getRom() {
         if (rom == null) {
-            rom = new ArrayList<Rom>();
+            rom = new ArrayList<>();
         }
         return this.rom;
     }
