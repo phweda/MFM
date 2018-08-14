@@ -42,17 +42,18 @@ public class ParseGameList extends ParseTextFile {
     @Override
     protected void processLine(String line) {
         //use a second Scanner to parse the content of each line
-        Scanner scanner = new Scanner(line);
-        scanner.useDelimiter("\"");
-        if (scanner.hasNext()) {
-            String key = scanner.next();
-            String value = "";
+        try (Scanner scanner = new Scanner(line)) {
+            scanner.useDelimiter("\"");
             if (scanner.hasNext()) {
-                value = scanner.next();
+                String key = scanner.next();
+                String value = "";
+                if (scanner.hasNext()) {
+                    value = scanner.next();
+                }
+                map.put(key.trim(), value.trim());
+            } else {
+                log("Empty or invalid line. Unable to process.");
             }
-            map.put(key.trim(), value.trim());
-        } else {
-            log("Empty or invalid line. Unable to process.");
         }
     }
 }

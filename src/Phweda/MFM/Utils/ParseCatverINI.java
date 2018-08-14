@@ -33,8 +33,8 @@ import java.util.Scanner;
  */
 public class ParseCatverINI extends ParseTextFile {
     /* Sort of redundant to have both */
-    private static boolean category = false;
-    private static boolean MAMEVersionAdded = false;
+    private boolean category = false;
+    private boolean MAMEVersionAdded = false;
 
     /**
      * Constructor.
@@ -78,6 +78,6 @@ public class ParseCatverINI extends ParseTextFile {
                 MFM.logger.addToList("ParseCatverINI We failed to find version or category");
             }
         }
-        //no need to call lineScanner.close(), since the source is a String
+        lineScanner.close();
     }
 }

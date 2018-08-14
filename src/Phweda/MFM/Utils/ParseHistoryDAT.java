@@ -38,7 +38,6 @@ public class ParseHistoryDAT extends ParseTextFile {
         super(fileName, mapIn);
     }
 
-    /* TODO test performance comparing usage of Strings vs Scanner */
     @Override
     protected void processLine(String line) {
 
@@ -63,8 +62,6 @@ public class ParseHistoryDAT extends ParseTextFile {
 
         /* Until line starting with $end */
         do {
-            // TODO do we need to add an endline here?
-            // YES But it appears to give us two!! ??
             historyText.append(line).append('\n');
             line = scanner.nextLine();
         } while (!line.startsWith("$end"));

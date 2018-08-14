@@ -50,12 +50,11 @@ public class ParseSYSINFODAT extends ParseTextFile {
         // $info line may have multiple comma separated systems and may end with a comma
 
         if (line.startsWith("$info") && line.length() > 6) {
-            line = line.substring(6, line.length());
+            line = line.substring(6);
             if (line.endsWith(",")) {
                 line = line.substring(0, line.length() - 2);
             }
         }
-
 
         String[] systems = line.split("[,]");
 
@@ -71,8 +70,6 @@ public class ParseSYSINFODAT extends ParseTextFile {
 
         /* Until line starting with $end */
         do {
-            // TODO do we need to add an endline here?
-            // YES But it appears to give us two!! ??
             infoText.append(line).append('\n');
             line = scanner.nextLine();
         } while (!line.startsWith("$end"));

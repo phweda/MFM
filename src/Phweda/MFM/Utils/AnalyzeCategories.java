@@ -44,8 +44,8 @@ import java.util.regex.Pattern;
  */
 public class AnalyzeCategories {
 
-    private HashMap<String, ArrayList<String>> categoryGames;
-    private ArrayList<String> allCategories;
+    private static HashMap<String, ArrayList<String>> categoryGames;
+    private static ArrayList<String> allCategories;
 
     private static ArrayList<String> rootCategories;
     private static ArrayList<String> arcadeRoots;
@@ -57,18 +57,16 @@ public class AnalyzeCategories {
     private static ArrayList<String> arcadeNoMatureCategories;
     private static ArrayList<String> systemNoMatureCategories;
 
-    private static HashMap<String, String> Version = new HashMap<String, String>();
-    private static HashMap<String, String> MachinetoCategoryMap = new HashMap<String, String>();
-    private static HashMap<String, Set<String>> CategorytoMachinesMap = new HashMap<String, Set<String>>();
-
-    private static Map<String, String> arcadeCategoriesMap = new HashMap<String, String>();
+    private static HashMap<String, String> version = new HashMap<>();
+    private static HashMap<String, String> machinetoCategoryMap = new HashMap<>();
+    private static Map<String, String> arcadeCategoriesMap = new HashMap<>();
 
     private static final String SEPARATOR = "~";
-
+    private static final String MATURE = "mature";
     private static String savePath = MFM.MFM_CATEGORY_DIR;
 
-    private Map<String, HashMap<String, String>> CatverINImap = new HashMap<String, HashMap<String, String>>();
-    private TreeMap<String, ArrayList<String>> categoryHierarchy = new TreeMap<String, ArrayList<String>>();
+    private static Map<String, HashMap<String, String>> catverINImap = new HashMap<>();
+    private static TreeMap<String, ArrayList<String>> categoryHierarchy = new TreeMap<>();
 
     /* Hashmap of Arraylists for CategoryListsMap.xml
         All Roots
@@ -81,50 +79,76 @@ public class AnalyzeCategories {
         Mature Roots
         System No Mature Categories
     */
-    private static HashMap<String, ArrayList<String>> categoryListsMap = new HashMap<String, ArrayList<String>>();
+    private static HashMap<String, ArrayList<String>> categoryListsMap = new HashMap<>();
 
-    public AnalyzeCategories() {
-        parseInputFiles();
-        //   getCategories();
-        createCatHierarchy();
-        arcadeSystemLists();
-        filterMature();
-        persistCategoriestoFile(savePath);
+    private AnalyzeCategories() {
+        throw new IllegalStateException("Utility clsss");
     }
 
-    private void parseInputFiles() {
+    public static boolean analyzeCategories() {
+        try {
+            parseInputFiles();
+            //   getCategories();
+            createCatHierarchy();
+            arcadeSystemLists();
+            filterMature();
+            persistCategoriestoFile(savePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static boolean analyzeCategories(String filePath) {
+        try {
+            Object obj = PersistUtils.loadAnObjectXML(filePath);
+            if (obj.getClass().isAssignableFrom(HashMap.class)) {
+                categoryGames = (HashMap<String, ArrayList<String>>) obj;
+            } else {
+                throw new ClassCastException("Input file must be XML of HashMap<String, ArrayList<String>> Object");
+            }
+            analyzeFile();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private static void parseInputFiles() {
         try {
 
-            CatverINImap.put("category", MachinetoCategoryMap);
-            CatverINImap.put("version", Version);
-            new ParseCatverINI(MFM.MFM_FOLDERS_DIR + MFM_Constants.CATVER_INI_FILENAME, CatverINImap).processFile();
+            catverINImap.put("category", machinetoCategoryMap);
+            catverINImap.put("version", version);
+            new ParseCatverINI(MFM.MFM_FOLDERS_DIR + MFM_Constants.CATVER_INI_FILENAME, catverINImap).processFile();
             new ParseRootOnlyINI(MFM.MFM_FOLDERS_DIR + MFM_Constants.ARCADE_INI_FILENAME, arcadeCategoriesMap).processFile();
 
-            TreeSet<String> sortedSet = new TreeSet<String>(MachinetoCategoryMap.values());
-            allCategories = new ArrayList<String>(sortedSet);
+            TreeSet<String> sortedSet = new TreeSet<>(machinetoCategoryMap.values());
+            allCategories = new ArrayList<>(sortedSet);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    private void analyzeFile() {
-        allCategories = new ArrayList<String>();
-        for (String key : categoryGames.keySet()) {
-            ArrayList<String> list = categoryGames.get(key);
-            if (!list.isEmpty()) {
-                allCategories.add(key);
+    private static void analyzeFile() {
+        allCategories = new ArrayList<>();
+        for (Map.Entry<String, ArrayList<String>> entry : categoryGames.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                allCategories.add(entry.getKey());
                 if (MFM.isSystemDebug()) {
-                    System.out.println(key);
+                    System.out.println(entry.getKey());
                 }
             }
         }
     }
 
-    private void createCatHierarchy() {
+    private static void createCatHierarchy() {
         for (String entry : allCategories) {
             if (entry.contains("/")) {
                 String key = entry.substring(0, entry.indexOf('/') - 1).trim();
-                int index = entry.indexOf("/") + 1;
+                int index = entry.indexOf('/') + 1;
                 String subKey = entry.substring(index);
 
                 if (categoryHierarchy.containsKey(key)) {
@@ -133,26 +157,26 @@ public class AnalyzeCategories {
                         categoryHierarchy.get(key).add(subKey);
                     }
                 } else {
-                    ArrayList<String> list = new ArrayList<String>();
+                    ArrayList<String> list = new ArrayList<>();
                     list.add(subKey);
                     categoryHierarchy.put(key, list);
                 }
             } else { // with newest catver.ini ... circa 191 we shouldn't need this
                 // If we haven't previously added it
                 if (!categoryHierarchy.containsKey(entry)) {
-                    categoryHierarchy.put(entry, new ArrayList<String>());
+                    categoryHierarchy.put(entry, new ArrayList<>());
                 }
             }
         }
 
         int count = 0;
         int countSub = 0;
-        rootCategories = new ArrayList<String>();
-        matureRoots = new ArrayList<String>();
+        rootCategories = new ArrayList<>();
+        matureRoots = new ArrayList<>();
         for (String key : categoryHierarchy.keySet()) {
             System.out.println(++count + ". " + key);
             rootCategories.add(key);
-            if (Pattern.compile(Pattern.quote("mature"), Pattern.CASE_INSENSITIVE).matcher(key).find()) {
+            if (Pattern.compile(Pattern.quote(MATURE), Pattern.CASE_INSENSITIVE).matcher(key).find()) {
                 matureRoots.add(key);
             }
             for (String subKey : categoryHierarchy.get(key)) {
@@ -161,16 +185,16 @@ public class AnalyzeCategories {
                 }
             }
             if (MFM.isSystemDebug()) {
-                System.out.println("");
+                System.out.println();
             }
         }
         categoryListsMap.put(MFMListBuilder.ALL_CATEGORY_ROOTS, rootCategories);
         categoryListsMap.put(MFMListBuilder.MATURE_CATEGORY_ROOTS, matureRoots);
     }
 
-    private void arcadeSystemLists() {
-        Set<String> arcadeRootSet = new TreeSet<String>();
-        arcadeCategories = new TreeSet<String>();
+    private static void arcadeSystemLists() {
+        Set<String> arcadeRootSet = new TreeSet<>();
+        arcadeCategories = new TreeSet<>();
         arcadeCategoriesMap.forEach((key, value) -> {
             Machine machine = MAMEInfo.getMachine(key);
             // Some roots do not have a direct entry e.g. Sports
@@ -189,52 +213,37 @@ public class AnalyzeCategories {
             }
         });
 
-        arcadeRoots = new ArrayList<String>(arcadeRootSet);
+        arcadeRoots = new ArrayList<>(arcadeRootSet);
 
-        systemCategories = new ArrayList<String>(allCategories);
+        systemCategories = new ArrayList<>(allCategories);
         systemCategories.removeAll(arcadeCategories);
 
         // For human readability for sanity checking
         Collections.sort(systemCategories);
 
         // Generate System Roots -- TODO figure out correct single lamda
-        TreeSet<String> sysRoots = new TreeSet<String>();
+        TreeSet<String> sysRoots = new TreeSet<>();
         systemCategories.forEach(category ->
         {
             if (category.indexOf('/') > 0) {
                 sysRoots.add(category.substring(0, category.indexOf('/')).trim());
             }
         });
-        systemRoots = new ArrayList<String>(sysRoots);
+        systemRoots = new ArrayList<>(sysRoots);
 
-        categoryListsMap.put(MFMListBuilder.ARCADE_CATEGORIES, new ArrayList<String>(arcadeCategories));
+        categoryListsMap.put(MFMListBuilder.ARCADE_CATEGORIES, new ArrayList<>(arcadeCategories));
         categoryListsMap.put(MFMListBuilder.ARCADE_CATEGORY_ROOTS, arcadeRoots);
         categoryListsMap.put(MFMListBuilder.SYSTEM_CATEGORIES, systemCategories);
         categoryListsMap.put(MFMListBuilder.SYSTEM_CATEGORY_ROOTS, systemRoots);
     }
 
-    @SuppressWarnings("unchecked")
-    public AnalyzeCategories(String filePath) {
-        try {
-            Object obj = PersistUtils.loadAnObjectXML(filePath);
-            if (obj.getClass().isAssignableFrom(HashMap.class)) {
-                categoryGames = (HashMap<String, ArrayList<String>>) obj;
-            } else {
-                throw new ClassCastException("Input file must be XML of HashMap<String, ArrayList<String>> Object");
-            }
-            analyzeFile();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void filterMature() {
-        arcadeNoMatureCategories = new ArrayList<String>();
-        systemNoMatureCategories = new ArrayList<String>();
-        TreeSet<String> matureCategories = new TreeSet<String>();
+    private static void filterMature() {
+        arcadeNoMatureCategories = new ArrayList<>();
+        systemNoMatureCategories = new ArrayList<>();
+        TreeSet<String> matureCategories = new TreeSet<>();
 
         arcadeCategories.forEach(category -> {
-            if (!Pattern.compile(Pattern.quote("mature"), Pattern.CASE_INSENSITIVE).matcher(category).find()) {
+            if (!Pattern.compile(Pattern.quote(MATURE), Pattern.CASE_INSENSITIVE).matcher(category).find()) {
                 arcadeNoMatureCategories.add(category);
             } else {
                 matureCategories.add(category);
@@ -242,7 +251,7 @@ public class AnalyzeCategories {
         });
 
         systemCategories.forEach(category -> {
-            if (!Pattern.compile(Pattern.quote("mature"), Pattern.CASE_INSENSITIVE).matcher(category).find()) {
+            if (!Pattern.compile(Pattern.quote(MATURE), Pattern.CASE_INSENSITIVE).matcher(category).find()) {
                 systemNoMatureCategories.add(category);
             } else {
                 matureCategories.add(category);
@@ -251,7 +260,7 @@ public class AnalyzeCategories {
 
         categoryListsMap.put(MFMListBuilder.ARCADE_NOMATURE_CATEGORIES, arcadeNoMatureCategories);
         categoryListsMap.put(MFMListBuilder.SYSTEM_NOMATURE_CATEGORIES, systemNoMatureCategories);
-        categoryListsMap.put(MFMListBuilder.ALL_MATURE_CATEGORIES, new ArrayList<String>(matureCategories));
+        categoryListsMap.put(MFMListBuilder.ALL_MATURE_CATEGORIES, new ArrayList<>(matureCategories));
     }
 
     private static void persistCategoriestoFile(String path) {
@@ -334,21 +343,21 @@ public class AnalyzeCategories {
     public static void enterNewCategories(File file, String name) {
 // All Roots	Arcade Roots	System Roots	Mature Roots	Arcade Categories	System Categories
 // All Mature Categories	Arcade No Mature Categories	System No Mature Categories
-        rootCategories = new ArrayList<String>();
-        arcadeRoots = new ArrayList<String>();
-        systemRoots = new ArrayList<String>();
-        matureRoots = new ArrayList<String>();
+        rootCategories = new ArrayList<>();
+        arcadeRoots = new ArrayList<>();
+        systemRoots = new ArrayList<>();
+        matureRoots = new ArrayList<>();
 
-        ArrayList<String> arcadeCategories = new ArrayList<String>();
-        systemCategories = new ArrayList<String>();
-        ArrayList<String> allMatureCategories = new ArrayList<String>();
-        arcadeNoMatureCategories = new ArrayList<String>();
-        systemNoMatureCategories = new ArrayList<String>();
+        ArrayList<String> arcadeCategories = new ArrayList<>();
+        systemCategories = new ArrayList<>();
+        ArrayList<String> allMatureCategories = new ArrayList<>();
+        arcadeNoMatureCategories = new ArrayList<>();
+        systemNoMatureCategories = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             // NOTE Why doesn't this work!!
             //   String line = br.readLine(); // Throw out header
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) {
                 // Throw out header
                 if (line.contains("All Roots")) {
@@ -388,7 +397,7 @@ public class AnalyzeCategories {
         systemNoMatureCategories.removeAll(Collections.singleton(""));
 
         // add all
-        categoryListsMap = new HashMap<String, ArrayList<String>>(); // Ensure it is empty
+        categoryListsMap = new HashMap<>(); // Ensure it is empty
 
         categoryListsMap.put(MFMListBuilder.ALL_CATEGORY_ROOTS, rootCategories);
         categoryListsMap.put(MFMListBuilder.ARCADE_CATEGORY_ROOTS, arcadeRoots);

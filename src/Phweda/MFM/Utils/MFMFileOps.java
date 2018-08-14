@@ -43,34 +43,9 @@ import java.util.*;
 public class MFMFileOps {
 
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
+    private static final String COPYING_FILE = "Copying File : ";
 
-    /* TODO determine if we need this here ??*/
-    public static void fileOps(String opName) {
-        try {
-            // Just for logger
-            // JOptionPane.showConfirmDialog(frame, opName);
-
-            switch (opName) {
-
-                case "Copy Directory Tree":
-
-                    break;
-                case "Update All Lists":
-
-                    break;
-                case "Update List":
-
-                    break;
-                case "MAME Update":
-
-                    break;
-
-
-            }
-        } catch (Exception exc) {
-
-        }
-
+    private MFMFileOps() { // cover implicit public constructor
     }
 
     /*
@@ -88,49 +63,46 @@ public class MFMFileOps {
     }
 
     /*
-     * TODO refactor this - too big and needs tightening up
      * Find all files for each game in a playlist.
      * Copy them to the appropriate Play directory if it exists
      */
-    // TODO Need to convert to a set of search roots see copyListResources
-    // Done logic moved to MAME_Resources
-    public static boolean populatePlayList(TreeSet treeSet) {
+    public static boolean populatePlayList(Set treeSet) {
 
         Object[] machines = treeSet.toArray();
-        FileUtils.MFM_FindFile ff = null;
+        FileUtils.MFMFindFile ff = null;
         for (Object machineName : machines) {
             // Find ROM and or CHD
             // Find all Extras
             String name = machineName.toString();
             try {
-                ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.RomsFullSetDir()), Paths.get(name),
+                ff = new FileUtils.MFMFindFile(Paths.get(mfmSettings.RomsFullSetDir()), Paths.get(name),
                         true, false);
 
                 if (mfmSettings.CHDsFullSetDir() != null && mfmSettings.CHDsFullSetDir().length() > 0 &&
                         !mfmSettings.RomsFullSetDir().equals(mfmSettings.CHDsFullSetDir())) {
-                    ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.CHDsFullSetDir()),
+                    ff = new FileUtils.MFMFindFile(Paths.get(mfmSettings.CHDsFullSetDir()),
                             Paths.get(name), true, true);
                 }
 
-                // With MESS merge we need to look for Systems' directory fixme??
-                ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.getExtrasFullSetDir()), Paths.get(name),
+                ff = new FileUtils.MFMFindFile(Paths.get(mfmSettings.getExtrasFullSetDir()), Paths.get(name),
                         true, true);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                // return false;
             }
         }
 
-        ArrayList<Path> fileList = FileUtils.MFM_FindFile.Files();
+        ArrayList<Path> fileList = FileUtils.MFMFindFile.files();
         // Note with MESS need to get a Directory for Extras
-        if (!FileUtils.MFM_FindFile.directories().isEmpty()) {
-            HashMap<String, String> dirs = FileUtils.MFM_FindFile.directories();
-            for (String dir : dirs.keySet()) {
-                fileList.add(Paths.get(dirs.get(dir)));
+        if (!FileUtils.MFMFindFile.directories().isEmpty()) {
+            HashMap<String, String> dirs = FileUtils.MFMFindFile.directories();
+            for (Map.Entry<String, String> entry : dirs.entrySet()) {
+                fileList.add(Paths.get(entry.getValue()));
             }
         }
-        ff.clear();
+        if (ff != null) {
+            ff.clear();
+        }
         moveFilesOLD(fileList);
 
         for (Object machineName : machines) {
@@ -140,16 +112,17 @@ public class MFMFileOps {
         return true;
     }
 
-    // NOTE fixed missing ancestor for Merged sets in MAME_Resources
     private static void loadRequiredResources(String machineName) {
         // Get the getMachine object and check for romof and device_ref
         // Find and move those
         MFM.logger.out("Checking for required parent or device ROMs : " + machineName);
         Machine machine = MAMEInfo.getMachine(machineName);
-        // NOTE we could get a null Machine??
-        List deviceRef = null;
+
+        List deviceRef;
         if (machine != null) {
             deviceRef = machine.getDeviceRef();
+        } else {
+            return;
         }
 
         if (machine.getRomof() != null && machine.getRomof().length() > 0) {
@@ -162,23 +135,25 @@ public class MFMFileOps {
         }
 
         if (deviceRef != null && !deviceRef.isEmpty()) {
-            FileUtils.MFM_FindFile ff = null;
+            FileUtils.MFMFindFile ff = null;
             for (Object name : deviceRef) {
                 try {
-                    ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.RomsFullSetDir()),
+                    ff = new FileUtils.MFMFindFile(Paths.get(mfmSettings.RomsFullSetDir()),
                             Paths.get(name.toString()), true, false);
                     if (mfmSettings.CHDsFullSetDir() != null && mfmSettings.CHDsFullSetDir().length() > 0 &&
                             !mfmSettings.RomsFullSetDir().equals(mfmSettings.CHDsFullSetDir())) {
-                        ff = new FileUtils.MFM_FindFile(Paths.get(mfmSettings.CHDsFullSetDir()),
+                        ff = new FileUtils.MFMFindFile(Paths.get(mfmSettings.CHDsFullSetDir()),
                                 Paths.get(name.toString()), true, false);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            ArrayList<Path> fileList = FileUtils.MFM_FindFile.Files();
+            ArrayList<Path> fileList = FileUtils.MFMFindFile.files();
             // Ensure search results are cleared for succeeding calls
-            ff.clear();
+            if (ff != null) {
+                ff.clear();
+            }
             moveFilesOLD(fileList);
         }
     }
@@ -187,7 +162,7 @@ public class MFMFileOps {
      * 3/11/2016
      * Updated methodology
      *
-     * @param files
+     * @param files Map of files to move
      */
     public static void moveFiles(TreeMap<String, Object> files) {
 
@@ -219,10 +194,10 @@ public class MFMFileOps {
         TreeSet<File> romsList = (TreeSet<File>) files.get(MFM_Constants.ROMS);
         for (File file : romsList) {
             Path path = Paths.get(file.getAbsolutePath());
-            MFM.logger.out("Copying File : " + path.toString() + " -> " + romsDir);
+            MFM.logger.out(COPYING_FILE + path.toString() + " -> " + romsDir);
             try {
                 if (romsDir != null) {
-                    if (Files.isDirectory(path)) {
+                    if (path.toFile().isDirectory()) {
                         FileUtils.copyDirectory(path, romsDir, true);
                     } else {
                         FileUtils.copyFile(path, romsDir, true);
@@ -236,37 +211,33 @@ public class MFMFileOps {
         }
 
         // CHDs
-        String CHDsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.CHDS);
-        if (CHDsDir == null) {
-            CHDsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
+        String chdsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.CHDS);
+        if (chdsDir == null) {
+            chdsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
         }
 
-        File CHDfile = new File(CHDsDir);
-        if (!CHDfile.exists()) {
-            CHDfile.mkdir();
+        File chdFile = new File(chdsDir);
+        if (!chdFile.exists()) {
+            try {
+                Files.createDirectory(chdFile.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         TreeSet<File> chdList = (TreeSet<File>) files.get(MFM_Constants.CHDS);
         for (File file : chdList) {
             Path path = Paths.get(file.getAbsolutePath());
-            MFM.logger.out("Copying File : " + path.toString() + " -> " + CHDsDir);
+            MFM.logger.out(COPYING_FILE + path.toString() + " -> " + chdsDir);
             try {
-                if (CHDsDir != null) {
-                    if (Files.isDirectory(path)) {
-                        // NOTE Do nothing no longer copying all automatically 12/20/2016
-                        //FileUtils.copyDirectory(path, CHDsDir, true);
-                    } else {
-                        // Create directory to maintain Folder/CHDfile structure
-                        String tempDir = CHDsDir + FileUtils.DIRECTORY_SEPARATOR + file.getParentFile().getName();
-                        File dir = new File(tempDir);
-                        if (!dir.exists()) {
-                            dir.mkdir();
-                        }
-                        FileUtils.copyFile(path, tempDir, true);
+                if (!path.toFile().isDirectory()) {
+                    // Create directory to maintain Folder/CHDfile structure
+                    String tempDir = chdsDir + FileUtils.DIRECTORY_SEPARATOR + file.getParentFile().getName();
+                    File dir = new File(tempDir);
+                    if (!dir.exists()) {
+                        Files.createDirectory(dir.toPath());
                     }
-                } else {
-                    MFM.logger.out("!!!!! copying resources found no 'chds' " +
-                            "or 'roms' directory in your Playset location");
+                    FileUtils.copyFile(path, tempDir, true);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -291,14 +262,11 @@ public class MFMFileOps {
             }
             for (String zipentry : zippedExtraFiles) {
                 MFM.logger.out("Copying zipped File : " + zipentry + " -> " + extrasDir);
-                try {
-                    boolean copied = ZipUtils.extractFile(zipFile.toPath(), zipentry,
-                            Paths.get(extrasDir + FileUtils.DIRECTORY_SEPARATOR + zipentry));
-                    if (!copied) {
-                        MFM.logger.out("FAILED copying zipped File : " + zipentry + " -> " + extrasDir);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+                boolean copied = ZipUtils.extractFile(zipFile.toPath(), zipentry,
+                        Paths.get(extrasDir + FileUtils.DIRECTORY_SEPARATOR + zipentry));
+                if (!copied) {
+                    MFM.logger.out("FAILED copying zipped File : " + zipentry + " -> " + extrasDir);
                 }
             }
         }
@@ -310,10 +278,10 @@ public class MFMFileOps {
 
             for (File file : extraFiles) {
                 Path path = Paths.get(file.getAbsolutePath());
-                MFM.logger.out("Copying File : " + path.toString() + " -> " + extrasDir);
+                MFM.logger.out(COPYING_FILE + path.toString() + " -> " + extrasDir);
                 try {
                     if (extrasDir != null) {
-                        if (Files.isDirectory(path)) {
+                        if (path.toFile().isDirectory()) {
                             FileUtils.copyDirectory(path, extrasDir, true);
                         } else {
                             FileUtils.copyFile(path, extrasDir, true);
@@ -326,6 +294,7 @@ public class MFMFileOps {
         }
     }
 
+    // TODO clean up this old mess
     private static void moveFilesOLD(ArrayList<Path> filesList) {
         for (Path path : filesList) {
             MFM.logger.out("Copying File source path is  : " + path.toString());
@@ -344,44 +313,8 @@ public class MFMFileOps {
                     // dir = MAMESettings.PlaySetDirectories().get("roms");
                     System.out.println(path + " : " + path.toString().toLowerCase());
                 }
-/*
-                try {
-                    if (Files.isDirectory(path)) {
-                        FileUtils.copyDirectory(path, dir, true);
-                    } else {
-                        FileUtils.copyFile(path, dir, true);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-*/
                 // Check for and load other required resources
-
-            } /*else if (path.toString().endsWith(".chd")) {
-                // Have to add CHD dir here
-                if ((dir = mfmSettings.PlaySetDirectories().get("chds")) != null) {
-
-                } else {
-                    dir = mfmSettings.PlaySetDirectories().get("roms");
-                }
-                // Strip off file name. For CHD we need to copy over the parent directory first
-                Path parentPath = path.getParent();
-                try {
-                    FileUtils.copyFile(parentPath, dir, true);
-                    FileUtils.copyFile(path,
-                            (dir + FileUtils.DIRECTORY_SEPARATOR + parentPath.getFileName().toString()), true);
-                } catch (IOException e) {
-                    if (e instanceof DirectoryNotEmptyException) {
-                        MFM.logger.addToList("Directory : " + path.getFileName() + " already exists"
-                        );
-                    } else {
-                        e.printStackTrace();
-                    }
-                }
-
             }
-*/
-            // TODO extras folders mapping in ? MAMEInfo? fixme : Map all Extras folders directly
             // Now the Extras for Arcades
             else {
 
@@ -396,7 +329,7 @@ public class MFMFileOps {
                  */
                 try {
                     if (dir != null) {
-                        if (Files.isDirectory(path)) {
+                        if (path.toFile().isDirectory()) {
                             FileUtils.copyDirectory(path, dir, true);
                         } else {
                             FileUtils.copyFile(path, dir, true);
@@ -413,14 +346,14 @@ public class MFMFileOps {
      * Find all MAME directories i.e. roms, chds, samples, snaps etc
      */
     public static HashMap<String, String> findMAMEdirectories(Path root, String[] dirNames) {
-        HashMap map = null;
+        HashMap<String, String> map = null;
         try {
-            FileUtils.MFM_FindFile ff = new FileUtils.MFM_FindFile(root, dirNames, false, true);
-            map = FileUtils.MFM_FindFile.directories();
+            FileUtils.MFMFindFile ff = new FileUtils.MFMFindFile(root, dirNames, false, true);
+            map = FileUtils.MFMFindFile.directories();
             // Ensure search results are cleared for succeeding calls
             ff.clear();
         } catch (IOException e) {
-            e.printStackTrace(MFM.logger.Writer());
+            e.printStackTrace(MFM.logger.writer());
         }
         return map;
     }
@@ -431,23 +364,16 @@ public class MFMFileOps {
     public static String findMAMEfile(Path root, Path name) {
         String path = null;
         try {
-            FileUtils.MFM_FindFile ff = new FileUtils.MFM_FindFile(root, name);
-            if (FileUtils.MFM_FindFile.File() != null) {
-                path = FileUtils.MFM_FindFile.File().toString();
+            FileUtils.MFMFindFile ff = new FileUtils.MFMFindFile(root, name);
+            if (FileUtils.MFMFindFile.file() != null) {
+                path = FileUtils.MFMFindFile.file().toString();
                 // Ensure search results are cleared for succeeding calls
                 ff.clear();
             }
         } catch (IOException e) {
-            e.printStackTrace(MFM.logger.Writer());
+            e.printStackTrace(MFM.logger.writer());
         }
         return path;
-    }
-
-    /* TODO is this needed??
-     * Find a single directory
-     */
-    protected static Path findMAMEdirectory(Path root, String name) {
-        return Paths.get("");
     }
 
 }

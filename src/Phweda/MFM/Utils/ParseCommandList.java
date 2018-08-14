@@ -30,8 +30,7 @@ import java.util.Map;
  * Time: 5:31 PM
  */
 public class ParseCommandList extends ParseTextFile {
-    private static Map<String, String> commands;
-    private static String category;
+    private Map<String, String> commands;
 
     /**
      * Constructor.
@@ -53,11 +52,13 @@ public class ParseCommandList extends ParseTextFile {
         if (line.charAt(0) == '#' || line.charAt(0) == '*') {
             StringBuilder sb = new StringBuilder(line);
             sb.delete(0, 1); //Remove # and space
-            category = sb.toString().trim();
+            String category = sb.toString().trim();
             if (map.containsKey(category)) {
+                // Bad design this uses different Map
                 commands = (Map<String, String>) map.get(category);
             } else {
-                commands = new HashMap<String, String>(20);
+                commands = new HashMap<>(20);
+                // Bad design this uses different Map
                 map.put(category, commands);
             }
 

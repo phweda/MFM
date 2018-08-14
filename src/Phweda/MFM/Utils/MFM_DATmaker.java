@@ -36,7 +36,6 @@ import Phweda.utils.PersistUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -51,6 +50,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Creates a standard DAT file for a list
  */
+@SuppressWarnings({"squid:S00117", "squid:S3008"})
 public class MFM_DATmaker {
 
     private static Map<String, Machine> map;
@@ -59,7 +59,7 @@ public class MFM_DATmaker {
     private static File DATschemaFile = new File(MFM.MFM_SETTINGS_DIR + "datafile2018.xsd");
     public static final String GOOD = "Good";
 
-    public static Datafile generateDAT(String listName, Set<String> list) throws ParserConfigurationException {
+    public static Datafile generateDAT(String listName, Set<String> list) {
         return createDAT(listName, list);
     }
 
@@ -109,15 +109,10 @@ public class MFM_DATmaker {
      * Creates and zips up builtin lists. To support MFM Data Set torrent
      **/
     public static void saveBuiltinListsDATs() {
-        List<Datafile> DATfiles = new ArrayList<Datafile>();
+        List<Datafile> DATfiles = new ArrayList<>();
         MFMPlayLists.getInstance().getMFMListNames()
-                .forEach(listName -> {
-                    try {
-                        DATfiles.add(createDAT(listName, MFMPlayLists.getInstance().getPlayList(listName)));
-                    } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                    }
-                });
+                .forEach(listName ->
+                        DATfiles.add(createDAT(listName, MFMPlayLists.getInstance().getPlayList(listName))));
 
         saveDATS(DATfiles);
     }
@@ -128,7 +123,7 @@ public class MFM_DATmaker {
      * 186_RUNNABLE_DAT.zip
      * Creates and zips up builtin lists. To support MFM Data Set torrent
      *
-     * @param DATfiles
+     * @param DATfiles DAT files to save to ZIP
      */
     private static void saveDATS(List<Datafile> DATfiles) {
         String zipName = getDATzipName();
@@ -158,7 +153,7 @@ public class MFM_DATmaker {
         persistDATs.start();
     }
 
-    private static Datafile createDAT(String listName, Set<String> list) throws ParserConfigurationException {
+    private static Datafile createDAT(String listName, Set<String> list) {
         Datafile df = new Datafile();
         df.setHeader(createHeader(listName));
         addMachines(df, list);
@@ -257,7 +252,7 @@ public class MFM_DATmaker {
         String dataVersion = MFMSettings.getInstance().getDataVersion();
         // OK just for fun. really should be if/else with no String concat
         sb.append(dataVersion.contains(MFMSettings.ALL_) ?
-                dataVersion.substring(4, dataVersion.length()) + "_" + "ALL" : dataVersion);
+                dataVersion.substring(4) + "_" + "ALL" : dataVersion);
 
         sb.append(LISTS_ZIP_FILE_SUFFIX);
         return sb.toString();
@@ -266,12 +261,12 @@ public class MFM_DATmaker {
     /**
      * Specifically for MFM version internal string
      *
-     * @return
+     * @return Number string with 0. prefix removed
      */
     private static String getDataVersionNumber() {
         String version = MFMSettings.getInstance().getDataVersion();
         if (version.contains(".")) {
-            return version.substring(version.lastIndexOf(".") + 1);
+            return version.substring(version.lastIndexOf('.') + 1);
         }
         return version;
     }

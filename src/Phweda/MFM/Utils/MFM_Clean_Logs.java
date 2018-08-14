@@ -32,18 +32,25 @@ import java.nio.file.Paths;
  * Time: 4:04 PM
  */
 public class MFM_Clean_Logs {
+
+    private MFM_Clean_Logs() { // Hide implicit public constructor - squid:S1118
+    }
+
     public static void cleanLogs() {
         // 86,400,000 == 1 day in milliseconds
         long deleteTime = System.currentTimeMillis() - 86400000;
 
         File logsDirectory = new File(MFM.MFM_LOGS_DIR);
-        for (File child : logsDirectory.listFiles()) {
-            if (child.lastModified() < deleteTime)
-                try {
-                    Files.deleteIfExists(Paths.get(child.getAbsolutePath()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        File[] files = logsDirectory.listFiles();
+        if (files != null) {
+            for (File child : files) {
+                if (child.lastModified() < deleteTime)
+                    try {
+                        Files.deleteIfExists(Paths.get(child.getAbsolutePath()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
         }
     }
 }

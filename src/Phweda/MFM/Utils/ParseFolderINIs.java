@@ -42,7 +42,6 @@ public class ParseFolderINIs extends ParseTextFile {
     /*
      * We just do all the work here
      *
-     * TODO figure out how to handle files like Favorites.ini that do not have any [] after ROOT_FOLDER
      */
     @Override
     protected void processLine(String line) {
@@ -50,7 +49,7 @@ public class ParseFolderINIs extends ParseTextFile {
         // Now the meat of it
         String MAMEfolder = "";
         String previousLine = null;
-        TreeSet<String> machines = null;
+        TreeSet<String> machines;
         while (scanner.hasNext()) {
 
             /* TODO figure out the Regex : match left square bracket followed by zero
@@ -87,7 +86,7 @@ public class ParseFolderINIs extends ParseTextFile {
                     previousLine = null;
                 }
 
-                machines = new TreeSet<String>();
+                machines = new TreeSet<>();
                 while (scanner.hasNext() && !line.contains("[")) {
                     if (line.length() > 0 && !line.contains("[")) {
                         machines.add(line);

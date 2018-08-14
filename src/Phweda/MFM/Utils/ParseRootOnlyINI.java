@@ -29,13 +29,13 @@ import java.util.Map;
  * Time: 10:57 AM
  */
 public class ParseRootOnlyINI extends ParseTextFile {
-    public ParseRootOnlyINI(String fileName, Map mapIn) {
+    ParseRootOnlyINI(String fileName, Map mapIn) {
         super(fileName, mapIn);
     }
 
     @Override
     protected void processLine(String line) {
-        String previousLine = null;
+
         while (scanner.hasNext()) {
 
             /* TODO figure out the Regex : match left square bracket followed by zero
@@ -44,18 +44,11 @@ public class ParseRootOnlyINI extends ParseTextFile {
              */
             //scanner.next(Pattern.compile("[\[\d*?\w\*?]]"))
             if (line.contains("[") && !line.contains("FOLDER_SETTINGS")) {
-
                 // Resolve the 'only has Root Folder' issue
                 if (line.contains("ROOT_FOLDER")) {
-
                     do {
                         line = scanner.nextLine();
                     } while (line.matches("\\s*") || line.startsWith(";"));
-
-
-                    if (line.matches("\\w+")) {
-                        previousLine = line;
-                    }
                 }
 
 
@@ -67,7 +60,6 @@ public class ParseRootOnlyINI extends ParseTextFile {
                 }
             } else {
                 line = scanner.nextLine();
-                continue;
             }
         }
     }

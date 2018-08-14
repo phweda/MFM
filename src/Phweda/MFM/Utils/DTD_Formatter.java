@@ -47,24 +47,21 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * Backs up raw DTD file then formats for human readability *
  */
 public class DTD_Formatter {
+    private File inputFile;
 
-    static File inputFile;
-    Path inputBackupFile;
+    private static HashMap<String, Integer> elements = new HashMap<>();
 
-    private static String currentElement;
-    private static HashMap<String, Integer> elements = new HashMap<String, Integer>();
-
-    public DTD_Formatter(File fileIn) {
-        inputFile = fileIn;
+    public DTD_Formatter(File inFile) {
+        inputFile = inFile;
         boolean valid = XMLUtils.validate(inputFile);
         if (!valid) {
             JOptionPane.showMessageDialog(null, "DTD_Formatter received a non-valid XML document\n" +
                     "File: " + inputFile.getAbsolutePath(), "XML Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        inputBackupFile = Paths.get(inputFile.getAbsolutePath() + "_Backup");
+        Path inputBackupFile = Paths.get(inputFile.getAbsolutePath() + "_Backup");
         try {
-            Path path = Files.copy(fileIn.toPath(), inputBackupFile, REPLACE_EXISTING);
+            Files.copy(inputFile.toPath(), inputBackupFile, REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,14 +70,14 @@ public class DTD_Formatter {
 
     private void format() {
 
-        try {
+        try (Scanner all = new Scanner(inputFile).useDelimiter("\\Z")) {
             // Use scanner to slurp entire file contents
-            String content = new Scanner(inputFile).useDelimiter("\\Z").next();
+            String content = all.next();
             String path = inputFile.getAbsolutePath();
-            inputFile.delete();
-            Scanner scanner = new Scanner(content);
-            scanner.useDelimiter("\\R");
-            try (PrintWriter pw = new PrintWriter(new File(path))) {
+            Files.delete(inputFile.toPath());
+
+            try (PrintWriter pw = new PrintWriter(new File(path)); Scanner scanner = new Scanner(content)) {
+                scanner.useDelimiter("\\R");
                 while (scanner.hasNext()) {
                     String line = scanner.next();
                     // System.out.println(scanner.next());
@@ -102,15 +99,15 @@ public class DTD_Formatter {
             } catch (FileNotFoundException exc) {
                 exc.printStackTrace();
             }
-        } catch (FileNotFoundException exc) {
+        } catch (IOException exc) {
             exc.printStackTrace();
         }
     }
 
     private String processElement(String line) {
-        currentElement = getElementName(line);
+        String currentElement = getElementName(line);
         if (elements.isEmpty()) {
-            elements.put(currentElement, new Integer(0));
+            elements.put(currentElement, 0);
         }
 
         for (String element : getSubElements(line)) {
@@ -120,18 +117,19 @@ public class DTD_Formatter {
     }
 
     private ArrayList<String> getSubElements(String line) {
-        ArrayList<String> elements = new ArrayList<String>();
+        ArrayList<String> elements = new ArrayList<>();
         // Return if none. See http://xmlwriter.net/xml_guide/element_declaration.shtml#DeclareMixed
         if (!line.contains("(") || (line.contains("#") && !line.contains("|"))) {
             return elements;
         }
-        String input = line.substring(line.indexOf('(') + 1, line.indexOf(")") - 1);
+        String input = line.substring(line.indexOf('(') + 1, line.indexOf(')') - 1);
         // Common case
         if (input.contains(",")) {
-            Scanner scanner = new Scanner(input);
-            scanner.useDelimiter(",");
-            while (scanner.hasNext()) {
-                elements.add(stripSpecialCharacters(scanner.next()));
+            try (Scanner scanner = new Scanner(input)) {
+                scanner.useDelimiter(",");
+                while (scanner.hasNext()) {
+                    elements.add(stripSpecialCharacters(scanner.next()));
+                }
             }
         } else if (!line.contains("|")) {
             elements.add(stripSpecialCharacters(input));

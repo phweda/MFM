@@ -23,6 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -56,7 +57,11 @@ public class MAMEDocType {
     public MAMEDocType(List<Path> files, String outputDirIn) {
         outputdir = new File(outputDirIn);
         if (!outputdir.exists()) {
-            outputdir.mkdir();
+            try {
+                Files.createDirectory(outputdir.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         process(files);
     }
@@ -76,18 +81,15 @@ public class MAMEDocType {
 
     private void saveDTD(Path file) {
         String version = getMameVersion(file);
-        //    System.out.println(version);
-        Path parent = file.getParent();
         File xmlFile = null;
         ArrayList<String> args = mameArgs(file);
         try {
             xmlFile = new File(file.getParent().toString() + File.separator + "mame" + version + ".xml");
-
             // Overwrite existing file
             if (xmlFile.exists()) {
-                boolean delete = xmlFile.delete();
+                Files.delete(xmlFile.toPath());
                 boolean create = xmlFile.createNewFile();
-                if (!delete || !create) {
+                if (!create) {
                     System.out.println("XML file delete/create failed!!!");
                     return;
                 }
@@ -100,14 +102,21 @@ public class MAMEDocType {
                 return;
             }
 
-        } catch (MAMEexe.MAME_Exception | InterruptedException | IOException e) { //    | InterruptedException | IOException
+        } catch (MAMEexe.MAME_Exception | IOException e) { //    | InterruptedException | IOException
             e.printStackTrace();
             return;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
         if (xmlFile.exists()) {
             try {
                 Document doc = getMameDoc(xmlFile);
+                if (doc == null) {
+                    System.out.println("Failed to get MAME Document.");
+                    return;
+                }
                 DocumentType doctype = doc.getDoctype();
                 //    System.out.println(version + "," + doctype.getInternalSubset().hashCode());
                 outputData.append(version);
@@ -130,7 +139,9 @@ public class MAMEDocType {
         StreamResult xmlOutput = new StreamResult(new StringWriter());
 
         try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            Transformer transformer = factory.newTransformer();
             transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "testing.dtd");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -150,7 +161,7 @@ public class MAMEDocType {
 
     // Note older Mame versions of -listxml did NOT support filtered output
     private ArrayList<String> mameArgs(Path file) {
-        ArrayList<String> args = new ArrayList<String>();
+        ArrayList<String> args = new ArrayList<>();
         MAMEexe.setBaseArgs(file.toString());
         args.add("-listxml");
         args.add("0*");
@@ -175,7 +186,7 @@ public class MAMEDocType {
         String version = null;
         File temp = null;
         MAMEexe.setBaseArgs(mameExe.toString());
-        ArrayList<String> args = new ArrayList<String>();
+        ArrayList<String> args = new ArrayList<>();
         args.add("-h");
         try {
             Path output = Files.createTempFile("output", ".txt");
@@ -186,18 +197,24 @@ public class MAMEDocType {
         try {
             Process process = MAMEexe.run(args, temp, false);
             process.waitFor();
-        } catch (MAMEexe.MAME_Exception | InterruptedException e) {
+        } catch (MAMEexe.MAME_Exception e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
-        try {
-            String content = new Scanner(temp).useDelimiter("\\Z").next();
+        if (temp == null) {
+            return "";
+        }
+        try (Scanner scanner = new Scanner(temp).useDelimiter("\\Z")) {
+            String content = scanner.next();
             int index = content.indexOf('0');
             version = content.substring(index + 2, index + 5);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        return version.trim();
+        return version != null ? version.trim() : "";
     }
 
 }

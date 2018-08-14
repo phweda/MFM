@@ -49,7 +49,7 @@ public class ParseExtrasInfoDATs extends ParseTextFile {
         }
 
         // $info line has one game
-        String game = line.substring(6, line.length());
+        String game = line.substring(6);
 
         // NOTE March 2017 end of messinfo.dat has changed we can get here on EOF
         /* Find next line starting with $mame & GOTO next line */
@@ -67,8 +67,6 @@ public class ParseExtrasInfoDATs extends ParseTextFile {
 
         /* Until line starting with $end */
         do {
-            // TODO do we need to add an endline here?
-            // YES But it appears to give us two!! ??
             infoText.append(line).append('\n');
             line = scanner.nextLine();
         } while (!line.startsWith("$end"));
