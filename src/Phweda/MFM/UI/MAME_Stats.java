@@ -18,9 +18,7 @@
 
 package Phweda.MFM.UI;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.MFM_Data;
+import Phweda.MFM.*;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
 
@@ -35,8 +33,11 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static Phweda.MFM.MFMSettings.PLAYABLE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,44 +47,57 @@ import java.util.stream.Collectors;
  */
 class MAME_Stats {
     final Mame mame;
-    final static LinkedHashMap<String, AtomicInteger> stats = new LinkedHashMap<String, AtomicInteger>(100);
-    final DecimalFormat percentFormater = new DecimalFormat("##.##%");
+    private final LinkedHashMap<String, AtomicInteger> stats = new LinkedHashMap<>(100);
+    private final DecimalFormat percentFormater = new DecimalFormat("##.##%");
 
-    static final LinkedHashMap<String, String> STATS_KEY_MAP = Arrays.stream(new Object[][]{
-            {"Total", "Total Machines"},
+    private static final String TOTAL = "Total";
+    private static final String DISPLAY_RASTER = "<html><center>Display<br>Raster</html>";
+    private static final String DISPLAY_VECTOR = "<html><center>Display<br>Vector</html>";
+    private static final String DISPLAY_LCD = "<html><center>Display<br>LCD</html>";
+    private static final String ORIENTATION_COCKTAIL = "<html><center>Orientation<br>Cocktail</html>";
+    private static final String ORIENTATION_HORIZONTAL = "<html><center>Orientation<br>Horizontal</html>";
+    private static final String ORIENTATION_VERTICAL = "<html><center>Orientation<br>Vertical</html>";
+
+    private static final String STATUS_GOOD = "<html><center>Status<br>Good</html>";
+    private static final String STATUS_IMPERFECT = "<html><center>Status<br>Imperfect</html>";
+    private static final String STATUS_PRELIMINARY = "<html><center>Status<br>Preliminary</html>";
+
+    static final Map<String, String> STATS_KEY_MAP = Arrays.stream(new Object[][]{
+            {TOTAL, "Total Machines"},
             {"All", "Machines possibly usable: Total minus BIOS & Devices"},
+            {MFMListBuilder.ARCADE, "Arcade games"},
             {"BIOS", "ROM BIOS (non-volatile firmware)"},
             {"CHD", "Machines with at least 1 CHD"},
             {"CHDs", "Total number of CHDs"},
             {"Device", "System hardware e.g. Controller Floppy Z80"},
-            {"Display Raster", "Display Raster"},
-            {"Display Vector", "Display Vector"},
-            {"Display LCD", "Display LCD"},
+            {DISPLAY_RASTER, DISPLAY_RASTER},
+            {DISPLAY_VECTOR, DISPLAY_VECTOR},
+            {DISPLAY_LCD, DISPLAY_LCD},
             {"Mechanical", "Mechanical Machine"},
-            {"Orientation Cocktail", "Cocktail orientation"},
-            {"Orientation Horizontal", "Horizontal orientation"},
-            {"Orientation Vertical", "Vertical orientation"},
+            {ORIENTATION_COCKTAIL, "Cocktail orientation"},
+            {ORIENTATION_HORIZONTAL, "Horizontal orientation"},
+            {ORIENTATION_VERTICAL, "Vertical orientation"},
             {"Runnable", "Marked runnable in XML"},
             {"Sample", "Machine has audio sample(s)"},
-            {"Status Good", "Machines marked good"},
-            {"Status Imperfect", "Machines marked imperfect"},
-            {"Status Preliminary", "Machines marked preliminary"},
-            {"Usable", "Status good or imperfect"},
+            {STATUS_GOOD, "Machines marked good"},
+            {STATUS_IMPERFECT, "Machines marked imperfect"},
+            {STATUS_PRELIMINARY, "Machines marked preliminary"},
+            {MFMListBuilder.SYSTEMS, "Systems(MESS) - PCs, handhelds etc."},
+            {PLAYABLE, "Machines marked Status good or imperfect"},
     }).collect(Collectors.toMap(kv -> (String) kv[0], kv -> (String) kv[1],
             (x, y) -> {
-                throw new IllegalStateException(String.format("Duplicate key ", x));
+                throw new IllegalStateException("Duplicate key " + x);
             },
-            LinkedHashMap<String, String>::new));
+            LinkedHashMap<String, String>::new)); // In this case IDEA inspection is wrong
 
-    {
+    MAME_Stats() {
         mame = MFM_Data.getInstance().getMame();
-        STATS_KEY_MAP.forEach((key, value) -> {
-            stats.put(key, new AtomicInteger());
-        });
+        STATS_KEY_MAP.forEach((key, value) -> stats.put(key, new AtomicInteger()));
+        // fixme we have two definitions for All!! MFM_Constants.ALL and MFMListBuilder.ALL!!
+        processStats(MFM_Data.getInstance().getDataVersion().contains(MFMListBuilder.ALL));
     }
 
     void saveStats() {
-        processStats();
         displayStats();
         saveStatstoFile();
     }
@@ -104,6 +118,7 @@ class MAME_Stats {
     private String getHeaderLine() {
         StringBuilder stringBuilder = new StringBuilder();
         STATS_KEY_MAP.keySet().forEach(key -> {
+            key = key.replaceAll(MFM_Wiki.XML_TAG_REGEX, " "); // Remove html tags
             stringBuilder.append(key);
             stringBuilder.append(",");
         });
@@ -111,7 +126,7 @@ class MAME_Stats {
         return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
     }
 
-    private String getDescriptionLine() {
+    String getDescriptionLine() {
         StringBuilder stringBuilder = new StringBuilder();
         STATS_KEY_MAP.keySet().forEach(key -> {
             stringBuilder.append(STATS_KEY_MAP.get(key));
@@ -132,7 +147,8 @@ class MAME_Stats {
     private String getTotalPercentsLine() {
         StringBuilder stringBuilder = new StringBuilder();
         stats.keySet().forEach(key -> {
-            stringBuilder.append(percentFormater.format(stats.get(key).floatValue() / stats.get("Total").floatValue()));
+            stringBuilder.append(percentFormater.format(
+                    stats.get(key).floatValue() / stats.get(TOTAL).floatValue()));
             stringBuilder.append(",");
         });
         return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
@@ -141,17 +157,17 @@ class MAME_Stats {
     private String getAllPercentsLine() {
         StringBuilder stringBuilder = new StringBuilder();
         stats.keySet().forEach(key -> {
-            stringBuilder.append(percentFormater.format(stats.get(key).floatValue() / stats.get("All").floatValue()));
+            stringBuilder.append(percentFormater.format(
+                    stats.get(key).floatValue() / stats.get("All").floatValue()));
             stringBuilder.append(",");
         });
         return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
     }
 
-    private void displayStats() {
+    Object[][] getStatsArray() {
         Object[][] statsArray = new Object[3][stats.size()];
-        Object[] headers = stats.keySet().toArray();
 
-        AtomicInteger total = stats.get("Total");
+        AtomicInteger total = stats.get(TOTAL);
         AtomicInteger all = stats.get("All");
         final AtomicInteger ai = new AtomicInteger(0);
         stats.forEach((key, value) -> {
@@ -159,17 +175,29 @@ class MAME_Stats {
             statsArray[1][ai.get()] = percentFormater.format(value.floatValue() / total.floatValue());
             statsArray[2][ai.getAndIncrement()] = percentFormater.format(value.floatValue() / all.floatValue());
         });
+        statsArray[1][0] = TOTAL + "%";
         statsArray[2][0] = "All% \u27B5";
-        statsArray[2][2] = "-";
+        statsArray[2][3] = "-";
+        statsArray[1][5] = "-";
         statsArray[2][5] = "-";
+        statsArray[2][6] = "-";
 
-        JTable statsTable = new JTable(statsArray, headers) {
+        return statsArray;
+    }
+
+    Object[] getStatsHeaders() {
+        return stats.keySet().toArray();
+    }
+
+    private void displayStats() {
+        JTable statsTable = new JTable(getStatsArray(), getStatsHeaders()) {
             //Implement table header tool tips.
+            @Override
             protected JTableHeader createDefaultTableHeader() {
                 return new JTableHeader(columnModel) {
+                    @Override
                     public String getToolTipText(MouseEvent e) {
-                        String tip = null;
-                        java.awt.Point p = e.getPoint();
+                        Point p = e.getPoint();
                         int index = columnModel.getColumnIndexAtX(p.x);
                         return STATS_KEY_MAP.get(columnModel.getColumn(index).getHeaderValue().toString());
                     }
@@ -186,42 +214,51 @@ class MAME_Stats {
             }
         };
 
-        int[] widths = {40, 35, 35, 35, 35, 50, 95, 85, 85, 80, 130, 130, 110, 75, 85, 85, 105, 105, 65}; // 1470
+        int[] widths = {60, 60, 60, 60, 60, 60, 60, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75}; // 21 = 1530
         for (int i = 0; i < statsTable.getColumnModel().getColumnCount(); i++) {
             statsTable.getColumnModel().getColumn(i).setMinWidth(widths[i]);
         }
-        statsTable.setFillsViewportHeight(false);
+        statsTable.setRowHeight(30);
+        statsTable.getTableHeader().setPreferredSize(new Dimension(1500, 40));
+        statsTable.setFillsViewportHeight(true);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JDialog dialog = new JDialog((Frame) null, "MAME STATS: " + MFMSettings.getInstance().getDataVersion());
-                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                dialog.setLocation(150, 250);
-                dialog.setMinimumSize(new Dimension(1575, 175));
-                dialog.setMaximumSize(new Dimension(1575, 175));
-                dialog.setPreferredSize(new Dimension(1575, 175));
-                dialog.setLayout(new BorderLayout());
-                JScrollPane scrollPane = new JScrollPane(statsTable);
-                scrollPane.setMinimumSize(new Dimension(1555, 170));
-                scrollPane.setMaximumSize(new Dimension(1555, 170));
-                dialog.add(scrollPane, BorderLayout.CENTER);
-                dialog.pack();
-                dialog.setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> {
+                    JDialog dialog = new JDialog((Frame) null, "MAME STATS: " +
+                            MFMSettings.getInstance().getDataVersion());
+                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                    dialog.setIconImage(MFMUI_Setup.getMFMIcon().getImage());
+                    dialog.setLocation(50, 250);
+                    dialog.setMinimumSize(new Dimension(1600, 190));
+                    dialog.setMaximumSize(new Dimension(1600, 190));
+                    dialog.setPreferredSize(new Dimension(1600, 190));
+                    dialog.setLayout(new BorderLayout());
+                    JScrollPane scrollPane = new JScrollPane(statsTable);
+                    scrollPane.setMinimumSize(new Dimension(1500, 190));
+                    scrollPane.setMaximumSize(new Dimension(1500, 190));
+                    dialog.add(scrollPane, BorderLayout.CENTER);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+        );
     }
 
-    private void processStats() {
+    private void processStats(boolean all) {
         for (Machine machine : mame.getMachine()) {
-            stats.get("Total").getAndIncrement();
-
-            if (machine.getIsbios().equals(Machine.YES)) {
-                stats.get("BIOS").getAndIncrement();
-            } else if (machine.getIsdevice().equals(Machine.YES)) {
-                stats.get("Device").getAndIncrement();
+            if (all) {
+                if (machine.getIsbios().equals(Machine.YES)) {
+                    stats.get("BIOS").getAndIncrement();
+                } else if (machine.getIsdevice().equals(Machine.YES)) {
+                    stats.get("Device").getAndIncrement();
+                } else {
+                    stats.get(MFM_Constants.ALL).getAndIncrement();
+                }
+            } else if (machine.getIsbios().equals(Machine.YES) || machine.getIsdevice().equals(Machine.YES)) {
+                continue;
             } else {
-                stats.get("All").getAndIncrement();
+                stats.get(MFM_Constants.ALL).getAndIncrement();
             }
+
+            stats.get(TOTAL).getAndIncrement();
 
             if (machine.getDisk() != null && !machine.getDisk().isEmpty()) {
                 stats.get("CHD").getAndIncrement();
@@ -231,15 +268,25 @@ class MAME_Stats {
             if (machine.getDisplay() != null && !machine.getDisplay().isEmpty()) {
                 switch (machine.getDisplay().get(0).getType()) {
                     case "raster":
-                        stats.get("Display Raster").getAndIncrement();
+                        stats.get(DISPLAY_RASTER).getAndIncrement();
                         break;
                     case "vector":
-                        stats.get("Display Vector").getAndIncrement();
+                        stats.get(DISPLAY_VECTOR).getAndIncrement();
                         break;
                     case "lcd":
-                        stats.get("Display LCD").getAndIncrement();
+                        stats.get(DISPLAY_LCD).getAndIncrement();
+                        break;
+                    default:
                         break;
                 }
+            }
+
+            if (MFMPlayLists.getInstance().getPlayList(MFMListBuilder.ARCADE).contains(machine.getName())) {
+                stats.get(MFMListBuilder.ARCADE).getAndIncrement();
+            }
+
+            if (MFMPlayLists.getInstance().getPlayList(MFMListBuilder.SYSTEMS).contains(machine.getName())) {
+                stats.get(MFMListBuilder.SYSTEMS).getAndIncrement();
             }
 
             if (machine.getIsmechanical().equals(Machine.YES)) {
@@ -249,16 +296,16 @@ class MAME_Stats {
             if (machine.getIsVertical() != null) {
                 if (!machine.getIsVertical().isEmpty() &&
                         machine.getIsVertical().equalsIgnoreCase(Machine.HORIZONTAL)) {
-                    stats.get("Orientation Horizontal").getAndIncrement();
+                    stats.get(ORIENTATION_HORIZONTAL).getAndIncrement();
                 } else if (!machine.getIsVertical().isEmpty() &&
                         machine.getIsVertical().equalsIgnoreCase(Machine.VERTICAL)) {
-                    stats.get("Orientation Vertical").getAndIncrement();
+                    stats.get(ORIENTATION_VERTICAL).getAndIncrement();
                 }
             }
 
             if (machine.getDriver() != null && machine.getDriver().getCocktail() != null &&
                     !machine.getDriver().getCocktail().isEmpty()) {
-                stats.get("Orientation Cocktail").getAndIncrement();
+                stats.get(ORIENTATION_COCKTAIL).getAndIncrement();
             }
 
             if (machine.getRunnable() != null && machine.getRunnable().equals(Machine.YES) &&
@@ -266,22 +313,24 @@ class MAME_Stats {
                 stats.get("Runnable").getAndIncrement();
             }
 
-            if (machine.getSample() != null && machine.getSample().size() > 0) {
+            if (machine.getSample() != null && !machine.getSample().isEmpty()) {
                 stats.get("Sample").getAndIncrement();
             }
 
             if (machine.getDriver() != null && !machine.getIsbios().equals(Machine.YES)) {
                 switch (machine.getDriver().getStatus()) {
                     case "preliminary":
-                        stats.get("Status Preliminary").getAndIncrement();
+                        stats.get(STATUS_PRELIMINARY).getAndIncrement();
                         break;
                     case "good":
-                        stats.get("Status Good").getAndIncrement();
-                        stats.get("Usable").getAndIncrement();
+                        stats.get(STATUS_GOOD).getAndIncrement();
+                        stats.get(PLAYABLE).getAndIncrement();
                         break;
                     case "imperfect":
-                        stats.get("Status Imperfect").getAndIncrement();
-                        stats.get("Usable").getAndIncrement();
+                        stats.get(STATUS_IMPERFECT).getAndIncrement();
+                        stats.get(PLAYABLE).getAndIncrement();
+                        break;
+                    default:
                         break;
                 }
             }
