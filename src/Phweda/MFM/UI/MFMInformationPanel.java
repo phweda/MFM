@@ -30,19 +30,19 @@ import java.awt.*;
 public class MFMInformationPanel extends JPanel {
     private static final String MESSAGE = "message";
     private static final String PROGRESS = "progress";
-    private static JLabel message = new JLabel();
+    private static JLabel messageLabel = new JLabel();
     private static JProgressBar progressBar = new MFMProgressBar();
     private static JPanel progressPanel = new JPanel();
-    boolean running = false;
-    Timer timer;
+    private boolean running = false;
+    private Timer timer;
 
     MFMInformationPanel() {
         super();
         progressPanel.add(progressBar);
         CardLayout cl = new CardLayout();
-        cl.addLayoutComponent(message, MESSAGE);
+        cl.addLayoutComponent(messageLabel, MESSAGE);
         cl.addLayoutComponent(progressPanel, PROGRESS);
-        this.add(message);
+        this.add(messageLabel);
         this.add(progressPanel);
         this.setLayout(cl);
         this.setPreferredSize(new Dimension(350, 100));
@@ -51,7 +51,7 @@ public class MFMInformationPanel extends JPanel {
     void showProgress(String title) {
         ((CardLayout) this.getLayout()).last(this);
         progressBar.setString(title);
-        message.setText("");
+        messageLabel.setText("");
         updateUI();
         progressPanel.setVisible(true);
         running = true;
@@ -65,7 +65,7 @@ public class MFMInformationPanel extends JPanel {
 
     public void showMessage(String message) {
         running = false;
-        MFMInformationPanel.message.setText(message);
+        MFMInformationPanel.messageLabel.setText(message);
         if (timer != null) {
             timer.stop();
             timer = null;

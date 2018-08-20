@@ -30,17 +30,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 class ImagePanel extends JComponent implements SwingConstants, Printable {
-    private Image image;
-    private Image defaultImage;
+    private transient Image image;
+    private transient Image defaultImage;
     private int verticalAlignment = CENTER;
     private int horizontalAlignment = CENTER;
-    private Path imagePath;
+    private transient Path imagePath;
 
     ImagePanel() {
     }
@@ -49,34 +48,34 @@ class ImagePanel extends JComponent implements SwingConstants, Printable {
         image = defaultImage = imageIn;
     }
 
-    public Image Image() {
+    public Image image() {
         return image;
     }
 
-    void Image(Image image) {
+    void image(Image image) {
         this.image = image;
         repaint();
     }
 
-    void Image(String path) {
+    void image(String path) {
         imagePath = Paths.get(path);
-        Image(new ImageIcon(path).getImage());
+        image(new ImageIcon(path).getImage());
     }
 
-    public void Image(File file) {
+    void image(File file) {
         imagePath = Paths.get(file.getAbsolutePath());
-        Image(new ImageIcon(file.getAbsolutePath()).getImage());
+        image(new ImageIcon(file.getAbsolutePath()).getImage());
     }
 
     Path getImagePath() {
         return imagePath;
     }
 
-    public void Image(byte[] imageData) {
-        Image(imageData == null ? null : new ImageIcon(imageData).getImage());
+    public void image(byte[] imageData) {
+        image(imageData == null ? null : new ImageIcon(imageData).getImage());
     }
 
-    void ImageReset() {
+    void imageReset() {
         image = defaultImage;
         repaint();
     }
@@ -132,33 +131,33 @@ class ImagePanel extends JComponent implements SwingConstants, Printable {
         int w = getWidth() - insets.left - insets.right;
         int h = getHeight() - insets.top - insets.bottom;
 
-        int src_w = image.getWidth(null);
-        int src_h = image.getHeight(null);
+        int srcW = image.getWidth(null);
+        int srcH = image.getHeight(null);
 
-        double scale_x = ((double) w) / src_w;
-        double scale_y = ((double) h) / src_h;
+        double scaleX = ((double) w) / srcW;
+        double scaleY = ((double) h) / srcH;
 
-        double scale = Math.min(scale_x, scale_y);
+        double scale = Math.min(scaleX, scaleY);
 
-        int dst_w = (int) (scale * src_w);
-        int dst_h = (int) (scale * src_h);
+        int dstW = (int) (scale * srcW);
+        int dstH = (int) (scale * srcH);
 
-        int dx = x + (w - dst_w) / 2;
+        int dx = x + (w - dstW) / 2;
         if (horizontalAlignment == LEFT)
             dx = x;
         else if (horizontalAlignment == RIGHT)
-            dx = x + w - dst_w;
+            dx = x + w - dstW;
 
-        int dy = y + (h - dst_h) / 2;
+        int dy = y + (h - dstH) / 2;
         if (verticalAlignment == TOP)
             dy = y;
         else if (verticalAlignment == BOTTOM)
-            dy = y + h - dst_h;
+            dy = y + h - dstH;
 
-        g.drawImage(image, dx, dy, dx + dst_w, dy + dst_h, 0, 0, src_w, src_h, null);
+        g.drawImage(image, dx, dy, dx + dstW, dy + dstH, 0, 0, srcW, srcH, null);
     }
 
-    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
 
         if (pageIndex > 0 || image == null)
             return NO_SUCH_PAGE;
@@ -166,22 +165,22 @@ class ImagePanel extends JComponent implements SwingConstants, Printable {
         double w = pageFormat.getImageableWidth();
         double h = pageFormat.getImageableHeight();
 
-        int src_w = image.getWidth(null);
-        int src_h = image.getHeight(null);
+        int srcW = image.getWidth(null);
+        int srcH = image.getHeight(null);
 
-        double scale_x = w / src_w;
-        double scale_y = h / src_h;
+        double scaleX = w / srcW;
+        double scaleY = h / srcH;
 
-        double scale = Math.min(scale_x, scale_y);
+        double scale = Math.min(scaleX, scaleY);
 
-        int dst_w = (int) (scale * src_w);
-        int dst_h = (int) (scale * src_h);
+        int dstW = (int) (scale * srcW);
+        int dstH = (int) (scale * srcH);
 
-        int dx = (int) ((w - dst_w) / 2);
+        int dx = (int) ((w - dstW) / 2);
 
-        int dy = (int) ((h - dst_h) / 2);
+        int dy = (int) ((h - dstH) / 2);
 
-        graphics.drawImage(image, dx, dy, dx + dst_w, dy + dst_h, 0, 0, src_w, src_h, null);
+        graphics.drawImage(image, dx, dy, dx + dstW, dy + dstH, 0, 0, srcW, srcH, null);
 
         return PAGE_EXISTS;
     }

@@ -24,14 +24,12 @@ import Phweda.utils.FileUtils;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,35 +42,36 @@ import java.util.ArrayList;
  * Provides scrolling through individual images from a list of images.<br>
  * MFM can parse GIFs & AVIs
  */
+@SuppressWarnings("squid:MaximumInheritanceDepth")
 public class ImagesViewer extends JFrame {
 
-    File imagesDir = new File(MFM.MFM_DIR + "/Images/");
-    JScrollPane scrollPane = new JScrollPane();
-    JPanel mainpanel = new JPanel();
-    ImagePanel imagePanel = new ImagePanel();
+    private File imagesDir = new File(MFM.MFM_DIR + "/Images/");
+    private JScrollPane scrollPane = new JScrollPane();
+    private JPanel mainpanel = new JPanel();
+    private ImagePanel imagePanel = new ImagePanel();
 
-    JLabel labelFilename = new JLabel();
-    JLabel labelFrameNumber = new JLabel();
+    private JLabel labelFilename = new JLabel();
+    private JLabel labelFrameNumber = new JLabel();
 
-    JPanel northPanel = new JPanel();
-    JPanel nextPanel = new JPanel(new GridLayout(3, 1));
-    JPanel previousPanel = new JPanel(new GridLayout(3, 1));
+    private JPanel northPanel = new JPanel();
+    private JPanel nextPanel = new JPanel(new GridLayout(3, 1));
+    private JPanel previousPanel = new JPanel(new GridLayout(3, 1));
 
-    JButton next1 = new JButton(">");
-    JButton previous1 = new JButton("<");
-    JButton next10 = new JButton(">>");
-    JButton previous10 = new JButton("<<");
-    JButton next100 = new JButton(">>>");
-    JButton previous100 = new JButton("<<<");
+    private JButton next1 = new JButton(">");
+    private JButton previous1 = new JButton("<");
+    private JButton next10 = new JButton(">>");
+    private JButton previous10 = new JButton("<<");
+    private JButton next100 = new JButton(">>>");
+    private JButton previous100 = new JButton("<<<");
+    private JButton save = new JButton("Save to file");
 
-    JButton save = new JButton("Save to file");
-
-    ArrayList<BufferedImage> frames;
-    File inputFile;
+    private transient List<BufferedImage> frames;
+    private File inputFile;
     int size;
-    int index = 0;
+    private int index = 0;
+    private static final String ARIAL = "Arial";
 
-    public ImagesViewer(ArrayList<BufferedImage> framesIn, File file) {
+    public ImagesViewer(List<BufferedImage> framesIn, File file) {
         super();
         frames = framesIn;
         size = frames.size();
@@ -82,20 +81,20 @@ public class ImagesViewer extends JFrame {
         init();
         // Release all Native for Garbage Collection
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        if (!imagesDir.exists()) {
-            imagesDir.mkdir();
+        if (!imagesDir.exists() && !imagesDir.mkdir()) {
+            MFM.logger.out("Images Viewer failed to create /Images/ directory");
         }
     }
 
     private void init() {
         addListeners();
 
-        next1.setFont(new Font("Arial", Font.BOLD, 24));
-        previous1.setFont(new Font("Arial", Font.BOLD, 24));
-        next10.setFont(new Font("Arial", Font.BOLD, 24));
-        previous10.setFont(new Font("Arial", Font.BOLD, 24));
-        next100.setFont(new Font("Arial", Font.BOLD, 24));
-        previous100.setFont(new Font("Arial", Font.BOLD, 24));
+        next1.setFont(new Font(ARIAL, Font.BOLD, 24));
+        previous1.setFont(new Font(ARIAL, Font.BOLD, 24));
+        next10.setFont(new Font(ARIAL, Font.BOLD, 24));
+        previous10.setFont(new Font(ARIAL, Font.BOLD, 24));
+        next100.setFont(new Font(ARIAL, Font.BOLD, 24));
+        previous100.setFont(new Font(ARIAL, Font.BOLD, 24));
 
         GridLayout gl = new GridLayout(1, 4, 5, 0);
         northPanel.setLayout(gl);
@@ -119,7 +118,7 @@ public class ImagesViewer extends JFrame {
         mainpanel.add(nextPanel, BorderLayout.EAST);
         mainpanel.add(save, BorderLayout.SOUTH);
 
-        imagePanel.Image(frames.get(index));
+        imagePanel.image(frames.get(index));
         this.add(mainpanel);
         this.pack();
         this.setLocation(100, 100);
@@ -131,86 +130,63 @@ public class ImagesViewer extends JFrame {
 
         this.addWindowListener(new ImagesWindow());
 
-        next1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //System.out.println("1 - index is : " + index);
-                index++;
-                if (index == size) {
-                    index = 0;
-                }
-                //System.out.println("2 - index is : " + index);
-                imagePanel.Image(frames.get(index));
-                setFrameNumber();
+        next1.addActionListener(event -> {
+            //System.out.println("1 - index is : " + index);
+            index++;
+            if (index == size) {
+                index = 0;
             }
+            //System.out.println("2 - index is : " + index);
+            imagePanel.image(frames.get(index));
+            setFrameNumber();
         });
 
-        previous1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                index--;
-                if (index == -1) {
-                    index = size - 1;
-                }
-                imagePanel.Image(frames.get(index));
-                setFrameNumber();
+        previous1.addActionListener(event -> {
+            index--;
+            if (index == -1) {
+                index = size - 1;
             }
+            imagePanel.image(frames.get(index));
+            setFrameNumber();
         });
 
-        next10.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                index += 10;
-                if (index >= size) {
-                    index = index - size;
-                }
-                imagePanel.Image(frames.get(index));
-                setFrameNumber();
+        next10.addActionListener(event -> {
+            index += 10;
+            if (index >= size) {
+                index = index - size;
             }
+            imagePanel.image(frames.get(index));
+            setFrameNumber();
         });
 
-        previous10.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                index -= 10;
-                if (index < 0) {
-                    index = index + size;
-                }
-                imagePanel.Image(frames.get(index));
-                setFrameNumber();
+        previous10.addActionListener(event -> {
+            index -= 10;
+            if (index < 0) {
+                index = index + size;
             }
+            imagePanel.image(frames.get(index));
+            setFrameNumber();
         });
 
-        next100.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                index += 100;
-                if (index >= size) {
-                    index = index - size;
-                }
-                imagePanel.Image(frames.get(index));
-                setFrameNumber();
+        next100.addActionListener(event -> {
+            index += 100;
+            if (index >= size) {
+                index = index - size;
             }
+            imagePanel.image(frames.get(index));
+            setFrameNumber();
         });
 
-        previous100.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                index -= 100;
-                if (index < 0) {
-                    index = index + size;
-                }
-                imagePanel.Image(frames.get(index));
-                setFrameNumber();
+        previous100.addActionListener(event -> {
+            index -= 100;
+            if (index < 0) {
+                index = index + size;
             }
+            imagePanel.image(frames.get(index));
+            setFrameNumber();
         });
 
-        save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveImagetoFile();
-            }
-        });
+        save.addActionListener(event -> saveImagetoFile());
     }
 
     private void setFrameNumber() {

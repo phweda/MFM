@@ -20,7 +20,6 @@ package Phweda.MFM.UI;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -32,33 +31,35 @@ import java.net.URISyntaxException;
  * Date: 10/7/2017
  * Time: 10:45 AM
  */
+@SuppressWarnings("WeakerAccess")
 public class LinkEditorPane {
 
+    private LinkEditorPane() { // Cover implicit public constructor per squid:S1118
+    }
 
     public static JEditorPane getLinkPane(String displayText, String link) {
         JLabel label = new JLabel();
         Font font = label.getFont();
 
-        StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
-        style.append("font-weight:" + (font.isBold() ? "bold" : "normal") + ";");
-        style.append("font-size:" + (font.getSize() + 4) + "pt;");
+        StringBuilder style = new StringBuilder("font-family:" + font.getFamily() + ";");
+        style.append("font-weight:");
+        style.append((font.isBold() ? "bold" : "normal"));
+        style.append(";");
+        style.append("font-size:");
+        style.append((font.getSize() + 4));
+        style.append("pt;");
 
         // Construct href
         String html = "<html><body style=\"" + style + "\">" +
                 "<a href=\"" + link + "\">" + displayText + "</a></body></html>";
         JEditorPane ep = new JEditorPane("text/html", html);
-        ep.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                Desktop desktop = Desktop.getDesktop();
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                        try {
-                            desktop.browse(new URI(link));
-                        } catch (IOException | URISyntaxException e1) {
-                            e1.printStackTrace();
-                        }
-                    }
+        ep.addHyperlinkListener(e -> {
+            Desktop desktop = Desktop.getDesktop();
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED && desktop.isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    desktop.browse(new URI(link));
+                } catch (IOException | URISyntaxException e1) {
+                    e1.printStackTrace();
                 }
             }
         });

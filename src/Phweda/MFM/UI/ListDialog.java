@@ -31,13 +31,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+@SuppressWarnings("squid:MaximumInheritanceDepth")
 class ListDialog extends JDialog implements ActionListener {
-    private static String value = "";
+    private String value = "";
     private JList<String> list;
     private JTextArea textArea;
 
     public ListDialog(Frame frame, JTextArea textArea, String labelText, String title,
-                      Object[] data, String initialValue, String longValue) {
+                      String[] data, String initialValue, String longValue) {
         super(frame, title, true);
 
         this.textArea = textArea;
@@ -52,7 +53,7 @@ class ListDialog extends JDialog implements ActionListener {
         getRootPane().setDefaultButton(addButton);
 
         //main part of the dialog
-        list = new JList(data);
+        list = new JList<>(data);
 
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         if (longValue != null) {
@@ -62,6 +63,7 @@ class ListDialog extends JDialog implements ActionListener {
         list.setFixedCellWidth(125);
         list.setVisibleRowCount(-1);
         list.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     addButton.doClick();
@@ -115,9 +117,6 @@ class ListDialog extends JDialog implements ActionListener {
                                     String longValue) {
 */
     public String showDialog() {
-        //    dialog = new ListDialog(frame, textArea, label, title, gameNames, initialValue, longValue);
-
-        // TODO for MFM so we can choose from MachineListTable also
         this.setModalityType(ModalityType.MODELESS);
 
         this.setVisible(true);
@@ -132,8 +131,8 @@ class ListDialog extends JDialog implements ActionListener {
     //Handle clicks on the Add and Done buttons.
     public void actionPerformed(ActionEvent e) {
         if ("Add".equals(e.getActionCommand())) {
-            ListDialog.value = list.getSelectedValue();
-            textArea.append(ListDialog.value + "\n");
+            value = list.getSelectedValue();
+            textArea.append(value + "\n");
         }
         if ("Done".equals(e.getActionCommand())) {
             this.setVisible(false);

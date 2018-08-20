@@ -31,9 +31,10 @@ import java.net.URISyntaxException;
  * Date: 5/12/2015
  * Time: 10:08 PM
  */
-public class MFMHTMLTextPane extends JTextPane {
+@SuppressWarnings("squid:MaximumInheritanceDepth")
+class MFMHTMLTextPane extends JTextPane {
 
-    public MFMHTMLTextPane() {
+    MFMHTMLTextPane() {
         this.setContentType("text/html");
         this.addHyperlinkListener(new UrlHyperlinkListener());
     }

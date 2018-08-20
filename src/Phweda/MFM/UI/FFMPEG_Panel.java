@@ -27,10 +27,11 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
+
+import static Phweda.MFM.MFMSettings.getInstance;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,19 +39,21 @@ import java.io.File;
  * Date: 5/29/2015
  * Time: 7:25 PM
  */
+@SuppressWarnings("squid:S00116")
 class FFMPEG_Panel extends JPanel {
 
-    private static JDialog dialog = null;
+    private JDialog dialog = null;
     private JFileChooser fileChooser = new JFileChooser();
-    private SettingsController controller = new SettingsController();
+    private transient SettingsController controller = new SettingsController();
     private JTextField FFmpegEXE = new JTextField();
     private JTextField FFmpegInputFolder = new JTextField();
     private JTextField FFmpegOutputFolder = new JTextField();
     private JTextField FFmpegMoveAVItoFolder = new JTextField();
-    private Font font = new Font("Arial", Font.BOLD, 16);
+    private Font arialFont = new Font("Arial", Font.BOLD, 16);
     private JButton runCommandButton;
+    private static final String CANCEL = "Cancel";
 
-    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+    private static MFMSettings mfmSettings = getInstance();
 
     FFMPEG_Panel() {
         this.setLayout(new GridLayout(10, 2, 10, 10));
@@ -62,7 +65,7 @@ class FFMPEG_Panel extends JPanel {
     private void createPanel() {
         fileChooser.setPreferredSize(new Dimension(600, 400));
         setComponentsFont(fileChooser.getComponents());
-        this.setName(MFM_Constants.FFmpeg_SETTINGS);
+        this.setName(MFM_Constants.FFMPEG_SETTINGS);
 
         /* NOTE using the <HTML> tags to trick JLabel into text wrap */
         JLabel label1 = new JLabel("<HTML>Select FFmpeg Executable</HTML>");
@@ -71,52 +74,46 @@ class FFMPEG_Panel extends JPanel {
         FFmpegEXE.setToolTipText("Click here to select your FFmpeg executable file");
 
         JLabel label2 = new JLabel("<HTML>Select FFmpeg input folder</HTML>");
-        FFmpegInputFolder.setName(MFM_Constants.FFmpeg_INPUT_FOLDER);
+        FFmpegInputFolder.setName(MFM_Constants.FFMPEG_INPUT_FOLDER);
         FFmpegInputFolder.addMouseListener(controller);
         FFmpegInputFolder.setToolTipText("Click here to select FFmpeg input folder");
 
         JLabel label3 = new JLabel("<HTML>Select FFmpeg output folder</HTML>");
-        FFmpegOutputFolder.setName(MFM_Constants.FFmpeg_OUTPUT_FOLDER);
+        FFmpegOutputFolder.setName(MFM_Constants.FFMPEG_OUTPUT_FOLDER);
         FFmpegOutputFolder.addMouseListener(controller);
         FFmpegOutputFolder.setToolTipText("Click here to select FFmpeg output folder");
 
         JLabel label4 = new JLabel("<HTML>Optional folder to move AVI file to</HTML>");
-        FFmpegMoveAVItoFolder.setName(MFM_Constants.FFmpeg_MoveAVIto_Folder);
+        FFmpegMoveAVItoFolder.setName(MFM_Constants.FFMPEG_MOVE_AVI_TO_FOLDER);
         FFmpegMoveAVItoFolder.addMouseListener(controller);
         FFmpegMoveAVItoFolder.setToolTipText("Click here to select folder to move AVI file to");
 
-        JButton saveB = new JButton("<HTML>Save " + MFM_Constants.FFmpeg_SETTINGS + "</HTML>");
+        JButton saveB = new JButton("<HTML>Save " + MFM_Constants.FFMPEG_SETTINGS + "</HTML>");
         saveB.setName("Save");
-        JButton cancelB = new JButton("Cancel");
-        cancelB.setName("Cancel");
-        ActionListener settingsListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (((JButton) e.getSource()).getName().equals("Save")) {
-                    mfmSettings.FFmpegEXEdir(FFmpegEXE.getText().substring(0,
-                            FFmpegEXE.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
-                    // Full Path
-                    mfmSettings.FFMPEGexe(FFmpegEXE.getText());
-                    mfmSettings.FFmpegOutputFolder(FFmpegOutputFolder.getText());
-                    mfmSettings.FFmpegInputFolder(FFmpegInputFolder.getText());
-                    mfmSettings.setFFmpegMoveAVItoFolder(FFmpegMoveAVItoFolder.getText());
-                    runCommandButton.setEnabled(isConfigured());
-                } else if (((JButton) e.getSource()).getName().equals("Cancel")) {
-                    dialog.dispose();
-                }
+        JButton cancelB = new JButton(CANCEL);
+        cancelB.setName(CANCEL);
+        ActionListener settingsListener = e -> {
+            if (((JButton) e.getSource()).getName().equals("Save")) {
+                mfmSettings.FFmpegEXEdir(FFmpegEXE.getText().substring(0,
+                        FFmpegEXE.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
+                // Full Path
+                mfmSettings.FFMPEGexe(FFmpegEXE.getText());
+                mfmSettings.FFmpegOutputFolder(FFmpegOutputFolder.getText());
+                mfmSettings.FFmpegInputFolder(FFmpegInputFolder.getText());
+                mfmSettings.setFFmpegMoveAVItoFolder(FFmpegMoveAVItoFolder.getText());
+                runCommandButton.setEnabled(isConfigured());
+            } else if (((JButton) e.getSource()).getName().equals(CANCEL)) {
+                dialog.dispose();
             }
         };
 
         saveB.addActionListener(settingsListener);
         cancelB.addActionListener(settingsListener);
 
-        runCommandButton = new JButton(new MFMAction(MFMAction.ConvertCommandAction, null));
-        runCommandButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.setEnabled(false);
-                dialog.dispose();
-            }
+        runCommandButton = new JButton(new MFMAction(MFMAction.CONVERT_FILES, null));
+        runCommandButton.addActionListener(e -> {
+            dialog.setEnabled(false);
+            dialog.dispose();
         });
 
         // Start disabled. Enable when we have 3 values where?? refreshSettings??
@@ -132,8 +129,8 @@ class FFMPEG_Panel extends JPanel {
         this.add(FFmpegMoveAVItoFolder);
 
         // NOTE Hack to trick GridLayout - should really do another layout manager
-        this.add(MFMUI_Setup.getFillPanel());
-        this.add(MFMUI_Setup.getFillPanel());
+        this.add(MFMUI_Setup.getInstance().getFillPanel());
+        this.add(MFMUI_Setup.getInstance().getFillPanel());
         JPanel buttonPanel = new JPanel();
 
         buttonPanel.add(saveB);
@@ -149,25 +146,23 @@ class FFMPEG_Panel extends JPanel {
 
         TitledBorder tb = BorderFactory.createTitledBorder(
                 new BevelBorder(BevelBorder.RAISED, Color.RED,
-                        Color.orange, Color.BLACK, Color.DARK_GRAY), MFM_Constants.FFmpeg_SETTINGS);
+                        Color.orange, Color.BLACK, Color.DARK_GRAY), MFM_Constants.FFMPEG_SETTINGS);
         tb.setTitleJustification(TitledBorder.CENTER);
-        tb.setTitleFont(font);
+        tb.setTitleFont(arialFont);
         tb.setTitleColor(new Color(81, 222, 255));
         this.setBorder(tb);
 
-        if (mfmSettings.getInstance().isLoaded()) {
-            if (mfmSettings.FFmpegEXEdir() != null) {
-                FFmpegEXE.setText(mfmSettings.FFMPEGexe());
-                if (mfmSettings.FFmpegInputFolder() != null) {
-                    FFmpegInputFolder.setText(mfmSettings.FFmpegInputFolder());
-                }
-                if (mfmSettings.FFmpegOutputFolder() != null) {
-                    FFmpegOutputFolder.setText(mfmSettings.FFmpegOutputFolder());
-                    runCommandButton.setEnabled(isConfigured());
-                }
-                if (mfmSettings.getFFmpegMoveAVItoFolder() != null) {
-                    FFmpegMoveAVItoFolder.setText(mfmSettings.getFFmpegMoveAVItoFolder());
-                }
+        if (mfmSettings.isLoaded() && mfmSettings.FFmpegEXEdir() != null) {
+            FFmpegEXE.setText(mfmSettings.FFMPEGexe());
+            if (mfmSettings.FFmpegInputFolder() != null) {
+                FFmpegInputFolder.setText(mfmSettings.FFmpegInputFolder());
+            }
+            if (mfmSettings.FFmpegOutputFolder() != null) {
+                FFmpegOutputFolder.setText(mfmSettings.FFmpegOutputFolder());
+                runCommandButton.setEnabled(isConfigured());
+            }
+            if (mfmSettings.getFFmpegMoveAVItoFolder() != null) {
+                FFmpegMoveAVItoFolder.setText(mfmSettings.getFFmpegMoveAVItoFolder());
             }
         }
     }
@@ -187,12 +182,11 @@ class FFMPEG_Panel extends JPanel {
         dialog.setVisible(true);
     }
 
-    // fixme why did I do this here??
     private void setComponentsFont(Component[] comp) {
         for (Component aComp : comp) {
             if (aComp instanceof Container) setComponentsFont(((Container) aComp).getComponents());
             try {
-                aComp.setFont(font);
+                aComp.setFont(arialFont);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -203,7 +197,7 @@ class FFMPEG_Panel extends JPanel {
 
         @Override
         public void singleClick(MouseEvent e) {
-
+            // required extending ClickListener
         }
 
         @Override
@@ -224,19 +218,22 @@ class FFMPEG_Panel extends JPanel {
                     FFmpegEXE.setText(file.getAbsolutePath());
                     break;
 
-                case MFM_Constants.FFmpeg_INPUT_FOLDER:
+                case MFM_Constants.FFMPEG_INPUT_FOLDER:
                     FFmpegInputFolder.setText(file.getAbsolutePath());
                     break;
 
-                case MFM_Constants.FFmpeg_OUTPUT_FOLDER:
+                case MFM_Constants.FFMPEG_OUTPUT_FOLDER:
                     path = file.getAbsolutePath();
                     FFmpegOutputFolder.setText(path);
                     break;
 
-                case MFM_Constants.FFmpeg_MoveAVIto_Folder:
+                case MFM_Constants.FFMPEG_MOVE_AVI_TO_FOLDER:
                     path = file.getAbsolutePath();
                     FFmpegMoveAVItoFolder.setText(path);
                     break;
+
+                default:
+                    // Not required only text fields are possible
             }
         }
     }

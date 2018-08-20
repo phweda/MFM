@@ -21,7 +21,7 @@ package Phweda.MFM.UI;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -35,11 +35,12 @@ import java.util.TreeSet;
 /**
  * JPanel for dynamic lists of checkboxes
  */
+@SuppressWarnings("ALL")
 public class DynamicCBpanel extends JPanel {
 
-    private ArrayList<JCheckBox> checkBoxes = new ArrayList<JCheckBox>();
+    private ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
 
-    DynamicCBpanel(ArrayList<String> keys, int columns) {
+    DynamicCBpanel(List keys, int columns) {
         super();
         this.setLayout(new GridLayout(keys.size() / columns + 1, columns));
         addCheckboxes(keys);
@@ -58,16 +59,16 @@ public class DynamicCBpanel extends JPanel {
         return checkBoxes;
     }
 
-    private void addCheckboxes(Collection<String> keys) {
-        for (String key : keys) {
-            JCheckBox checkBox = new JCheckBox(key);
+    private void addCheckboxes(List keys) {
+        for (Object key : keys) {
+            JCheckBox checkBox = new JCheckBox(key.toString());
             this.add(checkBox);
             checkBoxes.add(checkBox);
         }
     }
 
     TreeSet<String> getChecked() {
-        TreeSet<String> ts = new TreeSet<String>();
+        TreeSet<String> ts = new TreeSet<>();
         for (JCheckBox checkBox : checkBoxes) {
             if (checkBox.isSelected()) {
                 ts.add(checkBox.getText());

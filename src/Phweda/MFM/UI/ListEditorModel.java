@@ -27,12 +27,12 @@ import java.util.List;
  * Date: 6/23/2017
  * Time: 12:02 PM
  */
-public class ListEditorModel<E> extends DefaultListModel<E> {
+class ListEditorModel<E> extends DefaultListModel<E> {
 
     /**
      * Add all elements from input List
      *
-     * @param elements
+     * @param elements to add to active list
      */
     void addAll(List<E> elements) {
         elements.forEach(element -> {
@@ -46,7 +46,7 @@ public class ListEditorModel<E> extends DefaultListModel<E> {
     /**
      * Remove all elements from input List
      *
-     * @param elements
+     * @param elements to remove from active list
      */
     void removeAll(List<E> elements) {
         elements.forEach(this::removeElement);
@@ -56,9 +56,9 @@ public class ListEditorModel<E> extends DefaultListModel<E> {
     /**
      * Replace existing list with new list
      *
-     * @param newList
+     * @param newList new list to display
      */
-    public void refreshList(List<E> newList) {
+    void refreshList(List<E> newList) {
         this.clear();
         newList.forEach(this::addElement);
         this.fireContentsChanged(this, 0, this.getSize());

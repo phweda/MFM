@@ -43,13 +43,13 @@ import java.awt.*;
  */
 public class JMultiLineToolTip extends JToolTip {
     /// The preferred fixed width of the tooltip
-    protected int fixedWidth = 0;
+    private int fixedWidth = 0;
     /// The text of the tooltip
     String text;
     /// The component to which this tooltip is associated
-    JComponent component;
+    JComponent jComponent;
 
-    public JMultiLineToolTip() {
+    JMultiLineToolTip() {
         updateUI();
     }
 
@@ -59,7 +59,7 @@ public class JMultiLineToolTip extends JToolTip {
      * @return the preferred fixed width of the tooltip or zero if
      * there is no preferred width.
      */
-    public int getFixedWidth() {
+    int getFixedWidth() {
         return fixedWidth;
     }
 
@@ -69,10 +69,11 @@ public class JMultiLineToolTip extends JToolTip {
      * @param width the new preferred fixed width or zero if you
      *              don't want to specify a fixed width
      */
-    public void setFixedWidth(int width) {
+    void setFixedWidth(int width) {
         this.fixedWidth = width;
     }
 
+    @Override
     public void updateUI() {
         setUI(MultiLineToolTipUI.createUI(this));
     }
@@ -87,32 +88,33 @@ public class JMultiLineToolTip extends JToolTip {
  * @author tamas
  */
 class MultiLineToolTipUI extends BasicToolTipUI {
-    /// Shared instance of this UI class
-    static MultiLineToolTipUI instance = new MultiLineToolTipUI();
-    /// The JTextArea used to render the multi-line tooltip
-    private static JTextArea textArea;
-    protected CellRendererPane rendererPane;
-    /// The border used by the tooltip
-    Border tooltipBorder = new CompoundBorder(
+    // Shared instance of this UI class
+    private static MultiLineToolTipUI instance = new MultiLineToolTipUI();
+    // The JTextArea used to render the multi-line tooltip
+    private JTextArea textArea;
+    private CellRendererPane rendererPane;
+    // The border used by the tooltip
+    private Border tooltipBorder = new CompoundBorder(
             BorderFactory.createLineBorder(Color.BLACK, 1),
             BorderFactory.createEmptyBorder(2, 2, 2, 2)
     );
-    JToolTip tip;
 
-    /// Returns the shared instance of this UI class
+    // Returns the shared instance of this UI class
+    @SuppressWarnings("squid:S1172")
     public static ComponentUI createUI(JComponent c) {
         return instance;
     }
 
-    /// Installs this UI to the given component
+    // Installs this UI to the given component
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
-        tip = (JToolTip) c;
         rendererPane = new CellRendererPane();
         c.add(rendererPane);
     }
 
-    /// Uninstalls this UI from the given component
+    // Uninstalls this UI from the given component
+    @Override
     public void uninstallUI(JComponent c) {
         super.uninstallUI(c);
 
@@ -121,6 +123,7 @@ class MultiLineToolTipUI extends BasicToolTipUI {
     }
 
     /// Paints the tooltip on the given component using the given graphics context
+    @Override
     public void paint(Graphics g, JComponent c) {
         Dimension size = c.getSize();
         // textArea.setBackground(c.getBackground());
@@ -136,7 +139,7 @@ class MultiLineToolTipUI extends BasicToolTipUI {
     public Dimension getPreferredSize(JComponent c) {
         String tipText = ((JToolTip) c).getTipText();
         JMultiLineToolTip comp = (JMultiLineToolTip) c;
-        Dimension dim = null;
+        Dimension dim;
 
         if (tipText == null)
             return new Dimension(0, 0);

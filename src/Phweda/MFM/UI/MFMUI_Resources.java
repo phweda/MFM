@@ -18,8 +18,8 @@
 
 package Phweda.MFM.UI;
 
-import Phweda.MFM.Controllers;
 import Phweda.MFM.MFM;
+import Phweda.MFM.MachineControllers;
 import Phweda.utils.FileUtils;
 
 import javax.swing.*;
@@ -32,20 +32,21 @@ import java.util.HashMap;
  * Date: 1/6/12
  * Time: 11:15 PM
  */
+@SuppressWarnings("WeakerAccess")
 public class MFMUI_Resources {
 
-    static final String MFM_Icon_PNG = "MFM_Icon.png";
+    static final String MFM_ICON_PNG = "MFM_Icon.png";
     // Help files
     static final String MFM_HTML = "MFM.html";
     static final String MFM_COPYRIGHT_HTML = "MFM Copyright.html";
     static final String GNU_GPL_V3 = "GNU GPL V3.html";
     // Icons
     static final String A_PNG = "A.png";
-    static final String Arrow_PNG = "Arrow.png";
+    static final String ARROW_PNG = "Arrow.png";
     static final String C_PNG = "C.png";
     static final String EX_PNG = "EX.png";
-    static final String MFM_Image_PNG = "MFM_Image.png";
-    static final String Minus_PNG = "Minus.png";
+    static final String MFM_IMAGE_PNG = "MFM_Image.png";
+    static final String MINUS_PNG = "Minus.png";
     static final String I_PNG = "i.png";
     static final String L_PNG = "L.png";
     static final String P_PNG = "P.png";
@@ -64,7 +65,7 @@ public class MFMUI_Resources {
     private static final String KEYBOARD_CONTROL_IMG = "Keyboard_control.png";
     private static final String KEYPAD_CONTROL_IMG = "Keypad_control.png";
     private static final String JOYSTICK_CONTROL_IMG = "Joystick_control.png";
-    private static final String Lightgun_CONTROL_IMG = "Lightgun_control.png";
+    private static final String LIGHTGUN_CONTROL_PNG = "Lightgun_control.png";
     private static final String MAHJONG_CONTROL_IMG = "Mahjong_control2.png";
     private static final String MOUSE_CONTROL_IMG = "Mouse_control.png";
     private static final String PADDLE_CONTROL_IMG = "Paddle_control.png";
@@ -72,26 +73,24 @@ public class MFMUI_Resources {
     private static final String POSITIONAL_CONTROL_IMG = "Positional_control.png";
     private static final String STICK_CONTROL_IMG = "Stick_control.png";
     private static final String TRACKBALL_CONTROL_IMG = "Trackball_control.png";
-
     private static final String RESOURCES = "Resources";
     private static final String FLAGS = "flags";
     private static final String PNG_SUFFIX = ".png";
 
     private static MFMUI_Resources ourInstance;
-    private static HashMap<String, URL> resourceURLs;
-    private final String[] resourceNames = {
+    private static final String[] resourceNames = {
             MFM_HTML, MFM_COPYRIGHT_HTML, GNU_GPL_V3,
-            A_PNG, Arrow_PNG, C_PNG, CHECKMARK_PNG, CIRCULAR_ARROW, EX_PNG, MFM_Icon_PNG, MFM_Image_PNG, Minus_PNG,
+            A_PNG, ARROW_PNG, C_PNG, CHECKMARK_PNG, CIRCULAR_ARROW, EX_PNG, MFM_ICON_PNG, MFM_IMAGE_PNG, MINUS_PNG,
             I_PNG, L_PNG, P_PNG, S_PNG,
             UPARROW_PNG, VDUB, MAME_LOGO, MAME_LOGO_SMALL,
             BUTTON_CONTROL_IMG, DBL_JOYSTICK_CONTROL_IMG, DIAL_CONTROL_IMG, GAMBLING_CONTROL_IMG, HANAFUDA_CONTROL_IMG,
             KEYBOARD_CONTROL_IMG, KEYPAD_CONTROL_IMG, MAHJONG_CONTROL_IMG, MOUSE_CONTROL_IMG,
-            JOYSTICK_CONTROL_IMG, Lightgun_CONTROL_IMG, PADDLE_CONTROL_IMG, PEDAL_CONTROL_IMG, POSITIONAL_CONTROL_IMG,
+            JOYSTICK_CONTROL_IMG, LIGHTGUN_CONTROL_PNG, PADDLE_CONTROL_IMG, PEDAL_CONTROL_IMG, POSITIONAL_CONTROL_IMG,
             STICK_CONTROL_IMG, TRACKBALL_CONTROL_IMG
     };
+    private static final HashMap<String, URL> resourceURLs = new HashMap<>(resourceNames.length + 10);
 
     private MFMUI_Resources() {
-        resourceURLs = new HashMap<>(resourceNames.length + 10);
         loadResources();
     }
 
@@ -119,7 +118,7 @@ public class MFMUI_Resources {
         }
     }
 
-    HashMap<String, URL> ResourceURLs() {
+    HashMap<String, URL> resourceURLs() {
         return resourceURLs;
     }
 
@@ -127,8 +126,9 @@ public class MFMUI_Resources {
         return new ImageIcon(resourceURLs.get(name));
     }
 
+    @SuppressWarnings("SameParameterValue")
     ImageIcon getFlagImageIcon(String countryCode) {
-        URL url = this.getClass().getResource("Resources" + FileUtils.SLASH +
+        URL url = this.getClass().getResource(RESOURCES + FileUtils.SLASH +
                 FLAGS + FileUtils.SLASH + countryCode + PNG_SUFFIX);
         if (url != null) {
             return new ImageIcon(url);
@@ -139,53 +139,55 @@ public class MFMUI_Resources {
     String getLabelLocation(String label) {
         String location = "";
         switch (label) {
-            case Controllers.ONLY_BUTTONS:
+            case MachineControllers.ONLY_BUTTONS:
                 location = resourceURLs.get(BUTTON_CONTROL_IMG).toString();
                 break;
-            case Controllers.DIAL:
+            case MachineControllers.DIAL:
                 location = resourceURLs.get(DIAL_CONTROL_IMG).toString();
                 break;
-            case Controllers.DOUBLEJOY:
+            case MachineControllers.DOUBLEJOY:
                 location = resourceURLs.get(DBL_JOYSTICK_CONTROL_IMG).toString();
                 break;
-            case Controllers.GAMBLING:
+            case MachineControllers.GAMBLING:
                 location = resourceURLs.get(GAMBLING_CONTROL_IMG).toString();
                 break;
-            case Controllers.HANAFUDA:
+            case MachineControllers.HANAFUDA:
                 location = resourceURLs.get(HANAFUDA_CONTROL_IMG).toString();
                 break;
-            case Controllers.JOY:
+            case MachineControllers.JOY:
                 location = resourceURLs.get(JOYSTICK_CONTROL_IMG).toString();
                 break;
-            case Controllers.KEYBOARD:
+            case MachineControllers.KEYBOARD:
                 location = resourceURLs.get(KEYBOARD_CONTROL_IMG).toString();
                 break;
-            case Controllers.KEYPAD:
+            case MachineControllers.KEYPAD:
                 location = resourceURLs.get(KEYPAD_CONTROL_IMG).toString();
                 break;
-            case Controllers.LIGHTGUN:
-                location = resourceURLs.get(Lightgun_CONTROL_IMG).toString();
+            case MachineControllers.LIGHTGUN:
+                location = resourceURLs.get(LIGHTGUN_CONTROL_PNG).toString();
                 break;
-            case Controllers.MAHJONG:
+            case MachineControllers.MAHJONG:
                 location = resourceURLs.get(MAHJONG_CONTROL_IMG).toString();
                 break;
-            case Controllers.MOUSE:
+            case MachineControllers.MOUSE:
                 location = resourceURLs.get(MOUSE_CONTROL_IMG).toString();
                 break;
-            case Controllers.PADDLE:
+            case MachineControllers.PADDLE:
                 location = resourceURLs.get(PADDLE_CONTROL_IMG).toString();
                 break;
-            case Controllers.PEDAL:
+            case MachineControllers.PEDAL:
                 location = resourceURLs.get(PEDAL_CONTROL_IMG).toString();
                 break;
-            case Controllers.POSITIONAL:
+            case MachineControllers.POSITIONAL:
                 location = resourceURLs.get(POSITIONAL_CONTROL_IMG).toString();
                 break;
-            case Controllers.STICK:
+            case MachineControllers.STICK:
                 location = resourceURLs.get(STICK_CONTROL_IMG).toString();
                 break;
-            case Controllers.TRACKBALL:
+            case MachineControllers.TRACKBALL:
                 location = resourceURLs.get(TRACKBALL_CONTROL_IMG).toString();
+                break;
+            default:
                 break;
 
         }

@@ -25,7 +25,6 @@ import Phweda.utils.FileUtils;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -38,22 +37,23 @@ import java.io.File;
  */
 final class MFM_SettingsPanel extends JPanel {
 
-    private static final Font font = new Font("Arial", Font.BOLD, 16);
+    private static final transient Font myFont = new Font("Arial", Font.BOLD, 16);
     private static final Dimension size = new Dimension(1024, 768);
     private static JFrame frame;
     private JFileChooser fileChooser = new JFileChooser();
-    private SettingsController controller = new SettingsController();
-    private JTextField MAMEExePath = new JTextField();
-    private JTextField MAMERomsPath = new JTextField();
-    private JTextField SoftwareListRomsPath = new JTextField();
-    private JTextField MAMECHDsPath = new JTextField();
-    private JTextField SoftwareListCHDsPath = new JTextField();
-    private JTextField MAMEExtrasPath = new JTextField();
-    private JTextField MAMEVidsPath = new JTextField();
-    private JTextField MAMEPlayPath = new JTextField();
-    private JTextField VDubPath = new JTextField();
-    private JTextField FFmpegPath = new JTextField();
+    private transient SettingsController controller = new SettingsController();
+    private JTextField mameExePath = new JTextField();
+    private JTextField mameRomsPath = new JTextField();
+    private JTextField softwareListRomsPath = new JTextField();
+    private JTextField mameCHDsPath = new JTextField();
+    private JTextField softwareListCHDsPath = new JTextField();
+    private JTextField mameExtrasPath = new JTextField();
+    private JTextField mameVidsPath = new JTextField();
+    private JTextField mamePlayPath = new JTextField();
+    private JTextField vDubPath = new JTextField();
+    private JTextField ffmpegPath = new JTextField();
     private JCheckBox nonmergedCB = new JCheckBox("MAME ROMs NON-MERGED?");
+    private static final String CANCEL = "Cancel";
 
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
@@ -83,7 +83,7 @@ final class MFM_SettingsPanel extends JPanel {
         for (Component aComp : comp) {
             if (aComp instanceof Container) setComponentsFont(((Container) aComp).getComponents());
             try {
-                aComp.setFont(font);
+                aComp.setFont(myFont);
             } catch (Exception e) {
                 e.printStackTrace();
             }//do nothing
@@ -96,146 +96,143 @@ final class MFM_SettingsPanel extends JPanel {
 
         this.setName(MFM_Constants.MFM_SETTINGS);
         /* NOTE using the <HTML> tags to trick JLabel into text wrap */
-        JLabel MAMEXElabel = new JLabel("<HTML>Select MAME Executable</HTML>");
-        MAMEExePath.setName(MFM_Constants.MAME_EXE_DIRECTORY);
-        MAMEExePath.addMouseListener(controller);
-        MAMEExePath.setToolTipText("Click here and select MAME executable file");
+        JLabel mameExelabel = new JLabel("<HTML>Select MAME Executable</HTML>");
+        mameExePath.setName(MFM_Constants.MAME_EXE_DIRECTORY);
+        mameExePath.addMouseListener(controller);
+        mameExePath.setToolTipText("Click here and select MAME executable file");
 
-        JLabel MAMEROMSlabel = new JLabel(
+        JLabel mameRomsLabel = new JLabel(
                 "<HTML>Select root Directory full MAME Rom set</HTML>");
-        MAMERomsPath.setName(MFM_Constants.ROMS_FULL_SET_DIRECTORY);
-        MAMERomsPath.addMouseListener(controller);
-        MAMERomsPath.setToolTipText("Click here and select your MAME ROMs full set root directory");
+        mameRomsPath.setName(MFM_Constants.ROMS_FULL_SET_DIRECTORY);
+        mameRomsPath.addMouseListener(controller);
+        mameRomsPath.setToolTipText("Click here and select your MAME ROMs full set root directory");
 
-        JLabel MAMECHDSlabel = new JLabel(
+        JLabel mameCHDsLabel = new JLabel(
                 "<HTML>Select root Directory full MAME CHD set</HTML>");
-        MAMECHDsPath.setName(MFM_Constants.CHDS_FULL_SET_DIRECTORY);
-        MAMECHDsPath.addMouseListener(controller);
-        MAMECHDsPath.setToolTipText("Click here to select MAME CHD full set root directory");
+        mameCHDsPath.setName(MFM_Constants.CHDS_FULL_SET_DIRECTORY);
+        mameCHDsPath.addMouseListener(controller);
+        mameCHDsPath.setToolTipText("Click here to select MAME CHD full set root directory");
 
-        JLabel MAMEEXTRASlabel = new JLabel(
+        JLabel mameExtraslabel = new JLabel(
                 "<HTML>Select root Directory full MAME Extras set</HTML>");
-        MAMEExtrasPath.setName(MFM_Constants.EXTRAS_FULL_SET_DIRECTORY);
-        MAMEExtrasPath.addMouseListener(controller);
-        MAMEExtrasPath.setToolTipText("Click here and select your MAME Extras full set root directory");
+        mameExtrasPath.setName(MFM_Constants.EXTRAS_FULL_SET_DIRECTORY);
+        mameExtrasPath.addMouseListener(controller);
+        mameExtrasPath.setToolTipText("Click here and select your MAME Extras full set root directory");
 
-        JLabel MAMEVIDSlabel = new JLabel(
+        JLabel mameVideosLabel = new JLabel(
                 "<HTML>Select Directory of your MAME videos</HTML>");
-        MAMEVidsPath.setName(MFM_Constants.MAME_VIDS_DIRECTORY);
-        MAMEVidsPath.addMouseListener(controller);
-        MAMEVidsPath.setToolTipText("Click here and select the Directory of your MAME videos");
+        mameVidsPath.setName(MFM_Constants.MAME_VIDS_DIRECTORY);
+        mameVidsPath.addMouseListener(controller);
+        mameVidsPath.setToolTipText("Click here and select the Directory of your MAME videos");
 
-        JLabel MAMEPLAYPATHlabel = new JLabel("<HTML>Select Playset Directory to place MAME resources</HTML>");
-        MAMEPlayPath.setName(MFM_Constants.PLAYSET_ROOT_DIRECTORY);
-        MAMEPlayPath.addMouseListener(controller);
-        MAMEPlayPath.setToolTipText("Click here to set the Directory where you want your Playset");
+        JLabel mamePlayPathLabel = new JLabel("<HTML>Select Playset Directory to place MAME resources</HTML>");
+        mamePlayPath.setName(MFM_Constants.PLAYSET_ROOT_DIRECTORY);
+        mamePlayPath.addMouseListener(controller);
+        mamePlayPath.setToolTipText("Click here to set the Directory where you want your Playset");
 
-        JLabel SLROMSlabel = new JLabel("<HTML>Select root Directory full Software List ROMs</HTML>");
-        SoftwareListRomsPath.setName(MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY);
-        SoftwareListRomsPath.addMouseListener(controller);
-        SoftwareListRomsPath.setToolTipText("Click here and select your Software List ROMs directory");
+        JLabel softwarelistRomsLabel = new JLabel("<HTML>Select root Directory full Software List ROMs</HTML>");
+        softwareListRomsPath.setName(MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY);
+        softwareListRomsPath.addMouseListener(controller);
+        softwareListRomsPath.setToolTipText("Click here and select your Software List ROMs directory");
 
-        JLabel SLCHDSlabel = new JLabel("<HTML>Select root Directory full Software List CHDs</HTML>");
-        SoftwareListCHDsPath.setName(MFM_Constants.SOFTWARELIST_CHDS_FULL_SET_DIRECTORY);
-        SoftwareListCHDsPath.addMouseListener(controller);
-        SoftwareListCHDsPath.setToolTipText("Click here and select your Software List CHDs directory");
+        JLabel softwarelistCHDsLabel = new JLabel("<HTML>Select root Directory full Software List CHDs</HTML>");
+        softwareListCHDsPath.setName(MFM_Constants.SOFTWARELIST_CHDS_FULL_SET_DIRECTORY);
+        softwareListCHDsPath.addMouseListener(controller);
+        softwareListCHDsPath.setToolTipText("Click here and select your Software List CHDs directory");
 
 /*
         JLabel label9 = new JLabel("<HTML>Select VirtualDub Executable</HTML>");
-        VDubPath.setName(MFM_Constants.VIRTUALDUB_EXE);
-        VDubPath.addMouseListener(controller);
-        VDubPath.setToolTipText("Click here and select your VirtualDub executable file");
+        vDubPath.setName(MFM_Constants.VIRTUALDUB_EXE);
+        vDubPath.addMouseListener(controller);
+        vDubPath.setToolTipText("Click here and select your VirtualDub executable file");
 
         JLabel label10 = new JLabel("<HTML>Select FFmpeg Executable</HTML>");
-        FFmpegPath.setName(MFM_Constants.FFMPEG_EXE);
-        FFmpegPath.addMouseListener(controller);
-        FFmpegPath.setToolTipText("Click here and select your VirtualDub executable file");
+        ffmpegPath.setName(MFM_Constants.FFMPEG_EXE);
+        ffmpegPath.addMouseListener(controller);
+        ffmpegPath.setToolTipText("Click here and select your VirtualDub executable file");
 */
         JButton saveB = new JButton("<HTML>Save MFM Settings</HTML>");
         saveB.setName("Save");
-        JButton cancelB = new JButton("Cancel");
-        cancelB.setName("Cancel");
+        JButton cancelB = new JButton(CANCEL);
+        cancelB.setName(CANCEL);
 
 //*************************** SAVE SETTINGS**********************************************************
 
-        ActionListener settingsListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (((JButton) e.getSource()).getName().equals("Save")) {
+        ActionListener settingsListener = event -> {
+            if (((JButton) event.getSource()).getName().equals("Save")) {
 
-                    MFM.logger.separateLine();
-                    MFM.logger.addToList("Save Settings command received", true);
-                    MFM.logger.addToList("ROMs path: " + MAMERomsPath.getText(), true);
-                    MFM.logger.addToList("Software List ROMs path: " + SoftwareListRomsPath.getText(), true);
-                    MFM.logger.addToList("Play path: " + MAMEPlayPath.getText(), true);
-                    MFM.logger.addToList("MAME EXE path: " + MAMEExePath.getText(), true);
-                    MFM.logger.addToList("CHD path: " + MAMECHDsPath.getText(), true);
-                    MFM.logger.addToList("Software List CHDs path: " + SoftwareListCHDsPath.getText(), true);
-                    MFM.logger.addToList("Extras path: " + MAMEExtrasPath.getText(), true);
-                    MFM.logger.addToList("VIDs path: " + MAMEVidsPath.getText(), true);
+                MFM.logger.separateLine();
+                MFM.logger.addToList("Save Settings command received", true);
+                MFM.logger.addToList("ROMs path: " + mameRomsPath.getText(), true);
+                MFM.logger.addToList("Software List ROMs path: " + softwareListRomsPath.getText(), true);
+                MFM.logger.addToList("Play path: " + mamePlayPath.getText(), true);
+                MFM.logger.addToList("MAME EXE path: " + mameExePath.getText(), true);
+                MFM.logger.addToList("CHD path: " + mameCHDsPath.getText(), true);
+                MFM.logger.addToList("Software List CHDs path: " + softwareListCHDsPath.getText(), true);
+                MFM.logger.addToList("Extras path: " + mameExtrasPath.getText(), true);
+                MFM.logger.addToList("VIDs path: " + mameVidsPath.getText(), true);
 
-                    // NOTE maintain order!!! See MFMSettings.MAMEexeDir() first run for create config
-                    String mameexe = MAMEExePath.getText();
-                    if ((MAMERomsPath.getText().isEmpty() && MAMECHDsPath.getText().isEmpty() &&
-                            SoftwareListRomsPath.getText().isEmpty() && SoftwareListCHDsPath.getText().isEmpty())
-                            || MAMEPlayPath.getText().isEmpty()) {
-                        JOptionPane.showMessageDialog(frame,
-                                "1 Root ROMs/CHDs plus PlaySet Directory path required.");
-                        return;
-                    }
+                // NOTE maintain order!!! See MFMSettings.MAMEexeDir() first run for create config
+                String mameexe = mameExePath.getText();
+                if ((mameRomsPath.getText().isEmpty() && mameCHDsPath.getText().isEmpty() &&
+                        softwareListRomsPath.getText().isEmpty() && softwareListCHDsPath.getText().isEmpty())
+                        || mamePlayPath.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame,
+                            "1 Root ROMs/CHDs plus PlaySet Directory path required.");
+                    return;
+                }
 
 
-                    if (MFM_Data.getInstance().notLoaded() && (mameexe.length() < 6)) {
-                        JOptionPane.showMessageDialog(frame,
-                                "MFM Data not detected MAME.exe must be entered.");
-                        return;
-                    }
+                if (MFM_Data.getInstance().notLoaded() && (mameexe.length() < 6)) {
+                    JOptionPane.showMessageDialog(frame,
+                            "MFM Data not detected MAME.exe must be entered.");
+                    return;
+                }
 
-                    if (!mameexe.isEmpty() && mameexe.length() > 5 && mameexe.contains(FileUtils.DIRECTORY_SEPARATOR)) {
-                        mfmSettings.MAMEexeName(mameexe.substring(
-                                mameexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
-                        mfmSettings.MAMEexeDir(MAMEExePath.getText().substring(0,
-                                MAMEExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
+                if (!mameexe.isEmpty() && mameexe.length() > 5 && mameexe.contains(FileUtils.DIRECTORY_SEPARATOR)) {
+                    MFMSettings.MAMEexeName(mameexe.substring(
+                            mameexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
+                    mfmSettings.MAMEexeDir(mameExePath.getText().substring(0,
+                            mameExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
 
-                        // NOTE added 9/20/2016 removing MFMSettings call from MAME class and class rename
-                        // needed here for a first run
-                        MAMEexe.setBaseArgs(mfmSettings.fullMAMEexePath());
-                    }
+                    // NOTE added 9/20/2016 removing MFMSettings call from MAME class and class rename
+                    // needed here for a first run
+                    MAMEexe.setBaseArgs(mfmSettings.fullMAMEexePath());
+                }
 
-                    mfmSettings.RomsFullSetDir(MAMERomsPath.getText());
-                    mfmSettings.CHDsFullSetDir(MAMECHDsPath.getText());
-                    mfmSettings.setExtrasFullSetDir(MAMEExtrasPath.getText());
-                    //    mfmSettings.RomsPlaySetDir(MAMEPlayPath.getText());
-                    mfmSettings.setPlaySetDir(MAMEPlayPath.getText());
-                    mfmSettings.VIDsFullSetDir(MAMEVidsPath.getText());
-                    mfmSettings.SoftwareListRomsFullSetDir(SoftwareListRomsPath.getText());
-                    mfmSettings.SoftwareListCHDsFullSetDir(SoftwareListCHDsPath.getText());
-                    mfmSettings.nonMerged(nonmergedCB.isSelected());
+                mfmSettings.RomsFullSetDir(mameRomsPath.getText());
+                mfmSettings.CHDsFullSetDir(mameCHDsPath.getText());
+                mfmSettings.setExtrasFullSetDir(mameExtrasPath.getText());
+                //    mfmSettings.RomsPlaySetDir(mamePlayPath.getText());
+                mfmSettings.setPlaySetDir(mamePlayPath.getText());
+                mfmSettings.VIDsFullSetDir(mameVidsPath.getText());
+                mfmSettings.SoftwareListRomsFullSetDir(softwareListRomsPath.getText());
+                mfmSettings.SoftwareListCHDsFullSetDir(softwareListCHDsPath.getText());
+                mfmSettings.nonMerged(nonmergedCB.isSelected());
 
 //*************************************************************************************************
-                    frame.setVisible(false);
-                    frame.dispose();
-                    if (mfmSettings.PlaySetDirectories() == null) {
-                        MFM.getMFMSettings().updateDirectoriesResourceFiles();
-                    }
+                frame.setVisible(false);
+                frame.dispose();
+                if (mfmSettings.PlaySetDirectories() == null) {
+                    MFM.getMFMSettings().updateDirectoriesResourceFiles();
+                }
 
-                    mfmSettings.isLoaded(true);
-                    mfmSettings.updateDirectoriesResourceFiles();
-                    if (!MFM.isFirstRun()) {
-                        MAMEInfo.loadINIs();
-                    }
+                mfmSettings.isLoaded(true);
+                mfmSettings.updateDirectoriesResourceFiles();
+                if (!MFM.isFirstRun()) {
+                    MAMEInfo.loadINIs();
+                }
 
-                    MFM.getMFMSettings().persistMySettings();
+                MFM.getMFMSettings().persistMySettings();
 
-                    // Linux debug
-                    MFM.logger.addToList("END Save Settings", true);
-                    MFM.logger.separateLine();
-                } else if (((JButton) e.getSource()).getName().equals("Cancel")) {
-                    frame.dispose();
-                    if (!mfmSettings.isLoaded()) {
-                        MFM.logger.addToList("User canceled Settings", true);
-                        System.exit(4);
-                    }
+                // Linux debug
+                MFM.logger.addToList("END Save Settings", true);
+                MFM.logger.separateLine();
+            } else if (((JButton) event.getSource()).getName().equals(CANCEL)) {
+                frame.dispose();
+                if (!mfmSettings.isLoaded()) {
+                    MFM.logger.addToList("User canceled Settings", true);
+                    System.exit(4);
                 }
             }
         };
@@ -248,68 +245,68 @@ final class MFM_SettingsPanel extends JPanel {
         this.add(required);
         this.add(new JLabel(""));
 
-        this.add(MAMEPLAYPATHlabel);
-        this.add(MAMEPlayPath);
+        this.add(mamePlayPathLabel);
+        this.add(mamePlayPath);
 
         JLabel maybeRequired = new JLabel("========== ** Required if you run or parse MAME **", SwingConstants.TRAILING);
         maybeRequired.setToolTipText("Not required if you downloaded complete MFM Set " +
                 "and only desire List Building capabilities.");
         maybeRequired.setVerticalAlignment(SwingConstants.BOTTOM);
 
+        String longDivider = "===========================================";
         this.add(maybeRequired);
-        JLabel divider3 = new JLabel("===========================================");
+        JLabel divider3 = new JLabel(longDivider);
         divider3.setVerticalAlignment(SwingConstants.BOTTOM);
         this.add(divider3);
 
-        this.add(MAMEXElabel);
-        this.add(MAMEExePath);
+        this.add(mameExelabel);
+        this.add(mameExePath);
 
         JLabel oneRequired = new JLabel("=============================== ** 1 required **");
         oneRequired.setVerticalAlignment(SwingConstants.BOTTOM);
         oneRequired.setHorizontalAlignment(SwingConstants.RIGHT);
         this.add(oneRequired);
 
-        JLabel divider = new JLabel("===========================================");
+        JLabel divider = new JLabel(longDivider);
         divider.setVerticalAlignment(SwingConstants.BOTTOM);
         this.add(divider);
 
-        this.add(MAMEROMSlabel);
-        this.add(MAMERomsPath);
+        this.add(mameRomsLabel);
+        this.add(mameRomsPath);
 
         JLabel split = new JLabel("Leave unchecked if you have a SPLIT or MERGED ROM set");
         split.setHorizontalAlignment(SwingConstants.RIGHT);
         this.add(split);
         this.add(nonmergedCB);
 
-        this.add(MAMECHDSlabel);
-        this.add(MAMECHDsPath);
+        this.add(mameCHDsLabel);
+        this.add(mameCHDsPath);
 
-        this.add(SLROMSlabel);
-        this.add(SoftwareListRomsPath);
+        this.add(softwarelistRomsLabel);
+        this.add(softwareListRomsPath);
 
-        this.add(SLCHDSlabel);
-        this.add(SoftwareListCHDsPath);
+        this.add(softwarelistCHDsLabel);
+        this.add(softwareListCHDsPath);
 
         JLabel notRequired = new JLabel("============================ ** Not required **");
         notRequired.setVerticalAlignment(SwingConstants.BOTTOM);
         notRequired.setHorizontalAlignment(SwingConstants.RIGHT);
         this.add(notRequired);
-        JLabel divider2 = new JLabel("===========================================");
+        JLabel divider2 = new JLabel(longDivider);
         divider2.setVerticalAlignment(SwingConstants.BOTTOM);
         this.add(divider2);
 
-        this.add(MAMEEXTRASlabel);
-        this.add(MAMEExtrasPath);
+        this.add(mameExtraslabel);
+        this.add(mameExtrasPath);
 
-        this.add(MAMEVIDSlabel);
-        this.add(MAMEVidsPath);
+        this.add(mameVideosLabel);
+        this.add(mameVidsPath);
 
         // NOTE HAck to trick GridLayout - should really do another layout manager
         this.add(new JLabel());
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(saveB);
-        //fixme get the spacing in an appropriate way NOTE believe would need to switch to GridBagLayout
-        buttonPanel.add(new JLabel("           "));
+        buttonPanel.add(new JLabel("           ")); // spacing hack
         buttonPanel.add(cancelB);
         buttonPanel.setBackground(MFMUI.getMFMSettingsBGcolor());
         this.add(buttonPanel);
@@ -319,16 +316,16 @@ final class MFM_SettingsPanel extends JPanel {
 
         if (mfmSettings.isLoaded()) {
             if (mfmSettings.MAMEexeDir() != null && !mfmSettings.MAMEexeDir().isEmpty()) {
-                MAMEExePath.setText(
+                mameExePath.setText(
                         mfmSettings.MAMEexeDir() + FileUtils.DIRECTORY_SEPARATOR + mfmSettings.MAMEexeName());
             }
-            MAMERomsPath.setText(mfmSettings.RomsFullSetDir());
-            MAMECHDsPath.setText(mfmSettings.CHDsFullSetDir());
-            MAMEExtrasPath.setText(mfmSettings.getExtrasFullSetDir());
-            MAMEPlayPath.setText(mfmSettings.getPlaySetDir());
-            MAMEVidsPath.setText(mfmSettings.VIDsFullSetDir());
-            SoftwareListRomsPath.setText(mfmSettings.SoftwareListRomsFullSetDir());
-            SoftwareListCHDsPath.setText(mfmSettings.SoftwareListCHDsFullSetDir());
+            mameRomsPath.setText(mfmSettings.RomsFullSetDir());
+            mameCHDsPath.setText(mfmSettings.CHDsFullSetDir());
+            mameExtrasPath.setText(mfmSettings.getExtrasFullSetDir());
+            mamePlayPath.setText(mfmSettings.getPlaySetDir());
+            mameVidsPath.setText(mfmSettings.VIDsFullSetDir());
+            softwareListRomsPath.setText(mfmSettings.SoftwareListRomsFullSetDir());
+            softwareListCHDsPath.setText(mfmSettings.SoftwareListCHDsFullSetDir());
             nonmergedCB.setSelected(mfmSettings.isnonMerged());
         }
     }
@@ -336,16 +333,16 @@ final class MFM_SettingsPanel extends JPanel {
     private class SettingsController extends ClickListener {
 
         @Override
-        public void singleClick(MouseEvent e) {
+        public void singleClick(MouseEvent e) { // Ignore we just want double clicks
         }
 
         @Override
         public void doubleClick(MouseEvent e) {
             String fieldName = ((JTextField) e.getSource()).getName();
 
-            if (fieldName.equalsIgnoreCase(MAMEExePath.getName()) ||
-                    fieldName.equalsIgnoreCase(VDubPath.getName()) ||
-                    fieldName.equalsIgnoreCase(FFmpegPath.getName())) {
+            if (fieldName.equalsIgnoreCase(mameExePath.getName()) ||
+                    fieldName.equalsIgnoreCase(vDubPath.getName()) ||
+                    fieldName.equalsIgnoreCase(ffmpegPath.getName())) {
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fileChooser.setDialogTitle("Select File");
             } else {
@@ -361,37 +358,39 @@ final class MFM_SettingsPanel extends JPanel {
                 switch (fieldName) {
 
                     case MFM_Constants.MAME_EXE_DIRECTORY:
-                        MAMEExePath.setText(file.getAbsolutePath());
+                        mameExePath.setText(file.getAbsolutePath());
                         break;
                     case MFM_Constants.ROMS_FULL_SET_DIRECTORY:
                         String path = file.getAbsolutePath();
-                        MAMERomsPath.setText(path);
+                        mameRomsPath.setText(path);
                         break;
                     case MFM_Constants.CHDS_FULL_SET_DIRECTORY:
-                        MAMECHDsPath.setText(file.getAbsolutePath());
+                        mameCHDsPath.setText(file.getAbsolutePath());
                         break;
-                    case MFM_Constants.EXTRAS_FULL_SET_DIRECTORY: //"MAMEExtrasPath":
-                        MAMEExtrasPath.setText(file.getAbsolutePath());
+                    case MFM_Constants.EXTRAS_FULL_SET_DIRECTORY: //"mameExtrasPath":
+                        mameExtrasPath.setText(file.getAbsolutePath());
                         break;
                     case MFM_Constants.MAME_VIDS_DIRECTORY:
-                        MAMEVidsPath.setText(file.getAbsolutePath());
+                        mameVidsPath.setText(file.getAbsolutePath());
                         break;
                     case MFM_Constants.PLAYSET_ROOT_DIRECTORY:
-                        MAMEPlayPath.setText(file.getAbsolutePath());
+                        mamePlayPath.setText(file.getAbsolutePath());
                         break;
                     case MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY:
-                        SoftwareListRomsPath.setText(file.getAbsolutePath());
+                        softwareListRomsPath.setText(file.getAbsolutePath());
                         break;
                     case MFM_Constants.SOFTWARELIST_CHDS_FULL_SET_DIRECTORY:
-                        SoftwareListCHDsPath.setText(file.getAbsolutePath());
+                        softwareListCHDsPath.setText(file.getAbsolutePath());
                         break;
 
                     // These entries were removed from Settings UI in 0.7
                     case MFM_Constants.VIRTUALDUB_EXE:
-                        VDubPath.setText(file.getAbsolutePath());
+                        vDubPath.setText(file.getAbsolutePath());
                         break;
                     case MFM_Constants.FFMPEG_EXE:
-                        FFmpegPath.setText(file.getAbsolutePath());
+                        ffmpegPath.setText(file.getAbsolutePath());
+                        break;
+                    default:
                         break;
                 }
             }

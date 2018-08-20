@@ -23,13 +23,12 @@ import Phweda.MFM.MFM;
 import Phweda.MFM.MFM_Constants;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.utils.FileUtils;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
 
@@ -45,8 +44,7 @@ class MachineListTableModel extends AbstractTableModel {
     private String[] columnNames = {Machine.MACHINE_FULL_NAME, Machine.MACHINE_NAME, Machine.MANUFACTURER_CAPS,
             Machine.YEAR_CAPS, Machine.CATEGORY_CAPS, Machine.STATUS_CAPS, Machine.CLONEOF_CAPS};
 
-    private ArrayList<String[]> data = new ArrayList<String[]>();
-    private ArrayList<String[]> tempdata = new ArrayList<String[]>();
+    private ArrayList<String[]> tempdata = new ArrayList<>();
 
     private String listName;
     private String[] list;
@@ -58,12 +56,12 @@ class MachineListTableModel extends AbstractTableModel {
      *
      * */
 
-    void setData(TreeSet<String> list, String listName) {
+    void setData(SortedSet<String> list, String listName) {
         loadMachineList(list, listName);
     }
 
     /* TODO Hide and show columns */
-    private void loadMachineList(TreeSet<String> list, String listName) {
+    private void loadMachineList(SortedSet<String> list, String listName) {
         this.listName = listName;
         this.list = list.toArray(new String[0]);
         fireTableDataChanged();
@@ -85,9 +83,9 @@ class MachineListTableModel extends AbstractTableModel {
      * Decision for 0.9.5 is to NOT have a separate TableModel for Software. Trying to support mixed lists.
      * Let's see what happens. If not users would need to create 2 lists: Arcade & Software.
      *
-     * @param rowIndex
-     * @param columnIndex
-     * @return
+     * @param rowIndex    row index
+     * @param columnIndex column index
+     * @return value for this cell
      */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
@@ -95,7 +93,7 @@ class MachineListTableModel extends AbstractTableModel {
         // Put softwarelist first to avoid name collisions with Arcade games
         String name = list[rowIndex];
         String listName2 = listName;
-        if(name.contains(MFM_Constants.SOFTWARE_LIST_SEPARATER)){
+        if (name.contains(MFM_Constants.SOFTWARE_LIST_SEPARATER)) {
             String[] split = name.split(MFM_Constants.SOFTWARE_LIST_SEPARATER);
             listName2 = split[0];
             name = split[1];
@@ -119,9 +117,8 @@ class MachineListTableModel extends AbstractTableModel {
                     return software.getSupported() != null ? software.getSupported() : "";
                 case 6:
                     return software.getCloneof() != null ? software.getCloneof() : "";
-                default: {
+                default:
                     return "";
-                }
             }
         }
 
@@ -131,8 +128,8 @@ class MachineListTableModel extends AbstractTableModel {
         }
         // Expected for some lists
         else {
-            if (columnIndex == MachineListTable.keyColumn) {
-                String message = "MachineListTableModel.java:88 machine is null " + list[rowIndex];
+            if (columnIndex == MachineListTable.KEY_COLUMN) {
+                String message = "MachineListTableModel.java machine is null " + list[rowIndex];
                 if (MFM.isSystemDebug()) {
                     System.out.println(message);
                 }
@@ -155,33 +152,8 @@ class MachineListTableModel extends AbstractTableModel {
         return columnNames[column];
     }
 
-    /**
-     * Returns <code>Object.class</code> regardless of <code>columnIndex</code>.
-     *
-     * @param columnIndex the column being queried
-     * @return the Object.class
-     */
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return super.getColumnClass(columnIndex);
-    }
-
     public void addRow(String[] newRow) {
         tempdata.add(newRow);
-    }
-
-    private void addRows(List<String[]> rows) {
-        tempdata.addAll(rows);
-    }
-
-    /**
-     * Update table data after TableSwingWorker completes
-     * Effectively buffers new list till completed creating
-     */
-    private void update() {
-        data = tempdata;
-        fireTableDataChanged();
-        tempdata = new ArrayList<>();
     }
 
     private class TableSwingWorker extends SwingWorker<MachineListTableModel, String[]> {
@@ -214,6 +186,20 @@ class MachineListTableModel extends AbstractTableModel {
             return tableModel;
         }
 
+        private void addRows(List<String[]> rows) {
+            tempdata.addAll(rows);
+        }
+
+        /**
+         * Update table data after TableSwingWorker completes
+         * Effectively buffers new list till completed creating
+         */
+        private void update() {
+            ArrayList<String[]> data = tempdata;
+            fireTableDataChanged();
+            tempdata = new ArrayList<>();
+        }
+
         private String[] getMachineArray(Machine machine) {
             String[] data = new String[columnNames.length];
             IntStream.range(0, data.length)
@@ -224,7 +210,7 @@ class MachineListTableModel extends AbstractTableModel {
         @Override
         protected void done() {
             super.done();
-            tableModel.update();
+            update();
         }
 
         @Override
@@ -232,7 +218,7 @@ class MachineListTableModel extends AbstractTableModel {
             if (MFM.isSystemDebug()) {
                 System.out.println("Adding " + chunks.size() + " rows");
             }
-            tableModel.addRows(chunks);
+            addRows(chunks);
         }
     }
 }

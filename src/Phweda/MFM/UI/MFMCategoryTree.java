@@ -20,7 +20,8 @@ package Phweda.MFM.UI;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
-import java.util.TreeMap;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,26 +31,26 @@ import java.util.TreeMap;
  */
 public class MFMCategoryTree {
 
-    private static JCheckBoxTree jcbtree;
+    private JCheckBoxTree jcbtree;
 
-    public MFMCategoryTree(TreeMap<String, ArrayList<String>> treeMap) {
+    public MFMCategoryTree(SortedMap<String, ArrayList<String>> treeMap) {
         buildTree(treeMap);
     }
 
-    public static JCheckBoxTree getJCBTree() {
+    public JCheckBoxTree getJCBTree() {
         return jcbtree;
     }
 
-    private void buildTree(TreeMap<String, ArrayList<String>> treeMap) {
+    private void buildTree(SortedMap<String, ArrayList<String>> treeMap) {
 
         DefaultMutableTreeNode root;
         root = new DefaultMutableTreeNode("root");
         jcbtree = new JCheckBoxTree(root);
 
-        for (String category : treeMap.keySet()) {
-            DefaultMutableTreeNode catNode = new DefaultMutableTreeNode(category);
-            if (!treeMap.get(category).isEmpty()) {
-                for (String childCat : treeMap.get(category)) {
+        for (Map.Entry<String, ArrayList<String>> entry : treeMap.entrySet()) {
+            DefaultMutableTreeNode catNode = new DefaultMutableTreeNode(entry.getKey());
+            if (!entry.getValue().isEmpty()) {
+                for (String childCat : entry.getValue()) {
                     catNode.add(new DefaultMutableTreeNode(childCat));
                 }
             }

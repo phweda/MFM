@@ -29,12 +29,11 @@ import java.awt.event.ActionEvent;
  * Date: 8/18/13
  * Time: 5:54 PM
  */
-public class MFMOptionPane {
+class MFMOptionPane {
     JTextArea textArea = new JTextArea();
-    JDialog dialog;
 
-    public MFMOptionPane(String title, String text, Frame frame, int messageType,
-                         int optionType) {
+    MFMOptionPane(String title, String text, Frame frame, int messageType,
+                  int optionType) {
 
         final JScrollPane scrollPane = new JScrollPane();
         textArea.setFont(frame.getFont());
@@ -49,7 +48,6 @@ public class MFMOptionPane {
 
         scrollPane.setViewportView(textArea);
 
-        // Note fixme above this forces scroll to the top
         if (text.length() > 2) { // otherwise you get a IllegalArgumentException: bad position: 2
             textArea.setCaretPosition(DefaultCaret.OUT_TOP);
         }
@@ -60,7 +58,7 @@ public class MFMOptionPane {
                 scrollPane,
         };
         JOptionPane pane = new JOptionPane(array, JOptionPane.INFORMATION_MESSAGE);
-        dialog = pane.createDialog(frame, title);
+        JDialog dialog = pane.createDialog(frame, title);
         //    dialog.add(createPopup());
         dialog.setLocation(150, 150);
         dialog.setResizable(true);
@@ -88,23 +86,20 @@ public class MFMOptionPane {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                // Just for logger
-                // JOptionPane.showConfirmDialog(null, e.getActionCommand());
-
                 switch (e.getActionCommand()) {
 
                     case SELECTALL:
                         textArea.selectAll();
                         textArea.requestFocusInWindow();
                         break;
-
                     case COPY:
                         textArea.copy();
                         break;
                     case SAVETOFILE:
                         // TODO
                         break;
-
+                    default:
+                        break;
                 }
             } catch (Exception exc) {
                 exc.printStackTrace();

@@ -40,7 +40,7 @@ public class MFMBusyPainter extends BusyPainter {
     @Override
     protected void doPaint(Graphics2D g, Object t, int width, int height) {
         super.doPaint(g, t, width, height);
-        g.drawString(getTime(), (width / 7) * 2, new Double(height / 1.82).intValue());  //
+        g.drawString(getTime(), (width / 7) * 2, (int) (height / 1.82));  //
     }
 
     private String getTime() {

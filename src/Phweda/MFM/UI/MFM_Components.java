@@ -32,8 +32,6 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -45,49 +43,57 @@ import static Phweda.MFM.UI.MFMAction.*;
  * Major refactor 9/30/2016 moved Menubar creation to separate class MFM_Menubar
  */
 public class MFM_Components {
+    private static MFM_Components ourInstance;
     private static final JScrollPane leftTreeScrollPane = new JScrollPane();
     static MFMUI_Resources resources = MFMUI_Resources.getInstance();
-    private static MFMController MFMController;
-    private static JPopupMenu MachinePopupMenu;
-    private static JPopupMenu SoftwarePopupMenu;
-    private static JPanel MFMListPanel;
-    private static JTabbedPane ExtrasTabbedPane;
-    private static JTable machineListTable;
-    private static JScrollPane mfmFolderTreeScrollPane;
-    private static JMenuBar menuBar;
+    private MFMController mfmController;
+    private JPopupMenu machinePopupMenu;
+    private JPopupMenu softwarePopupMenu;
+    private JPanel mfmListPanel;
+    private JTabbedPane extrasTabbedPane;
+    private MachineListTable machineListTable;
+    private JScrollPane mfmFolderTreeScrollPane;
+    private JMenuBar menuBar;
     private static StatusBar statusBar;
     private static JLabel currentListName;
     private static MFMInformationPanel infoPanel;
-    private static JPanel fillPanel;
+    private JPanel fillPanel;
     private JTree tree;
 
-    // 0.9.5 adding Strings for Tab Titles - used for discovering images for ExtrasTabbedPane pane
-    static final String CABINET_COVER = "Cabinet/Cover";
-    static final String CPANEL = "CPanel";
-    static final String FLYERS = "Flyers";
-    static final String MARQUEES = "Marquees";
-    static final String PCB = "PCB";
-    static final String SNAP = "Snap";
-    static final String TITLES = "Titles";
+    // 0.9.5 adding Strings for Tab Titles - used for discovering images for extrasTabbedPane pane
+    private static final String CABINET_COVER = "Cabinet/Cover";
+    private static final String CPANEL = "CPanel";
+    private static final String FLYERS = "Flyers";
+    private static final String MARQUEES = "Marquees";
+    private static final String PCB = "PCB";
+    private static final String SNAP = "Snap";
+    private static final String TITLES = "Titles";
 
-    MFM_Components(MFMController controller) {
-        MFMController = controller;
+    private MFM_Components(MFMController controller) {
+        mfmController = controller;
         createUIComponents();
     }
 
-    public static MFMInformationPanel InfoPanel() {
+    public static MFM_Components getInstance(MFMController controller) {
+        if (ourInstance == null) {
+            ourInstance = new MFM_Components(controller);
+        }
+        return ourInstance;
+    }
+
+    public static MFMInformationPanel infoPanel() {
         return infoPanel;
     }
 
-    static JPopupMenu getListPopupMenu() {
-        return MachinePopupMenu;
+    JPopupMenu getListPopupMenu() {
+        return machinePopupMenu;
     }
 
-    static JPopupMenu getSoftwarelistPopupMenuPopupMenu() {
-        return SoftwarePopupMenu;
+    JPopupMenu getSoftwarelistPopupMenuPopupMenu() {
+        return softwarePopupMenu;
     }
 
-    static JPanel getMFMFolderTreeScrollPane() {
+    JPanel getMFMFolderTreeScrollPane() {
         if (mfmFolderTreeScrollPane == null) {
             return null;
         }
@@ -101,32 +107,29 @@ public class MFM_Components {
         return treePanel;
     }
 
-    private static JButton getTreeButton() {
+    private JButton getTreeButton() {
         final String showXML = "Show MAME XML";
         final String showINIs = "Show Folder INIs";
 
         final JButton treeButton = new JButton(showXML);
 
-        treeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (((AbstractButton) e.getSource()).getText().equals(showXML)) {
-                    treeButton.setText(showINIs);
-                    leftTreeScrollPane.getViewport().add(MAMEtoJTree.getInstance(false).getMAMEjTree());
-                } else {
-                    treeButton.setText(showXML);
-                    leftTreeScrollPane.getViewport().add(mfmFolderTreeScrollPane);
-                }
+        treeButton.addActionListener(event -> {
+            if (((AbstractButton) event.getSource()).getText().equals(showXML)) {
+                treeButton.setText(showINIs);
+                leftTreeScrollPane.getViewport().add(MAMEtoJTree.getInstance(false).getMAMEjTree());
+            } else {
+                treeButton.setText(showXML);
+                leftTreeScrollPane.getViewport().add(mfmFolderTreeScrollPane);
             }
         });
         return treeButton;
     }
 
-    static StatusBar StatusBar() {
+    StatusBar statusBar() {
         return statusBar;
     }
 
-    static JPanel getFillPanel() {
+    JPanel getFillPanel() {
         return fillPanel;
     }
 
@@ -141,15 +144,15 @@ public class MFM_Components {
                 dataSets[0]);
     }
 
-    public static JPanel getMFMListPanel() {
-        return MFMListPanel;
+    public JPanel getMfmListPanel() {
+        return mfmListPanel;
     }
 
     protected static MFMUI_Resources getResources() {
         return resources;
     }
 
-    Component createStatusBar(int width) {
+    static Component createStatusBar(int width) {
         statusBar = new StatusBar();
         ClockPanel clock = null;
         ImageIcon flagIcon = MFMUI_Resources.getInstance().getFlagImageIcon(MFM.LOCAL_COUNTRY);
@@ -183,19 +186,19 @@ public class MFM_Components {
         return statusBar;
     }
 
-    JTable getMachineListTable() {
+    MachineListTable getMachineListTable() {
         return machineListTable;
     }
 
-    JTabbedPane ExtrasTabbedPane() {
-        return ExtrasTabbedPane;
+    JTabbedPane extrasTabbedPane() {
+        return extrasTabbedPane;
     }
 
     JTree getTree() {
         return tree;
     }
 
-    JLabel CurrentListName() {
+    JLabel currentListName() {
         return currentListName;
     }
 
@@ -228,19 +231,18 @@ public class MFM_Components {
     }
 
     private void createFolderTree() {
-        if (null == MAMEInfo.getINIfiles() || MAMEInfo.getINIfiles().isEmpty()) {
+        if (null == MAMEInfo.getInifiles() || MAMEInfo.getInifiles().isEmpty()) {
             return;
         }
         DefaultMutableTreeNode root;
 
-        TreeMap<String, Map> INIfiles = new TreeMap<String, Map>(MAMEInfo.getINIfiles());
+        TreeMap<String, Map<String, String>> iniFiles = new TreeMap<>(MAMEInfo.getInifiles());
         root = new DefaultMutableTreeNode("INIfiles");
         tree = new JTree(root);
 
-        // TODO maybe we should simplify/explicate by having our own object - see ParseAllMachinesInfo too
-        for (Object ini : INIfiles.keySet()) {
+        for (Object ini : iniFiles.keySet()) {
             DefaultMutableTreeNode folderNode = new DefaultMutableTreeNode(ini);
-            Map categories = INIfiles.get(ini);
+            Map categories = iniFiles.get(ini);
             for (Object category : categories.keySet()) {
                 DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(category);
                 for (Object game : (TreeSet) categories.get(category)) {
@@ -251,24 +253,24 @@ public class MFM_Components {
             }
             root.add(folderNode);
         }
-        tree.addMouseListener(MFMController);
+        tree.addMouseListener(mfmController);
         mfmFolderTreeScrollPane = new JScrollPane(tree);
         // Expand root folder
         tree.expandRow(0);
     }
 
     private void createExtrasTabbedPane() {
-        ExtrasTabbedPane = new JTabbedPane();
-        Image defaultImage = getResources().getImageIcon(MFMUI_Resources.MFM_Image_PNG).getImage();
-        ExtrasTabbedPane.addTab(CABINET_COVER, new ImagePanel(defaultImage)); // Cabs/Systems
-        ExtrasTabbedPane.addTab(CPANEL, new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab(FLYERS, new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab(MARQUEES, new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab(PCB, new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab(SNAP, new ImagePanel(defaultImage));
-        ExtrasTabbedPane.addTab(TITLES, new ImagePanel(defaultImage));
+        extrasTabbedPane = new JTabbedPane();
+        Image defaultImage = getResources().getImageIcon(MFMUI_Resources.MFM_IMAGE_PNG).getImage();
+        extrasTabbedPane.addTab(CABINET_COVER, new ImagePanel(defaultImage)); // Cabs/Systems
+        extrasTabbedPane.addTab(CPANEL, new ImagePanel(defaultImage));
+        extrasTabbedPane.addTab(FLYERS, new ImagePanel(defaultImage));
+        extrasTabbedPane.addTab(MARQUEES, new ImagePanel(defaultImage));
+        extrasTabbedPane.addTab(PCB, new ImagePanel(defaultImage));
+        extrasTabbedPane.addTab(SNAP, new ImagePanel(defaultImage));
+        extrasTabbedPane.addTab(TITLES, new ImagePanel(defaultImage));
 
-        ExtrasTabbedPane.addChangeListener(MFMController);
+        extrasTabbedPane.addChangeListener(mfmController);
 
 /*
         JAVA ImageIO only supports the following formats
@@ -279,14 +281,14 @@ public class MFM_Components {
 
     private void setMachineListTable() {
         machineListTable = MachineListTable.getInstance();
-        machineListTable.addMouseListener(MFMController);
-        machineListTable.addMouseWheelListener(MFMController);
-        machineListTable.getSelectionModel().addListSelectionListener(MFMController);
+        machineListTable.addMouseListener(mfmController);
+        machineListTable.addMouseWheelListener(mfmController);
+        machineListTable.getSelectionModel().addListSelectionListener(mfmController);
     }
 
     private void createMachinePopup() {
-        MachinePopupMenu = new JPopupMenu(null);
-        MachinePopupMenu.setBorder(new BevelBorder(BevelBorder.LOWERED,
+        machinePopupMenu = new JPopupMenu(null);
+        machinePopupMenu.setBorder(new BevelBorder(BevelBorder.LOWERED,
                 new Color(74, 37, 19), new Color(117, 70, 53)));
 //==================================================================
         JSeparator separator = new JSeparator();
@@ -301,28 +303,28 @@ public class MFM_Components {
         separator3.setPreferredSize(new Dimension(50, 2));
         separator3.setBorder(new BevelBorder(BevelBorder.RAISED));
 //==================================================================
-        MachinePopupMenu.add(new MFMAction(AddtoListAction, null));
-        MachinePopupMenu.add(new MFMAction(RemovefromListAction, null));
-        MachinePopupMenu.add(separator);
-        MachinePopupMenu.add(new MFMAction(RecordMachineAction, null));
-        MachinePopupMenu.add(new MFMAction(PlayVideoAction, null));
-        MachinePopupMenu.add(getVideoOps());
+        machinePopupMenu.add(new MFMAction(ADD_TO_LIST, null));
+        machinePopupMenu.add(new MFMAction(REMOVE_FROM_LIST, null));
+        machinePopupMenu.add(separator);
+        machinePopupMenu.add(new MFMAction(RECORD_MACHINE, null));
+        machinePopupMenu.add(new MFMAction(PLAY_VIDEO, null));
+        machinePopupMenu.add(getVideoOps());
 
-        MachinePopupMenu.add(separator2);
-        MachinePopupMenu.add(new MFMAction(ShowHistoryAction, null));
-        MachinePopupMenu.add(new MFMAction(ShowManualAction, null));
-        MachinePopupMenu.add(new MFMAction(ShowInfoAction, null));
-        MachinePopupMenu.add(new MFMAction(MACHINE_XMLAction, null));
+        machinePopupMenu.add(separator2);
+        machinePopupMenu.add(new MFMAction(SHOW_HISTORY, null));
+        machinePopupMenu.add(new MFMAction(SHOW_MANUAL, null));
+        machinePopupMenu.add(new MFMAction(SHOW_INFO, null));
+        machinePopupMenu.add(new MFMAction(SHOW_MACHINE_XML, null));
 
-        MachinePopupMenu.add(separator3);
-        MachinePopupMenu.add(new MFMAction(ShowControlsDevicesAction, null));
-        MachinePopupMenu.add(new MFMAction(GOTOcloneofAction, null));
-        MachinePopupMenu.add(new MFMAction(OpenImageAction, null));
+        machinePopupMenu.add(separator3);
+        machinePopupMenu.add(new MFMAction(SHOW_CONTROLS_DEVICES, null));
+        machinePopupMenu.add(new MFMAction(GOTO_CLONEOF, null));
+        machinePopupMenu.add(new MFMAction(OPEN_IMAGE, null));
     }
 
     private void createSoftwarePopup() {
-        SoftwarePopupMenu = new JPopupMenu(null);
-        SoftwarePopupMenu.setBorder(new BevelBorder(BevelBorder.LOWERED,
+        softwarePopupMenu = new JPopupMenu(null);
+        softwarePopupMenu.setBorder(new BevelBorder(BevelBorder.LOWERED,
                 new Color(74, 37, 19), new Color(117, 70, 53)));
 //==================================================================
         JSeparator separator = new JSeparator();
@@ -331,40 +333,40 @@ public class MFM_Components {
 //==================================================================
 
 
-        SoftwarePopupMenu.add(new MFMAction(AddtoListAction, null));
-        SoftwarePopupMenu.add(new MFMAction(RemovefromListAction, null));
-        SoftwarePopupMenu.add(separator);
-        SoftwarePopupMenu.add(new MFMAction(ShowManualAction, null));
-        SoftwarePopupMenu.add(new MFMAction(SOFTWARE_XMLAction, null));
-        SoftwarePopupMenu.add(new MFMAction(GOTOcloneofAction, null));
-        SoftwarePopupMenu.add(new MFMAction(OpenImageAction, null));
+        softwarePopupMenu.add(new MFMAction(ADD_TO_LIST, null));
+        softwarePopupMenu.add(new MFMAction(REMOVE_FROM_LIST, null));
+        softwarePopupMenu.add(separator);
+        softwarePopupMenu.add(new MFMAction(SHOW_MANUAL, null));
+        softwarePopupMenu.add(new MFMAction(SHOW_SOFTWARE_XML, null));
+        softwarePopupMenu.add(new MFMAction(GOTO_CLONEOF, null));
+        softwarePopupMenu.add(new MFMAction(OPEN_IMAGE, null));
     }
 
     private JMenu getVideoOps() {
         JMenu videoOps = new JMenu("VideoOps");
-        videoOps.add(new MFMAction(PlayGametoAVIAction, null));
-        videoOps.add(new MFMAction(PlaybacktoAVIAction, null));
-        videoOps.add(new MFMAction(EditVideoAction, null));
-        videoOps.add(new MFMAction(CropAVIAction, null));
+        videoOps.add(new MFMAction(PLAY_RECORD_TO_AVI, null));
+        videoOps.add(new MFMAction(PLAYBACK_TO_AVI, null));
+        videoOps.add(new MFMAction(EDIT_VIDEO, null));
+        videoOps.add(new MFMAction(CROP_AVI, null));
         return videoOps;
     }
 
     //  NOTE replaced by ListBuilder
     private void createListChooserPanel() {
 
-        MFMListPanel = new JPanel(new BorderLayout());
-        //    MFMListPanel = new JPanel(new GridBagLayout());
+        mfmListPanel = new JPanel(new BorderLayout());
+        //    mfmListPanel = new JPanel(new GridBagLayout());
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 1));
         panel.setMinimumSize(new Dimension(250, 150));
         panel.setPreferredSize(new Dimension(250, 150));
 
-        MFMListPanel.add(panel, BorderLayout.SOUTH);
+        mfmListPanel.add(panel, BorderLayout.SOUTH);
 
-        MFMListPanel.setPreferredSize(new Dimension(250, 600));
-        MFMListPanel.setMaximumSize(new Dimension(250, 1100));
+        mfmListPanel.setPreferredSize(new Dimension(250, 600));
+        mfmListPanel.setMaximumSize(new Dimension(250, 1100));
 
-        MFMListPanel.validate();
+        mfmListPanel.validate();
     }
 }

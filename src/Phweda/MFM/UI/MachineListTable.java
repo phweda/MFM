@@ -30,17 +30,20 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
 
+import static Phweda.MFM.UI.MFMAction.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 6/16/2015
  * Time: 4:06 PM
  */
+@SuppressWarnings("squid:MaximumInheritanceDepth")
 class MachineListTable extends JTable {
-    static int keyColumn = 0;
-    static int categoryColumn = 4;
-    private static MachineListTable ourInstance;
-    private static int fullNameColumn = 0;
+    static final int KEY_COLUMN = 1;
+    int categoryColumn = 4;
+    private static final MachineListTable ourInstance;
+    static final int FULL_NAME_COLUMN = 0;
 
     static {
         ourInstance = new MachineListTable() {
@@ -48,7 +51,7 @@ class MachineListTable extends JTable {
             public void tableChanged(TableModelEvent e) {
                 super.tableChanged(e);
                 // If table isn't empty
-                if (!(e.getFirstRow() == TableModelEvent.HEADER_ROW)) {
+                if (e.getFirstRow() != TableModelEvent.HEADER_ROW) {
                     this.getSelectionModel().setSelectionInterval(0, 0);
                     this.requestFocus();
                 }
@@ -56,9 +59,9 @@ class MachineListTable extends JTable {
 
             @Override
             public JToolTip createToolTip() {
-                JMultiLineToolTip JMLITT = new JMultiLineToolTip();
-                JMLITT.setFixedWidth(this.getWidth());
-                return JMLITT;
+                JMultiLineToolTip jMultiLineToolTip = new JMultiLineToolTip();
+                jMultiLineToolTip.setFixedWidth(this.getWidth());
+                return jMultiLineToolTip;
             }
 
             //Implement table cell tool tips.
@@ -69,9 +72,9 @@ class MachineListTable extends JTable {
                 int rowIndex = rowAtPoint(p);
                 int colIndex = columnAtPoint(p);
 
-                if (colIndex == fullNameColumn) {
+                if (colIndex == FULL_NAME_COLUMN) {
                     try {
-                        tip = MAMEInfo.getMachine(getValueAt(rowIndex, keyColumn).toString()).getTruncatedHistory();
+                        tip = MAMEInfo.getMachine(getValueAt(rowIndex, KEY_COLUMN).toString()).getTruncatedHistory();
                     } catch (RuntimeException e1) {
                         //catch null pointer exception if mouse is over an empty line
                     }
@@ -94,66 +97,66 @@ class MachineListTable extends JTable {
         this.setModel(machineListTableModel);
         machineListTableModel.addTableModelListener(this);
 
-        MFMAction historyAction = new MFMAction("Show History", null);
-        historyAction.putValue(Action.ACTION_COMMAND_KEY, "Show History");
-        this.getInputMap().put(KeyStroke.getKeyStroke("F1"), "Show History");
-        this.getActionMap().put("Show History", historyAction);
+        MFMAction historyAction = new MFMAction(SHOW_HISTORY, null);
+        historyAction.putValue(Action.ACTION_COMMAND_KEY, SHOW_HISTORY);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F1"), SHOW_HISTORY);
+        this.getActionMap().put(SHOW_HISTORY, historyAction);
 
-        MFMAction manualAction = new MFMAction("Show Manual", null);
-        manualAction.putValue(Action.ACTION_COMMAND_KEY, "Show Manual");
-        this.getInputMap().put(KeyStroke.getKeyStroke("F2"), "Show Manual");
-        this.getActionMap().put("Show Manual", manualAction);
+        MFMAction manualAction = new MFMAction(SHOW_MANUAL, null);
+        manualAction.putValue(Action.ACTION_COMMAND_KEY, SHOW_MANUAL);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F2"), SHOW_MANUAL);
+        this.getActionMap().put(SHOW_MANUAL, manualAction);
 
-        MFMAction infoAction = new MFMAction("Show Info", null);
-        infoAction.putValue(Action.ACTION_COMMAND_KEY, "Show Info");
-        this.getInputMap().put(KeyStroke.getKeyStroke("F3"), "Show Info");
-        this.getActionMap().put("Show Info", infoAction);
+        MFMAction infoAction = new MFMAction(SHOW_INFO, null);
+        infoAction.putValue(Action.ACTION_COMMAND_KEY, SHOW_INFO);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F3"), SHOW_INFO);
+        this.getActionMap().put(SHOW_INFO, infoAction);
 
-        MFMAction runGameAction = new MFMAction("Run Machine", null);
-        runGameAction.putValue(Action.ACTION_COMMAND_KEY, "Run Machine");
-        this.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "Run Machine");
-        this.getActionMap().put("Run Machine", runGameAction);
+        MFMAction runGameAction = new MFMAction(RUN_MACHINE, null);
+        runGameAction.putValue(Action.ACTION_COMMAND_KEY, RUN_MACHINE);
+        this.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), RUN_MACHINE);
+        this.getActionMap().put(RUN_MACHINE, runGameAction);
 
-        MFMAction recordGameAction = new MFMAction("Record Machine", null);
-        recordGameAction.putValue(Action.ACTION_COMMAND_KEY, "Record Machine");
-        this.getInputMap().put(KeyStroke.getKeyStroke("F4"), "Record Machine");
-        this.getActionMap().put("Record Machine", recordGameAction);
+        MFMAction recordGameAction = new MFMAction(RECORD_MACHINE, null);
+        recordGameAction.putValue(Action.ACTION_COMMAND_KEY, RECORD_MACHINE);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F4"), RECORD_MACHINE);
+        this.getActionMap().put(RECORD_MACHINE, recordGameAction);
 
-        MFMAction playbacktoAVIAction = new MFMAction(MFMAction.PlaybacktoAVIAction, null);
-        playbacktoAVIAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.PlaybacktoAVIAction);
+        MFMAction playbacktoAVIAction = new MFMAction(PLAYBACK_TO_AVI, null);
+        playbacktoAVIAction.putValue(Action.ACTION_COMMAND_KEY, PLAYBACK_TO_AVI);
         this.getInputMap().put(KeyStroke.getKeyStroke("F5"),
-                MFMAction.PlaybacktoAVIAction);
-        this.getActionMap().put(MFMAction.PlaybacktoAVIAction, playbacktoAVIAction);
+                PLAYBACK_TO_AVI);
+        this.getActionMap().put(PLAYBACK_TO_AVI, playbacktoAVIAction);
 
-        MFMAction playbackGameAction = new MFMAction(MFMAction.PlaybackGameAction, null);
-        playbackGameAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.PlaybackGameAction);
-        this.getInputMap().put(KeyStroke.getKeyStroke("F6"), MFMAction.PlaybackGameAction);
-        this.getActionMap().put(MFMAction.PlaybackGameAction, playbackGameAction);
+        MFMAction playbackGameAction = new MFMAction(PLAYBACK_MACHINE, null);
+        playbackGameAction.putValue(Action.ACTION_COMMAND_KEY, PLAYBACK_MACHINE);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F6"), PLAYBACK_MACHINE);
+        this.getActionMap().put(PLAYBACK_MACHINE, playbackGameAction);
 
-        MFMAction playGametoAVIAction = new MFMAction(MFMAction.PlayGametoAVIAction, null);
-        playGametoAVIAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.PlayGametoAVIAction);
-        this.getInputMap().put(KeyStroke.getKeyStroke("F7"), MFMAction.PlayGametoAVIAction);
-        this.getActionMap().put(MFMAction.PlayGametoAVIAction, playGametoAVIAction);
+        MFMAction playGametoAVIAction = new MFMAction(PLAY_RECORD_TO_AVI, null);
+        playGametoAVIAction.putValue(Action.ACTION_COMMAND_KEY, PLAY_RECORD_TO_AVI);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F7"), PLAY_RECORD_TO_AVI);
+        this.getActionMap().put(PLAY_RECORD_TO_AVI, playGametoAVIAction);
 
-        MFMAction VidAction = new MFMAction("Play Video", null);
-        VidAction.putValue(Action.ACTION_COMMAND_KEY, "Play Video");
-        this.getInputMap().put(KeyStroke.getKeyStroke("F8"), "Play Video");
-        this.getActionMap().put("Play Video", VidAction);
+        MFMAction videoAction = new MFMAction(PLAY_VIDEO, null);
+        videoAction.putValue(Action.ACTION_COMMAND_KEY, PLAY_VIDEO);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F8"), PLAY_VIDEO);
+        this.getActionMap().put(PLAY_VIDEO, videoAction);
 
-        MFMAction EditVidAction = new MFMAction(MFMAction.EditVideoAction, null);
-        VidAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.EditVideoAction);
-        this.getInputMap().put(KeyStroke.getKeyStroke("F9"), MFMAction.EditVideoAction);
-        this.getActionMap().put(MFMAction.EditVideoAction, EditVidAction);
+        MFMAction editVideoAction = new MFMAction(EDIT_VIDEO, null);
+        videoAction.putValue(Action.ACTION_COMMAND_KEY, EDIT_VIDEO);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F9"), EDIT_VIDEO);
+        this.getActionMap().put(EDIT_VIDEO, editVideoAction);
 
-        MFMAction ListBuilderAction = new MFMAction(MFMAction.ListBuilderAction, null);
-        VidAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.ListBuilderAction);
-        this.getInputMap().put(KeyStroke.getKeyStroke("F10"), MFMAction.ListBuilderAction);
-        this.getActionMap().put(MFMAction.ListBuilderAction, ListBuilderAction);
+        MFMAction listBuilderAction = new MFMAction(LIST_BUILDER, null);
+        videoAction.putValue(Action.ACTION_COMMAND_KEY, LIST_BUILDER);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F10"), LIST_BUILDER);
+        this.getActionMap().put(LIST_BUILDER, listBuilderAction);
 
-        MFMAction ConvertVideoAction = new MFMAction(MFMAction.ConvertCommandAction, null);
-        VidAction.putValue(Action.ACTION_COMMAND_KEY, MFMAction.ConvertCommandAction);
-        this.getInputMap().put(KeyStroke.getKeyStroke("F12"), MFMAction.ConvertCommandAction);
-        this.getActionMap().put(MFMAction.ConvertCommandAction, ConvertVideoAction);
+        MFMAction convertVideoAction = new MFMAction(CONVERT_FILES, null);
+        videoAction.putValue(Action.ACTION_COMMAND_KEY, CONVERT_FILES);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F12"), CONVERT_FILES);
+        this.getActionMap().put(CONVERT_FILES, convertVideoAction);
 
         this.setRowHeight(25);
         this.setAutoCreateRowSorter(true);
@@ -170,10 +173,6 @@ class MachineListTable extends JTable {
          **/
         // Hard coded relative widths for now ** Pixels?? yes
         TableColumnModel columnModel = this.getColumnModel();
-
-        keyColumn = columnModel.getColumnIndex(Machine.MACHINE_NAME);
-        fullNameColumn = columnModel.getColumnIndex(Machine.MACHINE_FULL_NAME);
-
 
         int index = columnModel.getColumnIndex(Machine.MACHINE_NAME);
         columnModel.getColumn(index).setPreferredWidth(155);
@@ -221,7 +220,7 @@ class MachineListTable extends JTable {
                         comp.setForeground(Color.BLACK);
 
                         int newRow = ourInstance.convertRowIndexToModel(row);
-                        String itemName = (String) ourInstance.getModel().getValueAt(newRow, keyColumn);
+                        String itemName = (String) ourInstance.getModel().getValueAt(newRow, KEY_COLUMN);
                         String systemName = (String) ourInstance.getModel().getValueAt(newRow, categoryColumn);
                         if (!MAMEInfo.isSoftwareList(systemName)) {
                             systemName = null;

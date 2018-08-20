@@ -26,7 +26,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
-import static Phweda.MFM.UI.MFMUI_Resources.MFM_Icon_PNG;
+import static Phweda.MFM.UI.MFMUI_Resources.MFM_ICON_PNG;
 
 
 /**
@@ -40,8 +40,7 @@ public class MFMUI {
     private static final Color MFMSettingsBGcolor = new Color(250, 240, 230);
     private static final Color MFMLightGreen = new Color(102, 255, 102);
     private static final Color MFMLightRed = new Color(255, 48, 48);
-    private static MFMUI mfmui = null;
-    public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     static final Point screenCenterPoint = new Point(screenSize.width / 2, screenSize.height / 2);
     private static JFrame settingsFrame;
     private static boolean progressRunning = false;
@@ -49,52 +48,43 @@ public class MFMUI {
             MFM.MFM_TITLE.substring(0, MFM.MFM_TITLE.lastIndexOf(':')));
     private static Thread busyThread = null;
 
-    private MFMUI() {
-        // GUI initializer
-        MFMUI_Setup.getInstance();
+    private MFMUI() { // To cover implicit public constructor.
     }
 
-    // NOTE UNCOMMENT if you run directly from this class
-    //   private static MAMEInfo MI = new MAMEInfo();
-    //   private static MAMESettings MS = MAMESettings.getInstance();
-
+    /*
+    NOTE UNCOMMENT if you run directly from this class
+    private static MAMEInfo MI = new MAMEInfo();
+    private static MAMESettings MS = MAMESettings.getInstance();
+    */
     public static void main(String[] args) {
         // set a new dismiss delay milliseconds
         ToolTipManager.sharedInstance().setDismissDelay(20000);
 
         // Schedule a job for the event-dispatching thread:
         // creating and showing this application's GUI.
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                mfmui = new MFMUI();
-                MFMUI_Setup.getInstance().getController().init();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MFMUI_Setup.getInstance().getController().init());
     }
 
     public static void showBusy(boolean start, boolean loadData) {
         progressRunning = start;
         if (start) {
-            busyThread = new Thread() {
-                @Override
-                public void run() {
-                    busyDialog.setLocation(screenCenterPoint.x - 150, screenCenterPoint.y - 50);
-                    JXBusyLabel busyLabel = createComplexBusyLabel();
-                    if (loadData) {
-                        busyLabel.setText("<HTML>DATA<br>LOADING</HTML>");
-                        busyLabel.setToolTipText("MFM Data Loading");
-                    } else {
-                        busyLabel.setText("<HTML>Parsing<br>MAME data</HTML>");
-                        busyLabel.setToolTipText("Parsing MAME Data");
-                    }
-
-                    busyDialog.add(busyLabel);
-                    busyLabel.setBusy(true);
-                    busyDialog.setIconImage(MFMUI_Setup.getMFMIcon().getImage());
-                    busyDialog.pack();
-                    busyDialog.setVisible(true);
+            busyThread = new Thread(() -> {
+                busyDialog.setLocation(screenCenterPoint.x - 150, screenCenterPoint.y - 50);
+                JXBusyLabel busyLabel = createComplexBusyLabel();
+                if (loadData) {
+                    busyLabel.setText("<HTML>DATA<br>LOADING</HTML>");
+                    busyLabel.setToolTipText("MFM Data Loading");
+                } else {
+                    busyLabel.setText("<HTML>Parsing<br>MAME data</HTML>");
+                    busyLabel.setToolTipText("Parsing MAME Data");
                 }
-            };
+
+                busyDialog.add(busyLabel);
+                busyLabel.setBusy(true);
+                busyDialog.setIconImage(MFMUI_Setup.getMFMIcon().getImage());
+                busyDialog.pack();
+                busyDialog.setVisible(true);
+            });
             busyThread.start();
         } else {
             busyDialog.setVisible(false);
@@ -140,12 +130,13 @@ public class MFMUI {
             settingsFrame.dispose();
         }
         settingsFrame = new JFrame("MFM Settings");
-        settingsFrame.setIconImage(MFMUI_Resources.getInstance().getImageIcon(MFM_Icon_PNG).getImage());
+        settingsFrame.setIconImage(MFMUI_Resources.getInstance().getImageIcon(MFM_ICON_PNG).getImage());
 
         return settingsFrame;
     }
 
 
+    @SuppressWarnings("WeakerAccess")
     static Color getMFMcolor() {
         return MFMcolor;
     }

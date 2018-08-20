@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Phweda.MFM.UI.ListBuilderUI">
-  <grid id="27dc6" binding="ListBuilderPanel" custom-create="true" layout-manager="GridBagLayout">
+  <grid id="27dc6" binding="listBuilderPanel" custom-create="true" layout-manager="GridBagLayout">
     <constraints>
       <xy x="20" y="20" width="1080" height="830"/>
     </constraints>
@@ -146,7 +146,7 @@
           </component>
         </children>
       </grid>
-      <grid id="7b68" binding="UILeftPanel" layout-manager="GridBagLayout">
+      <grid id="7b68" binding="uileftPanel" layout-manager="GridBagLayout">
         <constraints>
           <grid row="0" column="0" row-span="6" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.5" weighty="1.0"/>
@@ -160,7 +160,7 @@
         </properties>
         <border type="line"/>
         <children>
-          <grid id="1873" binding="MAMEPanel" layout-manager="GridBagLayout">
+          <grid id="1873" binding="mamePanel" layout-manager="GridBagLayout">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="0.0"/>
@@ -217,7 +217,7 @@
               </component>
             </children>
           </grid>
-          <grid id="33b8a" binding="OrientationPanel" layout-manager="GridBagLayout">
+          <grid id="33b8a" binding="orientationPanel" layout-manager="GridBagLayout">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="0.0"/>
@@ -307,7 +307,7 @@
                   <text value="Raster"/>
                 </properties>
               </component>
-              <component id="361fd" class="javax.swing.JRadioButton" binding="LCDRadioButton" custom-create="true" default-binding="true">
+              <component id="361fd" class="javax.swing.JRadioButton" binding="lcdRadioButton" custom-create="true" default-binding="true">
                 <constraints>
                   <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                   <gridbag weightx="1.0" weighty="1.0"/>
@@ -401,7 +401,7 @@
               </component>
             </children>
           </grid>
-          <grid id="68bef" binding="GameButtonsPanel" layout-manager="GridBagLayout">
+          <grid id="68bef" binding="gameButtonsPanel" layout-manager="GridBagLayout">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="1.0" weighty="0.0"/>
@@ -594,7 +594,7 @@
           </vspacer>
         </children>
       </grid>
-      <grid id="338fe" binding="CategoriesPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+      <grid id="338fe" binding="categoriesPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints>
           <grid row="0" column="1" row-span="5" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false">
             <minimum-size width="520" height="485"/>
@@ -642,7 +642,7 @@
               </component>
             </children>
           </grid>
-          <scrollpane id="523d6" binding="CategoriesScrollPane" custom-create="true">
+          <scrollpane id="523d6" binding="categoriesScrollPane" custom-create="true">
             <constraints border-constraint="Center"/>
             <properties>
               <preferredSize width="600" height="600"/>
@@ -664,7 +664,7 @@
           </scrollpane>
         </children>
       </grid>
-      <grid id="de6f9" binding="UIRightPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+      <grid id="de6f9" binding="uiRightPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints>
           <grid row="0" column="2" row-span="5" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
           <gridbag weightx="0.0" weighty="0.0"/>
@@ -675,7 +675,7 @@
         </properties>
         <border type="line"/>
         <children>
-          <grid id="94230" binding="UIControlsScrollPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+          <grid id="94230" binding="uiControlsScrollPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints border-constraint="Center"/>
             <properties/>
             <border type="line"/>

@@ -32,6 +32,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -40,6 +41,7 @@ import java.util.Set;
  * Date: 11/15/2015
  * Time: 9:25 PM
  */
+@SuppressWarnings("squid:S1450")
 public class ListEditor implements ActionListener {
 
     private static final ListEditor ourInstance = new ListEditor();
@@ -133,14 +135,15 @@ public class ListEditor implements ActionListener {
             case AddRemoveDividerUI.REMOVE:
                 removeMachines();
                 break;
-
+            default:
+                break;
         }
     }
 
     private void addFromClipboard() {
         try {
             String input = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor).toString();
-            ArrayList<String> inputList = new ArrayList<String>(Arrays.asList(input.split("\n")));
+            ArrayList<String> inputList = new ArrayList<>(Arrays.asList(input.split("\n")));
             ((ListEditorModel<String>) workingList.getModel()).addAll(inputList);
             displayCurrentCount();
         } catch (UnsupportedFlavorException | IOException e) {
@@ -159,23 +162,23 @@ public class ListEditor implements ActionListener {
     }
 
     private void editWorkingList() {
-        String list = listComboBox.getSelectedItem().toString();
+        String list = Objects.requireNonNull(listComboBox.getSelectedItem()).toString();
         if (list.equals(CLEAR_LIST)) {
             ((ListEditorModel<String>) workingList.getModel()).clear();
         } else {
             if (unionCB.isSelected()) {
                 ((ListEditorModel<String>) workingList.getModel()).addAll(
-                        new ArrayList<String>(MFMPlayLists.getInstance().getPlayList(list)));
+                        new ArrayList<>(MFMPlayLists.getInstance().getPlayList(list)));
             } else if (intersectionCB.isSelected()) {
                 // Gotta be a more direct way of doing this
                 Object[] elements = ((ListEditorModel<String>) workingList.getModel()).toArray();
                 String[] strings = Arrays.copyOf(elements, elements.length, String[].class);
-                ArrayList<String> currentList = new ArrayList<String>(Arrays.asList(strings));
-                currentList.retainAll(new ArrayList<String>(MFMPlayLists.getInstance().getPlayList(list)));
+                ArrayList<String> currentList = new ArrayList<>(Arrays.asList(strings));
+                currentList.retainAll(new ArrayList<>(MFMPlayLists.getInstance().getPlayList(list)));
                 ((ListEditorModel<String>) workingList.getModel()).refreshList(currentList);
             } else if (exclusionCB.isSelected()) {
                 ((ListEditorModel<String>) workingList.getModel()).removeAll(
-                        new ArrayList<String>(MFMPlayLists.getInstance().getPlayList(list)));
+                        new ArrayList<>(MFMPlayLists.getInstance().getPlayList(list)));
             }
         }
         displayCurrentCount();
@@ -219,7 +222,7 @@ public class ListEditor implements ActionListener {
         flipViewButton.setActionCommand(FLIP_VIEW);
 
         Set<String> listKeys = MFMPlayLists.getInstance().getListEditorKeys();
-        listComboBox = new JComboBox<String>(listKeys.toArray(new String[listKeys.size()]));
+        listComboBox = new JComboBox<>(listKeys.toArray(new String[0]));
         listComboBox.addItem(CLEAR_LIST);
         listComboBox.setSelectedItem(CLEAR_LIST);
         listComboBox.setActionCommand(EDIT_WORKING_LIST);
@@ -241,11 +244,11 @@ public class ListEditor implements ActionListener {
         listEditorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         listEditorSplitPane.setUI(getDivider());
 
-        ListEditorModel<String> elm = new ListEditorModel<String>();
-        workingList = new JList<String>();
+        ListEditorModel<String> elm = new ListEditorModel<>();
+        workingList = new JList<>();
         workingList.setModel(elm);
 
-        machinesList = new JList<String>(MFMListBuilder.getRunnableArray());
+        machinesList = new JList<>(MFMListBuilder.getRunnableArray());
         machinesList.setVisibleRowCount(MFMListBuilder.getRunnableList().size() / 3 + 2);
 
     }
@@ -405,6 +408,7 @@ public class ListEditor implements ActionListener {
         return listEditorPanel;
     }
 
+    @SuppressWarnings("squid:MaximumInheritanceDepth")
     class ListEditorJCheckBox extends JCheckBox {
 
         ListEditorJCheckBox(String text) {

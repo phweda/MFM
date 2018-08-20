@@ -32,18 +32,18 @@ import java.awt.event.ActionListener;
  */
 public class AddRemoveDividerUI extends BasicSplitPaneUI {
 
-    private JButton addButtonV;
-    private JButton removeButtonV;
-    private JButton addButtonH;
-    private JButton removeButtonH;
+    private static JButton addButtonV;
+    private static JButton removeButtonV;
+    private static JButton addButtonH;
+    private static JButton removeButtonH;
 
-    static  final String ADD = "Add";
-    static  final String REMOVE = "Remove";
+    static final String ADD = "Add";
+    static final String REMOVE = "Remove";
 
-    private final Font defaultFont = new Font("Arial", Font.PLAIN, 14);
-    private final Dimension size = new Dimension(25,25);
+    private static final Font defaultFont = new Font("Arial", Font.PLAIN, 14);
+    private static final Dimension size = new Dimension(25, 25);
 
-    {
+    static {
         addButtonV = new JButton("<html>\u2192<br>\u2192</html>");
         removeButtonV = new JButton("<html>\u2190<br>\u2190</html>");
         addButtonH = new JButton("\u2193\u2193");
@@ -76,8 +76,10 @@ public class AddRemoveDividerUI extends BasicSplitPaneUI {
         this.setOrientation(orientation);
     }
 
+    @Override
     public BasicSplitPaneDivider createDefaultDivider() {
         BasicSplitPaneDivider divider = new BasicSplitPaneDivider(this) {
+            @Override
             public int getDividerSize() {
                 return ((int) size.getWidth());
             }
@@ -102,7 +104,7 @@ public class AddRemoveDividerUI extends BasicSplitPaneUI {
         return divider;
     }
 
-    void addActionListener(ActionListener listener){
+    void addActionListener(ActionListener listener) {
         addButtonH.addActionListener(listener);
         addButtonV.addActionListener(listener);
         removeButtonH.addActionListener(listener);

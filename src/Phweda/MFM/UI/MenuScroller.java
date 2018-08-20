@@ -11,8 +11,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * A class that provides scrolling capabilities to a long menu dropdown or
@@ -26,6 +24,7 @@ import java.awt.event.ActionListener;
  * @author Darryl
  * @version 1.5.0 04/05/12
  */
+@SuppressWarnings("WeakerAccess")
 public class MenuScroller {
 
     private JPopupMenu menu;
@@ -127,13 +126,12 @@ public class MenuScroller {
      * @param interval         the scroll interval, in milliseconds
      * @param topFixedCount    the number of items to fix at the top.  May be 0.
      * @param bottomFixedCount the number of items to fix at the bottom. May be 0
-     * @return the MenuScroller
      * @throws IllegalArgumentException if scrollCount or interval is 0 or
      *                                  negative or if topFixedCount or bottomFixedCount is negative
      */
-    public static MenuScroller setScrollerFor(JMenu menu, int scrollCount, int interval,
-                                              int topFixedCount, int bottomFixedCount) {
-        return new MenuScroller(menu, scrollCount, interval,
+    public static void setScrollerFor(JMenu menu, int scrollCount, int interval,
+                                      int topFixedCount, int bottomFixedCount) {
+        new MenuScroller(menu, scrollCount, interval,
                 topFixedCount, bottomFixedCount);
     }
 
@@ -387,8 +385,7 @@ public class MenuScroller {
         if (item == null) {
             keepVisibleIndex = -1;
         } else {
-            int index = menu.getComponentIndex(item);
-            keepVisibleIndex = index;
+            keepVisibleIndex = menu.getComponentIndex(item);
         }
     }
 
@@ -413,18 +410,6 @@ public class MenuScroller {
             menu.removePopupMenuListener(menuListener);
             menu = null;
         }
-    }
-
-    /**
-     * Ensures that the <code>dispose</code> method of this MenuScroller is
-     * called when there are no more refrences to it.
-     *
-     * @throws Throwable if an error occurs.
-     * @see MenuScroller#dispose()
-     */
-    @Override
-    public void finalize() throws Throwable {
-        dispose();
     }
 
     private void refreshMenu() {
@@ -504,17 +489,14 @@ public class MenuScroller {
     private class MenuScrollTimer extends Timer {
 
         public MenuScrollTimer(final int increment, int interval) {
-            super(interval, new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    firstIndex += increment;
-                    refreshMenu();
-                }
+            super(interval, event -> {
+                firstIndex += increment;
+                refreshMenu();
             });
         }
     }
 
+    @SuppressWarnings("squid:MaximumInheritanceDepth")
     private class MenuScrollItem extends JMenuItem
             implements ChangeListener {
 
@@ -542,7 +524,7 @@ public class MenuScroller {
         }
     }
 
-    private static enum MenuIcon implements Icon {
+    private enum MenuIcon implements Icon {
 
         UP(9, 1, 9),
         DOWN(1, 9, 1);

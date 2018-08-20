@@ -28,29 +28,30 @@ import javax.swing.text.View;
 import javax.swing.text.html.HTMLDocument;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 
 /**
  * StatusBar. <BR>A status bar is made of multiple zones. A zone can be any
  * JComponent.
  */
+@SuppressWarnings("WeakerAccess")
 public class StatusBar extends JComponent {
 
     /**
      * The key used to identified the default zone
      */
-    public final static String DEFAULT_ZONE = "default";
+    public static final String DEFAULT_ZONE = "default";
 
-    private Hashtable idToZones;
-    private Border zoneBorder;
+    private HashMap<String, Component> idToZones;
+    private transient Border zoneBorder;
 
     /**
      * Construct a new StatusBar
      */
     public StatusBar() {
         setLayout(LookAndFeelTweaks.createHorizontalPercentLayout());
-        idToZones = new Hashtable();
+        idToZones = new HashMap<>();
         setZoneBorder(BorderFactory.createLineBorder(Color.lightGray));
     }
 
@@ -61,8 +62,8 @@ public class StatusBar extends JComponent {
     /**
      * Adds a new zone in the StatusBar
      *
-     * @param id
-     * @param zone
+     * @param id          name of the zone
+     * @param zone        component in the zone
      * @param constraints one of the constraint support by the
      *                    {@link com.l2fprod.common.swing.PercentLayout}
      */
@@ -92,7 +93,7 @@ public class StatusBar extends JComponent {
     }
 
     public Component getZone(String id) {
-        return (Component) idToZones.get(id);
+        return idToZones.get(id);
     }
 
     /**
@@ -141,23 +142,24 @@ public class StatusBar extends JComponent {
  * @javabean.class name="PercentLayout"
  * shortDescription="A layout supports constraints expressed in percent."
  */
+@SuppressWarnings("WeakerAccess")
 class PercentLayout implements LayoutManager2 {
 
     /**
      * Useful constant to layout the components horizontally (from top to
      * bottom).
      */
-    public final static int HORIZONTAL = 0;
+    public static final int HORIZONTAL = 0;
 
     /**
      * Useful constant to layout the components vertically (from left to right).
      */
-    public final static int VERTICAL = 1;
-    private final static Constraint REMAINING_SPACE = new Constraint("*");
-    private final static Constraint PREFERRED_SIZE = new Constraint("");
+    public static final int VERTICAL = 1;
+    private static final Constraint REMAINING_SPACE = new Constraint("*");
+    private static final Constraint PREFERRED_SIZE = new Constraint("");
     private int orientation;
     private int gap;
-    private Hashtable m_ComponentToConstraint;
+    private HashMap<Component, Object> mComponentToConstraint;
 
     /**
      * Creates a new HORIZONTAL PercentLayout with a gap of 0.
@@ -170,7 +172,7 @@ class PercentLayout implements LayoutManager2 {
         setOrientation(orientation);
         this.gap = gap;
 
-        m_ComponentToConstraint = new Hashtable();
+        mComponentToConstraint = new HashMap<>();
     }
 
     /**
@@ -201,12 +203,12 @@ class PercentLayout implements LayoutManager2 {
     }
 
     public Constraint getConstraint(Component component) {
-        return (Constraint) m_ComponentToConstraint.get(component);
+        return (Constraint) mComponentToConstraint.get(component);
     }
 
     public void setConstraint(Component component, Object constraints) {
         if (constraints instanceof Constraint) {
-            m_ComponentToConstraint.put(component, constraints);
+            mComponentToConstraint.put(component, constraints);
         } else if (constraints instanceof Number) {
             setConstraint(
                     component,
@@ -218,8 +220,7 @@ class PercentLayout implements LayoutManager2 {
         } else if (constraints instanceof String) {
             String s = (String) constraints;
             if (s.endsWith("%")) {
-                float value = Float.valueOf(s.substring(0, s.length() - 1))
-                        .floatValue() / 100;
+                float value = Float.parseFloat(s.substring(0, s.length() - 1)) / 100;
                 if (value > 1 || value < 0)
                     throw new IllegalArgumentException("percent value must be >= 0 and <= 100");
                 setConstraint(component, new PercentConstraint(value));
@@ -280,7 +281,7 @@ class PercentLayout implements LayoutManager2 {
      * @param comp the component ot be removed
      */
     public void removeLayoutComponent(Component comp) {
-        m_ComponentToConstraint.remove(comp);
+        mComponentToConstraint.remove(comp);
     }
 
     /**
@@ -365,7 +366,7 @@ class PercentLayout implements LayoutManager2 {
         for (int i = 0, c = components.length; i < c; i++) {
             if (components[i].isVisible()) {
                 Constraint constraint =
-                        (Constraint) m_ComponentToConstraint.get(components[i]);
+                        (Constraint) mComponentToConstraint.get(components[i]);
                 if (constraint == null || constraint == PREFERRED_SIZE) {
                     sizes[i] =
                             (HORIZONTAL == orientation
@@ -385,7 +386,7 @@ class PercentLayout implements LayoutManager2 {
         for (int i = 0, c = components.length; i < c; i++) {
             if (components[i].isVisible()) {
                 Constraint constraint =
-                        (Constraint) m_ComponentToConstraint.get(components[i]);
+                        (Constraint) mComponentToConstraint.get(components[i]);
                 if (constraint instanceof PercentConstraint) {
                     sizes[i] = (int) (remainingSize * ((PercentConstraint) constraint)
                             .floatValue());
@@ -399,18 +400,18 @@ class PercentLayout implements LayoutManager2 {
         for (int i = 0, c = components.length; i < c; i++) {
             if (components[i].isVisible()) {
                 Constraint constraint =
-                        (Constraint) m_ComponentToConstraint.get(components[i]);
+                        (Constraint) mComponentToConstraint.get(components[i]);
                 if (constraint == REMAINING_SPACE) {
-                    remaining.add(new Integer(i));
+                    remaining.add(i);
                     sizes[i] = 0;
                 }
             }
         }
 
-        if (remaining.size() > 0) {
+        if (!remaining.isEmpty()) {
             int rest = availableSize / remaining.size();
             for (Iterator iter = remaining.iterator(); iter.hasNext(); ) {
-                sizes[((Integer) iter.next()).intValue()] = rest;
+                sizes[((int) iter.next())] = rest;
             }
         }
 
@@ -446,26 +447,23 @@ class PercentLayout implements LayoutManager2 {
     }
 
     static class NumberConstraint extends Constraint {
-        public NumberConstraint(int d) {
-            this(new Integer(d));
-        }
 
         public NumberConstraint(Integer d) {
             super(d);
         }
 
         public int intValue() {
-            return ((Integer) value).intValue();
+            return (int) value;
         }
     }
 
     static class PercentConstraint extends Constraint {
         public PercentConstraint(float d) {
-            super(new Float(d));
+            super(d);
         }
 
         public float floatValue() {
-            return ((Float) value).floatValue();
+            return (float) value;
         }
     }
 
@@ -474,15 +472,19 @@ class PercentLayout implements LayoutManager2 {
 /**
  * LookAndFeelTweaks. <br>
  */
+@SuppressWarnings("WeakerAccess")
 class LookAndFeelTweaks {
 
-    public final static Border PANEL_BORDER =
+    private LookAndFeelTweaks() { // To cover implicit public constructor
+    }
+
+    public static final Border PANEL_BORDER =
             BorderFactory.createEmptyBorder(3, 3, 3, 3);
 
-    public final static Border WINDOW_BORDER =
+    public static final Border WINDOW_BORDER =
             BorderFactory.createEmptyBorder(4, 10, 10, 10);
 
-    public final static Border EMPTY_BORDER =
+    public static final Border EMPTY_BORDER =
             BorderFactory.createEmptyBorder();
 
     public static void tweak() {

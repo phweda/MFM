@@ -44,6 +44,7 @@ public class MFMProgressBar extends JProgressBar implements Runnable {
         repaint();
     }
 
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
         // Progress bar is stopped by deletion
@@ -53,6 +54,7 @@ public class MFMProgressBar extends JProgressBar implements Runnable {
                 sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }

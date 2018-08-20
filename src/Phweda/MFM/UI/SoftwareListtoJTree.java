@@ -41,40 +41,35 @@ import java.util.List;
  * Date: 11/11/2017
  * Time: 7:39 PM
  */
-
-// TODO fixme? NOTE does this even make sense? Will anybody really want to see this as a tree?
 public class SoftwareListtoJTree extends JPanel {
     private static final String COPY = "Copy";
     private static final int FRAME_WIDTH = MFMUI.screenSize.width / 5;
     private static final int FRAME_HEIGHT = MFMUI.screenSize.height - 100;
-    private static JTree jTree;
+    private JTree jTree;
 
-    private static List<Software> softwares;
+    private transient List<Software> softwares;
     private static SoftwareListtoJTree ourInstance;
-    private final String valueDivider = " \u00bb ";
-    private final String softwareDivider = " \u00A8 ";
+    private static final String VALUE_DIVIDER = " \u00bb ";
+    private static final String SOFTWARE_DIVIDER = " \u00A8 ";
 
     private SoftwareListtoJTree(String softwareListName) {
 
         softwares = MAMEInfo.getSoftwareLists().getSoftwarelistsMap().get(softwareListName).getSoftware();
-
         this.setPreferredSize(new Dimension(FRAME_WIDTH - 10, FRAME_HEIGHT - 20));
 
         DefaultMutableTreeNode top = createTreeNode("SoftwareList");
         DefaultTreeModel dtModel = new DefaultTreeModel(top);
-
         jTree = new JTree(dtModel);
 
         Font font = jTree.getFont();
         jTree.setFont(new Font(font.getName(), font.getStyle(), font.getSize() + 4));
-
         jTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         jTree.setShowsRootHandles(true);
-
         jTree.setEditable(false);
 
         JScrollPane jScroll = new JScrollPane() {
             // This keeps the scrollpane a reasonable size
+            @Override
             public Dimension getPreferredSize() {
                 return new Dimension(FRAME_WIDTH, FRAME_HEIGHT);
             }
@@ -83,8 +78,8 @@ public class SoftwareListtoJTree extends JPanel {
         jScroll.getViewport().add(jTree);
 
         MouseListener ml = new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
-                int selRow = jTree.getRowForLocation(e.getX(), e.getY());
                 TreePath selPath = jTree.getPathForLocation(e.getX(), e.getY());
                 if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
                     Object obj = selPath.getLastPathComponent();
@@ -127,7 +122,7 @@ public class SoftwareListtoJTree extends JPanel {
             DefaultMutableTreeNode node = children.nextElement();
 
             String nodeString = node.getUserObject().toString();
-            String nodeSoftware = nodeString.substring(nodeString.lastIndexOf(' ') + 1, nodeString.length());
+            String nodeSoftware = nodeString.substring(nodeString.lastIndexOf(' ') + 1);
             if (nodeSoftware.equals(softwareName)) {
                 return node;
             }
@@ -136,9 +131,9 @@ public class SoftwareListtoJTree extends JPanel {
     }
 
     private void copytoClipboard(String nodeValue) {
-        nodeValue = nodeValue.contains(valueDivider) ?
-                nodeValue.split(valueDivider)[1].trim() :
-                nodeValue.split(softwareDivider)[1].trim();
+        nodeValue = nodeValue.contains(VALUE_DIVIDER) ?
+                nodeValue.split(VALUE_DIVIDER)[1].trim() :
+                nodeValue.split(SOFTWARE_DIVIDER)[1].trim();
 
         StringSelection ss = new StringSelection(nodeValue);
         Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -148,8 +143,9 @@ public class SoftwareListtoJTree extends JPanel {
     /**
      * This takes Softwarelist root and create an XML JTree
      */
+    @SuppressWarnings("SameParameterValue")
     private DefaultMutableTreeNode createTreeNode(String root) {
-        DefaultMutableTreeNode dmtNode = null;
+        DefaultMutableTreeNode dmtNode;
         dmtNode = new DefaultMutableTreeNode(root);
 
         softwares.sort(Comparator.comparing(Software::getName));
@@ -165,38 +161,38 @@ public class SoftwareListtoJTree extends JPanel {
      * @return software node
      */
     private DefaultMutableTreeNode createSoftwareNode(Software software) {
-        DefaultMutableTreeNode dmtNode = null;
+        DefaultMutableTreeNode dmtNode;
 
         // Name is always required
         String name = software.getName();
-        dmtNode = new DefaultMutableTreeNode("Software" + softwareDivider + name);
+        dmtNode = new DefaultMutableTreeNode("Software" + SOFTWARE_DIVIDER + name);
 
         String cloneof = software.getCloneof();
         if (cloneof != null && !cloneof.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("Cloneof" + valueDivider + cloneof));
+            dmtNode.add(new DefaultMutableTreeNode("Cloneof" + VALUE_DIVIDER + cloneof));
         }
 
         String supported = software.getSupported();
-        dmtNode.add(new DefaultMutableTreeNode("Supported" + valueDivider + supported));
+        dmtNode.add(new DefaultMutableTreeNode("Supported" + VALUE_DIVIDER + supported));
 
         String description = software.getDescription();
-        dmtNode.add(new DefaultMutableTreeNode("Description" + valueDivider + description));
+        dmtNode.add(new DefaultMutableTreeNode("Description" + VALUE_DIVIDER + description));
 
         String year = software.getYear();
-        dmtNode.add(new DefaultMutableTreeNode("Year" + valueDivider + year));
+        dmtNode.add(new DefaultMutableTreeNode("Year" + VALUE_DIVIDER + year));
 
         String publisher = software.getPublisher();
-        dmtNode.add(new DefaultMutableTreeNode("Publisher" + valueDivider + publisher));
+        dmtNode.add(new DefaultMutableTreeNode("Publisher" + VALUE_DIVIDER + publisher));
 
-        if (software.getInfo().size() > 0) {
+        if (!software.getInfo().isEmpty()) {
             dmtNode.add(getInfoNode(software));
         }
 
-        if (software.getSharedfeat().size() > 0) {
+        if (!software.getSharedfeat().isEmpty()) {
             dmtNode.add(getSharedfeatNode(software));
         }
 
-        if (software.getPart().size() > 0) {
+        if (!software.getPart().isEmpty()) {
             dmtNode.add(getPartNodes(software));
         }
         return dmtNode;
@@ -206,7 +202,7 @@ public class SoftwareListtoJTree extends JPanel {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Info");
         for (Info info : software.getInfo()) {
             String value = info.getValue() != null ? info.getValue() : "";
-            dmtNode.add(new DefaultMutableTreeNode(info.getName() + valueDivider + value));
+            dmtNode.add(new DefaultMutableTreeNode(info.getName() + VALUE_DIVIDER + value));
         }
         return dmtNode;
     }
@@ -215,7 +211,7 @@ public class SoftwareListtoJTree extends JPanel {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Sharedfeat");
         for (Sharedfeat sharedfeat : software.getSharedfeat()) {
             String value = sharedfeat.getValue() != null ? sharedfeat.getValue() : "";
-            dmtNode.add(new DefaultMutableTreeNode(sharedfeat.getName() + valueDivider + value));
+            dmtNode.add(new DefaultMutableTreeNode(sharedfeat.getName() + VALUE_DIVIDER + value));
         }
         return dmtNode;
     }
@@ -229,18 +225,18 @@ public class SoftwareListtoJTree extends JPanel {
     }
 
     private DefaultMutableTreeNode getPart(Part part) {
-        DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Part" + softwareDivider + part.getName());
-        dmtNode.add(new DefaultMutableTreeNode("Interface" + valueDivider + part.getInterface()));
-        if (part.getDataarea().size() > 0) {
+        DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Part" + SOFTWARE_DIVIDER + part.getName());
+        dmtNode.add(new DefaultMutableTreeNode("Interface" + VALUE_DIVIDER + part.getInterface()));
+        if (!part.getDataarea().isEmpty()) {
             dmtNode.add(getDataarea(part.getDataarea()));
         }
-        if (part.getDipswitch().size() > 0) {
+        if (!part.getDipswitch().isEmpty()) {
             dmtNode.add(getDipswitch(part.getDipswitch()));
         }
-        if (part.getDiskarea().size() > 0) {
+        if (!part.getDiskarea().isEmpty()) {
             dmtNode.add(getDiskarea(part.getDiskarea()));
         }
-        if (part.getFeature().size() > 0) {
+        if (!part.getFeature().isEmpty()) {
             dmtNode.add(getFeature(part.getFeature()));
         }
 
@@ -251,9 +247,9 @@ public class SoftwareListtoJTree extends JPanel {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Dataarea(s)");
         for (Dataarea dataarea : dataareas) {
             DefaultMutableTreeNode dataareaNode = new DefaultMutableTreeNode(dataarea.getName());
-            dataareaNode.add(new DefaultMutableTreeNode("Size" + valueDivider + dataarea.getSize()));
-            dataareaNode.add(new DefaultMutableTreeNode("Width" + valueDivider + dataarea.getWidth()));
-            dataareaNode.add(new DefaultMutableTreeNode("Endianness" + valueDivider + dataarea.getEndianness()));
+            dataareaNode.add(new DefaultMutableTreeNode("Size" + VALUE_DIVIDER + dataarea.getSize()));
+            dataareaNode.add(new DefaultMutableTreeNode("Width" + VALUE_DIVIDER + dataarea.getWidth()));
+            dataareaNode.add(new DefaultMutableTreeNode("Endianness" + VALUE_DIVIDER + dataarea.getEndianness()));
             dataareaNode.add(getRoms(dataarea.getRom()));
             dmtNode.add(dataareaNode);
         }
@@ -263,11 +259,11 @@ public class SoftwareListtoJTree extends JPanel {
     private DefaultMutableTreeNode getDipswitch(List<Dipswitch> dipswitchs) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Dipswitch(s)");
         for (Dipswitch dipswitch : dipswitchs) {
-            DefaultMutableTreeNode dipswitchNode = new DefaultMutableTreeNode("Name" + valueDivider +
+            DefaultMutableTreeNode dipswitchNode = new DefaultMutableTreeNode("Name" + VALUE_DIVIDER +
                     dipswitch.getName());
-            dipswitchNode.add(new DefaultMutableTreeNode("Mask" + valueDivider +
+            dipswitchNode.add(new DefaultMutableTreeNode("Mask" + VALUE_DIVIDER +
                     dipswitch.getMask()));
-            dipswitchNode.add(new DefaultMutableTreeNode("Tag" + valueDivider +
+            dipswitchNode.add(new DefaultMutableTreeNode("Tag" + VALUE_DIVIDER +
                     dipswitch.getTag()));
             dipswitchNode.add(getDipvalues(dipswitch.getDipvalue()));
             dmtNode.add(dipswitchNode);
@@ -289,7 +285,7 @@ public class SoftwareListtoJTree extends JPanel {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Feature(s)");
         for (Feature feature : features) {
             String value = feature.getValue() != null ? feature.getValue() : "";
-            DefaultMutableTreeNode featureNode = new DefaultMutableTreeNode(feature.getName() + valueDivider +
+            DefaultMutableTreeNode featureNode = new DefaultMutableTreeNode(feature.getName() + VALUE_DIVIDER +
                     value);
             dmtNode.add(featureNode);
         }
@@ -299,7 +295,7 @@ public class SoftwareListtoJTree extends JPanel {
     private DefaultMutableTreeNode getDipvalues(List<Dipvalue> dipvalues) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Dipvalue(s)");
         for (Dipvalue dipvalue : dipvalues) {
-            DefaultMutableTreeNode dipvalueNode = new DefaultMutableTreeNode(dipvalue.getName() + valueDivider +
+            DefaultMutableTreeNode dipvalueNode = new DefaultMutableTreeNode(dipvalue.getName() + VALUE_DIVIDER +
                     dipvalue.getValue());
             dmtNode.add(dipvalueNode);
         }
@@ -310,9 +306,9 @@ public class SoftwareListtoJTree extends JPanel {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Disk(s)");
         for (Disk disk : disks) {
             DefaultMutableTreeNode diskNode = new DefaultMutableTreeNode(disk.getName());
-            diskNode.add(new DefaultMutableTreeNode("SHA1" + valueDivider + disk.getSha1()));
-            diskNode.add(new DefaultMutableTreeNode("Status" + valueDivider + disk.getStatus()));
-            diskNode.add(new DefaultMutableTreeNode("Writeable" + valueDivider + disk.getWriteable()));
+            diskNode.add(new DefaultMutableTreeNode("SHA1" + VALUE_DIVIDER + disk.getSha1()));
+            diskNode.add(new DefaultMutableTreeNode("Status" + VALUE_DIVIDER + disk.getStatus()));
+            diskNode.add(new DefaultMutableTreeNode("Writeable" + VALUE_DIVIDER + disk.getWriteable()));
             dmtNode.add(diskNode);
         }
         return dmtNode;
@@ -322,13 +318,13 @@ public class SoftwareListtoJTree extends JPanel {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Disk(s)");
         for (Rom rom : roms) {
             DefaultMutableTreeNode romNode = new DefaultMutableTreeNode(rom.getName());
-            romNode.add(new DefaultMutableTreeNode("Size" + valueDivider + rom.getSize()));
-            romNode.add(new DefaultMutableTreeNode("CRC" + valueDivider + rom.getCrc()));
-            romNode.add(new DefaultMutableTreeNode("SHA1" + valueDivider + rom.getSha1()));
-            romNode.add(new DefaultMutableTreeNode("Offset" + valueDivider + rom.getOffset()));
-            romNode.add(new DefaultMutableTreeNode("Value" + valueDivider + rom.getValue()));
-            romNode.add(new DefaultMutableTreeNode("Status" + valueDivider + rom.getStatus()));
-            romNode.add(new DefaultMutableTreeNode("Loadflag" + valueDivider + rom.getLoadflag()));
+            romNode.add(new DefaultMutableTreeNode("Size" + VALUE_DIVIDER + rom.getSize()));
+            romNode.add(new DefaultMutableTreeNode("CRC" + VALUE_DIVIDER + rom.getCrc()));
+            romNode.add(new DefaultMutableTreeNode("SHA1" + VALUE_DIVIDER + rom.getSha1()));
+            romNode.add(new DefaultMutableTreeNode("Offset" + VALUE_DIVIDER + rom.getOffset()));
+            romNode.add(new DefaultMutableTreeNode("Value" + VALUE_DIVIDER + rom.getValue()));
+            romNode.add(new DefaultMutableTreeNode("Status" + VALUE_DIVIDER + rom.getStatus()));
+            romNode.add(new DefaultMutableTreeNode("Loadflag" + VALUE_DIVIDER + rom.getLoadflag()));
             dmtNode.add(romNode);
         }
         return dmtNode;

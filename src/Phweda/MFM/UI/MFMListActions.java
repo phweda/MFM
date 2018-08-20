@@ -26,6 +26,7 @@ import Phweda.MFM.mame.Machine;
 import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
@@ -39,10 +40,8 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static Phweda.MFM.MFMListBuilder.createPlayList;
@@ -55,13 +54,19 @@ import static Phweda.utils.FileUtils.stripSuffix;
  * Date: 11/5/2016
  * Time: 11:24 AM
  */
+@SuppressWarnings("RedundantThrows")
 class MFMListActions {
     private static MFMInformationPanel infoPanel = getInformationPanel();
     private static JFrame mainFrame = getFrame();
-    private static JDialog LBdialog;
+    private static JDialog listbuilderDialog;
+
+    private static final String LBUI_SER = "LBui.ser";
+
+    private MFMListActions() { // To cover implicit public constructor
+    }
 
     static String pickList(boolean all, String message) {
-        Object[] data = null;
+        Object[] data;
         if (all) {
             data = MFMPlayLists.getInstance().PlayListNames();
         } else {
@@ -98,7 +103,7 @@ class MFMListActions {
         JOptionPane.showMessageDialog(frame, jcb);
         frame.dispose();  // get rid of it
 
-        String listName = jcb.getSelectedItem().toString();
+        String listName = Objects.requireNonNull(jcb.getSelectedItem()).toString();
         if (listName.equals(MFM_Constants.NEW_LIST)) {
             String newName = JOptionPane.showInputDialog(null, "Enter List Name");
             if (newName == null || newName.isEmpty()) {
@@ -113,14 +118,12 @@ class MFMListActions {
 
     static void removefromList(String item, String listName) {
         MFMPlayLists.getInstance().removeMachineFromPlayList(listName, item);
-        int row = getListTable().getSelectedRow();
+        int row = getMachineListTable().getSelectedRow();
 
-        // TODO Refactor with changeList(listName)
-        MachineListTableModel gltm = (MachineListTableModel) getListTable().getModel();
+        MachineListTableModel gltm = (MachineListTableModel) getMachineListTable().getModel();
         gltm.setData(MFMPlayLists.getInstance().getPlayList(listName), listName);
         gltm.fireTableDataChanged();
-        // TODO test removal of first and last rows
-        getListTable().getSelectionModel().setSelectionInterval(row, row);
+        getMachineListTable().getSelectionModel().setSelectionInterval(row, row);
         showListInfo(listName);
     }
 
@@ -140,20 +143,19 @@ class MFMListActions {
     }
 
     static void showListEditor() {
-        Dialog listEditorDialog = new JDialog(mainFrame, MFMAction.ListEditorAction);
+        Dialog listEditorDialog = new JDialog(mainFrame, MFMAction.LIST_EDITOR);
         listEditorDialog.add(ListEditor.getInstance().$$$getRootComponent$$$());
         listEditorDialog.pack();
         listEditorDialog.setLocationRelativeTo(mainFrame);
         listEditorDialog.setVisible(true);
     }
 
-    static void ListtoFile() {
-        Object[] data = MFMPlayLists.getInstance().PlayListNames();
+    static void listtoFile() {
         final String listName = pickList(true, "Select list to Save");
 
         if (listName != null) {
             MFM.logger.addToList(listName + " is being saved to file", true);
-            TreeSet<String> ts = MFMPlayLists.getInstance().getPlayList(listName);
+            SortedSet<String> ts = MFMPlayLists.getInstance().getPlayList(listName);
             File listFile = new File(MFM.MFM_LISTS_DIR + listName + " " +
                     MFM_Data.getInstance().getDataVersion() + ".txt");
             try {
@@ -176,26 +178,26 @@ class MFMListActions {
         }
     }
 
-    static void ListtoDAT() {
+    static void listtoDAT() {
         final String listName = pickList(true, "Select list for DAT");
         if (listName != null) {
             MFM.logger.addToList("DAT for " + listName + " is being created and saved to file", true);
-            TreeSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
+            SortedSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
             try {
-                Datafile DATFile = MFM_DATmaker.generateDAT(listName, list);
-                PersistUtils.saveDATtoFile(DATFile, MFM.MFM_LISTS_DIR + listName +
+                Datafile datafile = MFM_DATmaker.generateDAT(listName, list);
+                PersistUtils.saveDATtoFile(datafile, MFM.MFM_LISTS_DIR + listName +
                         "(" + MFM_Data.getInstance().getDataVersion() + ").dat");
-            } catch (FileNotFoundException | ParserConfigurationException | TransformerException | JAXBException e) {
+            } catch (ParserConfigurationException | TransformerException | JAXBException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    static String DATtoList() {
+    static String datafiletoList() {
         File inputDATfile = pickValidateDAT();
         if (inputDATfile != null) {
-            Datafile DATfile = (Datafile) PersistUtils.retrieveJAXB(inputDATfile.getAbsolutePath(), Datafile.class);
-            MFMListBuilder.createListfromDAT(inputDATfile.getName(), DATfile);
+            Datafile datafile = (Datafile) PersistUtils.retrieveJAXB(inputDATfile.getAbsolutePath(), Datafile.class);
+            MFMListBuilder.createListfromDAT(inputDATfile.getName(), datafile);
             return inputDATfile.getName();
         }
         return "";
@@ -203,13 +205,13 @@ class MFMListActions {
 
     static File pickValidateDAT() {
         File file = pickDAT();
-        if (ValidateDAT(file)) {
+        if (file != null && validateDAT(file)) {
             return file;
         }
         return null;
     }
 
-    private static boolean ValidateDAT(File inputFile) {
+    private static boolean validateDAT(File inputFile) {
         String result = new MFM_DATmaker().validateDAT(inputFile);
         if (!result.equalsIgnoreCase(MFM_DATmaker.GOOD)) {
             JOptionPane.showMessageDialog(mainFrame, "DAT file is invalid\n" + result,
@@ -238,6 +240,9 @@ class MFMListActions {
         File externalList = pickListFile();
         if (externalList != null) {
             File inputfile = pickDAT();
+            if (inputfile == null) {
+                return;
+            }
             Datafile inputDAT = (Datafile) PersistUtils.retrieveJAXB(inputfile.getPath(), Datafile.class);
             if (inputDAT != null && inputfile.exists()) {
                 Set<String> list = FileUtils.listFromFile(externalList);
@@ -249,7 +254,7 @@ class MFMListActions {
     private static void saveFilteredDAT(Datafile inputDAT, Set<String> list, String name) {
         try {
             PersistUtils.saveDATtoFile(filterDAT(inputDAT, list), MFM.MFM_LISTS_DIR + name + "-filtered.xml");
-        } catch (FileNotFoundException | ParserConfigurationException |
+        } catch (ParserConfigurationException |
                 TransformerException | JAXBException e) {
             e.printStackTrace();
         }
@@ -275,16 +280,14 @@ class MFMListActions {
     static void listDataToCSV(String list) {
         File newFile = new File(MFM.MFM_LISTS_DIR + list +
                 MFM_Data.getInstance().getDataVersion() + "_data.csv");
-        TreeSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
-        PrintWriter pw = null;
+        SortedSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
+        PrintWriter pw;
         try {
             pw = new PrintWriter(newFile);
             pw.println(Machine.CSV_HEADER);
             for (String machine : machines) {
-                try {
+                if (MAMEInfo.getMachine(machine) != null) {
                     pw.println(MAMEInfo.getMachine(machine).toString());
-                } catch (Exception e) {
-                    // e.printStackTrace(); swallow it older sets missing driver
                 }
             }
             pw.close();
@@ -299,11 +302,16 @@ class MFMListActions {
         fileChooser.showDialog(null, JFileChooser.APPROVE_SELECTION);
         File file = fileChooser.getSelectedFile();
 
-        java.util.List<String> lines = null;
+        List<String> lines = null;
         try {
             lines = Files.readAllLines(file.toPath(), Charset.defaultCharset());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        if (lines == null || lines.isEmpty()) {
+            MFM.logger.out("List to import was empty! File was " + file.getName());
+            return null;
         }
 
         String fileName = stripSuffix(file.getName());
@@ -312,7 +320,7 @@ class MFMListActions {
             return null;
         }
 
-        String[] machines = lines.toArray(new String[lines.size()]);
+        String[] machines = lines.toArray(new String[0]);
         createPlayList(fileName, machines);
         return fileName;
     }
@@ -322,9 +330,7 @@ class MFMListActions {
             if (MFMPlayLists.getInstance().getMyPlayListsTree().containsKey(name)) {
                 int result = JOptionPane.showConfirmDialog(comp,
                         "That list name already exists. Overwrite it?", "", JOptionPane.YES_NO_OPTION);
-                if (result == JOptionPane.NO_OPTION) {
-                    return false;
-                }
+                return result == JOptionPane.NO_OPTION;
             } else {
                 JOptionPane.showMessageDialog(comp, "Please rename that is a reserved list name.");
                 return false;
@@ -346,6 +352,7 @@ class MFMListActions {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     private static void resourcestoFile(String list, TreeMap<String, Object> files) {
         MFM.logger.addToList(list + " resources are being saved to file", true);
         File listFile = new File(MFM.MFM_LISTS_DIR + list + " " +
@@ -407,13 +414,13 @@ class MFMListActions {
     /**
      * Transform Machine data to JSON
      *
-     * @param list
+     * @param list to create JSON for
      */
     static void listDataToJSON(String list) {
 
         File newFile = new File(MFM.MFM_LISTS_DIR + list + "_" +
                 MFM_Data.getInstance().getDataVersion() + "_data.json");
-        final TreeSet<String> playList = MFMPlayLists.getInstance().getPlayList(list);
+        final SortedSet<String> playList = MFMPlayLists.getInstance().getPlayList(list);
         final ObjectMapper objectMapper = new ObjectMapper();
 
         SwingWorker sw = new SwingWorker() {
@@ -428,7 +435,7 @@ class MFMListActions {
                             try {
                                 jsonInString = objectMapper.writerWithDefaultPrettyPrinter()
                                         .writeValueAsString(MAMEInfo.getMame().getMachineMap().get(machine));
-                            } catch (Exception e) {
+                            } catch (JsonProcessingException e) {
                                 e.printStackTrace();
                             }
                             pw.println(jsonInString);
@@ -446,82 +453,12 @@ class MFMListActions {
 
             @Override
             protected void done() {
-                // JOptionPane.showMessageDialog(mainFrame, "JSON Save Done");
                 infoPanel.showMessage(newFile.getName() + " is in the Lists directory.");
             }
         };
         Thread generateJSON = new Thread(sw);
         generateJSON.start();
         infoPanel.showProgress("Generating JSON for " + list);
-
-
-        /*      OK this was a shot at reflection for optional presence of the Jackson jars
-                Just decided to include the classes in the MFM jar - ~1 MB
-
-                URL[] urls = {new URL("jar:file:" + coreJar.getCanonicalPath() + "!/")};
-                URL[] urls2 = {new URL("jar:file:" + databindJar.getCanonicalPath() + "!/")};
-
-                URL[] allURLs = Stream.concat(Arrays.stream(urls), Arrays.stream(urls2))
-                        .toArray(URL[]::new);
-                URLClassLoader cl = URLClassLoader.newInstance(allURLs);
-
-                //no paramater
-                Class noparams[] = {};
-                //String parameter
-                Class[] paramObject = new Class[1];
-                paramObject[0] = Object.class;
-
-                Class<?> mapperClass =
-                        Class.forName("com.fasterxml.jackson.databind.ObjectMapper", true, cl);
-                Object mapper = mapperClass.newInstance();
-
-                Class<?> serializationConfigClass =
-                        Class.forName("com.fasterxml.jackson.databind.SerializationConfig", true, cl);
-                Object serializationConfig = serializationConfigClass.newInstance();
-
-                Method getSerializationConfig =
-                        mapperClass.getDeclaredMethod("getSerializationConfig", noparams);
-
-
-                Class<?> writerClass =
-                        Class.forName("com.fasterxml.jackson.databind.ObjectWriter", true, cl);
-
-                Constructor<?> cons = writerClass.getConstructor(mapperClass, serializationConfigClass);
-
-                Object writer = cons.newInstance(mapper, getSerializationConfig.invoke(noparams));
-
-
-                Method writerWithDefaultPrettyPrinter =
-                        writerClass.getDeclaredMethod("writerWithDefaultPrettyPrinter", noparams);
-                Method writeValueAsString = mapperClass.getDeclaredMethod("writeValueAsString", paramObject);
-
-                playList.forEach(machine -> {
-                    // Convert object to JSON string and pretty print
-                    String jsonInString = null;
-                    try {
-                        writerWithDefaultPrettyPrinter.invoke(mapper, null);
-                        jsonInString = (String) writeValueAsString.invoke(
-                                mapper, MAMEInfo.getMame().getMachineMap().get(machine));
-                    } catch (Exception e) {
-
-                        e.printStackTrace();
-                    }
-                    pw.println(jsonInString);
-                    System.out.println(jsonInString);
-                });
-                pw.close();
-            } catch (IOException | IllegalAccessException | InstantiationException | ClassNotFoundException |
-                    NoSuchMethodException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        } else {
-            String errorMessage = "JSON output requires jackson jars: " +
-                    "https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.8";
-            if (MFM.isDebug()) {
-                MFM.logger.out(errorMessage);
-            }
-            System.out.println(errorMessage);
-        }   */
     }
 
     /**
@@ -543,7 +480,7 @@ class MFMListActions {
         }
 
         final String list = pickList(true, "Choose List");
-        String message = null;
+        String message;
         if (copy) {
             message = "Copying Resources " + list;
         } else {
@@ -564,13 +501,9 @@ class MFMListActions {
                         MFMPlayLists.getInstance().getPlayList(list));
                 startTime = System.nanoTime();
                 if (copy) {
-                    try {
-                        // fixme bad design - move updateDirectories call?
-                        MFMSettings.getInstance().updateDirectoriesResourceFiles();
-                        MFMFileOps.moveFiles(resources);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    // fixme bad design - move updateDirectories call?
+                    MFMSettings.getInstance().updateDirectoriesResourceFiles();
+                    MFMFileOps.moveFiles(resources);
                 } else {
                     resourcestoFile(list, resources);
                 }
@@ -625,21 +558,22 @@ class MFMListActions {
     }
 
     static void openListBuilder(String baseList) {
-        if (LBdialog != null && LBdialog.isVisible()) {
-            LBdialog.toFront();
+        if (listbuilderDialog != null && listbuilderDialog.isVisible()) {
+            listbuilderDialog.toFront();
             return;
         }
 
         Dimension maxsize = new Dimension(1280, 900);
         Dimension minsize = new Dimension(1180, 750);
 
-        ListBuilderUI LBui;
+        ListBuilderUI listBuilderUI;
         JDialog tempLBdialog = null;
 
-        if (baseList.equals(ListBuilderUI.Previous) && Files.exists(Paths.get(MFM.MFM_SETTINGS_DIR + "LBui.ser"))) {
+        if (baseList.equals(ListBuilderUI.PREVIOUS) &&
+                Paths.get(MFM.MFM_SETTINGS_DIR + LBUI_SER).toFile().exists()) {
             try {
-                tempLBdialog = (JDialog) PersistUtils.loadAnObject(MFM.MFM_SETTINGS_DIR + "LBui.ser");
-                ListBuilderUI.getInstance().setController();
+                tempLBdialog = (JDialog) PersistUtils.loadAnObject(MFM.MFM_SETTINGS_DIR + LBUI_SER);
+                ListBuilderUI.setController();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -647,11 +581,11 @@ class MFMListActions {
 
         if (tempLBdialog == null) {
             tempLBdialog = new JDialog(mainFrame, "MFM List Builder");
-            LBui = ListBuilderUI.getInstance();
-            LBui.setController();
-            LBui.setState(baseList);
+            listBuilderUI = ListBuilderUI.getInstance();
+            ListBuilderUI.setController();
+            listBuilderUI.setState(baseList);
 
-            tempLBdialog.getContentPane().add(LBui.getListBuilderPanel());
+            tempLBdialog.getContentPane().add(listBuilderUI.getListBuilderPanel());
             setFontSize(tempLBdialog);
 
             tempLBdialog.setPreferredSize(maxsize);
@@ -659,19 +593,19 @@ class MFMListActions {
             tempLBdialog.setMinimumSize(minsize);
         }
 
-        LBdialog = tempLBdialog;
-        LBdialog.pack();
-        LBdialog.setResizable(true);
-        LBdialog.setLocationRelativeTo(mainFrame);
+        listbuilderDialog = tempLBdialog;
+        listbuilderDialog.pack();
+        listbuilderDialog.setResizable(true);
+        listbuilderDialog.setLocationRelativeTo(mainFrame);
 
-        LBdialog.addWindowListener(new WindowAdapter() {
+        listbuilderDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                PersistUtils.saveAnObject(LBdialog, MFM.MFM_SETTINGS_DIR + "LBui.ser");
+                PersistUtils.saveAnObject(listbuilderDialog, MFM.MFM_SETTINGS_DIR + LBUI_SER);
             }
         });
 
-        LBdialog.setVisible(true);
+        listbuilderDialog.setVisible(true);
     }
 }

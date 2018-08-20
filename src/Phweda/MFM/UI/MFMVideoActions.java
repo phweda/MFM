@@ -36,7 +36,6 @@ import javax.swing.*;
 import java.io.File;
 import java.nio.file.Path;
 
-import static Phweda.MFM.UI.MFMController.getFrame;
 import static Phweda.MFM.UI.MFMController.showInformation;
 
 /**
@@ -44,32 +43,36 @@ import static Phweda.MFM.UI.MFMController.showInformation;
  */
 class MFMVideoActions {
 
+    private MFMVideoActions() { // To cover implicit public constructor
+    }
+
+    @SuppressWarnings("ConstantConditions")
     static void showVideo(String gameName) {
         // TODO refactor so we can do the following efficiently
         Path fullPath = null;
         File snapFolder = new File(MFMSettings.getInstance().getPlaySetDir() +
                 FileUtils.DIRECTORY_SEPARATOR + "snap" + FileUtils.DIRECTORY_SEPARATOR);
 
-        File VIDsfolder = new File(MFMSettings.getInstance().VIDsFullSetDir() + FileUtils.DIRECTORY_SEPARATOR);
+        File vidsFolder = new File(MFMSettings.getInstance().VIDsFullSetDir() + FileUtils.DIRECTORY_SEPARATOR);
 
         if (MFM.isDebug()) {
-            MFM.logger.addToList(snapFolder.getAbsolutePath() + " : " + VIDsfolder.getAbsolutePath()
+            MFM.logger.addToList(snapFolder.getAbsolutePath() + " : " + vidsFolder.getAbsolutePath()
                     , true);
             MFM.logger.addToList(gameName, true);
         }
 
         // Quit if it is not a directory
-        if ((!VIDsfolder.exists() || !VIDsfolder.isDirectory()) &&
+        if ((!vidsFolder.exists() || !vidsFolder.isDirectory()) &&
                 (!snapFolder.exists() || !snapFolder.isDirectory())) {
-            showInformation("Video INIfiles", "No snap or videos folder found check your MFM and MAME settings ");
+            MFMController.showInformation("Video INIfiles", "No snap or videos folder found check your MFM and MAME settings ");
             return;
         }
         File[] snapVIDfiles = snapFolder.listFiles(FileUtils.VideoFilenameFilter);
 
         // TODO fix with MFMFileOps to search sub folders
-        File[] VIDfiles = VIDsfolder.listFiles(FileUtils.VideoFilenameFilter);
+        File[] vidFiles = vidsFolder.listFiles(FileUtils.VideoFilenameFilter);
         if ((snapVIDfiles != null && snapVIDfiles.length > 0) ||
-                (VIDfiles != null && VIDfiles.length > 0)) {
+                (vidFiles != null && vidFiles.length > 0)) {
             if (snapVIDfiles != null && snapVIDfiles.length > 0) {
                 for (File file : snapVIDfiles) {
                     if (file.getName().contains(gameName)) {
@@ -77,8 +80,8 @@ class MFMVideoActions {
                         break;
                     }
                 }
-            } else if (VIDfiles != null && VIDfiles.length > 0) {
-                for (File file : VIDfiles) {
+            } else if (vidFiles.length > 0) {
+                for (File file : vidFiles) {
                     if (file.getName().contains(gameName)) {
                         fullPath = file.toPath();
                         break;
@@ -96,17 +99,12 @@ class MFMVideoActions {
 
     static void runFFmpeg() {
         try {
-            MFM_Components.InfoPanel().showProgress("Converting Files");
+            MFM_Components.infoPanel().showProgress("Converting Files");
             SwingWorker sw = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
                     FFMPEG.getInstance().convertAll();
                     return true;
-                }
-
-                @Override
-                protected void done() {
-                    super.done();
                 }
             };
             Thread fileOps = new Thread(sw);
@@ -116,7 +114,7 @@ class MFMVideoActions {
         }
     }
 
-    static void CropAVI(String machine, MFMInformationPanel infoPanel) {
+    static void cropAVI(String machine, MFMInformationPanel infoPanel) {
         final String path = MFMSettings.getInstance().getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + "snap" +
                 FileUtils.DIRECTORY_SEPARATOR + machine + ".avi";
         final File machineVideo = new File(path);
@@ -125,6 +123,7 @@ class MFMVideoActions {
             infoPanel.showProgress("Cropping Video");
 
             SwingWorker sw = new SwingWorker() {
+                @SuppressWarnings("RedundantThrows")
                 @Override
                 protected Object doInBackground() throws Exception {
                     FFMPEG.getInstance().cropAVI(machineVideo, MAMEInfo.getMachine(machine));
@@ -141,16 +140,16 @@ class MFMVideoActions {
             Thread ffmpegOps = new Thread(sw);
             ffmpegOps.start();
         } else {
-            JOptionPane.showMessageDialog(getFrame(), path + "\nNot found.");
+            JOptionPane.showMessageDialog(MFMController.getFrame(), path + "\nNot found.");
         }
     }
 
     static void videoAction(final String action, MFMInformationPanel infoPanel) {
-        String filePath = null;
+        String filePath;
         JFileChooser chooser = new JFileChooser();
-        if (action.equals(MFMAction.AVIImagesAction)) {
+        if (action.equals(MFMAction.EXTRACT_AVI_IMAGES)) {
             chooser.setFileFilter(VideoUtils.AVIfilter);
-        } else if (action.equals(MFMAction.GIFImagesAction)) {
+        } else if (action.equals(MFMAction.EXTRACT_GIF_IMAGES)) {
             chooser.setFileFilter(VideoUtils.GIFfilter);
         }
 
@@ -165,11 +164,12 @@ class MFMVideoActions {
         infoPanel.showProgress(action);
         MFM.logger.addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
+            @SuppressWarnings("RedundantThrows")
             @Override
             protected Object doInBackground() throws Exception {
-                if (action.equals(MFMAction.GIFImagesAction)) {
+                if (action.equals(MFMAction.EXTRACT_GIF_IMAGES)) {
                     VideoUtils.showGIFimages(file);
-                } else if (action.equals(MFMAction.AVIImagesAction)) {
+                } else if (action.equals(MFMAction.EXTRACT_AVI_IMAGES)) {
                     VideoUtils.showAVIimages(file);
                 }
                 return true;
