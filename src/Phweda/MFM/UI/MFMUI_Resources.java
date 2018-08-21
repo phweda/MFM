@@ -103,17 +103,17 @@ public class MFMUI_Resources {
 
     private void loadResources() {
         URL testURL = this.getClass().getResource("");
-        MFM.logger.addToList("Resources : \n" + testURL, true);
+        MFM.getLogger().addToList("Resources : \n" + testURL, true);
         for (String name : resourceNames) {
             // NOTE works multisystem with slash it is in .jar that way
             URL url = this.getClass().getResource(RESOURCES + FileUtils.SLASH + name);
             if (url != null) {
                 if (MFM.isSystemDebug()) {
-                    MFM.logger.addToList(url.toString(), true);
+                    MFM.getLogger().addToList(url.toString(), true);
                 }
                 resourceURLs.put(name, url);
             } else {
-                MFM.logger.addToList("Failed to load resource : " + name, true);
+                MFM.getLogger().addToList("Failed to load resource : " + name, true);
             }
         }
     }

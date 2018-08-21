@@ -102,7 +102,7 @@ public class MAMEDocType {
                 return;
             }
 
-        } catch (MAMEexe.MAME_Exception | IOException e) { //    | InterruptedException | IOException
+        } catch (IOException e) { //    | InterruptedException | IOException
             e.printStackTrace();
             return;
         } catch (InterruptedException e) {
@@ -197,8 +197,6 @@ public class MAMEDocType {
         try {
             Process process = MAMEexe.run(args, temp, false);
             process.waitFor();
-        } catch (MAMEexe.MAME_Exception e) {
-            e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
             Thread.currentThread().interrupt();

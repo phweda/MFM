@@ -31,6 +31,7 @@ import java.io.Serializable;
 /**
  * Future class for/if move to JavaFX UI
  */
+@SuppressWarnings("WeakerAccess")
 public class MachineFX implements Serializable {
 
     private StringProperty name;

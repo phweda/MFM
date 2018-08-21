@@ -181,7 +181,7 @@ public class MAMEtoJTree extends JPanel {
     /**
      * This is simply to provide MAME input to test this class
      */
-    private static Mame jaxb() throws JAXBException, MAMEexe.MAME_Exception {
+    private static Mame jaxb() throws JAXBException {
         Mame mame;
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Phweda.MFM.mame.Mame.class);
@@ -194,7 +194,7 @@ public class MAMEtoJTree extends JPanel {
             mame = (Mame) jaxbUnmarshaller.unmarshal(inputStream);
 
             System.out.println("Machines" + mame.getMachine().size());
-        } catch (JAXBException | MAMEexe.MAME_Exception e) {
+        } catch (JAXBException e) {
             e.printStackTrace();
             throw e;
         }

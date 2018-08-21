@@ -50,7 +50,7 @@ public class MAME_Game_Prefixes {
         prefixes = getPrefixes();
         System.out.println(prefixes.toString());
         if (MFM.isDebug()) {
-            MFM.logger.addToList(prefixes.toString());
+            MFM.getLogger().addToList(prefixes.toString());
         }
     }
 
@@ -66,7 +66,7 @@ public class MAME_Game_Prefixes {
         for (String s : hm.keySet()) {
             ts.add(s);
         }
-        MFM.logger.addToList(hm.toString());
+        MFM.getLogger().addToList(hm.toString());
     }
 
     private void countGames(HashMap<String, AtomicInteger> hm, int length, String startsWith) {
@@ -115,8 +115,8 @@ public class MAME_Game_Prefixes {
         Process process = null;
         try {
             process = MAMEexe.run(fullListargs);
-        } catch (MAMEexe.MAME_Exception e) {
-            e.printStackTrace(MFM.logger.Writer());
+        } catch (Exception e) {
+            e.printStackTrace(MFM.getLogger().writer());
         }
         BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
@@ -141,7 +141,7 @@ public class MAME_Game_Prefixes {
             if (MFMSettings.getInstance().isLoaded()) {
                 MAMEInfo.getInstance(false, false, false);
             } else {
-                MFM.logger.addToList("No MAME Settings ", true);
+                MFM.getLogger().addToList("No MAME Settings ", true);
             }
             new MAME_Game_Prefixes();
         } catch (IOException e) {

@@ -155,7 +155,7 @@ public class MFM_Components {
     static Component createStatusBar(int width) {
         statusBar = new StatusBar();
         ClockPanel clock = null;
-        ImageIcon flagIcon = MFMUI_Resources.getInstance().getFlagImageIcon(MFM.LOCAL_COUNTRY);
+        ImageIcon flagIcon = MFMUI_Resources.getInstance().getFlagImageIcon(MFM.getLocalCountry());
         JLabel flag = null;
         if (flagIcon != null) {
             flag = new JLabel(flagIcon);

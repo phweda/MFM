@@ -43,7 +43,7 @@ public class ParseCatverINI extends ParseTextFile {
      */
     public ParseCatverINI(String fileName, Map mapIn) {
         super(fileName, mapIn);
-        MFM.logger.addToList("Catver file name: " + fileName, true);
+        MFM.getLogger().addToList("Catver file name: " + fileName, true);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ParseCatverINI extends ParseTextFile {
                 ((HashMap) map.get("version")).put(key.trim(), value.trim());
             } else {
                 // WE SHOULD NEVER GET HERE BUT ...
-                MFM.logger.addToList("ParseCatverINI We failed to find version or category");
+                MFM.getLogger().addToList("ParseCatverINI We failed to find version or category");
             }
         }
         lineScanner.close();

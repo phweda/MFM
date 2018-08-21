@@ -161,16 +161,16 @@ final class MFM_SettingsPanel extends JPanel {
         ActionListener settingsListener = event -> {
             if (((JButton) event.getSource()).getName().equals("Save")) {
 
-                MFM.logger.separateLine();
-                MFM.logger.addToList("Save Settings command received", true);
-                MFM.logger.addToList("ROMs path: " + mameRomsPath.getText(), true);
-                MFM.logger.addToList("Software List ROMs path: " + softwareListRomsPath.getText(), true);
-                MFM.logger.addToList("Play path: " + mamePlayPath.getText(), true);
-                MFM.logger.addToList("MAME EXE path: " + mameExePath.getText(), true);
-                MFM.logger.addToList("CHD path: " + mameCHDsPath.getText(), true);
-                MFM.logger.addToList("Software List CHDs path: " + softwareListCHDsPath.getText(), true);
-                MFM.logger.addToList("Extras path: " + mameExtrasPath.getText(), true);
-                MFM.logger.addToList("VIDs path: " + mameVidsPath.getText(), true);
+                MFM.getLogger().separateLine();
+                MFM.getLogger().addToList("Save Settings command received", true);
+                MFM.getLogger().addToList("ROMs path: " + mameRomsPath.getText(), true);
+                MFM.getLogger().addToList("Software List ROMs path: " + softwareListRomsPath.getText(), true);
+                MFM.getLogger().addToList("Play path: " + mamePlayPath.getText(), true);
+                MFM.getLogger().addToList("MAME EXE path: " + mameExePath.getText(), true);
+                MFM.getLogger().addToList("CHD path: " + mameCHDsPath.getText(), true);
+                MFM.getLogger().addToList("Software List CHDs path: " + softwareListCHDsPath.getText(), true);
+                MFM.getLogger().addToList("Extras path: " + mameExtrasPath.getText(), true);
+                MFM.getLogger().addToList("VIDs path: " + mameVidsPath.getText(), true);
 
                 // NOTE maintain order!!! See MFMSettings.MAMEexeDir() first run for create config
                 String mameexe = mameExePath.getText();
@@ -190,7 +190,7 @@ final class MFM_SettingsPanel extends JPanel {
                 }
 
                 if (!mameexe.isEmpty() && mameexe.length() > 5 && mameexe.contains(FileUtils.DIRECTORY_SEPARATOR)) {
-                    MFMSettings.MAMEexeName(mameexe.substring(
+                    mfmSettings.MAMEexeName(mameexe.substring(
                             mameexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
                     mfmSettings.MAMEexeDir(mameExePath.getText().substring(0,
                             mameExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
@@ -226,12 +226,12 @@ final class MFM_SettingsPanel extends JPanel {
                 MFM.getMFMSettings().persistMySettings();
 
                 // Linux debug
-                MFM.logger.addToList("END Save Settings", true);
-                MFM.logger.separateLine();
+                MFM.getLogger().addToList("END Save Settings", true);
+                MFM.getLogger().separateLine();
             } else if (((JButton) event.getSource()).getName().equals(CANCEL)) {
                 frame.dispose();
                 if (!mfmSettings.isLoaded()) {
-                    MFM.logger.addToList("User canceled Settings", true);
+                    MFM.getLogger().addToList("User canceled Settings", true);
                     System.exit(4);
                 }
             }

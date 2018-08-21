@@ -273,7 +273,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
      * @return selected Machine or Software name
      */
     private String getSelectedItem() {
-        String itemName = null;
+        String itemName;
         if (folderTree != null && listPopupMenu.getInvoker() == folderTree) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) folderTree.getLastSelectedPathComponent();
             if (node == null) {
@@ -298,7 +298,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                         + MFM_Constants.SOFTWARE_LIST_SEPARATER + itemName;
             }
             if (MFM.isDebug()) {
-                MFM.logger.addToList(itemName);
+                MFM.getLogger().addToList(itemName);
             }
         }
         return itemName;
@@ -385,9 +385,9 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     void runGame(String command) {
         String gameName = getSelectedItem();
         if (MFM.isDebug()) {
-            MFM.logger.out("Machine is: " + gameName);
+            MFM.getLogger().out("Machine is: " + gameName);
         }
-        ArrayList<String> args = null;
+        List<String> args;
         switch (command) {
 
             case MAMECommands.RECORD:
@@ -396,7 +396,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             case MAMECommands.PLAYBACK:
                 args = MAMECommands.playbackGame(gameName);
                 break;
-            case MAMECommands.PLAYBACKtoAVI:
+            case MAMECommands.PLAYBACK_TO_AVI:
                 args = MAMECommands.createAVIfromPlayback(gameName);
                 break;
             case MAMECommands.AVIWRITE:
@@ -413,8 +413,8 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 // NOTE Should never get here
                 return;
             }
-            MAMEexe.run(args, MFM.MAMEout);
-        } catch (MAMEexe.MAME_Exception e) {
+            MAMEexe.run(args, MFM.getMameout());
+        } catch (Exception e) {
             infoPanel.showMessage(gameName + " had errors");
             //        showInformation("MAME error", e.getError());
         }
@@ -428,11 +428,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                         "Created December 2011\n" +
                                 "Coded by phweda\n" +
                                 "phweda1@yahoo.com\n" +
-                                MFM.VERSION + "\t" + MFM.RELEASE_DATE
+                                MFM.getVERSION() + "\t" + MFM.getReleaseDate()
                 );
                 break;
             case "MFM User Guide":
-                FileUtils.openFileFromOS(Paths.get(MFM.MFM_DIR + MFM.MFM_User_Guide));
+                FileUtils.openFileFromOS(Paths.get(MFM.getMfmDir() + MFM.getMFMUserGuide()));
                 break;
             case "MFM Copyright":
                 showHTML("MFM Copyright", MFMUI_Resources.MFM_COPYRIGHT_HTML);
@@ -612,7 +612,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         } else if (new File(mfmSettings.FullSetDirectories().get(folder) + fileName).exists()) {
             imagePanel.image(mfmSettings.FullSetDirectories().get(folder) + fileName);
         } else if (mfmSettings.getExtrasZipFilesMap().containsKey(folder)) {
-            StringBuilder sb = new StringBuilder(MFM.TEMP_DIR);
+            StringBuilder sb = new StringBuilder(MFM.getTempdir());
             sb.append(folder);
             sb.append("-");
             sb.append(fileName);
@@ -667,7 +667,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             fullPath = mfmSettings.FullSetDirectories().get(manualFolder) + FileUtils.DIRECTORY_SEPARATOR
                     + selectedItem + PDF_EXT;
         } else if (mfmSettings.getExtrasZipFilesMap().containsKey(manualFolder)) {
-            StringBuilder sb = new StringBuilder(MFM.TEMP_DIR);
+            StringBuilder sb = new StringBuilder(MFM.getTempdir());
             sb.append(manualFolder);
             sb.append("-");
             sb.append(selectedItem);
@@ -698,16 +698,16 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     void showLog(String log) {
         switch (log) {
             case MFMAction.LOG:
-                FileUtils.openFileFromOS(Paths.get(MFM.Log.getAbsolutePath()));
+                FileUtils.openFileFromOS(Paths.get(MFM.getLog().getAbsolutePath()));
                 break;
             case MFMAction.MAME_OUTPUT:
-                FileUtils.openFileFromOS(Paths.get(MFM.MAMEout.getAbsolutePath()));
+                FileUtils.openFileFromOS(Paths.get(MFM.getMameout().getAbsolutePath()));
                 break;
             case MFMAction.ERROR_LOG:
-                FileUtils.openFileFromOS(Paths.get(MFM.ErrorLog.getAbsolutePath()));
+                FileUtils.openFileFromOS(Paths.get(MFM.getErrorLog().getAbsolutePath()));
                 break;
             case MFMAction.GC_LOG:
-                FileUtils.openFileFromOS(Paths.get(MFM.MFM_LOGS_DIR + "MFM_GC_log.txt"));
+                FileUtils.openFileFromOS(Paths.get(MFM.getMfmLogsDir() + "MFM_GC_log.txt"));
                 break;
             default:
                 break;
@@ -872,7 +872,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_Z) && e.isControlDown() && e.isAltDown()) {
-            JFileChooser jfc = new JFileChooser(MFM.MFM_CATEGORY_DIR);
+            JFileChooser jfc = new JFileChooser(MFM.getMfmCategoryDir());
             jfc.setFileFilter(FileUtils.csvFileFilter);
             jfc.showOpenDialog(mainFrame);
             File file = jfc.getSelectedFile();
@@ -901,14 +901,14 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     void zipLogs() {
         ZipUtils zipUtils = new ZipUtils();
-        String sb = MFM.MFM_DIR +
+        String sb = MFM.getMfmDir() +
                 FileUtils.DIRECTORY_SEPARATOR +
                 "MFM_Logs_" +
-                MFM.logNumber +
+                MFM.LOG_NUMBER +
                 ".zip";
-        zipUtils.zipIt(sb, new File(MFM.MFM_LOGS_DIR), MFM.MFM_LOGS_DIR);
+        zipUtils.zipIt(sb, new File(MFM.getMfmLogsDir()), MFM.getMfmLogsDir());
         if (Desktop.isDesktopSupported()) {
-            File dir = new File(MFM.MFM_DIR);
+            File dir = new File(MFM.getMfmDir());
             try {
                 Desktop.getDesktop().open(dir);
             } catch (IOException e) {
@@ -920,13 +920,13 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     void postToPastie() {
         List<String> lines = null;
         try {
-            lines = Files.readAllLines(MFM.ErrorLog.toPath(), Charset.defaultCharset());
+            lines = Files.readAllLines(MFM.getErrorLog().toPath(), Charset.defaultCharset());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         if (lines == null) {
-            MFM.logger.out("No error log entires to post to Pastie.");
+            MFM.getLogger().out("No error log entires to post to Pastie.");
             return;
         }
         String[] strings = lines.toArray(new String[0]);
@@ -965,6 +965,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     }
 
+    @SuppressWarnings("squid:S2696")
     final void init() {
 
         mainFrame = getInstance().getFrame();
@@ -984,7 +985,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         softwarelistPopupMenu = components.getSoftwarelistPopupMenuPopupMenu();
         currentList = components.currentListName();
         listName = currentList.getName();
-        infoPanel = components.infoPanel();
+        infoPanel = MFM_Components.infoPanel();
         statusBar = components.statusBar();
 
         mainFrame.pack();
@@ -994,7 +995,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         // Note order must be last!
         loadState();
         updateUI();
-        MFM.logger.out(MFM_Data.getInstance().rescanSets());
+        MFM.getLogger().out(MFM_Data.getInstance().rescanSets());
     }
 
     private void loadState() {
@@ -1145,12 +1146,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
         // Duplicative of MAMEtoJTree & SoftwareListtoJTree fixme
         tree.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
-                    if (selPath != null) {
-                        MAMEtoJTree.getInstance(false).copytoClipboard(selPath.getLastPathComponent().toString());
-                    }
+                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3 && selPath != null) {
+                    MAMEtoJTree.getInstance(false).copytoClipboard(selPath.getLastPathComponent().toString());
                 }
             }
         });
@@ -1185,7 +1185,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     void openFile() {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_LISTS_DIR);
+        JFileChooser fileChooser = new JFileChooser(MFM.getMfmListsDir());
         int returnValue = fileChooser.showOpenDialog(mainFrame);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             FileUtils.openFileFromOS(fileChooser.getSelectedFile().toPath());

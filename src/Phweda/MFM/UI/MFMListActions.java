@@ -68,7 +68,7 @@ class MFMListActions {
     static String pickList(boolean all, String message) {
         Object[] data;
         if (all) {
-            data = MFMPlayLists.getInstance().PlayListNames();
+            data = MFMPlayLists.getInstance().playListNames();
         } else {
             data = MFMPlayLists.getInstance().myPlayListNames();
         }
@@ -135,7 +135,7 @@ class MFMListActions {
                 "Remove", JOptionPane.OK_CANCEL_OPTION, null, data, data[0]);
 
         if (result != null) {
-            MFM.logger.addToList(result + " is being removed", true);
+            MFM.getLogger().addToList(result + " is being removed", true);
             MFMPlayLists.getInstance().removePlayList(result);
             MFMUI_Setup.getInstance().updateMenuBar("");
         }
@@ -154,9 +154,9 @@ class MFMListActions {
         final String listName = pickList(true, "Select list to Save");
 
         if (listName != null) {
-            MFM.logger.addToList(listName + " is being saved to file", true);
+            MFM.getLogger().addToList(listName + " is being saved to file", true);
             SortedSet<String> ts = MFMPlayLists.getInstance().getPlayList(listName);
-            File listFile = new File(MFM.MFM_LISTS_DIR + listName + " " +
+            File listFile = new File(MFM.getMfmListsDir() + listName + " " +
                     MFM_Data.getInstance().getDataVersion() + ".txt");
             try {
                 PrintWriter pw = new PrintWriter(new FileWriter(listFile));
@@ -181,11 +181,11 @@ class MFMListActions {
     static void listtoDAT() {
         final String listName = pickList(true, "Select list for DAT");
         if (listName != null) {
-            MFM.logger.addToList("DAT for " + listName + " is being created and saved to file", true);
+            MFM.getLogger().addToList("DAT for " + listName + " is being created and saved to file", true);
             SortedSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
             try {
                 Datafile datafile = MFM_DATmaker.generateDAT(listName, list);
-                PersistUtils.saveDATtoFile(datafile, MFM.MFM_LISTS_DIR + listName +
+                PersistUtils.saveDATtoFile(datafile, MFM.getMfmListsDir() + listName +
                         "(" + MFM_Data.getInstance().getDataVersion() + ").dat");
             } catch (ParserConfigurationException | TransformerException | JAXBException e) {
                 e.printStackTrace();
@@ -253,7 +253,7 @@ class MFMListActions {
 
     private static void saveFilteredDAT(Datafile inputDAT, Set<String> list, String name) {
         try {
-            PersistUtils.saveDATtoFile(filterDAT(inputDAT, list), MFM.MFM_LISTS_DIR + name + "-filtered.xml");
+            PersistUtils.saveDATtoFile(filterDAT(inputDAT, list), MFM.getMfmListsDir() + name + "-filtered.xml");
         } catch (ParserConfigurationException |
                 TransformerException | JAXBException e) {
             e.printStackTrace();
@@ -265,7 +265,7 @@ class MFMListActions {
     }
 
     private static File pickDAT() {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_DIR);
+        JFileChooser fileChooser = new JFileChooser(MFM.getMfmDir());
         fileChooser.setPreferredSize(new Dimension(640, 480));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Select DAT File");
@@ -278,7 +278,7 @@ class MFMListActions {
     }
 
     static void listDataToCSV(String list) {
-        File newFile = new File(MFM.MFM_LISTS_DIR + list +
+        File newFile = new File(MFM.getMfmListsDir() + list +
                 MFM_Data.getInstance().getDataVersion() + "_data.csv");
         SortedSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
         PrintWriter pw;
@@ -297,7 +297,7 @@ class MFMListActions {
     }
 
     static String importList(Container container) {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_LISTS_DIR);
+        JFileChooser fileChooser = new JFileChooser(MFM.getMfmListsDir());
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.showDialog(null, JFileChooser.APPROVE_SELECTION);
         File file = fileChooser.getSelectedFile();
@@ -310,7 +310,7 @@ class MFMListActions {
         }
 
         if (lines == null || lines.isEmpty()) {
-            MFM.logger.out("List to import was empty! File was " + file.getName());
+            MFM.getLogger().out("List to import was empty! File was " + file.getName());
             return null;
         }
 
@@ -340,7 +340,7 @@ class MFMListActions {
     }
 
     private static File pickListFile() {
-        JFileChooser fileChooser = new JFileChooser(MFM.MFM_DIR);
+        JFileChooser fileChooser = new JFileChooser(MFM.getMfmDir());
         fileChooser.setPreferredSize(new Dimension(640, 480));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Select filter List File");
@@ -354,8 +354,8 @@ class MFMListActions {
 
     @SuppressWarnings("unchecked")
     private static void resourcestoFile(String list, TreeMap<String, Object> files) {
-        MFM.logger.addToList(list + " resources are being saved to file", true);
-        File listFile = new File(MFM.MFM_LISTS_DIR + list + " " +
+        MFM.getLogger().addToList(list + " resources are being saved to file", true);
+        File listFile = new File(MFM.getMfmListsDir() + list + " " +
                 MFM_Data.getInstance().getDataVersion() + "_Resources.txt");
         int counter = 1;
         try {
@@ -418,7 +418,7 @@ class MFMListActions {
      */
     static void listDataToJSON(String list) {
 
-        File newFile = new File(MFM.MFM_LISTS_DIR + list + "_" +
+        File newFile = new File(MFM.getMfmListsDir() + list + "_" +
                 MFM_Data.getInstance().getDataVersion() + "_data.json");
         final SortedSet<String> playList = MFMPlayLists.getInstance().getPlayList(list);
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -490,7 +490,7 @@ class MFMListActions {
         if (copy) {
             infoPanel.showProgress(action);
         }
-        MFM.logger.addToList(action + " started", true);
+        MFM.getLogger().addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
             long startTime;
 
@@ -518,7 +518,7 @@ class MFMListActions {
                 }
                 long estimatedTime = (System.nanoTime() - startTime);
                 // System.out.println("Estimated time long is : " + estimatedTime);
-                MFM.logger.addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
+                MFM.getLogger().addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
                         FileUtils.NEWLINE, true);
             }
         };
@@ -532,7 +532,7 @@ class MFMListActions {
 
         final String action = "Scanning Resources";
         infoPanel.showProgress(action);
-        MFM.logger.addToList(action + " started", true);
+        MFM.getLogger().addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
             long startTime;
 
@@ -548,7 +548,7 @@ class MFMListActions {
                 super.done();
                 infoPanel.showMessage(action + " completed");
                 long estimatedTime = (System.nanoTime() - startTime);
-                MFM.logger.addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
+                MFM.getLogger().addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
                         FileUtils.NEWLINE, true);
             }
         };
@@ -570,9 +570,9 @@ class MFMListActions {
         JDialog tempLBdialog = null;
 
         if (baseList.equals(ListBuilderUI.PREVIOUS) &&
-                Paths.get(MFM.MFM_SETTINGS_DIR + LBUI_SER).toFile().exists()) {
+                Paths.get(MFM.getMfmSettingsDir() + LBUI_SER).toFile().exists()) {
             try {
-                tempLBdialog = (JDialog) PersistUtils.loadAnObject(MFM.MFM_SETTINGS_DIR + LBUI_SER);
+                tempLBdialog = (JDialog) PersistUtils.loadAnObject(MFM.getMfmSettingsDir() + LBUI_SER);
                 ListBuilderUI.setController();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -602,7 +602,7 @@ class MFMListActions {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                PersistUtils.saveAnObject(listbuilderDialog, MFM.MFM_SETTINGS_DIR + LBUI_SER);
+                PersistUtils.saveAnObject(listbuilderDialog, MFM.getMfmSettingsDir() + LBUI_SER);
             }
         });
 

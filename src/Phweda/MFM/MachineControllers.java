@@ -24,9 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -35,8 +33,7 @@ import java.util.stream.Stream;
  * Date: 9/16/2015
  * Time: 7:34 PM
  */
-// TODO needs rename: MAMEControllers ? MachineControllers ?
-public class Controllers implements Serializable {
+public class MachineControllers implements Serializable {
 
     public static final String TYPE = "type";
     public static final String WAYS = "ways";
@@ -60,7 +57,7 @@ public class Controllers implements Serializable {
     public static final String STICK = "stick";
     public static final String TRACKBALL = "trackball";
     public static final String TRIPLEJOY = "triplejoy";
-    private static Controllers ourInstance;
+    private static MachineControllers ourInstance;
     private static TreeMap<Integer, TreeSet<String>> controlMachinesList = new TreeMap<>();
     private static TreeMap<Integer, Phweda.MFM.mame.Control> controls = new TreeMap<>();
 
@@ -70,7 +67,7 @@ public class Controllers implements Serializable {
     private static String[] joysticks = new String[]{"All", "1", "2", "vertical2", "4", "8", "3 (half4)", "5 (half8)"};
     private static String[] doubleJoysticks = new String[]{"All", "2", "vertical2", "4/2", "4", "8", "8/2"};
 
-    private Controllers() {
+    private MachineControllers() {
         populateLabels(MFM_Data.getInstance().getControllerLabelsFile());
     }
 
@@ -84,9 +81,8 @@ public class Controllers implements Serializable {
         if (!file.exists()) {
             return;
         }
-        try {
+        try (Stream<String> lines = Files.lines(file.toPath())) {
             String delimiter = "=";
-            Stream<String> lines = Files.lines(file.toPath());
             lines.filter(line -> line.contains(delimiter))
                     .forEach(line -> {
                         String key = line.split(delimiter)[0].trim();
@@ -99,28 +95,28 @@ public class Controllers implements Serializable {
         }
     }
 
-    public static Controllers getInstance() {
+    public static MachineControllers getInstance() {
         if (ourInstance == null) {
-            ourInstance = new Controllers();
+            ourInstance = new MachineControllers();
         }
         return ourInstance;
     }
 
     /**
-     * Controllers name mapping MAME XML value are keys
+     * MachineControllers name mapping MAME XML value are keys
      *
-     * @return HashMap of common names or null if file not found
+     * @return Map of common names or null if file not found
      */
-    public static TreeMap<String, String> getControllerMAMEtoLabel() {
+    public static SortedMap<String, String> getControllerMAMEtoLabel() {
         return controllerMAMEtoLabel;
     }
 
     /**
-     * Controllers name mapping MAME XML value are keys
+     * MachineControllers name set
      *
-     * @return HashMap of common names or null if file not found
+     * @return Set of common names or null if file not found
      */
-    public static TreeSet<String> getMAMEControllerNames(TreeSet<String> commonLabels) {
+    public static SortedSet<String> getMAMEControllerNames(SortedSet<String> commonLabels) {
         TreeSet<String> labels = new TreeSet<>();
         for (String label : commonLabels) {
             labels.add(controllerLabeltoMAME.get(label));
@@ -133,11 +129,11 @@ public class Controllers implements Serializable {
     }
 
     /**
-     * Controllers reverse name mapping Common names are keys
+     * MachineControllers reverse name mapping Common names are keys
      *
-     * @return HashMap of common names or null if file not found
+     * @return Map of common names or null if file not found
      */
-    public static TreeMap<String, String> getControllerLabeltoMAME() {
+    public static SortedMap<String, String> getControllerLabeltoMAME() {
         return controllerLabeltoMAME;
     }
 
@@ -145,30 +141,9 @@ public class Controllers implements Serializable {
         return controlMachinesList;
     }
 
-    void setControlMachinesList(TreeMap<Integer, TreeSet<String>> controlMachinesList) {
-        Controllers.controlMachinesList = controlMachinesList;
+    static void setControlMachinesList(TreeMap<Integer, TreeSet<String>> controlMachinesList) {
+        MachineControllers.controlMachinesList = controlMachinesList;
     }
-
-/*  NOTE removed in 0.9.5 release as unneeded. Leaving here in case any associated bugs arise
-    // NOTE not sure we need this TODO fixme are we just running in a circle?
-    static TreeMap<Integer, Control> getControls() {
-        return controls;
-    }
-
-
-    static void setControls(TreeMap<Integer, Phweda.MFM.mame.Control> controls) {
-        Controllers.controls = controls;
-    }
-*/
-/*
-        static ArrayList<String> getControllersList() {
-        TreeSet<String> list = new TreeSet<>();
-        for (Integer signature : controls.keySet()) {
-            list.add(controls.get(signature).getType());
-        }
-        return new ArrayList<String>(list);
-    }
-*/
 
     public static String[] getJoysticks() {
         return joysticks;
@@ -182,6 +157,7 @@ public class Controllers implements Serializable {
         return controlMachinesList.get(ourInstance.getSignature(control)).contains(machine);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean checkSignature(int signature) {
         return controlMachinesList.keySet().contains(signature);
     }
@@ -235,7 +211,7 @@ public class Controllers implements Serializable {
     }
 */
 
-    public final void addMachine(ArrayList<String> args, String game) {
+    public final void addMachine(List<String> args, String game) {
         add(getSignature(args), game);
     }
 
@@ -243,9 +219,7 @@ public class Controllers implements Serializable {
         add(getSignature(type), game);
     }
 
-    // fixme this is messy now. Maybe go back and fix in ParseAllMachinesInfo
-    // type ways ways2 ways3
-    final int getSignature(ArrayList<String> args) {
+    final int getSignature(List<String> args) {
         StringBuilder sb = new StringBuilder();
         for (String arg : args) {
             if (!arg.equals("null")) {
@@ -291,7 +265,7 @@ public class Controllers implements Serializable {
         if (!controls.containsKey(hash)) {
             // System.out.println('`' + hash + "\tfor " + type);
             if (MFM.isDebug()) {
-                MFM.logger.addToList('`' + hash + "\tfor " + type);
+                MFM.getLogger().addToList('`' + hash + "\tfor " + type);
             }
             Control control = new Phweda.MFM.mame.Control();
             control.setType(type);
@@ -304,7 +278,7 @@ public class Controllers implements Serializable {
         if (!checkSignature(signature)) {
             // except "doublejoy" -806141341
             if (signature != -806141341) {
-                MFM.logger.addToList("Machine signature not found for: " + machineName + " - " + signature, true);
+                MFM.getLogger().addToList("Machine signature not found for: " + machineName + " - " + signature, true);
             }
             return false;
         }
@@ -316,7 +290,7 @@ public class Controllers implements Serializable {
             if (!checkSignature(signature)) {
                 // except "doublejoy" -806141341
                 if (signature != -806141341) {
-                    MFM.logger.addToList("Machine signature not found for: " + machineName + " - " + signature, true);
+                    MFM.getLogger().addToList("Machine signature not found for: " + machineName + " - " + signature, true);
                 }
                 continue;
             }

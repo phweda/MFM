@@ -20,10 +20,10 @@ package Phweda.MFM;
 
 import Phweda.utils.FileUtils;
 
-import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,18 +32,21 @@ import java.util.Arrays;
  * Time: 1:33 PM
  */
 public class MAMEexe {
-    static MAME_Output MAMEout = new MAME_Output();
-    private static ArrayList<String> args = new ArrayList<String>();
+    static MAME_Output mameOutput = new MAME_Output();
+    private static ArrayList<String> args = new ArrayList<>();
     private static Process process = null;
     private static String directory = "";
 
-    public static void setBaseArgs(String MAMEexe) {
+    private MAMEexe() { // To cover implicit publc constructor
+    }
+
+    public static void setBaseArgs(String mameexe) {
         // Clear previous
         args.clear();
 
-        directory = MAMEexe.substring(0, MAMEexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR));
+        directory = mameexe.substring(0, mameexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR));
         // Put in MAME exe
-        args.add(MAMEexe);
+        args.add(mameexe);
     }
 
     private static void cleanArgs() {
@@ -53,36 +56,27 @@ public class MAMEexe {
         args.add(exe);
     }
 
-    private static Process run(Object output, boolean logging) throws MAME_Exception {
+    private static Process run(Object output, boolean logging) {
 
         ProcessBuilder pb = new ProcessBuilder(args);
-        if (output != null)
-            if (output instanceof File) {
-                if (logging) {
-                    try {
-                        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter((File) output, true)));
-                        pw.println("*************************************************");
-                        pw.println(pb.command().toString());
-                        // Must flush or close otherwise output will be blocked by the PB
-                        pw.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                pb.redirectOutput(ProcessBuilder.Redirect.appendTo((File) output));
-                pb.redirectError(ProcessBuilder.Redirect.appendTo((File) output));
+        if (output instanceof File && logging) {
+            try {
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter((File) output, true)));
+                pw.println("*************************************************");
+                pw.println(pb.command().toString());
+                // Must flush or close otherwise output will be blocked by the PB
+                pw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            pb.redirectOutput(ProcessBuilder.Redirect.appendTo((File) output));
+            pb.redirectError(ProcessBuilder.Redirect.appendTo((File) output));
+        }
         try {
-            MFM.logger.addToList(pb.command().toString(), true);
+            MFM.getLogger().addToList(pb.command().toString(), true);
             System.out.println(pb.command().toString());
             pb.directory(new File(directory));
             process = pb.start();
-
-            if (output == null) {
-                // TODO what about capturing Standard outputstream??
-                //    MAMEout.setInput(process.getErrorStream(), pb.command().toString());
-            }
 
         } catch (IOException exc) {
             exc.printStackTrace();
@@ -91,7 +85,7 @@ public class MAMEexe {
         return process;
     }
 
-    public static Process run(ArrayList<String> args, File output) throws MAME_Exception {
+    public static Process run(List<String> args, File output) {
         setArgs(args);
         return run(output, true);
     }
@@ -100,16 +94,15 @@ public class MAMEexe {
      * @param args    process arguments
      * @param output  file to pipe process output to
      * @param logging to allow for not extraneous MFM output
-     * @return
-     * @throws MAME_Exception
+     * @return MAME process
      */
-    public static Process run(ArrayList<String> args, File output, boolean logging) throws MAME_Exception {
+    public static Process run(List<String> args, File output, boolean logging) {
         setArgs(args);
         return run(output, logging);
     }
 
     // NOTE hack to ensure we do NOT redirect process stream
-    public static Process run(ArrayList<String> args) throws MAME_Exception {
+    public static Process run(List<String> args) {
         setArgs(args);
         return run((Object) "NOPE", false);
     }
@@ -119,26 +112,25 @@ public class MAMEexe {
      *
      * @param arg single argument to MAME
      * @return MAME process
-     * @throws MAME_Exception MAME Exception
      */
-    public static Process run(String arg) throws MAME_Exception {
+    public static Process run(String arg) {
         setArgs(arg);
-        return run((File) null, true);
+        return run(null, true);
     }
 
     /**
-     * This sucks need to figure out do all default to MAMEout????
+     * This sucks need to figure out do all default to mameOutput????
      */
-    public static Process run(String[] args) throws MAME_Exception {
+    public static Process run(String[] args) {
         setArgs(args);
-        return run(MFM.MAMEout, true);
+        return run(MFM.getMameout(), true);
     }
 
-    public static void createConfig() throws MAME_Exception {
+    public static void createConfig() {
         run("-createconfig");
     }
 
-    public static Process runListXML(String arg) throws MAME_Exception {
+    public static Process runListXML(String arg) {
         setArgs("-listxml");
         return run(arg);
     }
@@ -147,7 +139,7 @@ public class MAMEexe {
         MAMEexe.args.addAll(Arrays.asList(args));
     }
 
-    private static void setArgs(ArrayList<String> args) {
+    private static void setArgs(List<String> args) {
         MAMEexe.args.addAll(args);
     }
 
@@ -159,64 +151,23 @@ public class MAMEexe {
         args.add(machine);
     }
 
-    public static String getMAMEexeVersion(){
+    public static String getMAMEexeVersion() {
         Process process = null;
         String output;
         try {
             process = MAMEexe.run("-help");
-        } catch (MAMEexe.MAME_Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         try {
             java.util.Scanner s = new java.util.Scanner(process.getInputStream()).useDelimiter("\\A");  //   process.getInputStream());
             output = s.next();
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
             return "";
         }
         return output;
     }
-
-    /**
-     * Failed attempt at sending key events to Mame exe
-     *
-     * @param pb
-     */
-    private static void sendKeyboard(Process pb) {
-        try {
-            // Robot robot = new Robot();
-
-/*
-                // Simulate a mouse click
-                robot.mousePress(InputEvent.BUTTON1_MASK);
-                robot.mouseRelease(InputEvent.BUTTON1_MASK);
-        */
-/*
-
-            // Simulate a key press
-            robot.keyPress(KeyEvent.VK_LEFT);
-            robot.keyRelease(KeyEvent.VK_RIGHT);
-            robot.keyPress(KeyEvent.VK_LEFT);
-            robot.keyRelease(KeyEvent.VK_RIGHT);
-
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
-*/
-
-            OutputStream out = pb.getOutputStream();
-
-            out.write(KeyEvent.VK_RIGHT);
-            out.write(KeyEvent.VK_LEFT);
-            out.write(KeyEvent.VK_RIGHT);
-            out.write(KeyEvent.VK_LEFT);
-            out.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     private static class MAME_Output {
         String args;
@@ -228,6 +179,7 @@ public class MAMEexe {
         void setInput(InputStream inputStream, String argsIn) throws MAME_Exception {
             if (inputStream == null) {
                 System.err.println("inputStream is NULL");
+                return;
             }
             args = argsIn;
             bis = new BufferedInputStream(inputStream);
@@ -237,8 +189,8 @@ public class MAMEexe {
         private void read() throws MAME_Exception {
             int read = 0;
 
-            for (int i = 0; i < separator.length; i++) {
-                baos.write(separator[i]);
+            for (byte aSeparator : separator) {
+                baos.write(aSeparator);
             }
 
             try {
@@ -266,23 +218,21 @@ public class MAMEexe {
     }
 
     public static class MAME_Exception extends Exception {
-        String MAMEerror = "";
+        String mameerror = "";
 
         MAME_Exception() {
             super();
-            MAMEerror = "Unknown MAME error";
+            mameerror = "Unknown MAME error";
         }
 
         MAME_Exception(String error) {
             super();
-            String output = error.contains("*") ? error.substring(error.lastIndexOf('*') + 1,
-                    error.length()) : error;
-            MAMEerror = output;
+            mameerror = error.contains("*") ? error.substring(error.lastIndexOf('*') + 1) : error;
             //System.out.println(error);
         }
 
         public String getError() {
-            return MAMEerror;
+            return mameerror;
         }
     }
 }

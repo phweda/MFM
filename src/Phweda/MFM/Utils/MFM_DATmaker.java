@@ -56,7 +56,7 @@ public class MFM_DATmaker {
     private static Map<String, Machine> map;
     private static final String NODUMP = "nodump";
     private static final String LISTS_ZIP_FILE_SUFFIX = "_Lists_DATs.zip";
-    private static File DATschemaFile = new File(MFM.MFM_SETTINGS_DIR + "datafile2018.xsd");
+    private static File DATschemaFile = new File(MFM.getMfmSettingsDir() + "datafile2018.xsd");
     public static final String GOOD = "Good";
 
     public static Datafile generateDAT(String listName, Set<String> list) {
@@ -89,7 +89,7 @@ public class MFM_DATmaker {
                 Validator validator = schema.newValidator();
                 validator.validate(new StreamSource(xmlFile));
             } else {
-                MFM.logger.addToList("Failed to find datafile!!! ", true);
+                MFM.getLogger().addToList("Failed to find datafile!!! ", true);
                 return "Failed to find datafile.xsd shoulf be in <MFM root>/Settings";
             }
         } catch (IOException | SAXException e) {
@@ -138,7 +138,7 @@ public class MFM_DATmaker {
                 synchronized (this) {
                     String logMessage = "Savings MFM DATS: " + DATfiles.size() + "\n\n";
                     System.out.println(logMessage);
-                    MFM.logger.addToList(logMessage, true);
+                    MFM.getLogger().addToList(logMessage, true);
 
                     try (ZipOutputStream zipOutputStream =
                                  new ZipOutputStream(new FileOutputStream(zipName))) {
@@ -248,10 +248,10 @@ public class MFM_DATmaker {
     // 186_Lists_DATs.zip
     // 186_ALL_Lists_DATs.zip
     private static String getDATzipName() {
-        StringBuilder sb = new StringBuilder(MFM.MFM_DATA_DIR);
+        StringBuilder sb = new StringBuilder(MFM.getMfmDataDir());
         String dataVersion = MFMSettings.getInstance().getDataVersion();
         // OK just for fun. really should be if/else with no String concat
-        sb.append(dataVersion.contains(MFMSettings.ALL_) ?
+        sb.append(dataVersion.contains(MFMSettings.ALL_UNDERSCORE) ?
                 dataVersion.substring(4) + "_" + "ALL" : dataVersion);
 
         sb.append(LISTS_ZIP_FILE_SUFFIX);

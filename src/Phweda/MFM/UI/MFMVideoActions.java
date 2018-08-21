@@ -56,9 +56,9 @@ class MFMVideoActions {
         File vidsFolder = new File(MFMSettings.getInstance().VIDsFullSetDir() + FileUtils.DIRECTORY_SEPARATOR);
 
         if (MFM.isDebug()) {
-            MFM.logger.addToList(snapFolder.getAbsolutePath() + " : " + vidsFolder.getAbsolutePath()
+            MFM.getLogger().addToList(snapFolder.getAbsolutePath() + " : " + vidsFolder.getAbsolutePath()
                     , true);
-            MFM.logger.addToList(gameName, true);
+            MFM.getLogger().addToList(gameName, true);
         }
 
         // Quit if it is not a directory
@@ -119,7 +119,7 @@ class MFMVideoActions {
                 FileUtils.DIRECTORY_SEPARATOR + machine + ".avi";
         final File machineVideo = new File(path);
         if (machineVideo.exists()) {
-            MFM.logger.addToList(path + " is being cropped", true);
+            MFM.getLogger().addToList(path + " is being cropped", true);
             infoPanel.showProgress("Cropping Video");
 
             SwingWorker sw = new SwingWorker() {
@@ -134,7 +134,7 @@ class MFMVideoActions {
                 protected void done() {
                     super.done();
                     infoPanel.showMessage(path + " has been cropped");
-                    MFM.logger.addToList("Cropping finished", true);
+                    MFM.getLogger().addToList("Cropping finished", true);
                 }
             };
             Thread ffmpegOps = new Thread(sw);
@@ -162,7 +162,7 @@ class MFMVideoActions {
 
         final File file = new File(filePath);
         infoPanel.showProgress(action);
-        MFM.logger.addToList(action + " started", true);
+        MFM.getLogger().addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
             @SuppressWarnings("RedundantThrows")
             @Override
@@ -179,7 +179,7 @@ class MFMVideoActions {
             protected void done() {
                 super.done();
                 infoPanel.showMessage(action + " completed");
-                MFM.logger.addToList(action + " completed", true);
+                MFM.getLogger().addToList(action + " completed", true);
             }
         };
         Thread videoOps = new Thread(sw);

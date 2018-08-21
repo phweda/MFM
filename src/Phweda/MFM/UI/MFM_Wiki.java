@@ -79,7 +79,7 @@ class MFM_Wiki {
      */
     static void listtoWikiTable(String list) {
 
-        try (PrintWriter printWriter = new PrintWriter(MFM.MFM_LISTS_DIR + list + "_" +
+        try (PrintWriter printWriter = new PrintWriter(MFM.getMfmListsDir() + list + "_" +
                 MFM_Data.getInstance().getPublishableDataVersion() + ".wiki")) {
             SortedSet<String> machineSet = MFMPlayLists.getInstance().getPlayList(list);
 
@@ -106,7 +106,7 @@ class MFM_Wiki {
     }
 
     static void statstoWikiTable(Object[][] stats, Object[] headers) {
-        try (PrintWriter printWriter = new PrintWriter(MFM.MFM_LISTS_DIR + "Stats_" +
+        try (PrintWriter printWriter = new PrintWriter(MFM.getMfmListsDir() + "Stats_" +
                 MFM_Data.getInstance().getPublishableDataVersion() + ".wiki")) {
 
             printWriter.println(STATS_TABLE_HEADER + MFM_Data.getInstance().getPublishableDataVersion() + "<br/>"
@@ -132,7 +132,7 @@ class MFM_Wiki {
     }
 
     private static void statsWikiLegend() {
-        try (PrintWriter printWriter = new PrintWriter(MFM.MFM_LISTS_DIR + "STATS_LEGEND.wiki")) {
+        try (PrintWriter printWriter = new PrintWriter(MFM.getMfmListsDir() + "STATS_LEGEND.wiki")) {
             printWriter.println(STATS_LEGEND_HEADER + ROW_SEPARATER);
             for (Map.Entry<String, String> entry : MAME_Stats.STATS_KEY_MAP.entrySet()) {
                 printWriter.println(ROW + entry.getKey().replaceAll(XML_TAG_REGEX, " "));

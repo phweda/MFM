@@ -70,9 +70,9 @@ class CommandDialog extends JDialog {
 
     private void loadCommands() {
 
-        if (Paths.get(MFM.MFM_SETTINGS_DIR + MY_COMMANDS_XML).toFile().exists()) {
+        if (Paths.get(MFM.getMfmSettingsDir() + MY_COMMANDS_XML).toFile().exists()) {
             try {
-                myCommands = (HashMap) PersistUtils.loadAnObjectXML(MFM.MFM_SETTINGS_DIR + MY_COMMANDS_XML);
+                myCommands = (HashMap) PersistUtils.loadAnObjectXML(MFM.getMfmSettingsDir() + MY_COMMANDS_XML);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -130,7 +130,7 @@ class CommandDialog extends JDialog {
                         // Split string on spaces
                         String[] splitArray = command.split("\\s+");
                         MAMEexe.run(splitArray);
-                    } catch (PatternSyntaxException | MAMEexe.MAME_Exception ex) {
+                    } catch (PatternSyntaxException ex) {
                         ex.printStackTrace();
                     }
                 }
@@ -197,7 +197,7 @@ class CommandDialog extends JDialog {
     }
 
     private void persistCommands() {
-        PersistUtils.saveAnObjectXML(myCommands, MFM.MFM_SETTINGS_DIR + MY_COMMANDS_XML);
+        PersistUtils.saveAnObjectXML(myCommands, MFM.getMfmSettingsDir() + MY_COMMANDS_XML);
     }
 
     private class CommandController extends ClickListener {

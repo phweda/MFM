@@ -63,7 +63,7 @@ public class AnalyzeCategories {
 
     private static final String SEPARATOR = "~";
     private static final String MATURE = "mature";
-    private static String savePath = MFM.MFM_CATEGORY_DIR;
+    private static String savePath = MFM.getMfmCategoryDir();
 
     private static Map<String, HashMap<String, String>> catverINImap = new HashMap<>();
     private static TreeMap<String, ArrayList<String>> categoryHierarchy = new TreeMap<>();
@@ -122,8 +122,8 @@ public class AnalyzeCategories {
 
             catverINImap.put("category", machinetoCategoryMap);
             catverINImap.put("version", version);
-            new ParseCatverINI(MFM.MFM_FOLDERS_DIR + MFM_Constants.CATVER_INI_FILENAME, catverINImap).processFile();
-            new ParseRootOnlyINI(MFM.MFM_FOLDERS_DIR + MFM_Constants.ARCADE_INI_FILENAME, arcadeCategoriesMap).processFile();
+            new ParseCatverINI(MFM.getMfmFoldersDir() + MFM_Constants.CATVER_INI_FILENAME, catverINImap).processFile();
+            new ParseRootOnlyINI(MFM.getMfmFoldersDir() + MFM_Constants.ARCADE_INI_FILENAME, arcadeCategoriesMap).processFile();
 
             TreeSet<String> sortedSet = new TreeSet<>(machinetoCategoryMap.values());
             allCategories = new ArrayList<>(sortedSet);
@@ -271,7 +271,7 @@ public class AnalyzeCategories {
     private static void outputToCSV() {
         PrintWriter pw;
         try {
-            pw = new PrintWriter(new File(MFM.MFM_CATEGORY_DIR + "categories.csv"));
+            pw = new PrintWriter(new File(MFM.getMfmCategoryDir() + "categories.csv"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;
@@ -410,6 +410,6 @@ public class AnalyzeCategories {
         categoryListsMap.put(MFMListBuilder.ARCADE_NOMATURE_CATEGORIES, arcadeNoMatureCategories);
         categoryListsMap.put(MFMListBuilder.SYSTEM_NOMATURE_CATEGORIES, systemNoMatureCategories);
 
-        persistCategoriestoFile(MFM.MFM_CATEGORY_DIR + name);
+        persistCategoriestoFile(MFM.getMfmCategoryDir() + name);
     }
 }

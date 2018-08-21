@@ -133,7 +133,7 @@ public class LoadNonMAMEresources {
     private static void loadCatverINI() {
         try {
             if (MFM.isDebug()) {
-                MFM.logger.addToList("In loadCatverINI");
+                MFM.getLogger().addToList("In loadCatverINI");
             }
             Map CatverINImap = new HashMap();
             CatverINImap.put("category", MachinetoCategoryMap);
@@ -148,7 +148,7 @@ public class LoadNonMAMEresources {
     private static void loadNplayersINI() {
         try {
             if (MFM.isDebug()) {
-                MFM.logger.addToList("In loadNplayersINI");
+                MFM.getLogger().addToList("In loadNplayersINI");
             }
             new ParsenPlayerINI(mfmSettings.getnPlayerINI(), nplayers).processFile();
         } catch (FileNotFoundException e) {

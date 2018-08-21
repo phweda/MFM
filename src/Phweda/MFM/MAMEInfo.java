@@ -45,35 +45,33 @@ import static Phweda.MFM.MFMListBuilder.CATEGORY_LISTS_HASHMAP;
  * Date: 11/25/11
  * Time: 2:04 PM
  */
-public class MAMEInfo // We'll just do the individual objects  ** implements Serializable
-{
+public class MAMEInfo {
     private static MAMEInfo ourInstance = null;
 
     private static final String RUNNABLE_MACHINES = "RunnableMachines";
     private static final String CATEGORIES = "Categories";
     private static final String CATEGORYMACHINES = "CategoryMachines";
     private static final String CATEGORYHIERARCHY = "CategoryHierarchy";
-    private static final String CONTROLLERS = "Controllers";
     private static final String CONTROLLERSMACHINES = "ControllerMachines";
 
     private static int runnable;
     private static HashMap<String, HashMap<String, String>> commands; // From -showusage LEGACY
     private static ArrayList<String> allCategories;  // From catver.ini
-    private static HashMap<String, ArrayList<String>> categoryMachines; // From catver.ini
-    private static TreeMap<String, ArrayList<String>> categoryHierarchy; // MFM generated for root allCategories
-    private static Controllers controllers;
+    private static HashMap<String, ArrayList<String>> categoryMachinesMap; // From catver.ini
+    private static TreeMap<String, ArrayList<String>> categoryHierarchyMap; // MFM generated for root allCategories
+    private static MachineControllers machineControllers;
     // Decided to just pre-populate these should really do a doublecheck
     private static String[] numButtons = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"};
     private static TreeSet<Integer> numPlayers = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 8));
 
-    // INIfiles containing: Catver, catlist, custom(GoldenAge), favorites, Genre, Mature, Multimonitor,version
-    private static HashMap<String, Map<String, String>> INIfiles = new HashMap<>(); // Parsed from MAME INIfiles directory
+    // inifiles containing: Catver, catlist, custom(GoldenAge), favorites, Genre, Mature, Multimonitor,version
+    private static HashMap<String, Map<String, String>> inifiles = new HashMap<>(); // Parsed from MAME inifiles directory
     private static TreeSet<String> runnableMachines;
 
     private static HashMap<String, ArrayList<String>> categoryListsMap;
 
     // NOTE with addition of ALL MAME data 10/2016 reverted to XML via JAXB
-    private static transient Mame mame;  // From -listxml now all Machines 10/14/15
+    private static Mame mame;  // From -listxml now all Machines 10/14/15
 
     private static Softwarelists softwareLists = null;
     private static boolean processAll = false; //hold the current state selected by user
@@ -86,7 +84,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         parsing = parse;
         processAll = all;
         if (MFM.isDebug() && allCategories != null) {
-            MFM.logger.addToList("Total categories is : " + allCategories.size());
+            MFM.getLogger().addToList("Total categories is : " + allCategories.size());
         }
         try {
             if (parse) {
@@ -118,14 +116,14 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             loadINIs();
             loadCategoriesMap();
             MFMListBuilder.initLists(parse);
-            MFM_Data.getInstance().persistStaticData(MFM.MFM_DATA_DIR, true);
+            MFM_Data.getInstance().persistStaticData(MFM.getMfmDataDir(), true);
         } catch (Exception exc) {
             if (MFM.isDebug()) {
                 if (parse) {
-                    MFM.logger.addToList("Exception parsing Mame : " +
+                    MFM.getLogger().addToList("Exception parsing Mame : " +
                             exc.getClass().getCanonicalName(), true);
                 } else {
-                    MFM.logger.addToList("Exception loading Mame and data objects : " +
+                    MFM.getLogger().addToList("Exception loading Mame and data objects : " +
                             exc.getClass().getCanonicalName(), true);
                 }
                 exc.printStackTrace();
@@ -157,7 +155,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return parsing;
     }
 
-    public static boolean isProcessAll() {
+    static boolean isProcessAll() {
         return processAll;
     }
 
@@ -192,7 +190,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         message.append(" - All flag is ");
         message.append(isProcessAll());
 
-        MFM.logger.addToList(message.toString(), true);
+        MFM.getLogger().addToList(message.toString(), true);
         if (MFM.isSystemDebug()) {
             System.out.println(message.toString());
         }
@@ -211,20 +209,20 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             MFM_Data.getInstance().setMame(mame);
             MFM_Data.getInstance().setStaticData(RUNNABLE_MACHINES, runnableMachines);
             MFM_Data.getInstance().setStaticData(CATEGORIES, allCategories);
-            MFM_Data.getInstance().setStaticData(CATEGORYHIERARCHY, categoryHierarchy);
+            MFM_Data.getInstance().setStaticData(CATEGORYHIERARCHY, categoryHierarchyMap);
 
-            if (controllers != null) {
+            if (machineControllers != null) {
                 // NOTE removing the Controls from being persisted.
-                //    MFM_Data.getInstance().setStaticData(CONTROLLERS, controllers.getControls());
-                MFM_Data.getInstance().setStaticData(CONTROLLERSMACHINES, controllers.getControlMachinesList());
+                //    MFM_Data.getInstance().setStaticData(CONTROLLERS, machineControllers.getControls());
+                MFM_Data.getInstance().setStaticData(CONTROLLERSMACHINES, machineControllers.getControlMachinesList());
             }
 
-            if (categoryMachines != null) {
-                MFM_Data.getInstance().setStaticData(CATEGORYMACHINES, categoryMachines);
+            if (categoryMachinesMap != null) {
+                MFM_Data.getInstance().setStaticData(CATEGORYMACHINES, categoryMachinesMap);
             }
         } else {
-            MFM.logger.separateLine();
-            MFM.logger.addToList(
+            MFM.getLogger().separateLine();
+            MFM.getLogger().addToList(
                     "EXITING on FATAL error. Unable to load Machines information.\n" +
                             "Check your MAME setup and ensure it is running properly", true);
             System.exit(3);
@@ -233,7 +231,7 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     }
 
     /**
-     * Extract parsed Runnable list, Categories info, Controllers
+     * Extract parsed Runnable list, Categories info, MachineControllers
      */
     private static void getParsedData() {
         runnableMachines = ParseAllMachinesInfo.getRunnable();
@@ -241,8 +239,8 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         if (allCategories != null && !allCategories.isEmpty()) {
             createCatHierarchy(allCategories);
         }
-        categoryMachines = ParseAllMachinesInfo.getCategoryGamesList();
-        controllers = ParseAllMachinesInfo.getControllers();
+        categoryMachinesMap = ParseAllMachinesInfo.getCategoryGamesList();
+        machineControllers = ParseAllMachinesInfo.getMachineControllers();
         softwareLists = ParseAllMachinesInfo.getSoftwarelists();
     }
 
@@ -264,21 +262,19 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
             fullListargs.add("-showusage");
 
             // TODO in memory only File via Path from Files.createtempfile
-            File showusageFile = new File(MFM.MFM_SETTINGS_DIR + "commands.txt");
+            File showusageFile = new File(MFM.getMfmSettingsDir() + "commands.txt");
             try {
                 // Added to overwrite if this text file previously existed
                 //noinspection ResultOfMethodCallIgnored
                 showusageFile.createNewFile();
                 Process process = MAMEexe.run(fullListargs, showusageFile);
                 process.waitFor();
-            } catch (MAMEexe.MAME_Exception e) {
-                e.printStackTrace(MFM.logger.Writer());
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
             // TODO Refactor we're passing in using then resetting commands Hashmap to itself
             // TODO DEBUG
-            ParseCommandList pcl = new ParseCommandList(MFM.MFM_SETTINGS_DIR + "commands.txt", commands);
+            ParseCommandList pcl = new ParseCommandList(MFM.getMfmSettingsDir() + "commands.txt", commands);
             try {
                 //noinspection unchecked
                 commands = (HashMap<String, HashMap<String, String>>) pcl.processFile();
@@ -317,18 +313,18 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
 
     @SuppressWarnings("unchecked")
     private static void loadCaches() {
-        INIfiles = (HashMap<String, Map<String, String>>) MFM_Data.getInstance().getUserInis();
+        inifiles = (HashMap<String, Map<String, String>>) MFM_Data.getInstance().getUserInis();
         runnableMachines = (TreeSet<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
         allCategories = (ArrayList<String>) MFM_Data.getInstance().getStaticData(CATEGORIES);
-        categoryMachines = (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().
+        categoryMachinesMap = (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().
                 getStaticData(CATEGORYMACHINES);
-        categoryHierarchy = (TreeMap<String, ArrayList<String>>)
+        categoryHierarchyMap = (TreeMap<String, ArrayList<String>>)
                 MFM_Data.getInstance().getStaticData(CATEGORYHIERARCHY);
         categoryListsMap =
                 (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().getStaticData(CATEGORY_LISTS_HASHMAP);
 
-        controllers = Controllers.getInstance();
-        controllers.setControlMachinesList((TreeMap<Integer, TreeSet<String>>)
+        machineControllers = MachineControllers.getInstance();
+        machineControllers.setControlMachinesList((TreeMap<Integer, TreeSet<String>>)
                 MFM_Data.getInstance().getStaticData(CONTROLLERSMACHINES));
     }
 
@@ -339,27 +335,16 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     @SuppressWarnings("unchecked")
     private static void loadCategoriesMap() {
         if (categoryListsMap == null) {
-            MFM.logger.addToList("MAMEInfo reloading categoryListsMap", true);
+            MFM.getLogger().addToList("MAMEInfo reloading categoryListsMap", true);
             try {
                 categoryListsMap = (HashMap<String, ArrayList<String>>)
-                        PersistUtils.loadAnObjectXML(MFM.MFM_CATEGORY_DIR + MFM.MFM_CATEGORY_DATA_FILE);
+                        PersistUtils.loadAnObjectXML(MFM.getMfmCategoryDir() + MFM.MFM_CATEGORY_DATA_FILE);
                 MFM_Data.getInstance().setStaticData(CATEGORY_LISTS_HASHMAP, categoryListsMap);
             } catch (FileNotFoundException e) {
-                MFM.logger.addToList("categoryListsMap FAILED to load from file", true);
+                MFM.getLogger().addToList("categoryListsMap FAILED to load from file", true);
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Mame Data Set version
-     *
-     * @return MFM Data Set version
-     * @see MFM_Data::getDataVersion()
-     * @deprecated since 0.85 with multiple Data sets
-     */
-    public static String getVersion() {
-        return MFMSettings.getInstance().getDataVersion();
     }
 
     public static double getVersionDouble() {
@@ -379,16 +364,6 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     public static String[] getNumButtons() {
         return numButtons;
     }
-
-/*  TODO
-    public static TreeMap getMachineList() {
-        return machineList;
-    }
-
-    public static void setMachineList(TreeMap gameListMap) {
-        MAMEInfo.machineList = gameListMap;
-    }
-*/
 
     // Future when we read live
     public static void setNumButtons(String[] buttons) {
@@ -419,16 +394,16 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         runnable = runnableIn;
     }
 
-    static HashMap<String, ArrayList<String>> getCategoryMachines() {
-        return categoryMachines;
+    static HashMap<String, ArrayList<String>> getCategoryMachinesMap() {
+        return categoryMachinesMap;
     }
 
-    public static Controllers getControllers() {
-        return controllers;
+    public static MachineControllers getMachineControllers() {
+        return machineControllers;
     }
 
-    static TreeMap<String, ArrayList<String>> getCategoryHierarchy() {
-        return categoryHierarchy;
+    static TreeMap<String, ArrayList<String>> getCategoryHierarchyMap() {
+        return categoryHierarchyMap;
     }
 
     public static Machine getMachine(String machineName) {
@@ -465,8 +440,8 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
         return softwareLists.getSoftwarelistsMap().containsKey(listName);
     }
 
-    public static HashMap<String, Map<String, String>> getINIfiles() {
-        return INIfiles;
+    public static Map<String, Map<String, String>> getInifiles() {
+        return inifiles;
     }
 
     static HashMap<String, ArrayList<String>> getCategoryListsMap() {
@@ -476,33 +451,33 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
     // TODO should we replace this with the newer AnalyzeCategories class??
     private static void createCatHierarchy(ArrayList<String> categories) {
         if (MFM.isDebug()) {
-            MFM.logger.addToList("Categories count is : " + categories.size());
+            MFM.getLogger().addToList("Categories count is : " + categories.size());
         }
-        categoryHierarchy = new TreeMap<>();
+        categoryHierarchyMap = new TreeMap<>();
         for (String entry : categories) {
             if (MFM.isDebug()) {
-                MFM.logger.addToList("Entry is : " + entry);
+                MFM.getLogger().addToList("Entry is : " + entry);
             }
             if (entry.contains("/")) {
                 String key = entry.substring(0, entry.indexOf('/') - 1);
                 // String subKey = entry.substring(index);
                 if (MFM.isDebug()) {
-                    MFM.logger.addToList("Key : " + key + "\tSub category : " + entry);
+                    MFM.getLogger().addToList("Key : " + key + "\tSub category : " + entry);
                 }
-                if (categoryHierarchy.containsKey(key)) {
+                if (categoryHierarchyMap.containsKey(key)) {
                     // Shouldn't need but guess there could be duplicates
-                    if (!categoryHierarchy.get(key).contains(entry)) {
-                        categoryHierarchy.get(key).add(entry);
+                    if (!categoryHierarchyMap.get(key).contains(entry)) {
+                        categoryHierarchyMap.get(key).add(entry);
                     }
                 } else {
                     ArrayList<String> list = new ArrayList<String>();
                     list.add(entry);
-                    categoryHierarchy.put(key, list);
+                    categoryHierarchyMap.put(key, list);
                 }
             } else {
                 // If we haven't previously added it
-                if (!categoryHierarchy.containsKey(entry)) {
-                    categoryHierarchy.put(entry, new ArrayList<String>());
+                if (!categoryHierarchyMap.containsKey(entry)) {
+                    categoryHierarchyMap.put(entry, new ArrayList<String>());
                 }
             }
         }
@@ -526,9 +501,9 @@ public class MAMEInfo // We'll just do the individual objects  ** implements Ser
                 }
 
                 if (!files.isEmpty()) {
-                    INIfiles = ParseAllMachinesInfo.INIfiles(files);
+                    inifiles = ParseAllMachinesInfo.INIfiles(files);
                     // Persist it
-                    MFM_Data.getInstance().persistUserInis(INIfiles);
+                    MFM_Data.getInstance().persistUserInis(inifiles);
                 }
             }
         }

@@ -45,7 +45,7 @@ import java.util.List;
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public class ImagesViewer extends JFrame {
 
-    private File imagesDir = new File(MFM.MFM_DIR + "/Images/");
+    private File imagesDir = new File(MFM.getMfmDir() + "/Images/");
     private JScrollPane scrollPane = new JScrollPane();
     private JPanel mainpanel = new JPanel();
     private ImagePanel imagePanel = new ImagePanel();
@@ -82,7 +82,7 @@ public class ImagesViewer extends JFrame {
         // Release all Native for Garbage Collection
         this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         if (!imagesDir.exists() && !imagesDir.mkdir()) {
-            MFM.logger.out("Images Viewer failed to create /Images/ directory");
+            MFM.getLogger().out("Images Viewer failed to create /Images/ directory");
         }
     }
 
@@ -211,7 +211,7 @@ public class ImagesViewer extends JFrame {
         @Override
         public void windowClosing(WindowEvent e) {
             super.windowClosing(e);
-            MFM.logger.out("Images frame closing");
+            MFM.getLogger().out("Images frame closing");
             frames = null;
         }
     }

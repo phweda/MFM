@@ -48,7 +48,7 @@ public class ParseAllMachinesInfo {
     private static HashMap<String, Map<String, String>> FolderINIfiles = null;
 
     private static ArrayList<String> categoriesList;
-    private static Controllers controllers = Controllers.getInstance();
+    private static MachineControllers machineControllers = MachineControllers.getInstance();
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
 
     /**
@@ -61,7 +61,7 @@ public class ParseAllMachinesInfo {
     public static Mame loadAllMachinesInfo(boolean all) {
         String message = "Parsing with ALL flag: " + all;
         System.out.println(message);
-        MFM.logger.addToList(message + "\nMAME exe is: " + MFMSettings.getInstance().fullMAMEexePath());
+        MFM.getLogger().addToList(message + "\nMAME exe is: " + MFMSettings.getInstance().fullMAMEexePath());
 
         try {
             // Note as of 0.85 we handle all Mame -listxml versions the same
@@ -119,7 +119,7 @@ public class ParseAllMachinesInfo {
             Process process = MAMEexe.run("-listxml");
             InputStream inputStream = process.getInputStream();
             mame = (Mame) jaxbUnmarshaller.unmarshal(inputStream);
-        } catch (JAXBException | MAMEexe.MAME_Exception e) {
+        } catch (JAXBException e) {
             e.printStackTrace();
         }
         return mame;
@@ -190,7 +190,7 @@ public class ParseAllMachinesInfo {
         // NOTE leave in to show running in shell window
         System.out.println(categoriesList);
         if (MFM.isDebug()) {
-            MFM.logger.addToList(categoriesList.toString());
+            MFM.getLogger().addToList(categoriesList.toString());
         }
     }
 
@@ -201,7 +201,7 @@ public class ParseAllMachinesInfo {
             for (Control control : machine.getInput().getControl()) {
                 String type = control.getType();
                 if (control.getWays() == null || control.getWays().isEmpty()) {
-                    controllers.addMachine(type, machine.getName());
+                    machineControllers.addMachine(type, machine.getName());
                 } else {
                     ArrayList<String> controlArgs = new ArrayList<>(5);
                     controlArgs.add(type);
@@ -212,7 +212,7 @@ public class ParseAllMachinesInfo {
                     if (control.getWays3() != null) {
                         controlArgs.add(control.getWays3());
                     }
-                    controllers.addMachine(controlArgs, machine.getName());
+                    machineControllers.addMachine(controlArgs, machine.getName());
                     controlArgs.clear();
                 }
             }
@@ -231,7 +231,7 @@ public class ParseAllMachinesInfo {
 
             for (File file : files) {
                 if (MFM.isDebug()) {
-                    MFM.logger.addToList(file.getName());
+                    MFM.getLogger().addToList(file.getName());
                 }
                 if (!file.getName().contains(MFM_Constants.CATVER_INI_FILENAME) &&
                         !file.getName().contains(MFM_Constants.CATVER_FULL_INI_FILENAME) &&
@@ -269,8 +269,8 @@ public class ParseAllMachinesInfo {
         return CategoryMachineListMap;
     }
 
-    public static Controllers getControllers() {
-        return controllers;
+    public static MachineControllers getMachineControllers() {
+        return machineControllers;
     }
 
 }

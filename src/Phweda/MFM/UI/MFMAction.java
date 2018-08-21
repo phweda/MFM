@@ -103,14 +103,14 @@ public class MFMAction extends AbstractAction {
         try {
 
             if (MFM.isDebug()) {
-                MFM.logger.addToList("MFMAction action command is: " + e.getActionCommand());
+                MFM.getLogger().addToList("MFMAction action command is: " + e.getActionCommand());
             }
 
             switch (e.getActionCommand()) {
 
                 case "File Operations":
                     //MFMFileOps.fileOps(((JMenuItem) e.getSource()).getText());
-                    MFM.logger.out("CALL TO FILE OPS FOUND!!");
+                    MFM.getLogger().out("CALL TO FILE OPS FOUND!!");
                     break;
 
                 case HELP:
@@ -141,7 +141,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case PLAYBACK_TO_AVI:
-                    controller.runGame(MAMECommands.PLAYBACKtoAVI);
+                    controller.runGame(MAMECommands.PLAYBACK_TO_AVI);
                     break;
 
                 case PLAY_RECORD_TO_AVI:
@@ -375,7 +375,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case EXIT:
-                    MFM.logger.addToList("MFM Closing on user command", true);
+                    MFM.getLogger().addToList("MFM Closing on user command", true);
                     MFMPlayLists.getInstance().persistPlayLists();
                     MFM.exit();
                     break;

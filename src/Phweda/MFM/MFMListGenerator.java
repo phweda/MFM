@@ -44,12 +44,12 @@ class MFMListGenerator {
         return ourInstance;
     }
 
-    private static TreeMap<String, TreeSet<String>> loadLanguagesINI() {
+    private static TreeMap<String, SortedSet<String>> loadLanguagesINI() {
         try {
             if (MFM.isDebug()) {
-                MFM.logger.addToList("In loadLanguagesINI");
+                MFM.getLogger().addToList("In loadLanguagesINI");
             }
-            TreeMap<String, TreeSet<String>> languagesMap = new TreeMap<>();
+            TreeMap<String, SortedSet<String>> languagesMap = new TreeMap<>();
             new ParseFolderINIs(MFMSettings.getInstance().getLanguageINI(), languagesMap).processFile();
             filterLanguagesMap(languagesMap);
             MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesMap);
@@ -60,7 +60,7 @@ class MFMListGenerator {
         return null;
     }
 
-    private static void filterLanguagesMap(TreeMap<String, TreeSet<String>> languagesMap) {
+    private static void filterLanguagesMap(TreeMap<String, SortedSet<String>> languagesMap) {
         // remove any non-existent machines - some entries in the languages.ini do not exist in many versions
         languagesMap.forEach((key, set) ->
                 set.removeIf(machineName -> !allList.contains(machineName))
@@ -76,7 +76,7 @@ class MFMListGenerator {
         }
 
         if (lists == null) {
-            lists = new HashMap<String, TreeSet<String>>();
+            lists = new HashMap<>();
             for (Map.Entry<String, Machine> entry : allMachines.entrySet()) {
                 Machine machine = entry.getValue();
                 String machineName = machine.getName();
@@ -104,13 +104,13 @@ class MFMListGenerator {
                     systemList.add(machineName);
                 } else {
                     if (MFM.isDebug()) {
-                        MFM.logger.addToList(machineName + " category : " + category +
+                        MFM.getLogger().addToList(machineName + " category : " + category +
                                 " has no entry in Arcade or System categories lists.");
                     }
                 }
 
-                if (machine.getDisk().size() > 0) {
-                    CHDList.add(machineName);
+                if (machine.getDisk().isEmpty()) {
+                    chdList.add(machineName);
                 }
 
                 // Skip other lists if it is NOT runnable
@@ -149,14 +149,14 @@ class MFMListGenerator {
                     clonesList.add(machineName);
                 } else {
                     System.out.println("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
-                    MFM.logger.addToList("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
+                    MFM.getLogger().addToList("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
                 }
 
-                if (machine.getDisplay().size() > 0 || !machine.getScreentype().isEmpty()) {
+                if (machine.getDisplay().isEmpty() || !machine.getScreentype().isEmpty()) {
                     String screenType = null;
                     if (!machine.getScreentype().isEmpty()) {
                         screenType = machine.getScreentype();
-                    } else if (machine.getDisplay().size() > 0) {
+                    } else if (machine.getDisplay().isEmpty()) {
                         screenType = machine.getDisplay().get(0).getType();
                     }
                     if (screenType == null) {
@@ -185,7 +185,7 @@ class MFMListGenerator {
             }
 
             // Which Categories have at least one Machine
-            HashMap<String, ArrayList<String>> categoryGames = MAMEInfo.getCategoryMachines();
+            HashMap<String, ArrayList<String>> categoryGames = MAMEInfo.getCategoryMachinesMap();
             for (Map.Entry<String, ArrayList<String>> categoryEntry : categoryGames.entrySet()) {
                 if (!categoryEntry.getValue().isEmpty()) {
                     categoriesWithMachineList.add(categoryEntry.getKey());
@@ -236,8 +236,8 @@ class MFMListGenerator {
             if (!lcdDisplayList.isEmpty()) {
                 lists.put(LCD, lcdDisplayList);
             }
-            if (!CHDList.isEmpty()) {
-                lists.put(CHD, CHDList);
+            if (!chdList.isEmpty()) {
+                lists.put(CHD, chdList);
             }
             if (!noImpefectList.isEmpty()) {
                 lists.put(NO_IMPERFECT, noImpefectList);
@@ -254,11 +254,11 @@ class MFMListGenerator {
     }
 
     @SuppressWarnings("unchecked")
-    TreeMap<String, TreeSet<String>> getLanguageLists(boolean parsing) {
-        TreeMap<String, TreeSet<String>> languagesListMap;
+    TreeMap<String, SortedSet<String>> getLanguageLists(boolean parsing) {
+        TreeMap<String, SortedSet<String>> languagesListMap;
         if (!parsing) {
             languagesListMap =
-                    (TreeMap<String, TreeSet<String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.LANGUAGESLISTS);
+                    (TreeMap<String, SortedSet<String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.LANGUAGESLISTS);
         } else {
             languagesListMap = loadLanguagesINI();
             // Dependency ALL list must already exists
@@ -270,9 +270,9 @@ class MFMListGenerator {
         return languagesListMap;
     }
 
-    TreeSet<String> generateListfromDAT(Datafile DAT) {
+    TreeSet<String> generateListfromDAT(Datafile datafile) {
         TreeSet<String> list = new TreeSet<>();
-        DAT.getGame().forEach(game -> list.add(game.getName()));
+        datafile.getGame().forEach(game -> list.add(game.getName()));
         return list;
     }
 

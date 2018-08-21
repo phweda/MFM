@@ -31,7 +31,12 @@ import java.util.Calendar;
  * Date: 12/25/11
  * Time: 5:33 PM
  */
+@SuppressWarnings("WeakerAccess")
 public final class MFM_Constants {
+
+    private MFM_Constants() { // To cover implicit public constructor
+    }
+
     public static final String MAME_EXE_DIRECTORY = "MAMEexeDir";
     public static final String MAME_EXE_NAME = "MAMEexeName";
     public static final String MAME_EXE_VERSION = "MAMEexeVersion";
@@ -44,7 +49,7 @@ public final class MFM_Constants {
 
     public static final String EXTRAS_FULL_SET_DIRECTORY = "ExtrasFullSetDir";
     public static final String PLAYSET_ROOT_DIRECTORY = "PlaySetRootDir";
-    // MFM external resource files - catver and nplayers included with MFM package
+    // MFM external resource files - catver, languages, and nplayers included with MFM package
     public static final String CATVER_FULL_INI_FILENAME = "catver_full.ini";
     public static final String CATVER_INI_FILENAME = "catver.ini";
     public static final String ARCADE_INI_FILENAME = "arcade.ini"; // added for parsing categories/updating categories map
@@ -55,16 +60,16 @@ public final class MFM_Constants {
     public static final String VIRTUALDUB_EXE = "VirtualDub exe";
     public static final String FFMPEG_EXE = "ffmpeg exe";
     public static final String FFMPEG_EXE_DIRECTORY = "FFMPEGexeDir";
-    public static final String FFmpeg_INPUT_FOLDER = "FFmpeg Input Folder";
-    public static final String FFmpeg_OUTPUT_FOLDER = "FFmpeg Output Folder";
-    public static final String FFmpeg_MoveAVIto_Folder = "FFmpeg Move AVI to Folder";
+    public static final String FFMPEG_INPUT_FOLDER = "FFmpeg Input Folder";
+    public static final String FFMPEG_OUTPUT_FOLDER = "FFmpeg Output Folder";
+    public static final String FFMPEG_MOVE_AVI_TO_FOLDER = "FFmpeg Move AVI to Folder";
     public static final String MFM_SETTINGS = "MFM Settings";
     public static final String NONMERGED = "Non-Merged";
-    public static final String FFmpeg_SETTINGS = "FFmpeg Settings";
+    public static final String FFMPEG_SETTINGS = "FFmpeg Settings";
     public static final String COMPATIBLE = "compatible";
     public static final String DATA_VERSION = "Data version";
     public static final String NEW_LIST = "-NEW-";
-    public static final char[] alphanum = new char[]{
+    protected static final char[] ALPHANUM = new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
@@ -83,7 +88,7 @@ public final class MFM_Constants {
     public static final int NORMALINT = 0;
     public static final int FONTSIZEINT = 12;
     public static final String LANGUAGESLISTS = "Languages Lists";
-    public static final String MAME_FOLDER_SNAPS = "snaps";
+    public static final String SNAPS = "snaps";
     public static final String ROMS = "roms";
     /*
                 MAME FOLDERS as of 10/1/2016
@@ -125,16 +130,17 @@ public final class MFM_Constants {
     static final String SOFTWARE_LISTS = "Software Lists";
     public static final String SOFTWARE_LIST_SEPARATER = "\u00A8";
     static final String SHOW_XML = "Show XML";
+    public static final String ALL = "All";
 
-    private static final ArrayList<String> folderNames = new ArrayList<String>(Arrays.asList(
-            "artwork", "artwork preview", "bkground", "bosses", "cabdevs", "cabinets", "chds",
-            "covers_SL", "cpanel", "ctrlr", "devices", "ends", "flyers", "folders", "gameover", "howto",
-            "icons", "ini", "logo", "manuals", "manuals_SL", "marquees",
-            "pcb", "roms", "samples", "scores", "select", "snap", "snap_SL", "snaps",
-            "Software Lists", "titles", "titles_SL", "versus", "video", "videosnaps"));
-    // TODO now this is dynamic should move WHERE?
-    public static String[] MAME_FOLDER_NAMES_ARRAY;
-    public static String[] yearsList;
+    private static final ArrayList<String> folderNames = new ArrayList<>(Arrays.asList(
+            ARTWORK, "artwork preview", "bkground", "bosses", "cabdevs", "cabinets", "chds",
+            "covers_SL", "cpanel", "ctrlr", "devices", "ends", "flyers", FOLDERS, "gameover", "howto",
+            "icons", "ini", "logo", MANUALS, MANUALS_SL, "marquees",
+            "pcb", "roms", "samples", "scores", "select", "snap", "snap_SL", SNAPS,
+            SOFTWARE_LISTS, "titles", "titles_SL", "versus", "video", "videosnaps"));
+
+    public static String[] MAME_FOLDER_NAMES_ARRAY; // TODO now this is dynamic should move WHERE?
+    public static final String[] yearsList;
 
     static {
         File folderNamesFile = MFM_Data.getInstance().getFolderNamesFile();
@@ -152,7 +158,7 @@ public final class MFM_Constants {
         int offset = 4;
         int finalYear = Calendar.getInstance().get(Calendar.YEAR) - offset;
         yearsList = new String[finalYear - 1974];
-        yearsList[0] = MFMListBuilder.ALL_YEARS; // bad design fixme maybe should be here
+        yearsList[0] = MFMListBuilder.ALL_YEARS;
         int k = 1;
         for (int i = 1975; i < finalYear; i++) {
             yearsList[k++] = String.valueOf(i);

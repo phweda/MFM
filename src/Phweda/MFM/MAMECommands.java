@@ -21,6 +21,7 @@ package Phweda.MFM;
 import Phweda.MFM.mame.Machine;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -37,26 +38,30 @@ public class MAMECommands {
     public static final String PLAYBACK = "-playback";
     public static final String AVIWRITE = "-aviwrite";
     public static final String SNAPSIZE = "-snapsize";
-    public static final String PLAYBACKtoAVI = PLAYBACK + AVIWRITE;
+    public static final String PLAYBACK_TO_AVI = PLAYBACK + AVIWRITE;
 
     //    private static final String snap1 = "-snapsize ";
-    public static final String snap2 = "x720";
-    private static final String snapArgHorizontal = "960x720";
-    private static final String snapArgVertical = "540x720";
+    public static final String SNAP_2 = "x720";
+    // private static final String SNAP_ARG_HORIZONTAL = "960x720";
+    // private static final String SNAP_ARG_VERTICAL = "540x720";
+
+    private MAMECommands() { // To cover implicit public constructor
+    }
+
 
     /**
      * Record a Games input for later playback
      * <p/>
      * Example commandline  ">mame64 ballbros -record ballbros.inp"
      *
-     * @param gameName
+     * @param machineName Machine to play and record to inp
      * @return Arguments list
      */
-    public static ArrayList<String> recordGame(String gameName) {
-        ArrayList<String> args = new ArrayList<String>(3);
-        args.add(gameName);
+    public static List<String> recordGame(String machineName) {
+        ArrayList<String> args = new ArrayList<>(3);
+        args.add(machineName);
         args.add(RECORD);
-        args.add(gameName + ".inp");
+        args.add(machineName + ".inp");
         return args;
     }
 
@@ -65,14 +70,14 @@ public class MAMECommands {
      * <p/>
      * Example commandline  ">mame64 –playback ballbros.inp"
      *
-     * @param gameName
+     * @param machineName Machine to playback from INP
      * @return Arguments list
      */
-    public static ArrayList<String> playbackGame(String gameName) {
-        ArrayList<String> args = new ArrayList<String>(3);
+    public static List<String> playbackGame(String machineName) {
+        ArrayList<String> args = new ArrayList<>(3);
         args.add(PLAYBACK);
-        args.add(gameName + ".inp");
-        args.add(gameName);
+        args.add(machineName + ".inp");
+        args.add(machineName);
         return args;
     }
 
@@ -82,24 +87,17 @@ public class MAMECommands {
      * Example commandline  ">mame64 -pb ballbros.inp -aviwrite ballbros.avi ballbros"
      * <p/>
      *
-     * @param gameName
+     * @param machineName Machine to run INP and record to AVI
      * @return Arguments list
      */
-    public static ArrayList<String> createAVIfromPlayback(String gameName) {
-        Machine machine = MAMEInfo.getMachine(gameName);
+    public static List<String> createAVIfromPlayback(String machineName) {
 
-        ArrayList<String> args = new ArrayList<String>(5);
+        ArrayList<String> args = new ArrayList<>(5);
         args.add(PLAYBACK);
-        args.add(gameName + ".inp");
+        args.add(machineName + ".inp");
         args.add(AVIWRITE);
-        args.add(gameName + ".avi");
-
-        // NOTE NO SNAPIZE!!!! http://forum.pleasuredome.org.uk/index.php?showtopic=25093&page=6#entry224277
-//        args.add(SNAPSIZE);
-        //    args.add(scale(game) + snap2);
-        //    args.add((game.isVertical() ? "960" : "540") + snap2);
-
-        args.add(gameName);
+        args.add(machineName + ".avi");
+        args.add(machineName);
         return args;
     }
 
@@ -109,14 +107,14 @@ public class MAMECommands {
      * <p/>
      * Example commandline  ">mame64 005 -aviwrite 005.avi"
      *
-     * @param gameName
+     * @param machineName Machine to run and record to AVI
      * @return Arguments list
      */
-    public static ArrayList<String> playGametoAVI(String gameName) {
-        ArrayList<String> args = new ArrayList<String>(3);
-        args.add(gameName);
+    public static List<String> playGametoAVI(String machineName) {
+        ArrayList<String> args = new ArrayList<>(3);
+        args.add(machineName);
         args.add(AVIWRITE);
-        args.add(gameName + ".avi");
+        args.add(machineName + ".avi");
         return args;
     }
 

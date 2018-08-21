@@ -40,7 +40,7 @@ public class MFM_Clean_Logs {
         // 86,400,000 == 1 day in milliseconds
         long deleteTime = System.currentTimeMillis() - 86400000;
 
-        File logsDirectory = new File(MFM.MFM_LOGS_DIR);
+        File logsDirectory = new File(MFM.getMfmLogsDir());
         File[] files = logsDirectory.listFiles();
         if (files != null) {
             for (File child : files) {

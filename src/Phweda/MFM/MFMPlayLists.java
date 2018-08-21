@@ -41,48 +41,49 @@ import static Phweda.MFM.MFMListBuilder.*;
  */
 public class MFMPlayLists implements Serializable {
     private static MFMPlayLists playlists;
-    private TreeMap<String, TreeSet<String>> MFMPlayListsTree = null;
-    private TreeMap<String, TreeSet<String>> languagesLists = null;
-    private Softwarelists softwareLists = null;
-    private TreeMap<String, TreeSet<String>> myPlayListsTree = null;
+    private TreeMap<String, SortedSet<String>> mfmPlayListsTree = null;
+    private transient SortedMap<String, SortedSet<String>> languagesLists = null;
+    private transient Softwarelists softwareLists = null;
+    private TreeMap<String, SortedSet<String>> myPlayListsTree = null;
     private ArrayList<String> allListsNames;
     private ArrayList<String> myListsNames;
 
     private TreeSet<String> allMachineNames = null;
     private TreeSet<String> biosMachineNames = null;
     private TreeSet<String> deviceMachineNames = null;
-    private TreeSet<String> runnableMachineNames = null;
+    private transient SortedSet<String> runnableMachineNames = null;
     private TreeSet<String> noCloneMachineNames = null;
     // Remove as VIDs project is dead
     // private TreeSet<String> VIDsMachineNames = null;
-    private TreeSet<String> clonesMachineNames = null;
-    private TreeSet<String> verticalsMachineNames = null;
-    private TreeSet<String> horizontalsMachineNames = null;
-    private TreeSet<String> cocktailMachineNames = null;
-    private TreeSet<String> simultaneousMachineNames = null;
-    private TreeSet<String> systemMachineNames = null;
-    private TreeSet<String> arcadeMachineNames = null;
-    private TreeSet<String> CHDMachineNames = null;
-    private TreeSet<String> noImperfectMachineNames = null;
+    private transient SortedSet<String> clonesMachineNames = null;
+    private transient SortedSet<String> verticalsMachineNames = null;
+    private transient SortedSet<String> horizontalsMachineNames = null;
+    private transient SortedSet<String> cocktailMachineNames = null;
+    private transient SortedSet<String> simultaneousMachineNames = null;
+    private transient SortedSet<String> systemMachineNames = null;
+    private transient SortedSet<String> arcadeMachineNames = null;
+    private transient SortedSet<String> chdMachineNames = null;
+    private transient SortedSet<String> noImperfectMachineNames = null;
 
-    private TreeSet<String> rasterDisplayMachineNames = null;
-    private TreeSet<String> vectorDisplayMachineNames = null;
-    private TreeSet<String> lcdDisplayMachineNames = null;
+    private transient SortedSet<String> rasterDisplayMachineNames = null;
+    private transient SortedSet<String> vectorDisplayMachineNames = null;
+    private transient SortedSet<String> lcdDisplayMachineNames = null;
 
     // We originally named an All list which does not include BIOS or DEVICES so everything is that combined list
-    public static String EVERYTHING = "Everything";
+    public static final String EVERYTHING = "Everything";
+    private static final String MFM_PLAYLISTS_XML = "MFM_Playlists.xml";
 
     private MFMPlayLists() {
         loadPlayLists();
         populateNames();
     }
 
-    void refreshLists() {
+    static void refreshLists() {
         playlists = new MFMPlayLists();
     }
 
     private void populateNames() {
-        allListsNames = new ArrayList<>(MFMPlayListsTree.keySet());
+        allListsNames = new ArrayList<>(mfmPlayListsTree.keySet());
         allListsNames.addAll(myPlayListsTree.keySet());
         allListsNames.addAll(languagesLists.keySet());
         myListsNames = new ArrayList<>(myPlayListsTree.keySet());
@@ -95,18 +96,18 @@ public class MFMPlayLists implements Serializable {
         return playlists;
     }
 
-    public TreeMap<String, TreeSet> getMFMplaylistsTree() {
-        TreeMap<String, TreeSet> tempMap = new TreeMap<>();
-        for (String key : MFMPlayListsTree.keySet()) {
-            if (MFMPlayListsTree.get(key).size() > 0) {
-                tempMap.put(key, MFMPlayListsTree.get(key));
+    public SortedMap<String, SortedSet<String>> getMFMplaylistsTree() {
+        TreeMap<String, SortedSet<String>> tempMap = new TreeMap<>();
+        for (Map.Entry<String, SortedSet<String>> entry : mfmPlayListsTree.entrySet()) {
+            if (!mfmPlayListsTree.get(entry.getKey()).isEmpty()) {
+                tempMap.put(entry.getKey(), entry.getValue());
             }
         }
         return tempMap;
     }
 
-    public TreeSet<String> getListBuilderPlaylistsKeys() {
-        TreeSet<String> tempSet = new TreeSet<>(MFMPlayListsTree.keySet());
+    public SortedSet<String> getListBuilderPlaylistsKeys() {
+        TreeSet<String> tempSet = new TreeSet<>(mfmPlayListsTree.keySet());
         // Remove non-buildable lists ALL == New see MFM_Menubar
         tempSet.remove(ALL);
         tempSet.remove(BIOS);
@@ -117,8 +118,8 @@ public class MFMPlayLists implements Serializable {
         return tempSet;
     }
 
-    public TreeSet<String> getListEditorKeys() {
-        TreeSet<String> tempSet = new TreeSet<>(MFMPlayListsTree.keySet());
+    public SortedSet<String> getListEditorKeys() {
+        TreeSet<String> tempSet = new TreeSet<>(mfmPlayListsTree.keySet());
         tempSet.remove(ALL);
         tempSet.remove(BIOS);
         tempSet.remove(DEVICES);
@@ -136,18 +137,17 @@ public class MFMPlayLists implements Serializable {
         return list.toArray(new String[0]);
     }
 
-
-    public TreeMap<String, TreeSet<String>> getLanguagesListMap() {
+    public SortedMap<String, SortedSet<String>> getLanguagesListMap() {
         return languagesListsMap;
     }
 
-    public TreeMap<String, TreeSet<String>> getMyPlayListsTree() {
+    public SortedMap<String, SortedSet<String>> getMyPlayListsTree() {
         return myPlayListsTree;
     }
 
-    public TreeMap<String, TreeSet<String>> getALLPlayListsTree() {
-        TreeMap<String, TreeSet<String>> allTree = new TreeMap<>();
-        allTree.putAll(MFMPlayListsTree);
+    public SortedMap<String, SortedSet<String>> getALLPlayListsTree() {
+        TreeMap<String, SortedSet<String>> allTree = new TreeMap<>();
+        allTree.putAll(mfmPlayListsTree);
         allTree.putAll(myPlayListsTree);
         allTree.putAll(languagesLists);
         return allTree;
@@ -171,7 +171,7 @@ public class MFMPlayLists implements Serializable {
         persistPlayLists();
     }
 
-    public Object[] PlayListNames() {
+    public Object[] playListNames() {
         return getAllPlayListNames().toArray();
     }
 
@@ -180,7 +180,7 @@ public class MFMPlayLists implements Serializable {
     }
 
     public Set<String> getMFMListNames() {
-        return MFMPlayListsTree.keySet();
+        return mfmPlayListsTree.keySet();
     }
 
     public String getNextListName(String currentName, boolean next) {
@@ -225,17 +225,17 @@ public class MFMPlayLists implements Serializable {
         return builderNames.toArray(new String[0]);
     }
 
-    public TreeSet<String> getPlayList(String listName) {
+    public SortedSet<String> getPlayList(String listName) {
         // TODO determine if we want Softwarelists included in this output or is it separate?
         // To support JSON and future DB. Get everything
         if (listName.equalsIgnoreCase(EVERYTHING)) {
-            TreeSet<String> everything = new TreeSet<>(MFMPlayListsTree.get(MFMListBuilder.ALL));
-            everything.addAll(MFMPlayListsTree.get(MFMListBuilder.BIOS));
-            everything.addAll(MFMPlayListsTree.get(MFMListBuilder.DEVICES));
+            TreeSet<String> everything = new TreeSet<>(mfmPlayListsTree.get(MFMListBuilder.ALL));
+            everything.addAll(mfmPlayListsTree.get(MFMListBuilder.BIOS));
+            everything.addAll(mfmPlayListsTree.get(MFMListBuilder.DEVICES));
             return everything;
         }
-        if (MFMPlayListsTree.containsKey(listName)) {
-            return MFMPlayListsTree.get(listName);
+        if (mfmPlayListsTree.containsKey(listName)) {
+            return mfmPlayListsTree.get(listName);
         } else if (languagesLists.containsKey(listName)) {
             return languagesLists.get(listName);
         } else if (myPlayListsTree.containsKey(listName)) {
@@ -243,7 +243,7 @@ public class MFMPlayLists implements Serializable {
         } else if (softwareLists.getSoftwarelistsMap().containsKey(listName)) {
             return getSoftwareListEntries(listName);
         }
-        return null;
+        return new TreeSet<>();
     }
 
     private TreeSet<String> getSoftwareListEntries(String softwareListName) {
@@ -274,14 +274,14 @@ public class MFMPlayLists implements Serializable {
     }
 
     private void loadPlayLists() {
-        Path path = Paths.get(MFM.MFM_SETTINGS_DIR + "MFM_Playlists.xml");
+        Path path = Paths.get(MFM.getMfmSettingsDir() + MFM_PLAYLISTS_XML);
         if (path.toFile().exists()) {
             try {
-                myPlayListsTree = (TreeMap<String, TreeSet<String>>) PersistUtils.loadAnObjectXML(
-                        MFM.MFM_SETTINGS_DIR + "MFM_Playlists.xml");
+                myPlayListsTree = (TreeMap<String, SortedSet<String>>) PersistUtils.loadAnObjectXML(
+                        MFM.getMfmSettingsDir() + MFM_PLAYLISTS_XML);
 
             } catch (Exception e) {
-                e.printStackTrace(MFM.logger.Writer());
+                e.printStackTrace(MFM.getLogger().writer());
             }
         }
         if (myPlayListsTree == null) {
@@ -289,17 +289,17 @@ public class MFMPlayLists implements Serializable {
         }
         // We retrieve the built in Machine lists each time
         // They are persisted by MAMEInfo in MFM_Data
-        boolean ALL = MFMSettings.getInstance().getDataVersion().contains("ALL");
+        boolean all = MFMSettings.getInstance().getDataVersion().contains(MFMListBuilder.ALL);
         if (allMachineNames == null) {
             if (MFMListBuilder.getAllList() == null) {
-                MFM.logger.addToList("MFMListBuilder is null in MFMPlayLists");
-                MFM.logger.addToList(Arrays.toString(Thread.currentThread().getStackTrace()));
+                MFM.getLogger().addToList("MFMListBuilder is null in MFMPlayLists");
+                MFM.getLogger().addToList(Arrays.toString(Thread.currentThread().getStackTrace()));
             }
             allMachineNames = MFMListBuilder.getAllList();
             biosMachineNames = MFMListBuilder.getBiosList();
             deviceMachineNames = MFMListBuilder.getDevicesList();
             // Need to determine by Data Set NOT application flag
-            if (ALL) {
+            if (all) {
                 runnableMachineNames = MFMListBuilder.getRunnableList();
             }
             clonesMachineNames = MFMListBuilder.getClonesList();
@@ -314,61 +314,61 @@ public class MFMPlayLists implements Serializable {
             rasterDisplayMachineNames = MFMListBuilder.getRasterDisplayList();
             vectorDisplayMachineNames = MFMListBuilder.getVectorDisplayList();
             lcdDisplayMachineNames = MFMListBuilder.getLcdDisplayList();
-            CHDMachineNames = MFMListBuilder.getCHDList();
+            chdMachineNames = MFMListBuilder.getChdList();
             noImperfectMachineNames = MFMListBuilder.getNoImperfectList();
         }
-        MFMPlayListsTree = new TreeMap<>();
-        MFMPlayListsTree.put(MFMListBuilder.ALL, allMachineNames);
+        mfmPlayListsTree = new TreeMap<>();
+        mfmPlayListsTree.put(MFMListBuilder.ALL, allMachineNames);
         // NOTE as of 0.85 we have multiple built in lists that DO NOT exist
         if (biosMachineNames != null && !biosMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.BIOS, biosMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.BIOS, biosMachineNames);
         }
         if (deviceMachineNames != null && !deviceMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.DEVICES, deviceMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.DEVICES, deviceMachineNames);
         }
 
-        if (ALL) {
-            MFMPlayListsTree.put(MFMListBuilder.RUNNABLE, runnableMachineNames);
+        if (all) {
+            mfmPlayListsTree.put(MFMListBuilder.RUNNABLE, runnableMachineNames);
         }
-        MFMPlayListsTree.put(MFMListBuilder.CLONE, clonesMachineNames);
-        MFMPlayListsTree.put(MFMListBuilder.NO_CLONE, noCloneMachineNames);
-        //    MFMPlayListsTree.put(MFMListBuilder.PD_VIDS, VIDsMachineNames);
+        mfmPlayListsTree.put(MFMListBuilder.CLONE, clonesMachineNames);
+        mfmPlayListsTree.put(MFMListBuilder.NO_CLONE, noCloneMachineNames);
+        //    mfmPlayListsTree.put(MFMListBuilder.PD_VIDS, VIDsMachineNames);
         if (verticalsMachineNames != null && !verticalsMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.VERTICAL, verticalsMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.VERTICAL, verticalsMachineNames);
         }
         if (horizontalsMachineNames != null && !horizontalsMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.HORIZONTAL, horizontalsMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.HORIZONTAL, horizontalsMachineNames);
         }
         if (cocktailMachineNames != null && !cocktailMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.COCKTAIL, cocktailMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.COCKTAIL, cocktailMachineNames);
         }
         if (simultaneousMachineNames != null && !simultaneousMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.SIMULTANEOUS, simultaneousMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.SIMULTANEOUS, simultaneousMachineNames);
         }
-        MFMPlayListsTree.put(MFMListBuilder.ARCADE, arcadeMachineNames);
+        mfmPlayListsTree.put(MFMListBuilder.ARCADE, arcadeMachineNames);
         if (systemMachineNames != null && !systemMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.SYSTEMS, systemMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.SYSTEMS, systemMachineNames);
         }
         if (rasterDisplayMachineNames != null && !rasterDisplayMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.RASTER, rasterDisplayMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.RASTER, rasterDisplayMachineNames);
         }
         if (vectorDisplayMachineNames != null && !vectorDisplayMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.VECTOR, vectorDisplayMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.VECTOR, vectorDisplayMachineNames);
         }
         if (lcdDisplayMachineNames != null && !lcdDisplayMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.LCD, lcdDisplayMachineNames);
+            mfmPlayListsTree.put(MFMListBuilder.LCD, lcdDisplayMachineNames);
         }
-        if (CHDMachineNames != null && !CHDMachineNames.isEmpty()) {
-            MFMPlayListsTree.put(MFMListBuilder.CHD, CHDMachineNames);
+        if (chdMachineNames != null && !chdMachineNames.isEmpty()) {
+            mfmPlayListsTree.put(MFMListBuilder.CHD, chdMachineNames);
         }
-        MFMPlayListsTree.put(MFMListBuilder.NO_IMPERFECT, noImperfectMachineNames);
+        mfmPlayListsTree.put(MFMListBuilder.NO_IMPERFECT, noImperfectMachineNames);
 
         languagesLists = MFMListBuilder.getLanguagesListsMap();
         softwareLists = MAMEInfo.getSoftwareLists();
     }
 
     public void persistPlayLists() {
-        PersistUtils.saveAnObjectXML(myPlayListsTree, MFM.MFM_SETTINGS_DIR + "MFM_Playlists.xml");
+        PersistUtils.saveAnObjectXML(myPlayListsTree, MFM.getMfmSettingsDir() + MFM_PLAYLISTS_XML);
     }
 
 }

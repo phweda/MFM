@@ -342,7 +342,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
             if (MFM.isSystemDebug()) {
                 System.out.println("ListBuilderUI command is: " + command);
             }
-            MFM.logger.addToList("ListBuilderUI command is: " + command, true);
+            MFM.getLogger().addToList("ListBuilderUI command is: " + command, true);
         }
 
         switch (command) {
@@ -483,7 +483,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
             if (MFM.isSystemDebug()) {
                 System.out.println("ListBuilderUI itemState is: " + e.paramString());
             }
-            MFM.logger.addToList("ListBuilderUI itemState is: " + e.paramString(), true);
+            MFM.getLogger().addToList("ListBuilderUI itemState is: " + e.paramString(), true);
         }
 
         if (e.getSource() == languagesComboBox) {

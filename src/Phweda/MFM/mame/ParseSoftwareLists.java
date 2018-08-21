@@ -46,8 +46,8 @@ class ParseSoftwareLists {
     static void generateSoftwareLists(Softwarelists softwarelists, String directory) {
         TreeSet<Softwarelist> set = new TreeSet<>();
         // Older versions have no software lists
-        if(!Files.exists(Paths.get(directory))){
-            MFM.logger.addToList("No MAME Hash directory found. Softwarelists not parsed.", true);
+        if (!Files.exists(Paths.get(directory))) {
+            MFM.getLogger().addToList("No MAME Hash directory found. Softwarelists not parsed.", true);
             return;
         }
         try {

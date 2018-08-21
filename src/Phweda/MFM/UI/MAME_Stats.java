@@ -103,7 +103,7 @@ class MAME_Stats {
     }
 
     private void saveStatstoFile() {
-        try (PrintWriter pw = new PrintWriter(new File(MFM.MFM_LISTS_DIR +
+        try (PrintWriter pw = new PrintWriter(new File(MFM.getMfmListsDir() +
                 MFM_Data.getInstance().getDataVersion() + "_stats.csv"))) {
             pw.println(getHeaderLine());
             pw.println(getCountsLine());

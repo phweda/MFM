@@ -25,8 +25,8 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 
 import static Phweda.MFM.UI.MFMAction.HELP;
 import static Phweda.MFM.UI.MFMAction.SHOW_LIST;
@@ -80,7 +80,7 @@ class MFM_MenuBar {
         MFMAction mameOutput = new MFMAction(MFMAction.MAME_OUTPUT, null);
         MFMAction mfmErrorLog = new MFMAction(MFMAction.ERROR_LOG, null);
         MFMAction mfmGCLog = null;
-        if (MFM.GCLog != null && MFM.GCLog.exists()) {
+        if (MFM.getGcLog() != null && MFM.getGcLog().exists()) {
             mfmGCLog = new MFMAction(MFMAction.GC_LOG, null);
         }
         MFMAction mfmZipLogs = new MFMAction(MFMAction.ZIP_LOGS, null);
@@ -296,7 +296,7 @@ class MFM_MenuBar {
         myListMenu.removeAll();
 
         JMenuItem item;
-        TreeMap<String, SortedSet<String>> pls = MFMPlayLists.getInstance().getMyPlayListsTree();
+        SortedMap<String, SortedSet<String>> pls = MFMPlayLists.getInstance().getMyPlayListsTree();
         for (String name : pls.keySet()) {
             item = myListMenu.add(mfmActionShowList);
             item.setActionCommand("Show List");
@@ -311,7 +311,7 @@ class MFM_MenuBar {
     private JMenu createMFMLists() {
         JMenu mfmList = new JMenu("MFM Lists");
         JMenuItem item;
-        TreeMap<String, SortedSet<String>> builtinPL = MFMPlayLists.getInstance().getMFMplaylistsTree();
+        SortedMap<String, SortedSet<String>> builtinPL = MFMPlayLists.getInstance().getMFMplaylistsTree();
 
         JMenu softwareLists = new JMenu("Software Lists");
         MenuScroller.setScrollerFor(softwareLists, 20, 50, 3, 3);

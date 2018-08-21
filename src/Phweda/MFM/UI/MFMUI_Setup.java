@@ -56,7 +56,7 @@ public class MFMUI_Setup {
 
     private static void getBaseFrame() {
         frame = new JFrame();
-        frame.setTitle(MFM.MFM_TITLE);
+        frame.setTitle(MFM.getMfmTitle());
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
 
@@ -185,7 +185,7 @@ public class MFMUI_Setup {
         @Override
         public void windowClosing(WindowEvent e) {
             super.windowClosing(e);
-            MFM.logger.addToList("MFM Closing on frame closing command", true);
+            MFM.getLogger().addToList("MFM Closing on frame closing command", true);
             MFM.exit();
         }
     }

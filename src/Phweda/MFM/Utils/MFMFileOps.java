@@ -115,7 +115,7 @@ public class MFMFileOps {
     private static void loadRequiredResources(String machineName) {
         // Get the getMachine object and check for romof and device_ref
         // Find and move those
-        MFM.logger.out("Checking for required parent or device ROMs : " + machineName);
+        MFM.getLogger().out("Checking for required parent or device ROMs : " + machineName);
         Machine machine = MAMEInfo.getMachine(machineName);
 
         List deviceRef;
@@ -194,7 +194,7 @@ public class MFMFileOps {
         TreeSet<File> romsList = (TreeSet<File>) files.get(MFM_Constants.ROMS);
         for (File file : romsList) {
             Path path = Paths.get(file.getAbsolutePath());
-            MFM.logger.out(COPYING_FILE + path.toString() + " -> " + romsDir);
+            MFM.getLogger().out(COPYING_FILE + path.toString() + " -> " + romsDir);
             try {
                 if (romsDir != null) {
                     if (path.toFile().isDirectory()) {
@@ -203,7 +203,7 @@ public class MFMFileOps {
                         FileUtils.copyFile(path, romsDir, true);
                     }
                 } else {
-                    MFM.logger.out("!!!!! copying resources found no 'roms' directory in your Playset location");
+                    MFM.getLogger().out("!!!!! copying resources found no 'roms' directory in your Playset location");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -228,7 +228,7 @@ public class MFMFileOps {
         TreeSet<File> chdList = (TreeSet<File>) files.get(MFM_Constants.CHDS);
         for (File file : chdList) {
             Path path = Paths.get(file.getAbsolutePath());
-            MFM.logger.out(COPYING_FILE + path.toString() + " -> " + chdsDir);
+            MFM.getLogger().out(COPYING_FILE + path.toString() + " -> " + chdsDir);
             try {
                 if (!path.toFile().isDirectory()) {
                     // Create directory to maintain Folder/CHDfile structure
@@ -257,16 +257,16 @@ public class MFMFileOps {
                 if (created) {
                     mfmSettings.getPlaySetDirectories().put(folder, extrasDirFile.getAbsolutePath());
                 } else {
-                    MFM.logger.out("Failed to create Playset directory while copying resources");
+                    MFM.getLogger().out("Failed to create Playset directory while copying resources");
                 }
             }
             for (String zipentry : zippedExtraFiles) {
-                MFM.logger.out("Copying zipped File : " + zipentry + " -> " + extrasDir);
+                MFM.getLogger().out("Copying zipped File : " + zipentry + " -> " + extrasDir);
 
                 boolean copied = ZipUtils.extractFile(zipFile.toPath(), zipentry,
                         Paths.get(extrasDir + FileUtils.DIRECTORY_SEPARATOR + zipentry));
                 if (!copied) {
-                    MFM.logger.out("FAILED copying zipped File : " + zipentry + " -> " + extrasDir);
+                    MFM.getLogger().out("FAILED copying zipped File : " + zipentry + " -> " + extrasDir);
                 }
             }
         }
@@ -278,7 +278,7 @@ public class MFMFileOps {
 
             for (File file : extraFiles) {
                 Path path = Paths.get(file.getAbsolutePath());
-                MFM.logger.out(COPYING_FILE + path.toString() + " -> " + extrasDir);
+                MFM.getLogger().out(COPYING_FILE + path.toString() + " -> " + extrasDir);
                 try {
                     if (extrasDir != null) {
                         if (path.toFile().isDirectory()) {
@@ -297,7 +297,7 @@ public class MFMFileOps {
     // TODO clean up this old mess
     private static void moveFilesOLD(ArrayList<Path> filesList) {
         for (Path path : filesList) {
-            MFM.logger.out("Copying File source path is  : " + path.toString());
+            MFM.getLogger().out("Copying File source path is  : " + path.toString());
             String dir = null;
             // If ZIP it could be a sample or artwork too!!
             if (path.toString().endsWith(".zip") || path.toString().endsWith(".7z")) {
@@ -353,7 +353,7 @@ public class MFMFileOps {
             // Ensure search results are cleared for succeeding calls
             ff.clear();
         } catch (IOException e) {
-            e.printStackTrace(MFM.logger.writer());
+            e.printStackTrace(MFM.getLogger().writer());
         }
         return map;
     }
@@ -371,7 +371,7 @@ public class MFMFileOps {
                 ff.clear();
             }
         } catch (IOException e) {
-            e.printStackTrace(MFM.logger.writer());
+            e.printStackTrace(MFM.getLogger().writer());
         }
         return path;
     }
