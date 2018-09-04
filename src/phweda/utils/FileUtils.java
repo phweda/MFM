@@ -16,10 +16,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package phweda.utils;
+package Phweda.utils;
 
-import phweda.mfm.MFM;
-import phweda.mfm.MFM_Constants;
+import Phweda.MFM.MFM;
+import Phweda.MFM.MFM_Constants;
 
 import java.awt.*;
 import java.io.*;
@@ -27,7 +27,6 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,6 +46,8 @@ public class FileUtils {
     public static final char SLASH = '/';
     public static final String DIRECTORY_SEPARATOR = File.separator;
     public static final String NEWLINE = System.getProperty("line.separator");
+    public static final char TAB = '\t';
+
     public static final String ZIPSUFFIX = ".zip";
 
     /* Used to limit search depth. 20 should be more than sufficient*/
@@ -129,7 +130,7 @@ public class FileUtils {
                 fileContents.append(line);
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace(MFM.logger.writer());
+            e.printStackTrace(MFM.getLogger().writer());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -339,7 +340,7 @@ public class FileUtils {
         static final TreeSet<String> extrasDirectories = new TreeSet<>(
                 Arrays.asList(MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
         static NavigableMap<String, File> cache;
-        static TreeMap<String, TreeMap<String, File>> extrasCache;
+        static SortedMap<String, SortedMap<String, File>> extrasCache;
         static boolean directoryOnly = false;
         static boolean extras = false;
         static boolean softwarelistCHDs = false;
@@ -360,7 +361,7 @@ public class FileUtils {
             softwarelistCHDs = false;
         }
 
-        public NavigableMap<String, TreeMap<String, File>> cacheExtrasFiles(Path root) {
+        public SortedMap<String, SortedMap<String, File>> cacheExtrasFiles(Path root) {
             extras = true;
             directoryOnly = false;
             extrasCache = new TreeMap<>();
@@ -426,7 +427,7 @@ public class FileUtils {
                 }
                 cache.put(key, directory);
             } else if (!extras) {
-                MFM.logger.addToList("FileUtils 363: " + dir + " does not exist.");
+                MFM.getLogger().addToList("FileUtils 363: " + dir + " does not exist.");
             }
             return CONTINUE;
         }
@@ -448,10 +449,10 @@ public class FileUtils {
                         file.getAbsolutePath().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR));
                 // Find which Extras folder is contained in the path and add file to that map
                 for (String folderName : extrasDirectories) {
-                    if (folderName.equalsIgnoreCase(MFM_Constants.MAME_FOLDER_SNAPS)) {
+                    if (folderName.equalsIgnoreCase(MFM_Constants.SNAPS)) {
                         continue;
                     }
-                    if (filePath.contains(folderName) && !filePath.contains(MFM_Constants.MAME_FOLDER_SNAPS)) {
+                    if (filePath.contains(folderName) && !filePath.contains(MFM_Constants.SNAPS)) {
                         try {
                             // TODO needs testing!!!! 3/14/16
                             // fixme is this conditional extraneous? Does it HAVE to be the parent?
@@ -546,12 +547,12 @@ public class FileUtils {
         }
 
         @SuppressWarnings("unchecked")
-        public static List<Path> files() {
+        public static ArrayList<Path> files() {
             return (ArrayList<Path>) files.clone();
         }
 
         @SuppressWarnings("unchecked")
-        public static Map<String, String> directories() {
+        public static HashMap<String, String> directories() {
             return (HashMap<String, String>) directories.clone();
         }
 

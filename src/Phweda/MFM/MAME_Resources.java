@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * MAME_Resources detects and stores the ROMs CHDs and Extras files from the User's entered sets
  */
-@SuppressWarnings("squid:S1845")
+@SuppressWarnings({"squid:S1845", "unchecked"})
 public class MAME_Resources {
 
     public static final String EXTRAS = "extras";
@@ -56,10 +56,10 @@ public class MAME_Resources {
             MAMEInfo.getSoftwareLists().getSoftwarelistsMap();
     private static final FileUtils.MFMcacheResourceFiles cacheResourceFiles = new FileUtils.MFMcacheResourceFiles();
     private static MAME_Resources ourInstance = new MAME_Resources();
-    private static TreeMap<String, Object> persistCaches;
-    private static TreeMap<String, TreeMap<String, File>> romsChdsCache;
-    private static TreeMap<String, TreeMap<String, File>> extrasResourceCache;
-    private static TreeMap<String, TreeMap<String, String>> zipExtrasResourceCache;
+    private static SortedMap<String, Object> persistCaches;
+    private static SortedMap<String, SortedMap<String, File>> romsChdsCache;
+    private static SortedMap<String, SortedMap<String, File>> extrasResourceCache;
+    private static SortedMap<String, SortedMap<String, String>> zipExtrasResourceCache;
     private static StringBuilder listResourceLog;
 
     private static MFMSettings mfmSettings = MFMSettings.getInstance();
@@ -94,7 +94,7 @@ public class MAME_Resources {
 
     private static void logScanResults() {
         StringBuilder sb = new StringBuilder("RESOURCE SCAN results:\n");
-        for (Map.Entry<String, TreeMap<String, File>> entry : romsChdsCache.entrySet()) {
+        for (Map.Entry<String, SortedMap<String, File>> entry : romsChdsCache.entrySet()) {
             sb.append(entry.getKey());
             sb.append(" : ");
             sb.append(entry.getValue().size());
@@ -145,7 +145,7 @@ public class MAME_Resources {
 
     private static void getMachineResources(String itemName, TreeMap<String, Object> resources) {
         Machine machine = machines.get(itemName);
-        Software software = null;
+        Software software;
         if (machine == null && itemName.contains(MFM_Constants.SOFTWARE_LIST_SEPARATER)) {
 
             String[] split = itemName.split(MFM_Constants.SOFTWARE_LIST_SEPARATER);
@@ -173,7 +173,7 @@ public class MAME_Resources {
             }
 
             // Has CHD
-            if (machine.getDisk().size() > 0) {
+            if (!machine.getDisk().isEmpty()) {
                 ((TreeSet<File>) resources.get(MFM_Constants.CHDS)).addAll(getMachineCHDFiles(machine));
             }
 
@@ -182,7 +182,7 @@ public class MAME_Resources {
             }
 
             // NOTE assumption is that all Devices are ROMS
-            if (machine.getDeviceRef().size() > 0) {
+            if (!machine.getDeviceRef().isEmpty()) {
                 ((TreeSet<File>) resources.get(MFM_Constants.ROMS)).addAll(getDeviceFiles(machine));
             }
 
@@ -199,7 +199,7 @@ public class MAME_Resources {
 
 
     private static File getMachineROMFile(String machineName) {
-        TreeMap<String, File> romFiles = romsChdsCache.get(MFM_Constants.ROMS_FULL_SET_DIRECTORY);
+        SortedMap<String, File> romFiles = romsChdsCache.get(MFM_Constants.ROMS_FULL_SET_DIRECTORY);
         if (romFiles.containsKey(machineName)) {
             return romFiles.get(machineName);
         } else {
@@ -213,11 +213,11 @@ public class MAME_Resources {
     }
 
     private static ArrayList<File> getMachineCHDFiles(Machine machine) {
-        TreeMap<String, File> CHDFiles = romsChdsCache.get(MFM_Constants.CHDS_FULL_SET_DIRECTORY);
-        ArrayList<File> chds = new ArrayList<File>();
+        SortedMap<String, File> chdFiles = romsChdsCache.get(MFM_Constants.CHDS_FULL_SET_DIRECTORY);
+        ArrayList<File> chds = new ArrayList<>();
         for (Disk disk : machine.getDisk()) {
-            if (CHDFiles.containsKey(disk.getName())) {
-                chds.add(CHDFiles.get(disk.getName()));
+            if (chdFiles.containsKey(disk.getName())) {
+                chds.add(chdFiles.get(disk.getName()));
             } else {
                 listResourceLog.append("FAILED to find CHD ");
                 listResourceLog.append(disk);
@@ -230,8 +230,8 @@ public class MAME_Resources {
     }
 
     private static void getMachineSoftwareListFiles(Machine machine, Map resources) {
-        TreeMap<String, File> listCHDFiles = romsChdsCache.get(MFM_Constants.SOFTWARELIST_CHDS_FULL_SET_DIRECTORY);
-        TreeMap<String, File> listROMFiles = romsChdsCache.get(MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY);
+        SortedMap<String, File> listCHDFiles = romsChdsCache.get(MFM_Constants.SOFTWARELIST_CHDS_FULL_SET_DIRECTORY);
+        SortedMap<String, File> listROMFiles = romsChdsCache.get(MFM_Constants.SOFTWARELIST_ROMS_FULL_SET_DIRECTORY);
 
         for (Softwarelist softwarelist : machine.getSoftwarelist()) {
             if (listCHDFiles.containsKey(softwarelist.getName())) {
@@ -284,15 +284,11 @@ public class MAME_Resources {
                     // inner cast to get Extras TreeMap of outer cast of Arraylist of files
                     ((TreeSet<File>) ((TreeMap<String, Object>) resources.get(EXTRAS)).get(key)).add(
                             extrasResourceCache.get(key).get(machineName));
-                } catch (Exception e) {
-                    if (e instanceof NullPointerException) {
-                        String message = "Machine getExtrasFiles threw NullPointerException for : " + machineName +
-                                " - key was " + key;
-                        System.out.print(message);
-                        MFM.getLogger().out(message);
-                    } else {
-                        e.printStackTrace();
-                    }
+                } catch (NullPointerException e) {
+                    String message = "Machine getExtrasFiles threw NullPointerException for : " + machineName +
+                            " - key was " + key;
+                    System.out.print(message);
+                    MFM.getLogger().out(message);
                 }
             }
             // If no Artwork search ancestors
@@ -366,10 +362,10 @@ public class MAME_Resources {
                 persistCaches = (TreeMap<String, Object>)
                         PersistUtils.loadAnObject(MFM.getMfmSettingsDir() + MFM.MAME_RESOURCES_CACHE);
 
-                romsChdsCache = (TreeMap<String, TreeMap<String, File>>) persistCaches.get(RESOURCECACHE);
-                extrasResourceCache = (TreeMap<String, TreeMap<String, File>>) persistCaches.get(EXTRASRESOURCECACHE);
+                romsChdsCache = (SortedMap<String, SortedMap<String, File>>) persistCaches.get(RESOURCECACHE);
+                extrasResourceCache = (SortedMap<String, SortedMap<String, File>>) persistCaches.get(EXTRASRESOURCECACHE);
                 zipExtrasResourceCache =
-                        (TreeMap<String, TreeMap<String, String>>) persistCaches.get(ZIPEXTRASRESOURCECACHE);
+                        (SortedMap<String, SortedMap<String, String>>) persistCaches.get(ZIPEXTRASRESOURCECACHE);
             } else {
                 MFM.getLogger().addToList("NO RESOURCE CACHE found");
                 persistCaches = new TreeMap<>();
@@ -380,11 +376,11 @@ public class MAME_Resources {
         }
     }
 
-    private void saveCache() {
+    private static void saveCache() {
         PersistUtils.saveAnObject(persistCaches, MFM.getMfmSettingsDir() + MFM.MAME_RESOURCES_CACHE);
     }
 
-    public void scan() {
+    public static void scan() {
         // romsChdsCache = new TreeMap<String, TreeMap<String, File>>();
         TreeMap<String, String> roots = mfmSettings.getResourceRoots();
         for (String root : roots.keySet()) {
@@ -426,7 +422,7 @@ public class MAME_Resources {
      * @param list     set of Machine names
      * @return TreeMap of list's resources
      */
-    public TreeMap<String, Object> generateListResources(String listName, SortedSet<String> list) {
+    public static SortedMap<String, Object> generateListResources(String listName, SortedSet<String> list) {
         listResourceLog = new StringBuilder();
         listResourceLog.append("Generating resource list for : ");
         listResourceLog.append(listName);

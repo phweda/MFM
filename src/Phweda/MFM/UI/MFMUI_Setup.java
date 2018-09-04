@@ -26,8 +26,6 @@ import Phweda.MFM.MFM_Constants;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import static Phweda.MFM.UI.MFMUI_Resources.MFM_ICON_PNG;
 
@@ -37,12 +35,17 @@ import static Phweda.MFM.UI.MFMUI_Resources.MFM_ICON_PNG;
  * Date: 10/7/2015
  * Time: 2:27 PM
  */
-public class MFMUI_Setup {
+public final class MFMUI_Setup {
     private static final ImageIcon mfmIcon = MFMUI_Resources.getInstance().getImageIcon(MFM_ICON_PNG);
+    private static final int LOCATION_220 = 220;
+    private static final int LOCATION_260 = 260;
+    private static final int LOCATION_300 = 300;
+    private static final int MFM_BORDER_COLOR = -3407821;
+    private static final double RESIZE_WEIGHT = 0.65;
     private MFM_Components mfmComponents;
-    private static MFMUI_Setup ourInstance = new MFMUI_Setup();
+    private static final MFMUI_Setup ourInstance = new MFMUI_Setup();
     private static JFrame frame;
-    private MFMController controller = new MFMController();
+    private final MFMController controller = new MFMController();
     private JSplitPane mfmMainPane;
     private JComponent leftPane;
 
@@ -62,6 +65,11 @@ public class MFMUI_Setup {
 
     MFMController getController() {
         return controller;
+    }
+
+    void init() {
+        controller.init();
+        MFMAction.setController(controller);
     }
 
     public void loadDataSet() {
@@ -88,7 +96,7 @@ public class MFMUI_Setup {
         }
     }
 
-    public JFrame getFrame() {
+    JFrame getFrame() {
         if (frame == null) {
             getBaseFrame();
         }
@@ -97,7 +105,7 @@ public class MFMUI_Setup {
             System.out.println("MFMUI_Setup getFrame");
         }
 
-        mfmComponents = MFM_Components.getInstance(controller);
+        mfmComponents = MFM_Components.getInstance();
         frame.setJMenuBar(mfmComponents.getMenuBar());
         setupMainView();
         frame.getContentPane().add(MFM_Components.createStatusBar(frame.getWidth()), BorderLayout.SOUTH);
@@ -107,22 +115,22 @@ public class MFMUI_Setup {
         String fontSize = MFMSettings.getInstance().MFMFontSize();
         switch (fontSize) {
             case MFM_Constants.NORMAL:
-                mfmMainPane.setDividerLocation(220);
+                mfmMainPane.setDividerLocation(LOCATION_220);
                 // mfmMainPane.setDividerLocation(0.12d);
                 break;
 
             case MFM_Constants.LARGE:
-                mfmMainPane.setDividerLocation(260);
+                mfmMainPane.setDividerLocation(LOCATION_260);
                 // mfmMainPane.setDividerLocation(0.12d);
                 break;
 
             case MFM_Constants.VERYLARGE:
-                mfmMainPane.setDividerLocation(300);
+                mfmMainPane.setDividerLocation(LOCATION_300);
                 // mfmMainPane.setDividerLocation(0.12d);
                 break;
 
             default:
-                mfmMainPane.setDividerLocation(220);
+                mfmMainPane.setDividerLocation(LOCATION_220);
                 break;
         }
 
@@ -135,7 +143,7 @@ public class MFMUI_Setup {
         mfmMainPane.setBorder(
                 BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(), null,
                         TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,
-                        new Color(-3407821)));
+                        new Color(MFM_BORDER_COLOR)));
         if (MFM.isListOnly()) {
             mfmMainPane.setRightComponent(new JScrollPane(mfmComponents.getMachineListTable()));
         } else {
@@ -150,14 +158,14 @@ public class MFMUI_Setup {
         JSplitPane mfmGamePane = new JSplitPane();
         mfmGamePane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(), null,
                 TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,
-                new Color(-3407821)));
+                new Color(MFM_BORDER_COLOR)));
         mfmGamePane.setOneTouchExpandable(false);
 
         final JScrollPane scrollPane2 = new JScrollPane();
         scrollPane2.setViewportView(mfmComponents.getMachineListTable());
         mfmGamePane.setLeftComponent(scrollPane2);
         mfmGamePane.setRightComponent(mfmComponents.extrasTabbedPane());
-        mfmGamePane.setResizeWeight(.65);
+        mfmGamePane.setResizeWeight(RESIZE_WEIGHT);
 
         mfmMainPane.setRightComponent(mfmGamePane);
     }
@@ -181,12 +189,4 @@ public class MFMUI_Setup {
         mfmMainPane.validate();
     }
 
-    static class MFMWindow extends WindowAdapter {
-        @Override
-        public void windowClosing(WindowEvent e) {
-            super.windowClosing(e);
-            MFM.getLogger().addToList("MFM Closing on frame closing command", true);
-            MFM.exit();
-        }
-    }
 }

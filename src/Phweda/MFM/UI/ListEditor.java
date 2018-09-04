@@ -18,10 +18,7 @@
 
 package Phweda.MFM.UI;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMListBuilder;
-import Phweda.MFM.MFMPlayLists;
+import Phweda.MFM.*;
 import Phweda.MFM.mame.Machine;
 
 import javax.swing.*;
@@ -63,7 +60,7 @@ public class ListEditor implements ActionListener {
     private JCheckBox exclusionCB;
     private JTextField countTextField;
 
-    private static final String CREATE_LIST = "Create List";
+    private static final String CREATE_LIST = MFM_Constants.CREATE_LIST;
     private static final String EDIT_WORKING_LIST = "Edit List";
     private static final String FLIP_VIEW = "Flip View";
     private static final String CLEAR_LIST = "Clear List";

@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package phweda.utils;
+package Phweda.utils;
 
-import phweda.mfm.MFM;
+import Phweda.MFM.MFM;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,12 +51,14 @@ public class ZipUtils {
      * @param fileName   file to extract
      * @param outputFile destination
      */
+    @SuppressWarnings("squid:S3725")
     public static boolean extractFile(Path zipFile, String fileName, Path outputFile) {
         // Wrap the file system in a try-with-resources statement
         // to auto-close it when finished and prevent a memory leak
         try (FileSystem fileSystem = FileSystems.newFileSystem(zipFile, null)) {
             Path fileToExtract = fileSystem.getPath(fileName);
-            if (!fileToExtract.toFile().exists()) { // LinkOption.NOFOLLOW_LINKS
+            // Ignore SonarLint as the underlying Windows implementation of .toFile() has not been implemented
+            if (!Files.exists(fileToExtract)) { // LinkOption.NOFOLLOW_LINKS
                 if (MFM.isSystemDebug()) {
                     System.out.println("Zip file not found is: " + fileToExtract);
                 }
@@ -68,7 +70,7 @@ public class ZipUtils {
             }
             Files.copy(fileToExtract, outputFile, StandardCopyOption.REPLACE_EXISTING);
             return true;
-        } catch (Exception exc) {
+        } catch (IOException exc) {
             exc.printStackTrace();
             return false;
         }
@@ -93,8 +95,8 @@ public class ZipUtils {
         return null;
     }
 
-    public static SortedMap<String, TreeMap<String, String>> getZipEntryNames(Map<String, File> extrasZipFilesMap) {
-        final TreeMap<String, TreeMap<String, String>> zipEntries = new TreeMap<>();
+    public static SortedMap<String, SortedMap<String, String>> getZipEntryNames(Map<String, File> extrasZipFilesMap) {
+        final SortedMap<String, SortedMap<String, String>> zipEntries = new TreeMap<>();
         extrasZipFilesMap.forEach((key, file) -> zipEntries.put(key, getZipEntries(file.getAbsolutePath())));
         return zipEntries;
     }

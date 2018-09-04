@@ -21,6 +21,7 @@ package Phweda.MFM.UI;
 import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MAMEexe;
 import Phweda.MFM.MFM;
+import Phweda.MFM.MFM_Constants;
 import Phweda.utils.ClickListener;
 import Phweda.utils.PersistUtils;
 
@@ -31,9 +32,13 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
+
+import static Phweda.MFM.MFM_Constants.NULL_STRING;
+import static Phweda.MFM.MFM_Constants.SPACE_STRING;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,8 +48,10 @@ import java.util.regex.PatternSyntaxException;
  */
 @SuppressWarnings({"squid:MaximumInheritanceDepth", "WeakerAccess"})
 class CommandDialog extends JDialog {
-    private static final String MAMECOMMANDS = "MAME Command Builder";
     private static final String MY_COMMANDS_XML = "myCommands.xml";
+    public static final String RUN_COMMAND = "Run Command";
+    public static final String SAVE_COMMAND = "Save Command";
+    public static final String MAME_COMMAND_BUILDER = "MAME Command Builder";
 
     private JTextField commandTextField;
     private JComboBox<String> commandsComboBox;
@@ -53,7 +60,7 @@ class CommandDialog extends JDialog {
     private JTree commandTree;
 
     private CommandDialog(Frame frame) {
-        super(frame, MAMECOMMANDS);
+        super(frame, MAME_COMMAND_BUILDER);
         loadCommands();
         init();
         setLocationRelativeTo(frame);
@@ -121,7 +128,7 @@ class CommandDialog extends JDialog {
             persistCommands();
         });
 
-        JButton runCommandButton = new JButton("Run Command");
+        JButton runCommandButton = new JButton(RUN_COMMAND);
         runCommandButton.addActionListener(e -> {
                     try {
                         // Run whatever is displayed in the textfield
@@ -146,8 +153,8 @@ class CommandDialog extends JDialog {
             } else if (e.getActionCommand().equals("comboBoxChanged")) {
                 String command = (String) commandsComboBox.getSelectedItem();
                 String value = myCommands.get(command);
-                if (!value.equals("null")) {
-                    commandTextField.setText(value + " ");
+                if (!NULL_STRING.equals(value)) {
+                    commandTextField.setText(value + MFM_Constants.SPACE_CHAR);
                     commandTextField.requestFocus();
                 }
 
@@ -156,14 +163,10 @@ class CommandDialog extends JDialog {
         });
 
         commandButtonPanel.add(commandsComboBox);
-        commandButtonPanel.add(new
-
-                JLabel(" "));
+        commandButtonPanel.add(new JLabel(SPACE_STRING));
         commandButtonPanel.add(saveCommandButton);
         commandButtonPanel.add(runCommandButton);
-        commandButtonPanel.add(new
-
-                JLabel(" "));
+        commandButtonPanel.add(new JLabel(SPACE_STRING));
         commandPanel.add(commandButtonPanel);
 
         commandPanel.setPreferredSize(new
@@ -176,12 +179,12 @@ class CommandDialog extends JDialog {
     private void createCommandTree() {
 
         DefaultMutableTreeNode root;
-        root = new DefaultMutableTreeNode("Commands");
+        root = new DefaultMutableTreeNode(MFM_Constants.COMMANDS);
         commandTree = new JTree(root);
 
         for (Object category : MAMEInfo.Commands().keySet()) {
             DefaultMutableTreeNode categoryNode = new DefaultMutableTreeNode(category);
-            for (Object command : ((HashMap) MAMEInfo.Commands().get(category)).keySet()) {
+            for (Object command : ((Map) MAMEInfo.Commands().get(category)).keySet()) {
 
                 DefaultMutableTreeNode commandNode = new DefaultMutableTreeNode(command +
                         "  ->  " + ((HashMap) MAMEInfo.Commands().get(category)).get(command));
@@ -189,6 +192,7 @@ class CommandDialog extends JDialog {
             }
             root.add(categoryNode);
         }
+
 
         commandTree.addMouseListener(new CommandController());
         this.add(new JScrollPane(commandTree), BorderLayout.CENTER);

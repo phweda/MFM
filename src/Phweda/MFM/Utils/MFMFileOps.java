@@ -30,6 +30,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static Phweda.MFM.MFM_Constants.ROMS;
+import static Phweda.MFM.MFM_Constants.SAMPLES;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Phweda
@@ -40,9 +43,9 @@ import java.util.*;
 /*
  * Provides methods for performing MFM File operations
  */
-public class MFMFileOps {
+public final class MFMFileOps {
 
-    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+    private static final MFMSettings mfmSettings = MFMSettings.getInstance();
     private static final String COPYING_FILE = "Copying File : ";
 
     private MFMFileOps() { // cover implicit public constructor
@@ -125,7 +128,7 @@ public class MFMFileOps {
             return;
         }
 
-        if (machine.getRomof() != null && machine.getRomof().length() > 0) {
+        if ((machine.getRomof() != null) && (machine.getRomof().length() > 0)) {
             if (deviceRef != null) {
                 deviceRef.add(machine.getRomof());
             } else {
@@ -134,7 +137,7 @@ public class MFMFileOps {
             }
         }
 
-        if (deviceRef != null && !deviceRef.isEmpty()) {
+        if ((deviceRef != null) && !deviceRef.isEmpty()) {
             FileUtils.MFMFindFile ff = null;
             for (Object name : deviceRef) {
                 try {
@@ -149,7 +152,7 @@ public class MFMFileOps {
                     e.printStackTrace();
                 }
             }
-            ArrayList<Path> fileList = FileUtils.MFMFindFile.files();
+            Iterable<Path> fileList = FileUtils.MFMFindFile.files();
             // Ensure search results are cleared for succeeding calls
             if (ff != null) {
                 ff.clear();
@@ -164,7 +167,7 @@ public class MFMFileOps {
      *
      * @param files Map of files to move
      */
-    public static void moveFiles(TreeMap<String, Object> files) {
+    public static void moveFiles(SortedMap<String, Object> files) {
 
 
         /**     FROM MAME_Resources
@@ -190,8 +193,8 @@ public class MFMFileOps {
          **/
 
         // ROMs
-        String romsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
-        TreeSet<File> romsList = (TreeSet<File>) files.get(MFM_Constants.ROMS);
+        String romsDir = mfmSettings.getPlaySetDirectories().get(ROMS);
+        Iterable<File> romsList = (Iterable<File>) files.get(ROMS);
         for (File file : romsList) {
             Path path = Paths.get(file.getAbsolutePath());
             MFM.getLogger().out(COPYING_FILE + path.toString() + " -> " + romsDir);
@@ -213,7 +216,7 @@ public class MFMFileOps {
         // CHDs
         String chdsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.CHDS);
         if (chdsDir == null) {
-            chdsDir = mfmSettings.getPlaySetDirectories().get(MFM_Constants.ROMS);
+            chdsDir = mfmSettings.getPlaySetDirectories().get(ROMS);
         }
 
         File chdFile = new File(chdsDir);
@@ -225,7 +228,7 @@ public class MFMFileOps {
             }
         }
 
-        TreeSet<File> chdList = (TreeSet<File>) files.get(MFM_Constants.CHDS);
+        Iterable<File> chdList = (Iterable<File>) files.get(MFM_Constants.CHDS);
         for (File file : chdList) {
             Path path = Paths.get(file.getAbsolutePath());
             MFM.getLogger().out(COPYING_FILE + path.toString() + " -> " + chdsDir);
@@ -295,19 +298,19 @@ public class MFMFileOps {
     }
 
     // TODO clean up this old mess
-    private static void moveFilesOLD(ArrayList<Path> filesList) {
+    private static void moveFilesOLD(Iterable<? extends Path> filesList) {
         for (Path path : filesList) {
             MFM.getLogger().out("Copying File source path is  : " + path.toString());
             String dir = null;
             // If ZIP it could be a sample or artwork too!!
             if (path.toString().endsWith(".zip") || path.toString().endsWith(".7z")) {
 
-                if (path.toString().toLowerCase().contains("roms")) {
-                    dir = mfmSettings.PlaySetDirectories().get("roms");
-                } else if (path.toString().toLowerCase().contains("samples")) {
-                    dir = mfmSettings.PlaySetDirectories().get("samples");
-                } else if (path.toString().toLowerCase().contains("artwork")) {
-                    dir = mfmSettings.PlaySetDirectories().get("artwork");
+                if (path.toString().toLowerCase().contains(ROMS)) {
+                    dir = mfmSettings.PlaySetDirectories().get(ROMS);
+                } else if (path.toString().toLowerCase().contains(SAMPLES)) {
+                    dir = mfmSettings.PlaySetDirectories().get(SAMPLES);
+                } else if (path.toString().toLowerCase().contains(MFM_Constants.ARTWORK)) {
+                    dir = mfmSettings.PlaySetDirectories().get(MFM_Constants.ARTWORK);
                 } else {
                     // TODO how to punt here??
                     // dir = MAMESettings.PlaySetDirectories().get("roms");
@@ -348,10 +351,10 @@ public class MFMFileOps {
     public static HashMap<String, String> findMAMEdirectories(Path root, String[] dirNames) {
         HashMap<String, String> map = null;
         try {
-            FileUtils.MFMFindFile ff = new FileUtils.MFMFindFile(root, dirNames, false, true);
+            FileUtils.MFMFindFile findFile = new FileUtils.MFMFindFile(root, dirNames, false, true);
             map = FileUtils.MFMFindFile.directories();
             // Ensure search results are cleared for succeeding calls
-            ff.clear();
+            findFile.clear();
         } catch (IOException e) {
             e.printStackTrace(MFM.getLogger().writer());
         }
@@ -364,11 +367,11 @@ public class MFMFileOps {
     public static String findMAMEfile(Path root, Path name) {
         String path = null;
         try {
-            FileUtils.MFMFindFile ff = new FileUtils.MFMFindFile(root, name);
+            FileUtils.MFMFindFile findFile = new FileUtils.MFMFindFile(root, name);
             if (FileUtils.MFMFindFile.file() != null) {
                 path = FileUtils.MFMFindFile.file().toString();
                 // Ensure search results are cleared for succeeding calls
-                ff.clear();
+                findFile.clear();
             }
         } catch (IOException e) {
             e.printStackTrace(MFM.getLogger().writer());

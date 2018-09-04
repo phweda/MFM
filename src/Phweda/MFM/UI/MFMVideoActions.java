@@ -36,12 +36,12 @@ import javax.swing.*;
 import java.io.File;
 import java.nio.file.Path;
 
-import static Phweda.MFM.UI.MFMController.showInformation;
-
 /**
- * Factored out of MFMController Oct 2016
+ *
  */
 class MFMVideoActions {
+
+    private static final MFMController controller = MFMUI_Setup.getInstance().getController();
 
     private MFMVideoActions() { // To cover implicit public constructor
     }
@@ -64,7 +64,7 @@ class MFMVideoActions {
         // Quit if it is not a directory
         if ((!vidsFolder.exists() || !vidsFolder.isDirectory()) &&
                 (!snapFolder.exists() || !snapFolder.isDirectory())) {
-            MFMController.showInformation("Video INIfiles", "No snap or videos folder found check your MFM and MAME settings ");
+            controller.showInformation("Video INIfiles", "No snap or videos folder found check your MFM and MAME settings ");
             return;
         }
         File[] snapVIDfiles = snapFolder.listFiles(FileUtils.VideoFilenameFilter);
@@ -93,7 +93,7 @@ class MFMVideoActions {
         if (fullPath != null) {
             FileUtils.openFileFromOS(fullPath);
         } else {
-            showInformation(gameName, "No video found for " + gameName);
+            controller.showInformation(gameName, "No video found for " + gameName);
         }
     }
 
@@ -140,7 +140,7 @@ class MFMVideoActions {
             Thread ffmpegOps = new Thread(sw);
             ffmpegOps.start();
         } else {
-            JOptionPane.showMessageDialog(MFMController.getFrame(), path + "\nNot found.");
+            JOptionPane.showMessageDialog(controller.getFrame(), path + "\nNot found.");
         }
     }
 

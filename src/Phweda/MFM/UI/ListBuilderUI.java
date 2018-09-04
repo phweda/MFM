@@ -34,14 +34,16 @@ import java.awt.event.ItemListener;
 import java.io.Serializable;
 import java.util.*;
 
+import static Phweda.MFM.UI.MFMAction.LIST_EDITOR;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 9/19/2015
  * Time: 1:21 PM
  */
-@SuppressWarnings("squid:S1450")
-public class ListBuilderUI implements ActionListener, ItemListener, Serializable {
+@SuppressWarnings({"squid:S1450", "DuplicateStringLiteralInspection"})
+public final class ListBuilderUI implements ActionListener, ItemListener, Serializable {
 
     private static final ListBuilderUI ourInstance = new ListBuilderUI();
 
@@ -110,10 +112,10 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
 
     private static final String VIEW_ALL_CATEGORIES_COMMAND = "View All Categories";
     private static final String SELECT_ALL_CATEGORIES_COMMAND = "Select All Categories";
-    private static final String ARCADE_ONLY_COMMAND = "Arcade only";
+    private static final String ARCADE_ONLY_COMMAND = "Arcade Only";
     private static final String NO_MATURE_COMMAND = "No Mature";
     private static final String NO_MECHANICAL_COMMAND = "No Mechanical";
-    private static final String SYSTEMS_ONLY_COMMAND = "Systems only";
+    private static final String SYSTEMS_ONLY_COMMAND = "Systems Only";
     private static final String BOTH_COMMAND = "Both";
 
     private static final String ALL_ORIENTATIONS_COMMAND = "All Orientations";
@@ -131,9 +133,8 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
     private static final String VECTOR_COMMAND = "Vector";
     private static final String LCD_COMMAND = "LCD";
 
-    private static final String CREATE_LIST_COMMAND = "Create List";
-    private static final String IMPORT_LIST_COMMAND = "Import List";
-    private static final String LIST_EDITOR_COMMAND = "List Editor";
+    private static final String CREATE_LIST_COMMAND = MFM_Constants.CREATE_LIST;
+    private static final String IMPORT_LIST_COMMAND = MFMAction.IMPORT_LIST;
 
     private static final String ANY_CONTROLS_COMMAND = "AnyControls";
     private static final String ALL_CONTROLS_COMMAND = "AllControls";
@@ -148,26 +149,27 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
 
     private ListBuilderUI() {
         if (listBuilderPanel == null) {
+            bothRadioButton = new JRadioButton();
+            arcadeOnlyRadioButton = new JRadioButton();
+            systemsOnlyRadioButton = new JRadioButton();
+            allRadioButton = new JRadioButton();
+            cocktailRadioButton = new JRadioButton();
+            horizontalRadioButton = new JRadioButton();
+            verticalRadioButton = new JRadioButton();
+            rasterRadioButton = new JRadioButton();
+            lcdRadioButton = new JRadioButton();
+            vectorRadioButton = new JRadioButton();
+            allDisplaysRadioButton = new JRadioButton();
+            anyControlsRB = new JRadioButton();
+            allControlsRB = new JRadioButton();
+            exactControlsRB = new JRadioButton();
+
             $$$setupUI$$$();
 
             setLabelsText();
             addActionListeners(listBuilderPanel);
             addItemListeners();
         }
-        bothRadioButton = new JRadioButton();
-        arcadeOnlyRadioButton = new JRadioButton();
-        systemsOnlyRadioButton = new JRadioButton();
-        allRadioButton = new JRadioButton();
-        cocktailRadioButton = new JRadioButton();
-        horizontalRadioButton = new JRadioButton();
-        verticalRadioButton = new JRadioButton();
-        rasterRadioButton = new JRadioButton();
-        lcdRadioButton = new JRadioButton();
-        vectorRadioButton = new JRadioButton();
-        allDisplaysRadioButton = new JRadioButton();
-        anyControlsRB = new JRadioButton();
-        allControlsRB = new JRadioButton();
-        exactControlsRB = new JRadioButton();
     }
 
     public static ListBuilderUI getInstance() {
@@ -262,41 +264,42 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         }
     }
 
+    @SuppressWarnings("ReuseOfLocalVariable")
     private void setLabelsText() {
         // with 0.85 we are NOT guaranteed to have these lists
-        String number = MFMListBuilder.getArcadeList() != null ?
+        String number = (MFMListBuilder.getArcadeList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getArcadeList().size()) : "0";
         arcadeOnlyRadioButton.setText(ARCADE_ONLY_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getSystemList() != null ?
+        number = (MFMListBuilder.getSystemList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getSystemList().size()) : "0";
         systemsOnlyRadioButton.setText(SYSTEMS_ONLY_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getVerticalsList() != null ?
+        number = (MFMListBuilder.getVerticalsList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getVerticalsList().size()) : "0";
         verticalRadioButton.setText(VERTICAL_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getHorizontalsList() != null ?
+        number = (MFMListBuilder.getHorizontalsList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getHorizontalsList().size()) : "0";
         horizontalRadioButton.setText(HORIZONTAL_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getCocktailsList() != null ?
+        number = (MFMListBuilder.getCocktailsList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getCocktailsList().size()) : "0";
         cocktailRadioButton.setText(COCKTAIL_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getVectorDisplayList() != null ?
+        number = (MFMListBuilder.getVectorDisplayList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getVectorDisplayList().size()) : "0";
         vectorRadioButton.setText(VECTOR_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getRasterDisplayList() != null ?
+        number = (MFMListBuilder.getRasterDisplayList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getRasterDisplayList().size()) : "0";
         rasterRadioButton.setText(RASTER_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getLcdDisplayList() != null ?
+        number = (MFMListBuilder.getLcdDisplayList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getLcdDisplayList().size()) : "0";
         lcdRadioButton.setText(LCD_COMMAND + " - " + number);
 
-        number = MFMListBuilder.getSimultaneousList() != null ?
+        number = (MFMListBuilder.getSimultaneousList() != null) ?
                 MFMController.decimalFormater.format(MFMListBuilder.getSimultaneousList().size()) : "0";
         simultaneousCB.setText(SIMULTANEOUS_COMMAND + " - " + number);
 
@@ -335,7 +338,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         String command = e.getActionCommand();
         // Need since we now add to the Label text
         if (command.contains(" -")) {
-            command = command.substring(0, command.indexOf(' '));
+            command = command.substring(0, command.indexOf(MFM_Constants.SPACE_CHAR));
         }
 
         if (MFM.isDebug()) {
@@ -456,8 +459,8 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
                 controller.importList();
                 break;
 
-            case LIST_EDITOR_COMMAND:
-                controller.showListEditor();
+            case LIST_EDITOR:
+                MFMController.showListEditor();
                 break;
 
             case ANY_CONTROLS_COMMAND:
@@ -737,7 +740,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.anchor = GridBagConstraints.SOUTH;
         buttonPanel.add(listNameLabel, gbc);
         listNameTF = new JTextField();
-        listNameTF.setMargin(new Insets(0, 20, 0, 30));
+        listNameTF.setMargin(new Insets(3, 6, 3, 6));
         listNameTF.setMaximumSize(new Dimension(255, 33));
         listNameTF.setMinimumSize(new Dimension(255, 33));
         listNameTF.setOpaque(true);
@@ -837,6 +840,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.fill = GridBagConstraints.BOTH;
         uileftPanel.add(mamePanel, gbc);
         mamePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "MAME", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        arcadeOnlyRadioButton.setActionCommand("Arcade Only");
         arcadeOnlyRadioButton.setLabel("Arcade Only");
         arcadeOnlyRadioButton.setMaximumSize(new Dimension(220, 30));
         arcadeOnlyRadioButton.setMinimumSize(new Dimension(220, 30));
@@ -850,7 +854,7 @@ public class ListBuilderUI implements ActionListener, ItemListener, Serializable
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         mamePanel.add(arcadeOnlyRadioButton, gbc);
-        systemsOnlyRadioButton.setActionCommand("Systems");
+        systemsOnlyRadioButton.setActionCommand("Systems Only");
         systemsOnlyRadioButton.setLabel("Systems Only");
         systemsOnlyRadioButton.setMaximumSize(new Dimension(230, 30));
         systemsOnlyRadioButton.setMinimumSize(new Dimension(230, 30));

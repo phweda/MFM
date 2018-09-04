@@ -26,6 +26,7 @@ import Phweda.MFM.mame.Machine;
 import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
 import Phweda.utils.PersistUtils;
+import Phweda.utils.XMLUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,7 +46,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static Phweda.MFM.MFMListBuilder.createPlayList;
-import static Phweda.MFM.UI.MFMController.*;
 import static Phweda.utils.FileUtils.stripSuffix;
 
 /**
@@ -55,14 +55,16 @@ import static Phweda.utils.FileUtils.stripSuffix;
  * Time: 11:24 AM
  */
 @SuppressWarnings("RedundantThrows")
-class MFMListActions {
-    private static MFMInformationPanel infoPanel = getInformationPanel();
-    private static JFrame mainFrame = getFrame();
+final class MFMListActions {
+    private static MFMController controller;
     private static JDialog listbuilderDialog;
-
     private static final String LBUI_SER = "LBui.ser";
 
-    private MFMListActions() { // To cover implicit public constructor
+    private MFMListActions() { // Cover implicit public constructor
+    }
+
+    public static void setController(MFMController controller) {
+        MFMListActions.controller = controller;
     }
 
     static String pickList(boolean all, String message) {
@@ -74,7 +76,7 @@ class MFMListActions {
         }
 
         @SuppressWarnings("MagicConstant") final String list = (String) JOptionPane.showInputDialog(
-                mainFrame, message,
+                controller.getFrame(), message,
                 "List Picker", JOptionPane.OK_CANCEL_OPTION, MFMUI_Setup.getMFMIcon(), data, data[0]);
 
         return list;
@@ -96,7 +98,7 @@ class MFMListActions {
         // Hack so we can position Dialog where mouse is. Do not want to subclass JOptionPane
         JFrame frame = new JFrame();
         frame.setSize(0, 0);
-        frame.setLocation(mainFrame.getMousePosition());
+        frame.setLocation(controller.getFrame().getMousePosition());
         frame.setVisible(true); // frame must be visible
 
         // now prompt for the list
@@ -118,20 +120,20 @@ class MFMListActions {
 
     static void removefromList(String item, String listName) {
         MFMPlayLists.getInstance().removeMachineFromPlayList(listName, item);
-        int row = getMachineListTable().getSelectedRow();
+        int row = controller.getMachineListTable().getSelectedRow();
 
-        MachineListTableModel gltm = (MachineListTableModel) getMachineListTable().getModel();
+        MachineListTableModel gltm = (MachineListTableModel) controller.getMachineListTable().getModel();
         gltm.setData(MFMPlayLists.getInstance().getPlayList(listName), listName);
         gltm.fireTableDataChanged();
-        getMachineListTable().getSelectionModel().setSelectionInterval(row, row);
-        showListInfo(listName);
+        controller.getMachineListTable().getSelectionModel().setSelectionInterval(row, row);
+        controller.showListInfo(listName);
     }
 
     static String removeList() {
         Object[] data = MFMPlayLists.getInstance().myPlayListNames();
 
         @SuppressWarnings("MagicConstant") final String result = (String) JOptionPane.showInputDialog(
-                mainFrame, "Select list to Remove",
+                controller.getFrame(), "Select list to Remove",
                 "Remove", JOptionPane.OK_CANCEL_OPTION, null, data, data[0]);
 
         if (result != null) {
@@ -143,10 +145,10 @@ class MFMListActions {
     }
 
     static void showListEditor() {
-        Dialog listEditorDialog = new JDialog(mainFrame, MFMAction.LIST_EDITOR);
+        Dialog listEditorDialog = new JDialog(controller.getFrame(), MFMAction.LIST_EDITOR);
         listEditorDialog.add(ListEditor.getInstance().$$$getRootComponent$$$());
         listEditorDialog.pack();
-        listEditorDialog.setLocationRelativeTo(mainFrame);
+        listEditorDialog.setLocationRelativeTo(controller.getFrame());
         listEditorDialog.setVisible(true);
     }
 
@@ -211,14 +213,21 @@ class MFMListActions {
         return null;
     }
 
+    static boolean validateXML(File file) {
+        if (file != null) {
+            return XMLUtils.validate(file);
+        }
+        return false;
+    }
+
     private static boolean validateDAT(File inputFile) {
         String result = new MFM_DATmaker().validateDAT(inputFile);
         if (!result.equalsIgnoreCase(MFM_DATmaker.GOOD)) {
-            JOptionPane.showMessageDialog(mainFrame, "DAT file is invalid\n" + result,
+            JOptionPane.showMessageDialog(controller.getFrame(), "DAT file is invalid\n" + result,
                     "Invalid DAT File", JOptionPane.ERROR_MESSAGE);
             return false;
         } else {
-            JOptionPane.showMessageDialog(mainFrame, inputFile.getName() + " is a valid DAT file.");
+            JOptionPane.showMessageDialog(controller.getFrame(), inputFile.getName() + " is a valid DAT file.");
         }
         return true;
     }
@@ -270,7 +279,7 @@ class MFMListActions {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Select DAT File");
 
-        int returnValue = fileChooser.showDialog(mainFrame, "OK");
+        int returnValue = fileChooser.showDialog(controller.getFrame(), "OK");
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile();
         }
@@ -345,7 +354,7 @@ class MFMListActions {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Select filter List File");
 
-        int returnValue = fileChooser.showDialog(mainFrame, "OK");
+        int returnValue = fileChooser.showDialog(controller.getFrame(), "OK");
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             return fileChooser.getSelectedFile();
         }
@@ -353,7 +362,7 @@ class MFMListActions {
     }
 
     @SuppressWarnings("unchecked")
-    private static void resourcestoFile(String list, TreeMap<String, Object> files) {
+    private static void resourcestoFile(String list, SortedMap<String, Object> files) {
         MFM.getLogger().addToList(list + " resources are being saved to file", true);
         File listFile = new File(MFM.getMfmListsDir() + list + " " +
                 MFM_Data.getInstance().getDataVersion() + "_Resources.txt");
@@ -362,7 +371,7 @@ class MFMListActions {
 
             final PrintWriter pw = new PrintWriter(new FileWriter(listFile));
             String format = "%,7d: ";
-            TreeSet<File> romsList = (TreeSet<File>) files.get(MFM_Constants.ROMS);
+            Iterable<File> romsList = (TreeSet<File>) files.get(MFM_Constants.ROMS);
             for (File file : romsList) {
                 String path = file.getAbsolutePath();
                 pw.format(format, counter++);
@@ -370,7 +379,7 @@ class MFMListActions {
             }
             pw.flush();
 
-            TreeSet<File> chdsList = (TreeSet<File>) files.get(MFM_Constants.CHDS);
+            Iterable<File> chdsList = (TreeSet<File>) files.get(MFM_Constants.CHDS);
             for (File file : chdsList) {
                 String path = file.getAbsolutePath();
                 pw.format(format, counter++);
@@ -403,7 +412,7 @@ class MFMListActions {
             e.printStackTrace();
             return;
         }
-        int open = JOptionPane.showConfirmDialog(mainFrame, "Open List Resources?",
+        int open = JOptionPane.showConfirmDialog(controller.getFrame(), "Open List Resources?",
                 "List", JOptionPane.OK_CANCEL_OPTION);
         if (open == JOptionPane.OK_OPTION) {
             FileUtils.openFileFromOS(Paths.get(listFile.getAbsolutePath()));
@@ -453,12 +462,12 @@ class MFMListActions {
 
             @Override
             protected void done() {
-                infoPanel.showMessage(newFile.getName() + " is in the Lists directory.");
+                controller.showMessage(newFile.getName() + " is in the Lists directory.");
             }
         };
         Thread generateJSON = new Thread(sw);
         generateJSON.start();
-        infoPanel.showProgress("Generating JSON for " + list);
+        controller.getInformationPanel().showProgress("Generating JSON for " + list);
     }
 
     /**
@@ -469,7 +478,7 @@ class MFMListActions {
      */
     static void copyResources(final boolean copy) {
         if (!MAME_Resources.getInstance().hasCache()) {
-            int returnValue = JOptionPane.showConfirmDialog(mainFrame, "Resource scan must be run first. Run now?",
+            int returnValue = JOptionPane.showConfirmDialog(controller.getFrame(), "Resource scan must be run first. Run now?",
                     "", JOptionPane.YES_NO_OPTION);
             if (returnValue == JOptionPane.YES_OPTION) {
                 scanResources();
@@ -480,6 +489,9 @@ class MFMListActions {
         }
 
         final String list = pickList(true, "Choose List");
+        if (list == null) {
+            return;
+        }
         String message;
         if (copy) {
             message = "Copying Resources " + list;
@@ -488,7 +500,7 @@ class MFMListActions {
         }
         final String action = message;
         if (copy) {
-            infoPanel.showProgress(action);
+            controller.getInformationPanel().showProgress(action);
         }
         MFM.getLogger().addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
@@ -497,7 +509,7 @@ class MFMListActions {
             @Override
             protected Object doInBackground() throws Exception {
                 // Resources are File obj except zipped extras which are String
-                TreeMap<String, Object> resources = MAME_Resources.getInstance().generateListResources(list,
+                SortedMap<String, Object> resources = MAME_Resources.getInstance().generateListResources(list,
                         MFMPlayLists.getInstance().getPlayList(list));
                 startTime = System.nanoTime();
                 if (copy) {
@@ -514,7 +526,7 @@ class MFMListActions {
             protected void done() {
                 super.done();
                 if (copy) {
-                    infoPanel.showMessage(action + " completed");
+                    controller.getInformationPanel().showMessage(action + " completed");
                 }
                 long estimatedTime = (System.nanoTime() - startTime);
                 // System.out.println("Estimated time long is : " + estimatedTime);
@@ -531,7 +543,7 @@ class MFMListActions {
         MFMSettings.getInstance().updateDirectoriesResourceFiles();
 
         final String action = "Scanning Resources";
-        infoPanel.showProgress(action);
+        controller.getInformationPanel().showProgress(action);
         MFM.getLogger().addToList(action + " started", true);
         SwingWorker sw = new SwingWorker() {
             long startTime;
@@ -539,14 +551,14 @@ class MFMListActions {
             @Override
             protected Object doInBackground() throws Exception {
                 startTime = System.nanoTime();
-                MAME_Resources.getInstance().scan();
+                MAME_Resources.scan();
                 return true;
             }
 
             @Override
             protected void done() {
                 super.done();
-                infoPanel.showMessage(action + " completed");
+                controller.getInformationPanel().showMessage(action + " completed");
                 long estimatedTime = (System.nanoTime() - startTime);
                 MFM.getLogger().addToList(action + " completed in " + Debug.formatMillis(estimatedTime) +
                         FileUtils.NEWLINE, true);
@@ -580,13 +592,13 @@ class MFMListActions {
         }
 
         if (tempLBdialog == null) {
-            tempLBdialog = new JDialog(mainFrame, "MFM List Builder");
+            tempLBdialog = new JDialog(controller.getFrame(), "MFM List Builder");
             listBuilderUI = ListBuilderUI.getInstance();
             ListBuilderUI.setController();
             listBuilderUI.setState(baseList);
 
             tempLBdialog.getContentPane().add(listBuilderUI.getListBuilderPanel());
-            setFontSize(tempLBdialog);
+            controller.setFontSize(tempLBdialog);
 
             tempLBdialog.setPreferredSize(maxsize);
             tempLBdialog.setMaximumSize(maxsize);
@@ -596,7 +608,7 @@ class MFMListActions {
         listbuilderDialog = tempLBdialog;
         listbuilderDialog.pack();
         listbuilderDialog.setResizable(true);
-        listbuilderDialog.setLocationRelativeTo(mainFrame);
+        listbuilderDialog.setLocationRelativeTo(controller.getFrame());
 
         listbuilderDialog.addWindowListener(new WindowAdapter() {
             @Override

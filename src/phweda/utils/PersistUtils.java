@@ -16,14 +16,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package phweda.utils;
+package Phweda.utils;
 
+import Phweda.MFM.datafile.Datafile;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import phweda.mfm.datafile.Datafile;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;

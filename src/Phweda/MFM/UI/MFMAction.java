@@ -20,10 +20,12 @@ package Phweda.MFM.UI;
 
 import Phweda.MFM.*;
 import Phweda.MFM.Utils.MFM_Clean_Logs;
+import Phweda.utils.FileUtils;
 import Phweda.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.nio.file.Paths;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,7 +55,7 @@ public class MFMAction extends AbstractAction {
     static final String HELP = "Help";
     static final String GOTO_CLONEOF = "GOTO cloneof";
     static final String EDIT_VIDEO = "Edit Video";
-    static final String MAME_COMMAND_BUILDER = "MAME Command Builder";
+    static final String MAME_COMMAND_BUILDER = CommandDialog.MAME_COMMAND_BUILDER;
     static final String CONVERT_FILES = "Convert Files";
     static final String CROP_AVI = "Crop AVI";
     static final String LIST_BUILDER = "List Builder";
@@ -61,17 +63,18 @@ public class MFMAction extends AbstractAction {
     static final String SHOW_CONTROLS_DEVICES = "Show Controls & Devices";
     static final String COPY_RESOURCES = "Copy Resources";
     static final String SAVE_RESOURCES_TO_FILE = "Save Resources to File";
-    static final String IMPORT_LIST = "Import List";
+    public static final String IMPORT_LIST = "Import List";
     static final String ZIP_LOGS = "Zip Logs";
     static final String POST_ERRORS_TO_PASTIE = "Post Errors to Pastie";
     static final String DUMP_WAYS_CONTROLS = "DUMP WAYS Controls";
     static final String SAVE_LIST_DATA = "Save List Data";
     static final String SCAN_RESOURCES = "Scan Resources";
     static final String SAVE_LIST_TO_FILE = "Save List to File";
-    static final String LIST_EDITOR = "List Editor";
+    public static final String LIST_EDITOR = "List Editor";
     static final String CREATE_DAT_FROM_LIST = "Create DAT from List";
     static final String CREATE_LIST_FROM_DAT = "Create List from DAT";
     static final String VALIDATE_DAT = "Validate DAT";
+    static final String VALIDATE_XML = "Validate XML";
     static final String FILTER_DAT_BY_LIST = "Filter DAT by List";
     static final String FILTER_DAT_BY_EXTERNAL_LIST = "Filter DAT by External List";
     static final String SHOW_MAME_XML = "Show MAME XML";
@@ -91,15 +94,86 @@ public class MFMAction extends AbstractAction {
     static final String MACHINE_VIDEO_INFO = "Machine Video Info";
     @SuppressWarnings("WeakerAccess")
     static final String EXIT = "Exit";
+    public static final String REMOVE_LIST = "Remove List";
+    public static final String SETTINGS = "Settings";
 
-    private static MFMController controller = MFMUI_Setup.getInstance().getController();
+    private static MFMController controller;
 
     public MFMAction(String text, Icon icon) {
         super(text, icon);
     }
 
+    static void setController(MFMController mfmController) {
+        controller = mfmController;
+    }
+
+    private static void filterDATbyList() {
+        MFMListActions.filterDATbyList();
+    }
+
+    private static void filterDATbyExternalList() {
+        MFMListActions.filterDATbyExternalList();
+    }
+
+    private static void listtoDAT() {
+        MFMListActions.listtoDAT();
+    }
+
+    private static void listtoFile() {
+        MFMListActions.listtoFile();
+    }
+
+    private static void runFFmpeg() {
+        MFMVideoActions.runFFmpeg();
+    }
+
+    private static void showListBuilder(String baseList) {
+        MFMListActions.openListBuilder(baseList);
+    }
+
+    private static void validateDAT() {
+        MFMListActions.pickValidateDAT();
+    }
+
+    /**
+     * Scan all resource roots for resources for this list.
+     * Log and report results
+     *
+     * @param copy If true copy the files else just report results
+     */
+    private static void copyResources(final boolean copy) {
+        MFMListActions.copyResources(copy);
+    }
+
+    private static void scanResources() {
+        MFMListActions.scanResources();
+    }
+
+    private static void showLog(String log) {
+        switch (log) {
+            case LOG:
+                FileUtils.openFileFromOS(Paths.get(MFM.getLog().getAbsolutePath()));
+                break;
+            case MAME_OUTPUT:
+                FileUtils.openFileFromOS(Paths.get(MFM.getMameout().getAbsolutePath()));
+                break;
+            case ERROR_LOG:
+                FileUtils.openFileFromOS(Paths.get(MFM.getErrorLog().getAbsolutePath()));
+                break;
+            case GC_LOG:
+                FileUtils.openFileFromOS(Paths.get(MFM.getMfmLogsDir() + "MFM_GC_log.txt"));
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static void showSettings() {
+        MFM_SettingsPanel.showSettingsPanel(MFMUI.getSettings());
+    }
+
     @SuppressWarnings("squid:S1479")
-    public void actionPerformed(ActionEvent e) {
+    public final void actionPerformed(ActionEvent e) {
         try {
 
             if (MFM.isDebug()) {
@@ -114,12 +188,12 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case HELP:
-                    controller.showHelp(((JMenuItem) e.getSource()).getText());
+                    controller.showHelp(((AbstractButton) e.getSource()).getText());
                     break;
 
                 case SHOW_LIST:
                     // Get the Play List name from JMenuItem text
-                    controller.changeList(((JMenuItem) e.getSource()).getText());
+                    controller.changeList(((AbstractButton) e.getSource()).getText());
                     break;
 
                 case RUN_MACHINE:
@@ -161,44 +235,44 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case FFMPEG:
-                    controller.ffmpegSettings();
+                    MFMController.ffmpegSettings();
                     break;
 
                 case CONVERT_FILES:
-                    controller.runFFmpeg();
+                    runFFmpeg();
                     break;
 
                 case EXTRACT_GIF_IMAGES:
                     if (e.getSource() instanceof JMenuItem) {
-                        controller.videoAction(EXTRACT_GIF_IMAGES);
+                        MFMController.videoAction(EXTRACT_GIF_IMAGES);
                     }
                     break;
 
                 case EXTRACT_AVI_IMAGES:
-                    controller.videoAction(EXTRACT_AVI_IMAGES);
+                    MFMController.videoAction(EXTRACT_AVI_IMAGES);
                     break;
 
                 case LIST_BUILDER:
-                    controller.showListBuilder(((JMenuItem) e.getSource()).getText());
+                    showListBuilder(((AbstractButton) e.getSource()).getText());
                     break;
 
                 case MFM_Constants.VERYLARGE:
                     // Order matters
                     SwingUtils.resizeFonts(MFM_Constants.VERYLARGEINT);
                     SwingUtils.changeFont(MFMController.getFrame(), MFM_Constants.FONTSIZEINT + MFM_Constants.VERYLARGEINT);
-                    controller.updateUI();
+                    MFMController.updateUI();
                     MFMSettings.getInstance().MFMFontSize(MFM_Constants.VERYLARGE);
                     break;
                 case MFM_Constants.LARGE:
                     SwingUtils.resizeFonts(MFM_Constants.LARGEINT);
                     SwingUtils.changeFont(MFMController.getFrame(), MFM_Constants.FONTSIZEINT + MFM_Constants.LARGEINT);
-                    controller.updateUI();
+                    MFMController.updateUI();
                     MFMSettings.getInstance().MFMFontSize(MFM_Constants.LARGE);
                     break;
                 case MFM_Constants.NORMAL:
                     SwingUtils.resizeFonts(MFM_Constants.FONTSIZEINT);
                     SwingUtils.changeFont(MFMController.getFrame(), MFM_Constants.FONTSIZEINT);
-                    controller.updateUI();
+                    MFMController.updateUI();
                     MFMSettings.getInstance().MFMFontSize(MFM_Constants.NORMAL);
                     break;
 
@@ -226,12 +300,12 @@ public class MFMAction extends AbstractAction {
                     controller.showVideo();
                     break;
 
-                case "Settings":
-                    controller.showSettings();
+                case SETTINGS:
+                    showSettings();
                     break;
 
                 case OPEN_FILE:
-                    controller.openFile();
+                    MFMController.openFile();
                     break;
 
                 case LOAD_DATA_SET:
@@ -247,35 +321,35 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case MAME_COMMAND_BUILDER:
-                    controller.commandDialog();
+                    MFMController.commandDialog();
                     break;
 
-                case "Create List":
-                    controller.showListBuilder("");
+                case MFM_Constants.CREATE_LIST:
+                    showListBuilder("");
                     break;
 
                 case COPY_RESOURCES:
-                    controller.copyResources(true);
+                    copyResources(true);
                     break;
 
                 case SAVE_RESOURCES_TO_FILE:
-                    controller.copyResources(false);
+                    copyResources(false);
                     break;
 
                 case SCAN_RESOURCES:
-                    controller.scanResources();
+                    scanResources();
                     break;
 
                 case IMPORT_LIST:
                     controller.importList();
                     break;
 
-                case "Remove List":
+                case REMOVE_LIST:
                     controller.removeList();
                     break;
 
                 case LIST_EDITOR:
-                    controller.showListEditor();
+                    MFMController.showListEditor();
                     break;
 
                 case ADD_TO_LIST:
@@ -287,11 +361,11 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case SAVE_LIST_TO_FILE:
-                    controller.listtoFile();
+                    listtoFile();
                     break;
 
                 case CREATE_DAT_FROM_LIST:
-                    controller.listtoDAT();
+                    listtoDAT();
                     break;
 
                 case CREATE_LIST_FROM_DAT:
@@ -299,35 +373,37 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case VALIDATE_DAT:
-                    controller.validateDAT();
+                    validateDAT();
+                    break;
+
+                case VALIDATE_XML:
+                    MFMController.validateXML();
                     break;
 
                 case FILTER_DAT_BY_LIST:
-                    controller.filterDATbyList();
+                    filterDATbyList();
                     break;
 
                 case FILTER_DAT_BY_EXTERNAL_LIST:
-                    controller.filterDATbyExternalList();
+                    filterDATbyExternalList();
                     break;
 
                 case SAVE_LIST_DATA:
-                    controller.listMachinesToCSV();
+                    MFMController.listMachinesToCSV();
                     break;
 
                 case GOTO_CLONEOF:
                     controller.gotoCloneof();
                     break;
 
-                case "Save Command":
+                case CommandDialog.SAVE_COMMAND:
+                    break; // Legacy but maybe future?
 
-                    break;
-
-                case "Run Command":
-
-                    break;
+                case CommandDialog.RUN_COMMAND:
+                    break; // Legacy but maybe future?
 
                 case SHOW_MAME_XML:
-                    controller.showMAMEtree();
+                    MFMController.showMAMEXML();
                     break;
 
                 case SHOW_MACHINE_XML:
@@ -339,27 +415,27 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case LOG:
-                    controller.showLog(LOG);
+                    showLog(LOG);
                     break;
 
                 case MAME_OUTPUT:
-                    controller.showLog(MAME_OUTPUT);
+                    showLog(MAME_OUTPUT);
                     break;
 
                 case ERROR_LOG:
-                    controller.showLog(ERROR_LOG);
+                    showLog(ERROR_LOG);
                     break;
 
                 case GC_LOG:
-                    controller.showLog(GC_LOG);
+                    showLog(GC_LOG);
                     break;
 
                 case ZIP_LOGS:
-                    controller.zipLogs();
+                    MFMController.zipLogs();
                     break;
 
                 case POST_ERRORS_TO_PASTIE:
-                    controller.postToPastie();
+                    MFMController.postToPastie();
                     break;
 
                 case DUMP_WAYS_CONTROLS:
@@ -384,14 +460,14 @@ public class MFMAction extends AbstractAction {
                 default:
                     String command = e.getActionCommand();
                     if (SwingUtils.lookandFeelNames().contains(command)) {
-                        controller.changeLnF(command);
+                        MFMController.changeLnF(command);
                         controller.showMFMmessage("Changed UI to " + command);
                         MFMSettings.getInstance().MFMLookAndFeel(command);
 
                     }
-                    controller.updateUI();
+                    MFMController.updateUI();
             }
-        } catch (Exception exc) {
+        } catch (RuntimeException exc) {
             exc.printStackTrace();
         }
     }

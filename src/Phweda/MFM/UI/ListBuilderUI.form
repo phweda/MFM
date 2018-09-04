@@ -76,7 +76,7 @@
               <gridbag top="5" left="0" bottom="5" right="0" weightx="0.4" weighty="1.0"/>
             </constraints>
             <properties>
-              <margin top="0" left="20" bottom="0" right="30"/>
+              <margin top="3" left="6" bottom="3" right="6"/>
               <maximumSize width="255" height="33"/>
               <minimumSize width="255" height="33"/>
               <opaque value="true"/>
@@ -178,6 +178,7 @@
                   <gridbag weightx="1.0" weighty="0.0"/>
                 </constraints>
                 <properties>
+                  <actionCommand value="Arcade Only"/>
                   <label value="Arcade Only"/>
                   <maximumSize width="220" height="30"/>
                   <minimumSize width="220" height="30"/>
@@ -193,7 +194,7 @@
                   <gridbag weightx="1.0" weighty="0.0"/>
                 </constraints>
                 <properties>
-                  <actionCommand value="Systems"/>
+                  <actionCommand value="Systems Only"/>
                   <label value="Systems Only"/>
                   <maximumSize width="230" height="30"/>
                   <minimumSize width="230" height="30"/>

@@ -156,7 +156,6 @@ public class MFMPlayLists implements Serializable {
     public void createPlayList(String name, String[] machines) {
         TreeSet<String> treeSet = new TreeSet<>(Arrays.asList(machines));
         myPlayListsTree.put(name, treeSet);
-        persistPlayLists();
         allListsNames.add(name);
         myListsNames.add(name);
         persistPlayLists();
@@ -165,7 +164,6 @@ public class MFMPlayLists implements Serializable {
     void createPlayList(String name, TreeSet<String> machines) {
         TreeSet<String> treeSet = new TreeSet<>(machines);
         myPlayListsTree.put(name, treeSet);
-        persistPlayLists();
         allListsNames.add(name);
         myListsNames.add(name);
         persistPlayLists();

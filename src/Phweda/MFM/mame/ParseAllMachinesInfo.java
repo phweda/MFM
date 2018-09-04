@@ -55,7 +55,8 @@ public class ParseAllMachinesInfo {
      * NOTE : If not parsing All we only load Playable games as determined by :
      * <driver status="good" or
      * <driver status="imperfect"
-     * see MAME source info.c - info_xml_creator::output_driver()
+     * see MAME source info.cpp - info_xml_creator::output_driver
+     * https://github.com/mamedev/mame/blob/master/src/frontend/mame/info.cpp
      **/
 
     public static Mame loadAllMachinesInfo(boolean all) {

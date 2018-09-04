@@ -18,6 +18,8 @@
 
 package Phweda.MFM;
 
+import Phweda.MFM.UI.MFMAction;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,8 +36,22 @@ import java.util.Calendar;
 @SuppressWarnings("WeakerAccess")
 public final class MFM_Constants {
 
-    private MFM_Constants() { // To cover implicit public constructor
-    }
+    public static final String SOFTWARE_LISTS = "Software Lists";
+    public static final String FILES_ARE_IN_THE_MFM_LISTS_FOLDER = "Files are in the MFM/Lists folder";
+    public static final String COVERS_SL = "covers_SL";
+    public static final String SNAP_SL = "snap_SL";
+    public static final String TITLES_SL = "titles_SL";
+    public static final String TITLES = "titles";
+    public static final String CABINETS = "cabinets";
+    public static final String WORKING = "Working";
+    public static final String RUNNABLE = "Runnable ";
+    public static final String VERSION = "Version";
+    public static final String CREATE_LIST = "Create List"; // Not usable in UI widget bound to xml code
+    public static final String CATEGORY = "Category";
+    public static final String NULL_STRING = "null";
+    public static final String SPACE_STRING = " ";
+
+    public static final char SPACE_CHAR = ' ';
 
     public static final String MAME_EXE_DIRECTORY = "MAMEexeDir";
     public static final String MAME_EXE_NAME = "MAMEexeName";
@@ -69,7 +85,7 @@ public final class MFM_Constants {
     public static final String COMPATIBLE = "compatible";
     public static final String DATA_VERSION = "Data version";
     public static final String NEW_LIST = "-NEW-";
-    protected static final char[] ALPHANUM = new char[]{
+    static final char[] ALPHANUM = {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
@@ -90,13 +106,7 @@ public final class MFM_Constants {
     public static final String LANGUAGESLISTS = "Languages Lists";
     public static final String SNAPS = "snaps";
     public static final String ROMS = "roms";
-    /*
-                MAME FOLDERS as of 10/1/2016
-    artwork, artwork preview, bkground, bosses, cabdevs, cabinets, chds, covers_SL, cpanel, ctrlr, devices, ends, flyers,
-    folders, gameover, howto, icons, ini, logo, manuals, manuals_SL, marquees, pcb, roms, samples, scores, select, snap,
-    snap_SL, snaps, Software Lists, titles, titles_SL, versus, video, videosnaps
-
-     */
+    public static final String SAMPLES = "samples";
     public static final String CHDS = "chds";
     static final String FULL_SET_DIRECTORIES_MAP = "FullSetDirectories MAP";
     static final String PLAY_SET_DIRECTORIES_MAP = "PlaySetDirectories";
@@ -118,26 +128,29 @@ public final class MFM_Constants {
     static final String LOOKANDFEEL = "lookAndFeel";
     static final String SELECTEDTAB = "Selected Tab";
     static final String FOLDERS = "folders";
-    static final String CATEGORY = "Category";
-    static final String SETTINGS = "Settings";
+    static final String SETTINGS = MFMAction.SETTINGS;
     static final String DATA = "Data";
-    static final String RESOURCES = "Resources";
     static final String JARS = "Jars";
     static final String LISTS = "Lists";
     static final String LOGS = "Logs";
-    static final String COMMANDS = "Commands";
-    static final String ARTWORK = "artwork";
-    static final String SOFTWARE_LISTS = "Software Lists";
+    public static final String COMMANDS = "Commands";
+    public static final String ARTWORK = "artwork";
     public static final String SOFTWARE_LIST_SEPARATER = "\u00A8";
     static final String SHOW_XML = "Show XML";
     public static final String ALL = "All";
+    // Help items
+    public static final String ABOUT = "About";
+    public static final String MFM_USER_GUIDE = "MFM User Guide";
+    public static final String MFM_COPYRIGHT = "MFM Copyright";
+    public static final String GNU_GPL = "GNU GPL";
+    public static final String HOT_KEYS = "Hot Keys";
 
     private static final ArrayList<String> folderNames = new ArrayList<>(Arrays.asList(
-            ARTWORK, "artwork preview", "bkground", "bosses", "cabdevs", "cabinets", "chds",
-            "covers_SL", "cpanel", "ctrlr", "devices", "ends", "flyers", FOLDERS, "gameover", "howto",
+            ARTWORK, "artwork preview", "bkground", "bosses", "cabdevs", CABINETS, "chds",
+            COVERS_SL, "cpanel", "ctrlr", "devices", "ends", "flyers", FOLDERS, "gameover", "howto",
             "icons", "ini", "logo", MANUALS, MANUALS_SL, "marquees",
-            "pcb", "roms", "samples", "scores", "select", "snap", "snap_SL", SNAPS,
-            SOFTWARE_LISTS, "titles", "titles_SL", "versus", "video", "videosnaps"));
+            "pcb", "roms", SAMPLES, "scores", "select", "snap", SNAP_SL, SNAPS,
+            SOFTWARE_LISTS, TITLES, TITLES_SL, "versus", "video", "videosnaps"));
 
     public static String[] MAME_FOLDER_NAMES_ARRAY; // TODO now this is dynamic should move WHERE?
     public static final String[] yearsList;
@@ -164,4 +177,8 @@ public final class MFM_Constants {
             yearsList[k++] = String.valueOf(i);
         }
     }
+
+    private MFM_Constants() { // To cover implicit public constructor
+    }
+
 }

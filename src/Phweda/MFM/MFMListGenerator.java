@@ -145,18 +145,18 @@ class MFMListGenerator {
                 String cloneof = machine.getCloneof();
                 if (cloneof == null || cloneof.isEmpty()) {
                     noClonesList.add(machineName);
-                } else if (cloneof.length() > 1) {
+                } else if (cloneof.length() > 1) { // No machine with single char so 2 or more we assume is correct
                     clonesList.add(machineName);
                 } else {
                     System.out.println("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
                     MFM.getLogger().addToList("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
                 }
 
-                if (machine.getDisplay().isEmpty() || !machine.getScreentype().isEmpty()) {
+                if (!machine.getDisplay().isEmpty() || !machine.getScreentype().isEmpty()) {
                     String screenType = null;
                     if (!machine.getScreentype().isEmpty()) {
                         screenType = machine.getScreentype();
-                    } else if (machine.getDisplay().isEmpty()) {
+                    } else if (!machine.getDisplay().isEmpty()) {
                         screenType = machine.getDisplay().get(0).getType();
                     }
                     if (screenType == null) {

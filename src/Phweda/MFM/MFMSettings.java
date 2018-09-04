@@ -259,6 +259,9 @@ public class MFMSettings {
 
     public void setShowXML(boolean showXML) {
         ourSettings.put(MFM_Constants.SHOW_XML, showXML);
+        if (!showXML) {
+            System.gc(); // Worth a shot here to recover the very large JTree?
+        }
     }
 
     public Map<String, File> getExtrasZipFilesMap() {

@@ -19,6 +19,7 @@
 package Phweda.MFM.UI;
 
 import Phweda.MFM.MFM;
+import Phweda.MFM.MFM_Constants;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.icon.EmptyIcon;
 
@@ -62,7 +63,7 @@ public class MFMUI {
 
         // Schedule a job for the event-dispatching thread:
         // creating and showing this application's GUI.
-        SwingUtilities.invokeLater(() -> MFMUI_Setup.getInstance().getController().init());
+        SwingUtilities.invokeLater(() -> MFMUI_Setup.getInstance().init());
     }
 
     public static void showBusy(boolean start, boolean loadData) {
@@ -129,7 +130,7 @@ public class MFMUI {
         if (settingsFrame != null) {
             settingsFrame.dispose();
         }
-        settingsFrame = new JFrame("MFM Settings");
+        settingsFrame = new JFrame(MFM_Constants.MFM_SETTINGS);
         settingsFrame.setIconImage(MFMUI_Resources.getInstance().getImageIcon(MFM_ICON_PNG).getImage());
 
         return settingsFrame;

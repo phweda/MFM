@@ -19,6 +19,7 @@
 package Phweda.MFM;
 
 import Phweda.MFM.UI.MFMUI;
+import Phweda.MFM.UI.MFMUI_Resources;
 import Phweda.MFM.UI.MFMUI_Setup;
 import Phweda.utils.Debug;
 import Phweda.utils.FileUtils;
@@ -29,10 +30,7 @@ import javax.swing.*;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,9 +39,9 @@ import java.util.Map;
  * Time: 2:06 PM
  */
 @SuppressWarnings("WeakerAccess")
-public class MFM {
+public final class MFM {
 
-    public static final String APPLICATION_NAME = "MAME File Manager";
+    public static final String MAME_FILE_MANAGER = "MAME File Manager";
 
     private static String mfmDir;
     private static String mfmSettingsDir;
@@ -56,16 +54,17 @@ public class MFM {
     private static String mfmCategoryDir;
     private static final String MFM_USER_GUIDE = "MAME File Manager User Guide.pdf";
     // Update these with each release
-    private static final String VERSION = "Version 0.9.5";
-    private static final String BUILD = "BUILD 0.9.500";
-    private static final String RELEASE_DATE = "Released : June 2018";
+    private static final String VERSION = "Version 0.9.6";
+    private static final String BUILD = "BUILD 0.9.600";
+    private static final String RELEASE_DATE = "Released : Sept 2018";
     private static final String LOCAL_COUNTRY = Locale.getDefault().getCountry();
-    private static final String MFM_TITLE = MFM.APPLICATION_NAME + "  :  " + MFM.VERSION;
+    private static final String MFM_TITLE = MAME_FILE_MANAGER + "  :  " + VERSION;
 
-    static int timeNow = (int) System.currentTimeMillis();
+    public static final char COLON = ':';
+
     // Gives us a 6 digit descending, over time, number
-    public static final int LOG_NUMBER = timeNow >> 12;
-    ;
+    public static final int LOG_NUMBER = (int) System.currentTimeMillis() >> 12;
+
     static final String MFM_SETTINGS_FILE = "MFM_SETTINGS.xml";
     static final String MFM_CATEGORY_DATA_FILE = "CategoryListsMap.xml";
     static final String MAME_RESOURCES_CACHE = "Resources_cache.ser";
@@ -116,6 +115,9 @@ public class MFM {
         }
     }
 
+    MFM() {
+    }
+
     public static void main(String[] args) {
         loadSwitches(Arrays.asList(args));
         logEnvironment();
@@ -155,8 +157,10 @@ public class MFM {
 
             // Load Data Set
             MFMUI_Setup.getInstance().loadDataSet();
+
             // Wait for Data Set load
-            while (MFM_Data.getInstance().notLoaded()) {
+            MFM_Data mfmData = MFM_Data.getInstance();
+            while (mfmData.notLoaded()) {
                 try {
                     Thread.sleep(25);
                 } catch (InterruptedException e) {
@@ -164,12 +168,12 @@ public class MFM {
                     Thread.currentThread().interrupt();
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
     }
 
-    private static void loadSwitches(List<String> switches) {
+    private static void loadSwitches(Collection<String> switches) {
         /*
           Command line switches
         */
@@ -211,36 +215,36 @@ public class MFM {
         logger.out("Temp dir is " + tempdir);
 
         // Get the VM arguments and log
-        RuntimeMXBean RuntimemxBean = ManagementFactory.getRuntimeMXBean();
-        List<String> arguments = RuntimemxBean.getInputArguments();
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        List<String> arguments = runtimeMXBean.getInputArguments();
         logger.separateLine();
-        logger.out(OS_VERSION + "\n");
+        logger.out(OS_VERSION + '\n');
 
-        if (isDebug()) {
+        if (debug) {
             Map<String, String> env = System.getenv();
             for (String envName : env.keySet()) {
                 if (envName.contains("PROCESSOR")) {
                     logger.out(envName + " : " + env.get(envName));
-                } else if (isSystemDebug()) {
+                } else if (systemoutDebug) {
                     // logger.out(envName + " : " + env.get(envName)); // NOTE Comment out to protect users' configs
                 }
             }
         }
         logger.separateLine();
-        String JAVA_version = System.getProperty("java.version");
-        String JVM_version = ManagementFactory.getRuntimeMXBean().getVmVersion();
-        logger.addToList("Java version : " + JAVA_version);
-        logger.addToList("JVM version : " + JVM_version);
+        String javaVersion = System.getProperty("java.version");
+        String jvmVersion = ManagementFactory.getRuntimeMXBean().getVmVersion();
+        logger.addToList("Java version : " + javaVersion);
+        logger.addToList("JVM version : " + jvmVersion);
         for (String arg : arguments) {
             logger.addToList(arg);
             if (arg.startsWith("-Xloggc:")) {
-                gcLog = new File(arg.substring(arg.indexOf(':') + 1));
+                gcLog = new File(arg.substring(arg.indexOf(COLON) + 1));
             }
         }
         logger.separateLine();
     }
 
-    @SuppressWarnings("squid:S2178")
+    @SuppressWarnings({"squid:S2178", "MethodWithMoreThanThreeNegations"})
     private static void setPathsandDirectories(String path) {
         // Path we are executing in
         mfmDir = path + FileUtils.DIRECTORY_SEPARATOR;
@@ -249,7 +253,7 @@ public class MFM {
         // Folder we create on the local file system for Data Sets
         mfmDataDir = mfmDir + MFM_Constants.DATA + FileUtils.DIRECTORY_SEPARATOR;
         // Resources are all within the MFM.jar file
-        mfmResources = FileUtils.DIRECTORY_SEPARATOR + MFM_Constants.RESOURCES + FileUtils.DIRECTORY_SEPARATOR;
+        mfmResources = FileUtils.DIRECTORY_SEPARATOR + MFMUI_Resources.RESOURCES + FileUtils.DIRECTORY_SEPARATOR;
         // Added LnF Jars are placed here
         mfmJarsDir = mfmDir + MFM_Constants.JARS + FileUtils.DIRECTORY_SEPARATOR;
         // Lists output files are placed here
@@ -264,34 +268,34 @@ public class MFM {
         boolean mfmnodirectories = false;
         File settingsDIR = new File(mfmSettingsDir);
         if (!settingsDIR.exists()) {
-            mfmnodirectories = mfmnodirectories | !settingsDIR.mkdir();
+            mfmnodirectories |= !settingsDIR.mkdir();
         }
 
         File dataDIR = new File(mfmDataDir);
         if (!dataDIR.exists()) {
-            mfmnodirectories = mfmnodirectories | !dataDIR.mkdir();
+            mfmnodirectories |= !dataDIR.mkdir();
         }
 
         File jarsDIR = new File(mfmJarsDir);
         if (!jarsDIR.exists()) {
-            mfmnodirectories = mfmnodirectories | !jarsDIR.mkdir();
+            mfmnodirectories |= !jarsDIR.mkdir();
         }
 
         File logsDIR = new File(mfmLogsDir);
         if (!logsDIR.exists()) {
-            mfmnodirectories = mfmnodirectories | !logsDIR.mkdir();
+            mfmnodirectories |= !logsDIR.mkdir();
         }
 
         File listDIR = new File(mfmListsDir);
         if (!listDIR.exists()) {
-            mfmnodirectories = mfmnodirectories | !listDIR.mkdir();
+            mfmnodirectories |= !listDIR.mkdir();
         }
 
         if (tempdir == null) {
             tempdir = mfmDir + FileUtils.DIRECTORY_SEPARATOR + "temp" + FileUtils.DIRECTORY_SEPARATOR;
             File tempDir = new File(tempdir);
             if (!tempDir.exists()) {
-                mfmnodirectories = mfmnodirectories & !tempDir.mkdir();
+                mfmnodirectories &= !tempDir.mkdir();
             }
         }
 
@@ -429,10 +433,6 @@ public class MFM {
 
     public static File getfFmpegout() {
         return fFmpegout;
-    }
-
-    public static MFMSettings getMfmSettings() {
-        return mfmSettings;
     }
 
     private static void add3rdPartyLFs() {

@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package phweda.utils;
+package Phweda.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -46,7 +46,6 @@ public class MFM_Components {
     private static MFM_Components ourInstance;
     private static final JScrollPane leftTreeScrollPane = new JScrollPane();
     static MFMUI_Resources resources = MFMUI_Resources.getInstance();
-    private MFMController mfmController;
     private JPopupMenu machinePopupMenu;
     private JPopupMenu softwarePopupMenu;
     private JPanel mfmListPanel;
@@ -55,7 +54,7 @@ public class MFM_Components {
     private JScrollPane mfmFolderTreeScrollPane;
     private JMenuBar menuBar;
     private static StatusBar statusBar;
-    private static JLabel currentListName;
+    private static JLabel currentListLabel;
     private static MFMInformationPanel infoPanel;
     private JPanel fillPanel;
     private JTree tree;
@@ -69,14 +68,13 @@ public class MFM_Components {
     private static final String SNAP = "Snap";
     private static final String TITLES = "Titles";
 
-    private MFM_Components(MFMController controller) {
-        mfmController = controller;
+    private MFM_Components() {
         createUIComponents();
     }
 
-    public static MFM_Components getInstance(MFMController controller) {
+    public static MFM_Components getInstance() {
         if (ourInstance == null) {
-            ourInstance = new MFM_Components(controller);
+            ourInstance = new MFM_Components();
         }
         return ourInstance;
     }
@@ -148,6 +146,10 @@ public class MFM_Components {
         return mfmListPanel;
     }
 
+    public static JLabel getCurrentListLabel() {
+        return currentListLabel;
+    }
+
     protected static MFMUI_Resources getResources() {
         return resources;
     }
@@ -166,19 +168,19 @@ public class MFM_Components {
 
         JLabel versionJL = new JLabel("MAME " + MFMSettings.getInstance().getMAMEVersion() + "   :   DATA " +
                 MFM_Data.getInstance().getDataVersion(), SwingConstants.CENTER);
-        currentListName = new JLabel(MFMListBuilder.ALL,
+        currentListLabel = new JLabel(MFMListBuilder.ALL,
                 getResources().getImageIcon(MFMUI_Resources.UPARROW_PNG), SwingConstants.LEFT);
         infoPanel = new MFMInformationPanel();
         infoPanel.showMessage("Main View");
-        JLabel workingJL = new JLabel("Runnable " + MAMEInfo.getRunnable(), SwingConstants.CENTER);
+        JLabel workingJL = new JLabel(MFM_Constants.RUNNABLE + MAMEInfo.getRunnable(), SwingConstants.CENTER);
 
         if (flag == null) {
-            statusBar.setZones(new String[]{"Version", "currentListName", "Information", "Working", "Clock"},
-                    new JComponent[]{versionJL, currentListName, infoPanel, workingJL, clock},
+            statusBar.setZones(new String[]{MFM_Constants.VERSION, "currentListName", "Information", MFM_Constants.WORKING, "Clock"},
+                    new JComponent[]{versionJL, currentListLabel, infoPanel, workingJL, clock},
                     new String[]{"20%", "24%", "*", "12%", "6%"});
         } else {
-            statusBar.setZones(new String[]{"Version", "currentListName", "Information", "Working", "Flag"},
-                    new JComponent[]{versionJL, currentListName, infoPanel, workingJL, flag},
+            statusBar.setZones(new String[]{MFM_Constants.VERSION, "currentListName", "Information", MFM_Constants.WORKING, "Flag"},
+                    new JComponent[]{versionJL, currentListLabel, infoPanel, workingJL, flag},
                     new String[]{"20%", "24%", "*", "12%", "6%"});
         }
 
@@ -198,8 +200,8 @@ public class MFM_Components {
         return tree;
     }
 
-    JLabel currentListName() {
-        return currentListName;
+    JLabel currentListLabel() {
+        return currentListLabel;
     }
 
     JMenuBar getMenuBar() {
@@ -253,7 +255,6 @@ public class MFM_Components {
             }
             root.add(folderNode);
         }
-        tree.addMouseListener(mfmController);
         mfmFolderTreeScrollPane = new JScrollPane(tree);
         // Expand root folder
         tree.expandRow(0);
@@ -270,8 +271,6 @@ public class MFM_Components {
         extrasTabbedPane.addTab(SNAP, new ImagePanel(defaultImage));
         extrasTabbedPane.addTab(TITLES, new ImagePanel(defaultImage));
 
-        extrasTabbedPane.addChangeListener(mfmController);
-
 /*
         JAVA ImageIO only supports the following formats
         BMP  bmp  jpg  JPG  jpeg  JPEG
@@ -281,9 +280,6 @@ public class MFM_Components {
 
     private void setMachineListTable() {
         machineListTable = MachineListTable.getInstance();
-        machineListTable.addMouseListener(mfmController);
-        machineListTable.addMouseWheelListener(mfmController);
-        machineListTable.getSelectionModel().addListSelectionListener(mfmController);
     }
 
     private void createMachinePopup() {

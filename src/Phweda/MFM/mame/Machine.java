@@ -27,6 +27,7 @@
 package Phweda.MFM.mame;
 
 import Phweda.MFM.MFM;
+import Phweda.MFM.MFM_Constants;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -148,6 +149,7 @@ import static Phweda.utils.FileUtils.doubleQuoteString;
         "unknownElements"
 })
 @XmlRootElement(name = "machine")
+@SuppressWarnings({"squid:S1845", "WeakerAccess"})
 public class Machine {
 
     //========================= MFM ===================================
@@ -155,7 +157,7 @@ public class Machine {
     // For Column header names all caps
     public static final String MACHINE_NAME = "Machine Name";
     public static final String MACHINE_FULL_NAME = "Game(System) Name";
-    public static final String CATEGORY_CAPS = "Category";
+    public static final String CATEGORY_CAPS = MFM_Constants.CATEGORY;
     public static final String YEAR_CAPS = "Year";
     public static final String MANUFACTURER_CAPS = "Manufacturer";
     public static final String STATUS_CAPS = "Status";

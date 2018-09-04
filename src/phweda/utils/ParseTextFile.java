@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package phweda.utils;
+package Phweda.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,6 +36,7 @@ public class ParseTextFile {
     protected static final String NUM_REGEX = "^[0-9]";
     protected static final String ALPHA_REGEX = "^[a-zA-Z]";
     protected Scanner scanner;
+    // Bad design we overload with multiple Map parameter types
     protected Map map;
     private File file;
 
@@ -69,10 +70,9 @@ public class ParseTextFile {
         return map;
     }
 
-    /*
-     Overridable method for processing lines in different ways.
-
-    */
+    /**
+     * Overridable method for processing lines in different ways.
+     **/
     protected void processLine(String line) {
         //use a second Scanner to parse the content of each line
         try (Scanner scanner = new Scanner(line)) {

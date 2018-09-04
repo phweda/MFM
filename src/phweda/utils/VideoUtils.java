@@ -16,13 +16,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package phweda.utils;
+package Phweda.utils;
 
+import Phweda.MFM.MFM;
+import Phweda.MFM.MFMSettings;
+import Phweda.MFM.UI.ImagesViewer;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
-import phweda.mfm.MFM;
-import phweda.mfm.MFMSettings;
-import phweda.mfm.UI.ImagesViewer;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -146,7 +146,7 @@ public class VideoUtils {
                 return;
             }
         }
-        MFM.logger.addToList("VDub file to run is : " + filePath);
+        MFM.getLogger().addToList("VDub file to run is : " + filePath);
         File aviFile = new File(filePath);
         ProcessBuilder pb;
         if (!aviFile.exists()) {

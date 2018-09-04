@@ -37,6 +37,7 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +56,7 @@ import static Phweda.MFM.MFM_Constants.*;
 import static Phweda.MFM.UI.MFMListActions.pickList;
 import static Phweda.MFM.UI.MFMUI_Setup.getInstance;
 import static Phweda.MFM.Utils.AnalyzeCategories.analyzeCategories;
+import static Phweda.utils.FileUtils.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,10 +68,13 @@ import static Phweda.MFM.Utils.AnalyzeCategories.analyzeCategories;
 /**
  * GUI Controller
  */
-class MFMController extends ClickListener implements ListSelectionListener, ChangeListener, KeyListener {
+final class MFMController extends ClickListener implements ListSelectionListener, ChangeListener, KeyListener {
     static final DecimalFormat decimalFormater = new DecimalFormat("###,###");
-    private static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    private static JFrame mainFrame;
+    private static final int INT_50 = 50;
+    private static final int INT_20 = 20;
+
+    private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    static JFrame mainFrame; // Not private so no synthetic accessor probably inconsequential
     private static MFM_Components components;
     private JTree folderTree;
     private static MachineListTable machineListTable;
@@ -77,24 +82,27 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     private JPopupMenu listPopupMenu;
     private JPopupMenu softwarelistPopupMenu;
 
-    private static JLabel currentList;
+    private static JLabel currentListLabel;
     private static String listName;
     private static MFMInformationPanel infoPanel;
     private StatusBar statusBar;
-
     private final JTextPane htmlTextPane = new MFMHTMLTextPane();
-    private boolean firstLoad = true;
 
+    private boolean firstLoad = true;
     // To differentiate lookup for images
     private boolean isSoftwarelist = false;
+    private static final int SCROLLPANE_WIDTH = 800;
+    private static final double DIVIDER_LOCATION = 0.16;
+    private static final String LOADED = "loaded";
 
-    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+    @SuppressWarnings("WeakerAccess")
+    static final MFMSettings mfmSettings = MFMSettings.getInstance();
 
-    static void showListInfo(String listName) {
-        SortedSet<String> list = MFMPlayLists.getInstance().getPlayList(listName);
+    static void showListInfo(String listNameIn) {
+        SortedSet<String> list = MFMPlayLists.getInstance().getPlayList(listNameIn);
         String output = decimalFormater.format(list.size());
-        currentList.setText(listName + " - " + output);
-        currentList.setName(listName);
+        currentListLabel.setText(listNameIn + " - " + output);
+        currentListLabel.setName(listNameIn);
     }
 
     public static JFrame getFrame() {
@@ -114,17 +122,13 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             return;
         }
         MFMOptionPane optionPane = new MFMOptionPane(title, text, mainFrame, 0, 0);
-        optionPane.textArea.scrollRectToVisible(new Rectangle(0, 0, 50, 20));
+        optionPane.textArea.scrollRectToVisible(new Rectangle(0, 0, INT_50, INT_20));
     }
 
     static void setFontSize(Container container) {
-        if (mfmSettings.MFMFontSize() != null &&
-                !mfmSettings.MFMFontSize().equals(MFM_Constants.NORMAL)) {
-
-            int num = mfmSettings.MFMFontSize().equals(MFM_Constants.LARGE) ?
-                    MFM_Constants.LARGEINT : MFM_Constants.VERYLARGEINT;
-
-            SwingUtils.changeFont(container, MFM_Constants.FONTSIZEINT + num);
+        if ((mfmSettings.MFMFontSize() != null) && !mfmSettings.MFMFontSize().equals(NORMAL)) {
+            int num = mfmSettings.MFMFontSize().equals(LARGE) ? LARGEINT : VERYLARGEINT;
+            SwingUtils.changeFont(container, FONTSIZEINT + num);
         }
     }
 
@@ -137,21 +141,21 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 
     private void showPopup(MouseEvent e) {
-        if ((isSoftwarelist || isSelectedSoftware()) && e.getSource() == machineListTable) {
+        if ((isSoftwarelist || isSelectedSoftware()) && (e.getSource() == machineListTable)) {
             softwarelistPopupMenu.show(e.getComponent(), e.getX(), e.getY());
-        } else if (!isSoftwarelist && (e.getSource() == machineListTable || e.getSource() == folderTree)) {
+        } else if (!isSoftwarelist && ((e.getSource() == machineListTable) || (e.getSource() == folderTree))) {
             listPopupMenu.show(e.getComponent(), e.getX(), e.getY());
         }
     }
 
     @Override
     public void singleClick(MouseEvent e) {
-        if (e.getSource() == extrasTabbedPane && e.getButton() == MouseEvent.BUTTON3) {
+        if ((e.getSource() == extrasTabbedPane) && (e.getButton() == MouseEvent.BUTTON3)) {
             int i = JOptionPane.showConfirmDialog(extrasTabbedPane, "Open the Image?");
             if (i == JOptionPane.YES_OPTION) {
                 openImage();
             }
-        } else if (folderTree != null && e.getSource() == folderTree && e.getButton() == MouseEvent.BUTTON1) {
+        } else if ((folderTree != null) && (e.getSource() == folderTree) && (e.getButton() == MouseEvent.BUTTON1)) {
             // GOTO selected game
             gotoItem(getMouseSelectedGame());
         }
@@ -193,12 +197,13 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             // Could do this with a nested Ternary
             if (nextRow < 0) {
                 nextRow = 0;
-            } else if (nextRow > machineListTable.getRowCount() - 1) {
+            } else if (nextRow > (machineListTable.getRowCount() - 1)) {
                 nextRow = machineListTable.getRowCount() - 1;
             }
 
             machineListTable.getSelectionModel().setSelectionInterval(0, nextRow);
-            machineListTable.scrollRectToVisible(new Rectangle(machineListTable.getCellRect(nextRow, 0, true)));
+            machineListTable.scrollRectToVisible(
+                    new Rectangle(machineListTable.getCellRect(nextRow, 0, true)));
         }
     }
 
@@ -219,13 +224,14 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     void changeList(String updateListName) {
 
         SortedSet<String> list = MFMPlayLists.getInstance().getPlayList(updateListName);
-        if (list == null || (list.isEmpty())) {
+        if ((list == null) || (list.isEmpty())) {
             showError(updateListName + " is empty");
-            updateListName = MFMListBuilder.ALL;
+            listName = MFMListBuilder.ALL;
             list = MFMPlayLists.getInstance().getALLPlayListsTree().get(MFMListBuilder.ALL);
+        } else {
+            listName = updateListName;
         }
-        listName = updateListName;
-// fixme possible naming collisions we need to add check to User list creation to prevent usage of Softwarelist names
+        // fixme possible naming collisions we need to add check to User list creation to prevent usage of Softwarelist names
         isSoftwarelist = MAMEInfo.isSoftwareList(listName);
 
         MachineListTableModel gltm = (MachineListTableModel) machineListTable.getModel();
@@ -237,22 +243,22 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     static boolean checkRunnableSoftware(String name) {
         // System.out.println("Software name : " + name); // For Dev debug too noisy
         Software software = MAMEInfo.getSoftware(name, listName);
-        return software != null && software.getSupported().equalsIgnoreCase(Machine.YES);
+        return (software != null) && software.getSupported().equalsIgnoreCase(Machine.YES);
     }
 
     static boolean checkRunnableSoftware(String name, String systemName) {
         // System.out.println("Software name : " + name); // For Dev debug too noisy
         Software software = MAMEInfo.getSoftware(name, systemName);
-        return software != null && software.getSupported().equalsIgnoreCase(Machine.YES);
+        return (software != null) && software.getSupported().equalsIgnoreCase(Machine.YES);
     }
 
-    private void showList(String listName) {
-        showListInfo(listName);
+    private void showList(String listNameIn) {
+        showListInfo(listNameIn);
         updateUI();
-        mfmSettings.MFMCurrentList(listName);
+        mfmSettings.MFMCurrentList(listNameIn);
     }
 
-    void commandDialog() {
+    static void commandDialog() {
         CommandDialog.showCommands(mainFrame);
     }
 
@@ -268,13 +274,13 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     /**
      * Gets the name of the selected Machine or Software
      * Software gets reported as "List Name" _ "name"
-     * NOTE what about mixed list - NOTE think I have this handled?
+     * NOTE what about mixed list - think I have this handled?
      *
      * @return selected Machine or Software name
      */
     private String getSelectedItem() {
         String itemName;
-        if (folderTree != null && listPopupMenu.getInvoker() == folderTree) {
+        if ((folderTree != null) && (listPopupMenu.getInvoker() == folderTree)) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) folderTree.getLastSelectedPathComponent();
             if (node == null) {
                 return null;
@@ -304,7 +310,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         return itemName;
     }
 
-    private boolean isSelectedSoftware() {
+    private static boolean isSelectedSoftware() {
         int row = machineListTable.getSelectedRow();
         // If no row is selected return ** row == -1
         if (row < 0) {
@@ -315,9 +321,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         return MAMEInfo.isSoftwareList(categoryEntry);
     }
 
-    private void gotoItem(String itemName) {
+    private static void gotoItem(String itemName) {
         int row = 0;
-        while (row < machineListTable.getRowCount()) {
+        int max = machineListTable.getRowCount();
+        while (row < max) {
             if (machineListTable.getModel().getValueAt(row, MachineListTable.KEY_COLUMN).equals(itemName)) {
                 row = machineListTable.convertRowIndexToView(row);
                 machineListTable.getSelectionModel().setSelectionInterval(row, row);
@@ -345,41 +352,32 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         updateUI();
     }
 
-    void showListEditor() {
+    static void showListEditor() {
         MFMListActions.showListEditor();
     }
 
-    void listtoFile() {
-        MFMListActions.listtoFile();
-    }
-
-    void listtoDAT() {
-        MFMListActions.listtoDAT();
-    }
-
     void dattoList() {
-        String listName = MFMListActions.datafiletoList();
-        if (!listName.isEmpty()) {
-            changeList(listName);
+        String newListName = MFMListActions.datafiletoList();
+        if (!newListName.isEmpty()) {
+            changeList(newListName);
         }
     }
 
-    void validateDAT() {
-        MFMListActions.pickValidateDAT();
-    }
-
-    void filterDATbyList() {
-        MFMListActions.filterDATbyList();
-    }
-
-    void filterDATbyExternalList() {
-        MFMListActions.filterDATbyExternalList();
+    static void validateXML() {
+        JFileChooser fileChooser = new JFileChooser(MFM.getMfmListsDir());
+        int returnValue = fileChooser.showOpenDialog(mainFrame);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            boolean answer = MFMListActions.validateXML((fileChooser.getSelectedFile()));
+            String message;
+            message = answer ? "File is valid XML" : "File is NOT valid XML - see error log for the exception.";
+            showMessage(message);
+        }
     }
 
     void importList() {
-        String listName = MFMListActions.importList(getFrame());
-        changeList(listName);
-        MFMUI_Setup.getInstance().updateMenuBar(listName);
+        String listName2 = MFMListActions.importList(mainFrame);
+        changeList(listName2);
+        getInstance().updateMenuBar(listName2);
     }
 
     void runGame(String command) {
@@ -414,7 +412,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 return;
             }
             MAMEexe.run(args, MFM.getMameout());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             infoPanel.showMessage(gameName + " had errors");
             //        showInformation("MAME error", e.getError());
         }
@@ -423,22 +421,24 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     void showHelp(String text) {
 
         switch (text) {
-            case "About":
-                showInformation("MAME File Manager",
-                        "Created December 2011\n" +
-                                "Coded by phweda\n" +
-                                "phweda1@yahoo.com\n" +
-                                MFM.getVERSION() + "\t" + MFM.getReleaseDate()
-                );
+            case ABOUT:
+                showInformation(MFM.MAME_FILE_MANAGER,
+                        "Created December 2011" + NEWLINE +
+                                "Coded by phweda" + NEWLINE +
+                                "phweda1@yahoo.com" + NEWLINE +
+                                MFM.getVERSION() + TAB + MFM.getReleaseDate());
                 break;
-            case "MFM User Guide":
+            case MFM_USER_GUIDE:
                 FileUtils.openFileFromOS(Paths.get(MFM.getMfmDir() + MFM.getMFMUserGuide()));
                 break;
-            case "MFM Copyright":
-                showHTML("MFM Copyright", MFMUI_Resources.MFM_COPYRIGHT_HTML);
+            case MFM_COPYRIGHT:
+                showHTML(MFM_COPYRIGHT, MFMUI_Resources.MFM_COPYRIGHT_HTML);
                 break;
-            case "GNU GPL":
-                showHTML("GNU GPL V3", MFMUI_Resources.GNU_GPL_V3);
+            case GNU_GPL:
+                showHTML(GNU_GPL, MFMUI_Resources.GNU_GPL_V3);
+                break;
+            case HOT_KEYS:
+                showHTML(HOT_KEYS, MFMUI_Resources.HOT_KEYS_HTML);
                 break;
             default:
                 break;
@@ -467,31 +467,44 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     // Todo move/refactor
     void showControlsDevices() {
+        String newlineTab = NEWLINE + TAB;
+
         String machineName = getSelectedItem();
         Machine machine = MAMEInfo.getMachine(machineName);
         if (machine.getIsdevice().equals(Machine.YES) || machine.getIsbios().equals(Machine.YES)) {
             return;
         }
 
-        StringBuilder info = new StringBuilder();
+
+        StringBuilder info = new StringBuilder(200);
         List<Control> controls = machine.getInput().getControl();
-        info.append("Controls:\n\t");
+        info.append("Controls:");
+        info.append(newlineTab);
+
         for (Control control : controls) {
             info.append(MachineControllers.getControllerMAMEtoLabel().get(control.getType()));
-            info.append("\n\t");
+            info.append(newlineTab);
         }
 
-        info.append("\nPlayers:\t");
+        info.append(NEWLINE);
+        info.append("Players:");
+        info.append(TAB);
         info.append(machine.getInput().getPlayers());
-        info.append("\nButtons:\t");
+        info.append(NEWLINE);
+        info.append("Buttons:");
+        info.append(TAB);
         info.append(machine.getButtons());
-        info.append("\n\nDEVICES:\n");
+        info.append(NEWLINE);
+        info.append(NEWLINE);
+        info.append("DEVICES:");
+        info.append(NEWLINE);
         List<Device> list = machine.getDevice();
         for (Device device : list) {
-            info.append("\t");
+            info.append(TAB);
             info.append(device.getTag());
-            info.append("\n");
+            info.append(NEWLINE);
         }
+        info.trimToSize();
         showInformation(machineName, info.toString());
     }
 
@@ -516,7 +529,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         } catch (IOException e) {
             e.printStackTrace();
         }
-        htmlTextPane.setPreferredSize(new Dimension(850, 600));
+        htmlTextPane.setPreferredSize(new Dimension(850, 800));
         scrollPane.setViewportView(htmlTextPane);
         // NOTE we do all of this to have a resizable dialog.
         Object[] array = {
@@ -525,13 +538,17 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         };
         JOptionPane pane = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE);
         JDialog dialog = pane.createDialog(mainFrame, "");
-        dialog.setLocation(150, 150);
+        dialog.setLocation(150, INT_50);
         dialog.setResizable(true);
         dialog.setVisible(true);
     }
 
     void showMFMmessage(String message) {
         infoPanel.showMessage(message);
+    }
+
+    static void showMessage(String message) {
+        JOptionPane.showMessageDialog(mainFrame, message);
     }
 
     void openImage() {
@@ -542,14 +559,14 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     void gotoCloneof() {
         if (isSoftwarelist) {
-            Software software = MAMEInfo.getSoftware(getSelectedItem(), currentList.getName());
-            if (software != null && software.getCloneof() != null && !software.getCloneof().equals("")) {
+            Software software = MAMEInfo.getSoftware(getSelectedItem(), currentListLabel.getName());
+            if ((software != null) && (software.getCloneof() != null) && !software.getCloneof().isEmpty()) {
                 gotoItem(software.getCloneof());
             }
         } else {
             // GOTO selected game's parent(cloneof)
             Machine machine = MAMEInfo.getMachine(getSelectedItem());
-            if (machine != null && machine.getCloneof() != null && !machine.getCloneof().equals("")) {
+            if ((machine != null) && (machine.getCloneof() != null) && !machine.getCloneof().isEmpty()) {
                 gotoItem(machine.getCloneof());
             }
         }
@@ -566,7 +583,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
         try {
             row = machineListTable.convertRowIndexToModel(row);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             imagePanel.imageReset();
             return;
         }
@@ -577,25 +594,25 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         String folder = extrasTabbedPane.getTitleAt(index).toLowerCase();
 
         // NOTE hack for lists with mixed Machine/Software if not isSoftwarelist but Machine not found assume Software
-        if (isSoftwarelist || MAMEInfo.getMachine(gameName) == null) {
+        if (isSoftwarelist || (MAMEInfo.getMachine(gameName) == null)) {
             switch (folder) {
 
                 case "cabinet/cover":
-                    folder = "covers_SL";
+                    folder = COVERS_SL;
                     break;
 
                 case "snap":
-                    folder = "snap_SL";
+                    folder = SNAP_SL;
                     break;
 
-                case "titles":
-                    folder = "titles_SL";
+                case TITLES:
+                    folder = TITLES_SL;
                     break;
                 default:
                     break;
             }
-        } else if (folder.contains("/")) {
-            folder = "cabinets";
+        } else if (folder.contains(String.valueOf(SLASH))) {
+            folder = CABINETS;
         }
 
         String fileName = gameName + PNG_EXT;
@@ -614,7 +631,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         } else if (mfmSettings.getExtrasZipFilesMap().containsKey(folder)) {
             StringBuilder sb = new StringBuilder(MFM.getTempdir());
             sb.append(folder);
-            sb.append("-");
+            sb.append('-');
             sb.append(fileName);
             File tempImage = new File(sb.toString()); // temp file name needs to be unique
             // if it doesn't exist try in the Zip
@@ -645,23 +662,23 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     }
 
-    private void showError(String text) {
+    private static void showError(String text) {
         JOptionPane.showMessageDialog(mainFrame, text, "ERROR", JOptionPane.ERROR_MESSAGE);
     }
 
     void showManual() {
         String selectedItem = getSelectedItem();
         // NOTE hack for lists with mixed Machine/Software if not isSoftwarelist but Machine not found assume Software
-        String manualFolder = isSoftwarelist || MAMEInfo.getMachine(selectedItem) == null ? MANUALS_SL : MANUALS;
+        String manualFolder = (isSoftwarelist || (MAMEInfo.getMachine(selectedItem) == null)) ? MANUALS_SL : MANUALS;
         String fullPath = null;
         File tempManual = null;
         String dir = mfmSettings.PlaySetDirectories().get(manualFolder);
-        if (dir != null && FileUtils.fileExists(dir, selectedItem + PDF_EXT)) {
+        if ((dir != null) && FileUtils.fileExists(dir, selectedItem + PDF_EXT)) {
             fullPath = mfmSettings.PlaySetDirectories().get(manualFolder) + FileUtils.DIRECTORY_SEPARATOR
                     + selectedItem + PDF_EXT;
         }
         // Can't be guaranteed this exists either!
-        else if (mfmSettings.FullSetDirectories().get(manualFolder) != null &&
+        else if ((mfmSettings.FullSetDirectories().get(manualFolder) != null) &&
                 FileUtils.fileExists(mfmSettings.FullSetDirectories().get(manualFolder),
                         selectedItem + PDF_EXT)) {
             fullPath = mfmSettings.FullSetDirectories().get(manualFolder) + FileUtils.DIRECTORY_SEPARATOR
@@ -679,7 +696,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
                 if (isSoftwarelist) {
                     // prepend the Softwarelist name to the filename
-                    selectedItem = currentList.getName() + FileUtils.DIRECTORY_SEPARATOR + selectedItem;
+                    selectedItem = currentListLabel.getName() + FileUtils.DIRECTORY_SEPARATOR + selectedItem;
                 }
                 ZipUtils.extractFile(mfmSettings.getExtrasZipFilesMap().get(manualFolder).toPath(),
                         selectedItem + PDF_EXT, Paths.get(sb.toString()));
@@ -688,29 +705,10 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
         if (fullPath != null) {
             FileUtils.openFileFromOS(Paths.get(fullPath));
-        } else if (tempManual != null && tempManual.exists()) {
+        } else if ((tempManual != null) && tempManual.exists()) {
             FileUtils.openFileFromOS(Paths.get(tempManual.getAbsolutePath()));
         } else {
             showInformation(selectedItem, "No manual found for " + selectedItem);
-        }
-    }
-
-    void showLog(String log) {
-        switch (log) {
-            case MFMAction.LOG:
-                FileUtils.openFileFromOS(Paths.get(MFM.getLog().getAbsolutePath()));
-                break;
-            case MFMAction.MAME_OUTPUT:
-                FileUtils.openFileFromOS(Paths.get(MFM.getMameout().getAbsolutePath()));
-                break;
-            case MFMAction.ERROR_LOG:
-                FileUtils.openFileFromOS(Paths.get(MFM.getErrorLog().getAbsolutePath()));
-                break;
-            case MFMAction.GC_LOG:
-                FileUtils.openFileFromOS(Paths.get(MFM.getMfmLogsDir() + "MFM_GC_log.txt"));
-                break;
-            default:
-                break;
         }
     }
 
@@ -719,67 +717,51 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         MFMVideoActions.showVideo(gameName);
     }
 
-    /**
-     * Scan all resource roots for resources for this list.
-     * Log and report results
-     *
-     * @param copy If true copy the files else just report results
-     */
-    void copyResources(final boolean copy) {
-        MFMListActions.copyResources(copy);
-    }
-
-    void scanResources() {
-        MFMListActions.scanResources();
-    }
-
-    void updateUI() {
+    static void updateUI() {
         SwingUtilities.updateComponentTreeUI(mainFrame);
         mainFrame.validate();
-    }
-
-    void showSettings() {
-        MFM_SettingsPanel.showSettingsPanel(MFMUI.getSettings());
     }
 
     @Override
     public void keyTyped(KeyEvent e) {
 //        System.out.println("Typed: " + e.getKeyCode() + "\t" + e.getKeyChar());
+        // If ALT then it is a mnemonic skip
+        if (!e.isAltDown()) {
+            if (e.getKeyChar() == KeyEvent.VK_A) {
+                changeList(MFMListBuilder.ALL);
+            }
 
-        if (e.getKeyChar() == 'a') {
-            changeList(MFMListBuilder.ALL);
-        }
+            if (e.getKeyChar() == KeyEvent.VK_B) {
+                changeList(MFMListBuilder.BIOS);
+            }
 
-        if (e.getKeyChar() == 'b') {
-            changeList(MFMListBuilder.BIOS);
-        }
+            if (e.getKeyChar() == KeyEvent.VK_C) {
+                changeList(MFMListBuilder.CLONE);
+            }
 
-        if (e.getKeyChar() == 'c') {
-            changeList(MFMListBuilder.CLONE);
-        }
+            if (e.getKeyChar() == KeyEvent.VK_D) {
+                changeList(MFMListBuilder.DEVICES);
+            }
 
-        if (e.getKeyChar() == 'd') {
-            changeList(MFMListBuilder.DEVICES);
-        }
+            if (e.getKeyChar() == KeyEvent.VK_H) {
+                changeList(MFMListBuilder.HORIZONTAL);
+            }
 
-        if (e.getKeyChar() == 'h') {
-            changeList(MFMListBuilder.HORIZONTAL);
-        }
+            if (e.getKeyChar() == KeyEvent.VK_N) {
+                changeList(MFMListBuilder.NO_CLONE);
+            }
 
-        if (e.getKeyChar() == 'n') {
-            changeList(MFMListBuilder.NO_CLONE);
-        }
+            if ((e.getKeyChar() == KeyEvent.VK_R) && MFM_Data.getInstance().getDataVersion().contains(MFMListBuilder.ALL)) {
+                changeList(MFMListBuilder.RUNNABLE);
+            }
 
-        if (e.getKeyChar() == 'r') {
-            changeList(MFMListBuilder.RUNNABLE);
-        }
+            if (e.getKeyChar() == KeyEvent.VK_S) {
+                changeList(MFMListBuilder.SYSTEMS);
+            }
 
-        if (e.getKeyChar() == 's') {
-            changeList(MFMListBuilder.SYSTEMS);
-        }
-
-        if (e.getKeyChar() == 'v') {
-            changeList(MFMListBuilder.VERTICAL);
+            if (e.getKeyChar() == KeyEvent.VK_V) {
+                changeList(MFMListBuilder.VERTICAL);
+            }
         }
 
     }
@@ -787,31 +769,31 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     @Override
     public void keyPressed(KeyEvent e) {
 
-        if ((e.getKeyCode() == KeyEvent.VK_A) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_A) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
             changeList(MFMListBuilder.ARCADE);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_N) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_N) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
             changeList(MFMListBuilder.NO_IMPERFECT);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_O) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_O) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
             openFile();
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_R) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_R) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
             changeList(MFMListBuilder.RASTER);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_S) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0) && !e.isShiftDown()) {
+        if ((e.getKeyCode() == KeyEvent.VK_S) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) && !e.isShiftDown()) {
             changeList(MFMListBuilder.SIMULTANEOUS);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
             changeList(MFMListBuilder.VECTOR);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
             showItemXML();
         }
 
@@ -820,7 +802,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             zipLogs();
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
             showNextList(true, true);
         }
 
@@ -828,25 +810,25 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             showNextList(true, false);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & KeyEvent.ALT_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & InputEvent.ALT_MASK) != 0)) {
             showNextList(false, true);
         }
 
-        if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & KeyEvent.ALT_MASK) != 0)) {
+        if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & InputEvent.ALT_MASK) != 0)) {
             showNextList(false, false);
         }
 
         //================== SPECIAL FUNCTIONS  =================
 
-        if (e.getKeyCode() == KeyEvent.VK_D && e.isControlDown() && e.isShiftDown()) {
+        if ((e.getKeyCode() == KeyEvent.VK_D) && e.isControlDown() && e.isShiftDown()) {
             MFM_DATmaker.saveBuiltinListsDATs();
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_J && e.isControlDown() && e.isShiftDown()) {
+        if ((e.getKeyCode() == KeyEvent.VK_J) && e.isControlDown() && e.isShiftDown()) {
             listMachinesToJSON(false);
         }
 
-        if (e.getKeyCode() == KeyEvent.VK_K && e.isControlDown() && e.isShiftDown()) {
+        if ((e.getKeyCode() == KeyEvent.VK_K) && e.isControlDown() && e.isShiftDown()) {
             listMachinesToJSON(true);
         }
 
@@ -859,7 +841,8 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_T) && e.isControlDown() && e.isShiftDown()) {
-            MFM_Wiki.listtoWikiTable(currentList.getText().substring(0, currentList.getText().indexOf(' ')));
+            MFM_Wiki.listtoWikiTable(currentListLabel.getText().substring(0,
+                    currentListLabel.getText().indexOf(SPACE_CHAR)));
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_U) && e.isControlDown() && e.isShiftDown()) {
@@ -893,19 +876,15 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     private void showNextList(boolean all, boolean next) {
         if (all) {
-            changeList(MFMPlayLists.getInstance().getNextListName(currentList.getName(), next));
+            changeList(MFMPlayLists.getInstance().getNextListName(currentListLabel.getName(), next));
         } else {
-            changeList(MFMPlayLists.getInstance().getNextMyListName(currentList.getName(), next));
+            changeList(MFMPlayLists.getInstance().getNextMyListName(currentListLabel.getName(), next));
         }
     }
 
-    void zipLogs() {
+    static void zipLogs() {
         ZipUtils zipUtils = new ZipUtils();
-        String sb = MFM.getMfmDir() +
-                FileUtils.DIRECTORY_SEPARATOR +
-                "MFM_Logs_" +
-                MFM.LOG_NUMBER +
-                ".zip";
+        String sb = MFM.getMfmDir() + DIRECTORY_SEPARATOR + "MFM_Logs_" + MFM.LOG_NUMBER + ".zip";
         zipUtils.zipIt(sb, new File(MFM.getMfmLogsDir()), MFM.getMfmLogsDir());
         if (Desktop.isDesktopSupported()) {
             File dir = new File(MFM.getMfmDir());
@@ -917,7 +896,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         }
     }
 
-    void postToPastie() {
+    static void postToPastie() {
         List<String> lines = null;
         try {
             lines = Files.readAllLines(MFM.getErrorLog().toPath(), Charset.defaultCharset());
@@ -935,11 +914,11 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             System.arraycopy(strings, strings.length - 101, strings2, 0, 100);
         }
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(250);
         for (String s : strings2) {
             if (s != null) {
                 builder.append(s);
-                builder.append(FileUtils.NEWLINE);
+                builder.append(NEWLINE);
             }
         }
 
@@ -952,15 +931,16 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (null != result && !result.isEmpty()) {
+            if ((result != null) && !result.isEmpty()) {
                 System.out.println(result);
                 Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection stringSelection = new StringSelection(result);
+                Transferable stringSelection = new StringSelection(result);
                 clpbrd.setContents(stringSelection, null);
-                JOptionPane.showMessageDialog(getFrame(), "Pastie link is in your Clipboard\n" + result);
+                JOptionPane.showMessageDialog(mainFrame, "Pastie link is in your Clipboard" +
+                        NEWLINE + result);
             }
         } else {
-            JOptionPane.showMessageDialog(getFrame(), "Error log is empty");
+            JOptionPane.showMessageDialog(mainFrame, "Error log is empty");
         }
 
     }
@@ -983,8 +963,8 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
         listPopupMenu = components.getListPopupMenu();
         softwarelistPopupMenu = components.getSoftwarelistPopupMenuPopupMenu();
-        currentList = components.currentListName();
-        listName = currentList.getName();
+        currentListLabel = components.currentListLabel();
+        listName = currentListLabel.getName();
         infoPanel = MFM_Components.infoPanel();
         statusBar = components.statusBar();
 
@@ -1005,29 +985,29 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
         // NOTE Oh Well Obi complained: I personally hate it when apps grab the whole screen on startup
         mainFrame.setPreferredSize(new Dimension(screenSize.width, screenSize.height));
-        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        mainFrame.addWindowListener(new MFMUI_Setup.MFMWindow());
+        mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
+        mainFrame.addWindowListener(new MFMController.MFMWindow());
         setFontSize(mainFrame);
 
         String list = mfmSettings.MFMCurrentList();
-        if (list != null && list.length() > 0) {
+        if ((list != null) && (!list.isEmpty())) {
             changeList(list);
         } else {
             changeList(MFMListBuilder.ALL);
         }
 
         Integer tabIndex = mfmSettings.selectedTab();
-        if (tabIndex != null && tabIndex > 0) {
+        if ((tabIndex != null) && (tabIndex > 0)) {
             components.extrasTabbedPane().setSelectedIndex(tabIndex);
         }
 
         String lnF = mfmSettings.MFMLookAndFeel();
-        if (lnF != null && lnF.length() > 0) {
+        if ((lnF != null) && (!lnF.isEmpty())) {
             changeLnF(lnF);
         }
     }
 
-    void changeLnF(String lnF) {
+    static void changeLnF(String lnF) {
         SwingUtils.changeLandF(lnF, mainFrame);
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
@@ -1041,25 +1021,21 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         Machine machine = MAMEInfo.getMachine(getSelectedItem());
         String orientation = machine.getIsVertical();
         showInformation(machine.getName() + " video information",
-                orientation + "\n--------------------------\n" +
-                        "Width : " + machine.getWidth() + "\n" +
+                orientation + NEWLINE + "--------------------------" + NEWLINE +
+                        "Width : " + machine.getWidth() + NEWLINE +
                         "Height : " + machine.getHeight() +
-                        "\n--------------------------\n" +
+                        NEWLINE + "--------------------------" + NEWLINE +
                         "Aspect Ratio: " + MAMECommands.aspectRatio(machine)
         );
     }
 
-    void videoAction(final String action) {
+    static void videoAction(final String action) {
         MFMVideoActions.videoAction(action, infoPanel);
     }
 
-    void ffmpegSettings() {
+    static void ffmpegSettings() {
         final FFMPEG_Panel ffmpegPanel = new FFMPEG_Panel();
         ffmpegPanel.showSettingsPanel(mainFrame);
-    }
-
-    void runFFmpeg() {
-        MFMVideoActions.runFFmpeg();
     }
 
     void cropAVI() {
@@ -1067,19 +1043,15 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         MFMVideoActions.cropAVI(machine, infoPanel);
     }
 
-    void showListBuilder(String baseList) {
-        MFMListActions.openListBuilder(baseList);
-    }
-
     void refreshVersion() {
         if (!MFM.isFirstRun()) {
-            ((JLabel) statusBar.getZone("Version")).setText("MAME " + mfmSettings.getMAMEVersion() +
+            ((JLabel) statusBar.getZone(VERSION)).setText("MAME " + mfmSettings.getMAMEVersion() +
                     " : DATA " + MFM_Data.getInstance().getDataVersion());
         }
     }
 
     private void refreshRunnable() {
-        ((JLabel) statusBar.getZone("Working")).setText("Runnable " + MAMEInfo.getRunnable());
+        ((JLabel) statusBar.getZone(WORKING)).setText(RUNNABLE + MAMEInfo.getRunnable());
     }
 
 /*  Retain for debugging
@@ -1089,12 +1061,12 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
     }
 */
 
-    void listMachinesToCSV() {
+    static void listMachinesToCSV() {
         MFMListActions.listDataToCSV(pickList(true, "Pick list to export MAME data to CSV"));
-        JOptionPane.showMessageDialog(mainFrame, "Files are in the MFM/Lists folder");
+        JOptionPane.showMessageDialog(mainFrame, FILES_ARE_IN_THE_MFM_LISTS_FOLDER);
     }
 
-    private void listMachinesToJSON(boolean everything) {
+    private static void listMachinesToJSON(boolean everything) {
 
         if (everything) {
             MFMListActions.listDataToJSON(MFMPlayLists.EVERYTHING);
@@ -1104,19 +1076,19 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         String list = pickList(true, "Pick list to export MAME data to JSON");
         if (list != null) {
             MFMListActions.listDataToJSON(list);
-            JOptionPane.showMessageDialog(mainFrame, "Files are in the MFM/Lists folder");
+            JOptionPane.showMessageDialog(mainFrame, FILES_ARE_IN_THE_MFM_LISTS_FOLDER);
         }
     }
 
     // Todo move the tree display methods out of controller
-    void showMAMEtree() {
+    static void showMAMEXML() {
         // we know it is a JSplitPane see MAMEUI_Setup
         //    Container container = folderTree.getParent().getParent().getParent(); // JViewPort -> JScrollPane -> JSplitPane
         //    container.remove(folderTree);
         Container container = (Container) mainFrame.getContentPane().getComponents()[0];
         if (mfmSettings.isShowXML()) {
             ((JSplitPane) container).setLeftComponent(new JScrollPane(MAMEtoJTree.getInstance(false).getMAMEjTree()));
-            ((JSplitPane) container).setDividerLocation(.16);
+            ((JSplitPane) container).setDividerLocation(DIVIDER_LOCATION);
         } else {
             MFMUI_Setup.getInstance().refreshLeftPane();
         }
@@ -1125,16 +1097,16 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
 
     void showItemXML() {
         String selectedItem = getSelectedItem();
-        JDialog dialog = new JDialog(getFrame(), selectedItem);
+        JDialog dialog = new JDialog(mainFrame, selectedItem);
         JScrollPane scrollPane = new JScrollPane();
 
         // NOTE hack for lists with mixed Machine/Software if not isSoftwarelist but Machine not found assume Software
         // fixme ouch nested ternary for mixed lists
-        DefaultMutableTreeNode itemNode = isSoftwarelist || MAMEInfo.getMachine(selectedItem) == null ?
-                MAMEInfo.isSoftwareList(currentList.getName()) ?
-                        SoftwareListtoJTree.getInstance(currentList.getName()).getSoftwareNode(selectedItem) :
+        DefaultMutableTreeNode itemNode = (isSoftwarelist || (MAMEInfo.getMachine(selectedItem) == null)) ?
+                (MAMEInfo.isSoftwareList(currentListLabel.getName()) ?
+                        SoftwareListtoJTree.getInstance(currentListLabel.getName()).getSoftwareNode(selectedItem) :
                         SoftwareListtoJTree.getInstance(selectedItem.split(MFM_Constants.SOFTWARE_LIST_SEPARATER)[0])
-                                .getSoftwareNode(selectedItem)
+                                .getSoftwareNode(selectedItem))
                 : MAMEtoJTree.getInstance(false).getMachineNode(selectedItem);
 
 
@@ -1149,7 +1121,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             @Override
             public void mousePressed(MouseEvent e) {
                 TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3 && selPath != null) {
+                if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON3) && (selPath != null)) {
                     MAMEtoJTree.getInstance(false).copytoClipboard(selPath.getLastPathComponent().toString());
                 }
             }
@@ -1168,7 +1140,8 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 });
         // Expand all if softwarelist -> NOTE my guess that if looking at this XML will be easier if expanded
         if (isSoftwarelist) {
-            for (int i = 0; i < tree.getRowCount(); i++) {
+            int max = tree.getRowCount();
+            for (int i = 0; i < max; i++) {
                 tree.expandRow(i);
             }
         }
@@ -1177,24 +1150,24 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         SwingUtils.updateIcons(tree);
 
         scrollPane.getViewport().add(tree);
-        scrollPane.setPreferredSize(new Dimension(350, getFrame().getHeight() - 100));
+        scrollPane.setPreferredSize(new Dimension(SCROLLPANE_WIDTH, mainFrame.getHeight() - 100));
         dialog.getContentPane().add(scrollPane);
         dialog.pack();
-        dialog.setLocation(100, 50);
+        dialog.setLocation(100, INT_50);
         dialog.setVisible(true);
     }
 
-    void openFile() {
+    static void openFile() {
         JFileChooser fileChooser = new JFileChooser(MFM.getMfmListsDir());
         int returnValue = fileChooser.showOpenDialog(mainFrame);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
-            FileUtils.openFileFromOS(fileChooser.getSelectedFile().toPath());
+            openFileFromOS(fileChooser.getSelectedFile().toPath());
         }
     }
 
     void loadDataSet(boolean pickList) {
         String dataSet = mfmSettings.getDataVersion();
-        if (pickList || dataSet == null) {
+        if (pickList || (dataSet == null)) {
             // Special case first run no Data Sets found!
             int dSets = MFM_Data.getInstance().getDataSets().length;
             if (dSets < 1) {
@@ -1203,7 +1176,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
                 }
                 //    REMOVED FIRST RUN PARSE OPTION Oct 2017
                 showDataSetsURL();
-            } else if (dSets == 1 && mainFrame != null) {
+            } else if ((dSets == 1) && (mainFrame != null)) {
                 return; // Already loaded NOTE look for a better way to do this
             } else if (dSets == 1) {
                 dataSet = MFM_Data.getInstance().getDataSets()[0];
@@ -1212,7 +1185,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             }
         }
 
-        if (dataSet != null && !dataSet.isEmpty() && !dataSet.equals("null")) {
+        if ((dataSet != null) && !dataSet.isEmpty() && !"null".equals(dataSet)) {
             mfmSettings.setDataVersion(dataSet);
         } else {
             return;
@@ -1248,14 +1221,14 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         loadDataSet.start();
     }
 
-    private void updateuiData(String dataSet) {
-        if (mainFrame != null && mainFrame.isVisible() && !firstLoad) {
+    void updateuiData(String dataSet) {
+        if ((mainFrame != null) && mainFrame.isVisible() && !firstLoad) {
             // Refresh MAME JTree
             MAMEtoJTree.getInstance(true);
             MFMUI_Setup.getInstance().refreshLeftPane();
 
             // Force table refresh if needed
-            changeList(currentList.getName());
+            changeList(currentListLabel.getName());
 
             updateUI();
 
@@ -1263,20 +1236,25 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             refreshVersion();
             refreshRunnable();
             MFMUI_Setup.getInstance().updateMenuBar("");
-            infoPanel.showMessage(dataSet + " loaded");
+            infoPanel.showMessage(dataSet + LOADED);
         } else {
             firstLoad = false;
             // Hack for Parsing on first run load
             if (mainFrame != null) {
                 updateUI();
-                infoPanel.showMessage(dataSet + " loaded");
+                infoPanel.showMessage(dataSet + LOADED);
             }
         }
     }
 
-    // First run hack No Data Set
-    private void showDataSetsURL() {
-        JDialog urlDialog = new JDialog(getFrame(), "No Data Set");
+    /**
+     * First run hack No Data Set
+     *
+     * @deprecated
+     **/
+    @Deprecated
+    private static void showDataSetsURL() {
+        JDialog urlDialog = new JDialog(mainFrame, "No Data Set");
         urlDialog.getContentPane().add(LinkEditorPane.getLinkPane("Download a Data Set",
                 "https://github.com/phweda/MFM/releases"));
 
@@ -1319,7 +1297,7 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
             @SuppressWarnings("RedundantThrows")
             @Override
             protected Object doInBackground() throws Exception {
-                synchronized (this) {
+                synchronized (mainFrame) {
                     MAMEInfo.getInstance(true, true, all);
                 }
                 return null;
@@ -1337,5 +1315,13 @@ class MFMController extends ClickListener implements ListSelectionListener, Chan
         Thread parseMAME = new Thread(sw);
         parseMAME.start();
     }
-}
 
+    private static final class MFMWindow extends WindowAdapter {
+        @Override
+        public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            MFM.getLogger().addToList("MFM Closing on frame closing command", true);
+            MFM.exit();
+        }
+    }
+}

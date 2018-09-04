@@ -18,10 +18,8 @@
 
 package Phweda.MFM.mame;
 
-import Phweda.MFM.MAMEInfo;
 import Phweda.MFM.MAMEexe;
 import Phweda.MFM.MFM;
-import Phweda.MFM.MFMSettings;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date: 9/1/13
  * Time: 5:26 PM
  */
+@Deprecated
 public class MAME_Game_Prefixes {
     Set<String> prefixes;
     Set<String> games;
@@ -127,25 +126,5 @@ public class MAME_Game_Prefixes {
         }
         br.close();
         return ts;
-    }
-
-    /**
-     * Testing
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        try {
-            new MFM();
-            if (MFMSettings.getInstance().isLoaded()) {
-                MAMEInfo.getInstance(false, false, false);
-            } else {
-                MFM.getLogger().addToList("No MAME Settings ", true);
-            }
-            new MAME_Game_Prefixes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

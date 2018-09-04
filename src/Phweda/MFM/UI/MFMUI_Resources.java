@@ -35,12 +35,14 @@ import java.util.HashMap;
 @SuppressWarnings("WeakerAccess")
 public class MFMUI_Resources {
 
-    static final String MFM_ICON_PNG = "MFM_Icon.png";
     // Help files
     static final String MFM_HTML = "MFM.html";
     static final String MFM_COPYRIGHT_HTML = "MFM Copyright.html";
     static final String GNU_GPL_V3 = "GNU GPL V3.html";
+    static final String HOT_KEYS_HTML = "Hot Keys.html";
+
     // Icons
+    static final String MFM_ICON_PNG = "MFM_Icon.png";
     static final String A_PNG = "A.png";
     static final String ARROW_PNG = "Arrow.png";
     static final String C_PNG = "C.png";
@@ -73,13 +75,13 @@ public class MFMUI_Resources {
     private static final String POSITIONAL_CONTROL_IMG = "Positional_control.png";
     private static final String STICK_CONTROL_IMG = "Stick_control.png";
     private static final String TRACKBALL_CONTROL_IMG = "Trackball_control.png";
-    private static final String RESOURCES = "Resources";
+    public static final String RESOURCES = "Resources";
     private static final String FLAGS = "flags";
     private static final String PNG_SUFFIX = ".png";
 
     private static MFMUI_Resources ourInstance;
     private static final String[] resourceNames = {
-            MFM_HTML, MFM_COPYRIGHT_HTML, GNU_GPL_V3,
+            MFM_HTML, MFM_COPYRIGHT_HTML, GNU_GPL_V3, HOT_KEYS_HTML,
             A_PNG, ARROW_PNG, C_PNG, CHECKMARK_PNG, CIRCULAR_ARROW, EX_PNG, MFM_ICON_PNG, MFM_IMAGE_PNG, MINUS_PNG,
             I_PNG, L_PNG, P_PNG, S_PNG,
             UPARROW_PNG, VDUB, MAME_LOGO, MAME_LOGO_SMALL,

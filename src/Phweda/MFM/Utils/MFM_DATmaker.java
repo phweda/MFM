@@ -240,7 +240,7 @@ public class MFM_DATmaker {
         header.setCategory("Standard DatFile");
         header.setDate(new SimpleDateFormat("yyyy.MM.dd").format(new Date()));
         header.setVersion(MFM_Data.getInstance().getDataVersion());
-        header.setAuthor(MFM.APPLICATION_NAME);
+        header.setAuthor(MFM.MAME_FILE_MANAGER);
         return header;
     }
 

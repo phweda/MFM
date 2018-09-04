@@ -291,10 +291,10 @@ public final class MFMListBuilder {
     private static void getCategoryLists() {
         // NOTE moved input from file to MAMEInfo 4/18
 
-        HashMap<String, ArrayList<String>> map = MAMEInfo.getCategoryListsMap();
+        Map<String, ArrayList<String>> map = MAMEInfo.getCategoryListsMap();
         allCategoryRoots = map.get(ALL_CATEGORY_ROOTS);
         arcadeCategoryRoots = map.get(ARCADE_CATEGORY_ROOTS);
-        ArrayList<String> matureCategoryRoots = map.get(MATURE_CATEGORY_ROOTS);
+        List<String> matureCategoryRoots = map.get(MATURE_CATEGORY_ROOTS);
         systemCategoryRoots = map.get(SYSTEM_CATEGORY_ROOTS);
         allMatureCategories = map.get(ALL_MATURE_CATEGORIES);
         systemCategories = map.get(SYSTEM_CATEGORIES);
