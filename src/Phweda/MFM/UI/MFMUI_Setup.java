@@ -69,7 +69,6 @@ public final class MFMUI_Setup {
 
     void init() {
         controller.init();
-        MFMAction.setController(controller);
     }
 
     public void loadDataSet() {

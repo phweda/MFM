@@ -61,9 +61,13 @@ public class MFMUI {
         // set a new dismiss delay milliseconds
         ToolTipManager.sharedInstance().setDismissDelay(20000);
 
-        // Schedule a job for the event-dispatching thread:
-        // creating and showing this application's GUI.
-        SwingUtilities.invokeLater(() -> MFMUI_Setup.getInstance().init());
+        try {
+            // Schedule a job for the event-dispatching thread:
+            // creating and showing this application's GUI.
+            SwingUtilities.invokeLater(() -> MFMUI_Setup.getInstance().init());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void showBusy(boolean start, boolean loadData) {

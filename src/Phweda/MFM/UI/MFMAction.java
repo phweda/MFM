@@ -70,6 +70,7 @@ public class MFMAction extends AbstractAction {
     static final String SAVE_LIST_DATA = "Save List Data";
     static final String SCAN_RESOURCES = "Scan Resources";
     static final String SAVE_LIST_TO_FILE = "Save List to File";
+    @SuppressWarnings("WeakerAccess")
     public static final String LIST_EDITOR = "List Editor";
     static final String CREATE_DAT_FROM_LIST = "Create DAT from List";
     static final String CREATE_LIST_FROM_DAT = "Create List from DAT";
@@ -94,17 +95,12 @@ public class MFMAction extends AbstractAction {
     static final String MACHINE_VIDEO_INFO = "Machine Video Info";
     @SuppressWarnings("WeakerAccess")
     static final String EXIT = "Exit";
+    @SuppressWarnings("WeakerAccess")
     public static final String REMOVE_LIST = "Remove List";
     public static final String SETTINGS = "Settings";
 
-    private static MFMController controller;
-
     public MFMAction(String text, Icon icon) {
         super(text, icon);
-    }
-
-    static void setController(MFMController mfmController) {
-        controller = mfmController;
     }
 
     private static void filterDATbyList() {
@@ -188,50 +184,50 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case HELP:
-                    controller.showHelp(((AbstractButton) e.getSource()).getText());
+                    MFMController.showHelp(((AbstractButton) e.getSource()).getText());
                     break;
 
                 case SHOW_LIST:
                     // Get the Play List name from JMenuItem text
-                    controller.changeList(((AbstractButton) e.getSource()).getText());
+                    MFMController.changeList(((AbstractButton) e.getSource()).getText());
                     break;
 
                 case RUN_MACHINE:
                     if (MFMController.getMachineListTable().hasFocus()) {
-                        controller.runGame("");
+                        MFMController.runGame("");
                     }
                     break;
 
                 case RECORD_MACHINE:
-                    controller.runGame(MAMECommands.RECORD);
+                    MFMController.runGame(MAMECommands.RECORD);
                     break;
 
                 case MACHINE_VIDEO_INFO:
-                    controller.showGameVideoInfo();
+                    MFMController.showGameVideoInfo();
                     break;
 
                 case PLAYBACK_MACHINE:
-                    controller.runGame(MAMECommands.PLAYBACK);
+                    MFMController.runGame(MAMECommands.PLAYBACK);
                     break;
 
                 case PLAYBACK_TO_AVI:
-                    controller.runGame(MAMECommands.PLAYBACK_TO_AVI);
+                    MFMController.runGame(MAMECommands.PLAYBACK_TO_AVI);
                     break;
 
                 case PLAY_RECORD_TO_AVI:
-                    controller.runGame(MAMECommands.AVIWRITE);
+                    MFMController.runGame(MAMECommands.AVIWRITE);
                     break;
 
                 case VDUB:
-                    controller.vDUB();
+                    MFMController.vDUB();
                     break;
 
                 case EDIT_VIDEO:
-                    controller.vDUB();
+                    MFMController.vDUB();
                     break;
 
                 case CROP_AVI:
-                    controller.cropAVI();
+                    MFMController.cropAVI();
                     break;
 
                 case FFMPEG:
@@ -277,27 +273,27 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case SHOW_HISTORY:
-                    controller.showHistory();
+                    MFMController.showHistory();
                     break;
 
                 case SHOW_MANUAL:
-                    controller.showManual();
+                    MFMController.showManual();
                     break;
 
                 case SHOW_INFO:
-                    controller.showInfo();
+                    MFMController.showInfo();
                     break;
 
                 case SHOW_CONTROLS_DEVICES:
-                    controller.showControlsDevices();
+                    MFMController.showControlsDevices();
                     break;
 
                 case OPEN_IMAGE:
-                    controller.openImage();
+                    MFMController.openImage();
                     break;
 
                 case PLAY_VIDEO:
-                    controller.showVideo();
+                    MFMController.showVideo();
                     break;
 
                 case SETTINGS:
@@ -309,15 +305,15 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case LOAD_DATA_SET:
-                    controller.loadDataSet(true);
+                    MFMController.loadDataSet(true);
                     break;
 
                 case PARSE_MAME_RUNNABLE:
-                    controller.parseMAME(false);
+                    MFMController.parseMAME(false);
                     break;
 
                 case PARSE_MAME_ALL:
-                    controller.parseMAME(true);
+                    MFMController.parseMAME(true);
                     break;
 
                 case MAME_COMMAND_BUILDER:
@@ -341,11 +337,11 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case IMPORT_LIST:
-                    controller.importList();
+                    MFMController.importList();
                     break;
 
                 case REMOVE_LIST:
-                    controller.removeList();
+                    MFMController.removeList();
                     break;
 
                 case LIST_EDITOR:
@@ -353,11 +349,11 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case ADD_TO_LIST:
-                    controller.addtoList();
+                    MFMController.addtoList();
                     break;
 
                 case REMOVE_FROM_LIST:
-                    controller.removefromList();
+                    MFMController.removefromList();
                     break;
 
                 case SAVE_LIST_TO_FILE:
@@ -369,7 +365,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case CREATE_LIST_FROM_DAT:
-                    controller.dattoList();
+                    MFMController.dattoList();
                     break;
 
                 case VALIDATE_DAT:
@@ -393,7 +389,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case GOTO_CLONEOF:
-                    controller.gotoCloneof();
+                    MFMController.gotoCloneof();
                     break;
 
                 case CommandDialog.SAVE_COMMAND:
@@ -407,11 +403,11 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case SHOW_MACHINE_XML:
-                    controller.showItemXML();
+                    MFMController.showItemXML();
                     break;
 
                 case SHOW_SOFTWARE_XML:
-                    controller.showItemXML();
+                    MFMController.showItemXML();
                     break;
 
                 case LOG:
@@ -439,7 +435,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case DUMP_WAYS_CONTROLS:
-                    // controller.MAMEControlsDUMP();
+                    // MFMController.MAMEControlsDUMP();
                     break;
 
                 case CLEAN_LOGS:
@@ -447,7 +443,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case UPDATE_VERSION:
-                    controller.refreshVersion();
+                    MFMController.refreshVersion();
                     break;
 
                 case EXIT:
@@ -461,7 +457,7 @@ public class MFMAction extends AbstractAction {
                     String command = e.getActionCommand();
                     if (SwingUtils.lookandFeelNames().contains(command)) {
                         MFMController.changeLnF(command);
-                        controller.showMFMmessage("Changed UI to " + command);
+                        MFMController.showMFMmessage("Changed UI to " + command);
                         MFMSettings.getInstance().MFMLookAndFeel(command);
 
                     }
