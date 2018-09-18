@@ -21,6 +21,7 @@ package Phweda.MFM.UI;
 import Phweda.MFM.*;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
+import Phweda.utils.FileUtils;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -30,6 +31,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -38,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static Phweda.MFM.MFMSettings.PLAYABLE;
+import static Phweda.MFM.MFM_Constants.HYPHEN;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,7 +50,7 @@ import static Phweda.MFM.MFMSettings.PLAYABLE;
  * Time: 1:25 PM
  */
 class MAME_Stats {
-    final Mame mame;
+    private final Mame mame;
     private final LinkedHashMap<String, AtomicInteger> stats = new LinkedHashMap<>(100);
     private final DecimalFormat percentFormater = new DecimalFormat("##.##%");
 
@@ -62,23 +66,25 @@ class MAME_Stats {
     private static final String STATUS_IMPERFECT = "<html><center>Status<br>Imperfect</html>";
     private static final String STATUS_PRELIMINARY = "<html><center>Status<br>Preliminary</html>";
 
+    @SuppressWarnings("WeakerAccess")
+    public static final String RUNNABLE = "Runnable";
     static final Map<String, String> STATS_KEY_MAP = Arrays.stream(new Object[][]{
             {TOTAL, "Total Machines"},
-            {"All", "Machines possibly usable: Total minus BIOS & Devices"},
+            {MFM_Constants.ALL, "Machines possibly usable: Total minus BIOS & Devices"},
             {MFMListBuilder.ARCADE, "Arcade games"},
             {"BIOS", "ROM BIOS (non-volatile firmware)"},
             {"CHD", "Machines with at least 1 CHD"},
             {"CHDs", "Total number of CHDs"},
-            {"Device", "System hardware e.g. Controller Floppy Z80"},
+            {Machine.DEVICE, "System hardware e.g. Controller Floppy Z80"},
             {DISPLAY_RASTER, DISPLAY_RASTER},
             {DISPLAY_VECTOR, DISPLAY_VECTOR},
             {DISPLAY_LCD, DISPLAY_LCD},
-            {"Mechanical", "Mechanical Machine"},
+            {Machine.MECHANICAL, "Mechanical Machine"},
             {ORIENTATION_COCKTAIL, "Cocktail orientation"},
             {ORIENTATION_HORIZONTAL, "Horizontal orientation"},
             {ORIENTATION_VERTICAL, "Vertical orientation"},
-            {"Runnable", "Marked runnable in XML"},
-            {"Sample", "Machine has audio sample(s)"},
+            {RUNNABLE, "Marked runnable in XML"},
+            {Machine.SAMPLE, "Machine has audio sample(s)"},
             {STATUS_GOOD, "Machines marked good"},
             {STATUS_IMPERFECT, "Machines marked imperfect"},
             {STATUS_PRELIMINARY, "Machines marked preliminary"},
@@ -90,6 +96,12 @@ class MAME_Stats {
             },
             LinkedHashMap<String, String>::new)); // In this case IDEA inspection is wrong
 
+    private static final int SIXTY = 60;
+    private static final int SEVENTY_FIVE = 75;
+    private static final int ONE_NINETY = 190;
+    private static final int FIFTEEN_HUNDRED = 1500;
+    private static final int SIXTEEN_HUNDRED = 1600;
+
     MAME_Stats() {
         mame = MFM_Data.getInstance().getMame();
         STATS_KEY_MAP.forEach((key, value) -> stats.put(key, new AtomicInteger()));
@@ -97,95 +109,95 @@ class MAME_Stats {
         processStats(MFM_Data.getInstance().getDataVersion().contains(MFMListBuilder.ALL));
     }
 
-    void saveStats() {
+    final void saveStats() {
         displayStats();
         saveStatstoFile();
     }
 
     private void saveStatstoFile() {
         try (PrintWriter pw = new PrintWriter(new File(MFM.getMfmListsDir() +
-                MFM_Data.getInstance().getDataVersion() + "_stats.csv"))) {
+                MFM_Data.getInstance().getDataVersion() + "_stats.csv"), StandardCharsets.UTF_8.name())) {
             pw.println(getHeaderLine());
             pw.println(getCountsLine());
             pw.println(getTotalPercentsLine());
             pw.println(getAllPercentsLine());
             pw.flush();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
-    private String getHeaderLine() {
-        StringBuilder stringBuilder = new StringBuilder();
+    private static String getHeaderLine() {
+        StringBuilder stringBuilder = new StringBuilder(275);
         STATS_KEY_MAP.keySet().forEach(key -> {
             key = key.replaceAll(MFM_Wiki.XML_TAG_REGEX, " "); // Remove html tags
             stringBuilder.append(key);
-            stringBuilder.append(",");
+            stringBuilder.append(FileUtils.COMMA_STRING);
         });
 
-        return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
+        return stringBuilder.substring(0, stringBuilder.lastIndexOf(FileUtils.COMMA_STRING));
     }
 
-    String getDescriptionLine() {
-        StringBuilder stringBuilder = new StringBuilder();
+    final String getDescriptionLine() {
+        StringBuilder stringBuilder = new StringBuilder(520);
         STATS_KEY_MAP.keySet().forEach(key -> {
             stringBuilder.append(STATS_KEY_MAP.get(key));
-            stringBuilder.append(",");
+            stringBuilder.append(FileUtils.COMMA_STRING);
         });
-        return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
+        return stringBuilder.substring(0, stringBuilder.lastIndexOf(FileUtils.COMMA_STRING));
     }
 
     private String getCountsLine() {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder(100);
         stats.keySet().forEach(key -> {
             stringBuilder.append(stats.get(key));
-            stringBuilder.append(",");
+            stringBuilder.append(FileUtils.COMMA_STRING);
         });
-        return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
+        return stringBuilder.substring(0, stringBuilder.lastIndexOf(FileUtils.COMMA_STRING));
     }
 
     private String getTotalPercentsLine() {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder(128);
         stats.keySet().forEach(key -> {
             stringBuilder.append(percentFormater.format(
                     stats.get(key).floatValue() / stats.get(TOTAL).floatValue()));
-            stringBuilder.append(",");
+            stringBuilder.append(FileUtils.COMMA_STRING);
         });
-        return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
+        return stringBuilder.substring(0, stringBuilder.lastIndexOf(FileUtils.COMMA_STRING));
     }
 
     private String getAllPercentsLine() {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder(128);
         stats.keySet().forEach(key -> {
             stringBuilder.append(percentFormater.format(
                     stats.get(key).floatValue() / stats.get("All").floatValue()));
-            stringBuilder.append(",");
+            stringBuilder.append(FileUtils.COMMA_STRING);
         });
-        return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
+        return stringBuilder.substring(0, stringBuilder.lastIndexOf(FileUtils.COMMA_STRING));
     }
 
-    Object[][] getStatsArray() {
+    final Object[][] getStatsArray() {
         Object[][] statsArray = new Object[3][stats.size()];
 
         AtomicInteger total = stats.get(TOTAL);
-        AtomicInteger all = stats.get("All");
+        AtomicInteger all = stats.get(MFM_Constants.ALL);
         final AtomicInteger ai = new AtomicInteger(0);
         stats.forEach((key, value) -> {
             statsArray[0][ai.get()] = MFMController.decimalFormater.format(value);
             statsArray[1][ai.get()] = percentFormater.format(value.floatValue() / total.floatValue());
             statsArray[2][ai.getAndIncrement()] = percentFormater.format(value.floatValue() / all.floatValue());
         });
-        statsArray[1][0] = TOTAL + "%";
-        statsArray[2][0] = "All% \u27B5";
-        statsArray[2][3] = "-";
-        statsArray[1][5] = "-";
-        statsArray[2][5] = "-";
-        statsArray[2][6] = "-";
+        statsArray[1][0] = TOTAL + '%';
+        statsArray[2][0] = "All% ➵";
+        statsArray[2][3] = HYPHEN;
+        statsArray[1][5] = HYPHEN;
+        statsArray[2][5] = HYPHEN;
+        statsArray[2][6] = HYPHEN;
 
         return statsArray;
     }
 
-    Object[] getStatsHeaders() {
+    final Object[] getStatsHeaders() {
         return stats.keySet().toArray();
     }
 
@@ -196,8 +208,8 @@ class MAME_Stats {
             protected JTableHeader createDefaultTableHeader() {
                 return new JTableHeader(columnModel) {
                     @Override
-                    public String getToolTipText(MouseEvent e) {
-                        Point p = e.getPoint();
+                    public String getToolTipText(MouseEvent event) {
+                        Point p = event.getPoint();
                         int index = columnModel.getColumnIndexAtX(p.x);
                         return STATS_KEY_MAP.get(columnModel.getColumn(index).getHeaderValue().toString());
                     }
@@ -208,19 +220,23 @@ class MAME_Stats {
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component comp = super.prepareRenderer(renderer, row, column);
                 if (comp instanceof JLabel) {
-                    ((JLabel) comp).setHorizontalAlignment(JLabel.CENTER);
+                    ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
                 }
                 return comp;
             }
         };
 
-        int[] widths = {60, 60, 60, 60, 60, 60, 60, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75, 75}; // 21 = 1530
+        int[] widths = {SIXTY, SIXTY, SIXTY, SIXTY, SIXTY, SIXTY, SIXTY, SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE,
+                SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE,
+                SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE, SEVENTY_FIVE}; // 21 = 1530
+
         for (int i = 0; i < statsTable.getColumnModel().getColumnCount(); i++) {
             statsTable.getColumnModel().getColumn(i).setMinWidth(widths[i]);
         }
         statsTable.setRowHeight(30);
-        statsTable.getTableHeader().setPreferredSize(new Dimension(1500, 40));
+        statsTable.getTableHeader().setPreferredSize(new Dimension(FIFTEEN_HUNDRED, 40));
         statsTable.setFillsViewportHeight(true);
+        statsTable.setShowGrid(true);
 
         SwingUtilities.invokeLater(() -> {
                     JDialog dialog = new JDialog((Frame) null, "MAME STATS: " +
@@ -228,13 +244,13 @@ class MAME_Stats {
                     dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                     dialog.setIconImage(MFMUI_Setup.getMFMIcon().getImage());
                     dialog.setLocation(50, 250);
-                    dialog.setMinimumSize(new Dimension(1600, 190));
-                    dialog.setMaximumSize(new Dimension(1600, 190));
-                    dialog.setPreferredSize(new Dimension(1600, 190));
+            dialog.setMinimumSize(new Dimension(SIXTEEN_HUNDRED, ONE_NINETY));
+            dialog.setMaximumSize(new Dimension(SIXTEEN_HUNDRED, ONE_NINETY));
+            dialog.setPreferredSize(new Dimension(SIXTEEN_HUNDRED, ONE_NINETY));
                     dialog.setLayout(new BorderLayout());
                     JScrollPane scrollPane = new JScrollPane(statsTable);
-                    scrollPane.setMinimumSize(new Dimension(1500, 190));
-                    scrollPane.setMaximumSize(new Dimension(1500, 190));
+            scrollPane.setMinimumSize(new Dimension(FIFTEEN_HUNDRED, ONE_NINETY));
+            scrollPane.setMaximumSize(new Dimension(FIFTEEN_HUNDRED, ONE_NINETY));
                     dialog.add(scrollPane, BorderLayout.CENTER);
                     dialog.pack();
                     dialog.setVisible(true);
@@ -248,7 +264,7 @@ class MAME_Stats {
                 if (machine.getIsbios().equals(Machine.YES)) {
                     stats.get("BIOS").getAndIncrement();
                 } else if (machine.getIsdevice().equals(Machine.YES)) {
-                    stats.get("Device").getAndIncrement();
+                    stats.get(Machine.DEVICE).getAndIncrement();
                 } else {
                     stats.get(MFM_Constants.ALL).getAndIncrement();
                 }
@@ -260,17 +276,17 @@ class MAME_Stats {
 
             stats.get(TOTAL).getAndIncrement();
 
-            if (machine.getDisk() != null && !machine.getDisk().isEmpty()) {
+            if ((machine.getDisk() != null) && !machine.getDisk().isEmpty()) {
                 stats.get("CHD").getAndIncrement();
                 stats.get("CHDs").getAndAdd(machine.getDisk().size());
             }
 
-            if (machine.getDisplay() != null && !machine.getDisplay().isEmpty()) {
+            if ((machine.getDisplay() != null) && !machine.getDisplay().isEmpty()) {
                 switch (machine.getDisplay().get(0).getType()) {
-                    case "raster":
+                    case MFM_Constants.RASTER:
                         stats.get(DISPLAY_RASTER).getAndIncrement();
                         break;
-                    case "vector":
+                    case MFM_Constants.VECTOR:
                         stats.get(DISPLAY_VECTOR).getAndIncrement();
                         break;
                     case "lcd":
@@ -290,7 +306,7 @@ class MAME_Stats {
             }
 
             if (machine.getIsmechanical().equals(Machine.YES)) {
-                stats.get("Mechanical").getAndIncrement();
+                stats.get(Machine.MECHANICAL).getAndIncrement();
             }
 
             if (machine.getIsVertical() != null) {
@@ -303,30 +319,30 @@ class MAME_Stats {
                 }
             }
 
-            if (machine.getDriver() != null && machine.getDriver().getCocktail() != null &&
+            if ((machine.getDriver() != null) && (machine.getDriver().getCocktail() != null) &&
                     !machine.getDriver().getCocktail().isEmpty()) {
                 stats.get(ORIENTATION_COCKTAIL).getAndIncrement();
             }
 
-            if (machine.getRunnable() != null && machine.getRunnable().equals(Machine.YES) &&
+            if ((machine.getRunnable() != null) && machine.getRunnable().equals(Machine.YES) &&
                     !machine.getIsbios().equals(Machine.YES)) {
-                stats.get("Runnable").getAndIncrement();
+                stats.get(RUNNABLE).getAndIncrement();
             }
 
-            if (machine.getSample() != null && !machine.getSample().isEmpty()) {
-                stats.get("Sample").getAndIncrement();
+            if ((machine.getSample() != null) && !machine.getSample().isEmpty()) {
+                stats.get(Machine.SAMPLE).getAndIncrement();
             }
 
-            if (machine.getDriver() != null && !machine.getIsbios().equals(Machine.YES)) {
+            if ((machine.getDriver() != null) && !machine.getIsbios().equals(Machine.YES)) {
                 switch (machine.getDriver().getStatus()) {
-                    case "preliminary":
+                    case Machine.PRELIMINARY:
                         stats.get(STATUS_PRELIMINARY).getAndIncrement();
                         break;
-                    case "good":
+                    case Machine.GOOD:
                         stats.get(STATUS_GOOD).getAndIncrement();
                         stats.get(PLAYABLE).getAndIncrement();
                         break;
-                    case "imperfect":
+                    case Machine.IMPERFECT:
                         stats.get(STATUS_IMPERFECT).getAndIncrement();
                         stats.get(PLAYABLE).getAndIncrement();
                         break;
