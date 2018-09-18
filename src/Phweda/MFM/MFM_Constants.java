@@ -19,6 +19,7 @@
 package Phweda.MFM;
 
 import Phweda.MFM.UI.MFMAction;
+import Phweda.MFM.mame.Machine;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,8 +50,10 @@ public final class MFM_Constants {
     public static final String CREATE_LIST = "Create List"; // Not usable in UI widget bound to xml code
     public static final String CATEGORY = "Category";
     public static final String NULL_STRING = "null";
+    public static final String VECTOR = "vector";
+    public static final String RASTER = "raster";
     public static final String SPACE_STRING = " ";
-
+    public static final String HYPHEN = "-";
     public static final char SPACE_CHAR = ' ';
 
     public static final String MAME_EXE_DIRECTORY = "MAMEexeDir";
@@ -150,7 +153,7 @@ public final class MFM_Constants {
             COVERS_SL, "cpanel", "ctrlr", "devices", "ends", "flyers", FOLDERS, "gameover", "howto",
             "icons", "ini", "logo", MANUALS, MANUALS_SL, "marquees",
             "pcb", "roms", SAMPLES, "scores", "select", "snap", SNAP_SL, SNAPS,
-            SOFTWARE_LISTS, TITLES, TITLES_SL, "versus", "video", "videosnaps"));
+            SOFTWARE_LISTS, TITLES, TITLES_SL, "versus", Machine.VIDEO, "videosnaps"));
 
     public static String[] MAME_FOLDER_NAMES_ARRAY; // TODO now this is dynamic should move WHERE?
     public static final String[] yearsList;

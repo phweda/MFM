@@ -134,9 +134,9 @@ import static Phweda.utils.FileUtils.doubleQuoteString;
         "sample",
         "chip",
         "display",
-        "sound",
+        Machine.SOUND,
         "input",
-        "dipswitch",
+        Machine.DIPSWITCH,
         "configuration",
         "port",
         "adjuster",
@@ -192,10 +192,12 @@ public class Machine {
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
     public static final String DISPLAY = "display";
-    public static final String VIDEO = "video";
     public static final String DRIVER = "driver";
     public static final String DEVICE_REF = "device_ref";
     public static final String ISBIOS = "isbios";
+    public static final String DIPSWITCH = "dipswitch";
+    public static final String SOUND = "sound";
+    public static final String VIDEO = "video";
     public static final String DISK = "disk";
     public static final String SOFTWARELIST = "softwarelist";
     public static final String YEAR = "year";
@@ -225,13 +227,16 @@ public class Machine {
     public static final String SIZE = "size";
     public static final String SHA1 = "sha1";
     public static final String CRC = "crc";
+    public static final String MECHANICAL = "Mechanical";
+    public static final String SAMPLE = "Sample";
+    public static final String DEVICE = "Device";
 
-    static final String MACHINE = "machine";
+    public static final String MACHINE = "machine";
     // Legacy xml dtd value is "game"
-    static final String GAME = "game";
-    static final String GOOD = "good";
-    static final String IMPERFECT = "imperfect";
-    static final String PRELIMINARY = "preliminary";
+    public static final String GAME = "game";
+    public static final String GOOD = "good";
+    public static final String IMPERFECT = "imperfect";
+    public static final String PRELIMINARY = "preliminary";
     @XmlTransient
     private int buttons = -1;
 
@@ -251,7 +256,7 @@ public class Machine {
 
     @XmlElements({
             @XmlElement(name = "display", type = Display.class),
-            @XmlElement(name = "video", type = Display.class)
+            @XmlElement(name = VIDEO, type = Display.class)
     })
 
     protected List<Display> display;
