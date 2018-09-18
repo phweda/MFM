@@ -47,6 +47,9 @@ public class FileUtils {
     public static final String DIRECTORY_SEPARATOR = File.separator;
     public static final String NEWLINE = System.getProperty("line.separator");
     public static final char TAB = '\t';
+    public static final char COMMA = ',';
+    public static final String COMMA_STRING = ",";
+    public static final String EMPTY_STRING = "";
 
     public static final String ZIPSUFFIX = ".zip";
 
@@ -54,7 +57,7 @@ public class FileUtils {
     private static final int MAX_DEPTH = 25;
     private static int maxDepth = MAX_DEPTH;
 
-    private static final HashMap<String, String> videoExtensionsMap = new HashMap<>();
+    private static final Map<String, String> videoExtensionsMap = new HashMap<>(6);
 
     private FileUtils() {
     }
@@ -119,7 +122,7 @@ public class FileUtils {
             file = new File((String) path);
         }
 
-        if (file == null || !file.exists()) {
+        if ((file == null) || !file.exists()) {
             return null;
         }
 
