@@ -35,13 +35,9 @@ import static Phweda.MFM.MFMListBuilder.*;
  */
 class MFMListGenerator {
 
-    private static MFMListGenerator ourInstance = new MFMListGenerator();
+    private static final String WE_SHOULDN_T_GET_HERE_LIST_BUILDER_GENERATE_MFMLISTS_CLONEOF = "We shouldn't get here : ListBuilder.generateMFMLists() cloneof";
 
     private MFMListGenerator() {
-    }
-
-    public static MFMListGenerator getInstance() {
-        return ourInstance;
     }
 
     private static TreeMap<String, SortedSet<String>> loadLanguagesINI() {
@@ -60,7 +56,7 @@ class MFMListGenerator {
         return null;
     }
 
-    private static void filterLanguagesMap(TreeMap<String, SortedSet<String>> languagesMap) {
+    private static void filterLanguagesMap(Map<String, ? extends SortedSet<String>> languagesMap) {
         // remove any non-existent machines - some entries in the languages.ini do not exist in many versions
         languagesMap.forEach((key, set) ->
                 set.removeIf(machineName -> !allList.contains(machineName))
@@ -69,14 +65,15 @@ class MFMListGenerator {
         languagesMap.entrySet().removeIf(set -> set.getValue().isEmpty());
     }
 
-    HashMap<String, TreeSet<String>> generateMFMLists(boolean parsing) {
+    @SuppressWarnings("ContinueStatement")
+    static HashMap<String, TreeSet<String>> generateMFMLists(boolean parsing) {
         HashMap<String, TreeSet<String>> lists = null;
         if (!parsing) {
             lists = (HashMap<String, TreeSet<String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.LISTS);
         }
 
         if (lists == null) {
-            lists = new HashMap<>();
+            lists = new HashMap<>(24);
             for (Map.Entry<String, Machine> entry : allMachines.entrySet()) {
                 Machine machine = entry.getValue();
                 String machineName = machine.getName();
@@ -126,7 +123,7 @@ class MFMListGenerator {
                     }
 
                     // If the cocktail attr exists
-                    if (machine.getDriver().getCocktail() != null && !machine.getDriver().getCocktail().isEmpty()) {
+                    if ((machine.getDriver().getCocktail() != null) && !machine.getDriver().getCocktail().isEmpty()) {
                         cocktailList.add(machineName);
                     }
                 }
@@ -143,13 +140,13 @@ class MFMListGenerator {
                 }
 
                 String cloneof = machine.getCloneof();
-                if (cloneof == null || cloneof.isEmpty()) {
+                if ((cloneof == null) || cloneof.isEmpty()) {
                     noClonesList.add(machineName);
                 } else if (cloneof.length() > 1) { // No machine with single char so 2 or more we assume is correct
                     clonesList.add(machineName);
                 } else {
-                    System.out.println("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
-                    MFM.getLogger().addToList("We shouldn't get here : ListBuilder.generateMFMLists() cloneof");
+                    System.out.println(WE_SHOULDN_T_GET_HERE_LIST_BUILDER_GENERATE_MFMLISTS_CLONEOF);
+                    MFM.getLogger().addToList(WE_SHOULDN_T_GET_HERE_LIST_BUILDER_GENERATE_MFMLISTS_CLONEOF);
                 }
 
                 if (!machine.getDisplay().isEmpty() || !machine.getScreentype().isEmpty()) {
@@ -164,11 +161,11 @@ class MFMListGenerator {
                     }
                     switch (screenType) {
 
-                        case "raster":
+                        case MFM_Constants.RASTER:
                             rasterDisplayList.add(machineName);
                             break;
 
-                        case "vector":
+                        case MFM_Constants.VECTOR:
                             vectorDisplayList.add(machineName);
                             break;
 
@@ -185,7 +182,7 @@ class MFMListGenerator {
             }
 
             // Which Categories have at least one Machine
-            HashMap<String, ArrayList<String>> categoryGames = MAMEInfo.getCategoryMachinesMap();
+            Map<String, ArrayList<String>> categoryGames = MAMEInfo.getCategoryMachinesMap();
             for (Map.Entry<String, ArrayList<String>> categoryEntry : categoryGames.entrySet()) {
                 if (!categoryEntry.getValue().isEmpty()) {
                     categoriesWithMachineList.add(categoryEntry.getKey());
@@ -254,7 +251,7 @@ class MFMListGenerator {
     }
 
     @SuppressWarnings("unchecked")
-    TreeMap<String, SortedSet<String>> getLanguageLists(boolean parsing) {
+    static TreeMap<String, SortedSet<String>> getLanguageLists(boolean parsing) {
         TreeMap<String, SortedSet<String>> languagesListMap;
         if (!parsing) {
             languagesListMap =
@@ -263,14 +260,14 @@ class MFMListGenerator {
             languagesListMap = loadLanguagesINI();
             // Dependency ALL list must already exists
             MFM_Data.getInstance().setStaticData(MFM_Constants.LANGUAGESLISTS, languagesListMap);
-            if (languagesListMap == null && MFM.isSystemDebug()) {
+            if ((languagesListMap == null) && MFM.isSystemDebug()) {
                 System.out.println("In MFMListGenerator failed to generate Languages lists");
             }
         }
         return languagesListMap;
     }
 
-    TreeSet<String> generateListfromDAT(Datafile datafile) {
+    static TreeSet<String> generateListfromDAT(Datafile datafile) {
         TreeSet<String> list = new TreeSet<>();
         datafile.getGame().forEach(game -> list.add(game.getName()));
         return list;
