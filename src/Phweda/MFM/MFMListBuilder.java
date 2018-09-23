@@ -110,7 +110,7 @@ public final class MFMListBuilder {
     static TreeSet<String> categoriesWithMachineList = new TreeSet<>();
     static TreeMap<String, SortedSet<String>> languagesListsMap;
     private static TreeSet<String> allCategoriesList;
-    private static TreeMap<String, ArrayList<String>> categoryHierarchy;
+    private static Map<String, ArrayList<String>> categoryHierarchy;
     private static ArrayList<String> allCategoryRoots;
     private static ArrayList<String> arcadeCategoryRoots;
     private static ArrayList<String> systemCategoryRoots;

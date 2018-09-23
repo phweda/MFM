@@ -456,7 +456,7 @@ public final class ListBuilderUI implements ActionListener, ItemListener, Serial
                 break;
 
             case IMPORT_LIST_COMMAND:
-                controller.importList();
+                MFMController.importList();
                 break;
 
             case LIST_EDITOR:
@@ -528,17 +528,18 @@ public final class ListBuilderUI implements ActionListener, ItemListener, Serial
 
         SortedSet<String> list = builder.generateList();
         if (list.isEmpty()) {
-            JOptionPane.showMessageDialog(getListBuilderPanel(), listName + " : list is empty");
+            JOptionPane.showMessageDialog(listBuilderPanel, listName + " : list is empty");
             return;
         }
 
         String[] machines = new String[list.size()];
+        Arrays.asList(list.toArray()).toArray(machines);
         MFMListBuilder.createPlayList(listName, machines);
-        getListBuilderPanel().getTopLevelAncestor().requestFocus();
+        listBuilderPanel.getTopLevelAncestor().requestFocus();
     }
 
     private void setSelectAllCategories(boolean isSelected) {
-        ArrayList<JCheckBox> checkBoxes = ((DynamicCBpanel) categoriesCBpanel).getCheckBoxes();
+        Iterable<JCheckBox> checkBoxes = ((DynamicCBpanel) categoriesCBpanel).getCheckBoxes();
         for (JCheckBox cb : checkBoxes) {
             cb.setSelected(isSelected);
         }
@@ -546,7 +547,7 @@ public final class ListBuilderUI implements ActionListener, ItemListener, Serial
 
     @SuppressWarnings("SameParameterValue")
     private void setSelectAllControls(boolean isSelected) {
-        ArrayList<JCheckBox> checkBoxes = ((DynamicCBpanel) controlsCBPanel).getCheckBoxes();
+        Iterable<JCheckBox> checkBoxes = ((DynamicCBpanel) controlsCBPanel).getCheckBoxes();
         for (JCheckBox cb : checkBoxes) {
             cb.setSelected(isSelected);
         }
@@ -635,10 +636,10 @@ public final class ListBuilderUI implements ActionListener, ItemListener, Serial
 
         controlsCBPanel = new DynamicCBpanel(new ArrayList<>(controllersLabels), 1);
 
-        HashMap<String, String> tooltips = new HashMap<>();
+        Map<String, String> tooltips = new HashMap<>(20);
         for (String label : controllersLabels) {
             String revLabel = MachineControllers.getControllerLabeltoMAME().get(label);
-            if (revLabel != null && !MFMUI_Resources.getInstance().getLabelLocation(revLabel).isEmpty()) {
+            if ((revLabel != null) && !MFMUI_Resources.getInstance().getLabelLocation(revLabel).isEmpty()) {
                 tooltips.put(label,
                         "<html><img src=\"" + MFMUI_Resources.getInstance().getLabelLocation(revLabel));
             }

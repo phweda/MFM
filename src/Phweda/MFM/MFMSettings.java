@@ -35,8 +35,8 @@ import java.util.*;
  * Date: 11/22/11
  * Time: 2:19 PM
  */
-@SuppressWarnings({"squid:S00117", "squid:S00100", "WeakerAccess"})
-public class MFMSettings {
+@SuppressWarnings({"squid:S00117", "squid:S00100", "WeakerAccess", "MethodParameterNamingConvention"})
+public final class MFMSettings {
     private static MFMSettings ourInstance = null;
 
     private HashMap<String, String> fullSetExtrasDirectories;
@@ -47,7 +47,7 @@ public class MFMSettings {
     private boolean exeChanged = false;
     private boolean loaded = false;
     // Special case logic
-    private static final double DBL_143 = 143d;// removed the decimal for correct comparison e.g. 0.70 is > 0.143
+    private static final double DBL_143 = 143.0d;// removed the decimal for correct comparison e.g. 0.70 is > 0.143
     public static final String ALL_UNDERSCORE = "ALL_";
     public static final String PLAYABLE = "Playable";
     public static final String PLAYABLE_UNDERSCORE = "Playable_";
@@ -192,7 +192,7 @@ public class MFMSettings {
     }
 
     public boolean isnonMerged() {
-        return ourSettings.get(MFM_Constants.NONMERGED) != null &&
+        return (ourSettings.get(MFM_Constants.NONMERGED) != null) &&
                 Boolean.parseBoolean(ourSettings.get(MFM_Constants.NONMERGED).toString());
     }
 
@@ -253,7 +253,7 @@ public class MFMSettings {
     }
 
     public boolean isShowXML() {
-        return ourSettings.get(MFM_Constants.SHOW_XML) != null &&
+        return (ourSettings.get(MFM_Constants.SHOW_XML) != null) &&
                 Boolean.valueOf(ourSettings.get(MFM_Constants.SHOW_XML).toString());
     }
 
@@ -290,7 +290,7 @@ public class MFMSettings {
     }
 
     public String MFMFontSize() {
-        if (ourSettings == null || ourSettings.get(MFM_Constants.FONTSIZE) == null) {
+        if ((ourSettings == null) || (ourSettings.get(MFM_Constants.FONTSIZE) == null)) {
             return MFM_Constants.NORMAL;
         }
         return (String) ourSettings.get(MFM_Constants.FONTSIZE);
@@ -344,7 +344,7 @@ public class MFMSettings {
 
         for (String folderName : folders) {
             // If it is null create it unless it is ini - that are optional
-            if (playSetDirectories.get(folderName) == null || !folderName.equals("ini")) {
+            if ((playSetDirectories.get(folderName) == null) || !folderName.equals("ini")) {
                 if (folderName.equals("roms") || folderName.equals("chds") ||
                         (!folderName.equals("ini") && fullSetExtrasDirectories.containsKey(folderName))) {
                     File newDir = new File(getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folderName);
@@ -442,7 +442,7 @@ public class MFMSettings {
         // strip *. for Double comparison
         Double dataVersionDouble = Double.valueOf(dataVersion.substring(dataVersion.indexOf('.') + 1));
 
-        if (!dataVersion.contains(ALL_UNDERSCORE) && (MAMEInfo.isProcessAll() || dataVersionDouble <= DBL_143)) {
+        if (!dataVersion.contains(ALL_UNDERSCORE) && (MAMEInfo.isProcessAll() || (dataVersionDouble <= DBL_143))) {
             ourSettings.put(MFM_Constants.DATA_VERSION, ALL_UNDERSCORE + dataVersion);
         } else {
             ourSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
@@ -477,17 +477,17 @@ public class MFMSettings {
         MFM_Data data = MFM_Data.getInstance();
         ourSettings = (HashMap<String, Object>) data.getObject(MFM_Constants.MFM_SETTINGS);
         //
-        if (ourSettings == null || ourSettings.size() <= 2) {
+        if ((ourSettings == null) || (ourSettings.size() <= 2)) {
             MFM.getLogger().separateLine();
             MFM.getLogger().addToList("NO SETTINGS FOUND", true);
             MFM.getLogger().separateLine();
             return;
         }
 
-        if ((ourSettings.size() <= 1) && (getPlaySetDir() != null && RomsFullSetDir() != null)) { // TODO figure this out
+        if ((ourSettings.size() <= 1) && ((getPlaySetDir() != null) && (RomsFullSetDir() != null))) { // TODO figure this out
             updateDirectoriesResourceFiles();
             loaded = true;
-        } else if (getPlaySetDir() != null && RomsFullSetDir() != null) {
+        } else if ((getPlaySetDir() != null) && (RomsFullSetDir() != null)) {
             fullSetExtrasDirectories = (HashMap<String, String>) ourSettings.get(
                     MFM_Constants.FULL_SET_DIRECTORIES_MAP);
             playSetDirectories = (HashMap<String, String>) ourSettings.get(MFM_Constants.PLAY_SET_DIRECTORIES_MAP);
@@ -496,7 +496,7 @@ public class MFMSettings {
         }
 
         // Get version first run special case
-        if (this.getDataVersion() == null && !MFM.isDoParse()) {
+        if ((this.getDataVersion() == null) && !MFM.isDoParse()) {
             // First run special case
             // Wait for Data Set scan
             while (MFM_Data.isScanningDataSets()) {
@@ -559,12 +559,12 @@ public class MFMSettings {
         ourSettings.put(MFM_Constants.EXTRAS_ZIPS, extrasZips);
 
         try {   // Get the categories file
-            if (playSetDirectories.get(MFM_Constants.FOLDERS) != null &&
+            if ((playSetDirectories.get(MFM_Constants.FOLDERS) != null) &&
                     FileUtils.fileExists(playSetDirectories.get(MFM_Constants.FOLDERS),
                             MFM_Constants.CATVER_FULL_INI_FILENAME)) {
                 setCatverINI(MFMFileOps.findMAMEfile(Paths.get(playSetDirectories.get(MFM_Constants.FOLDERS)),
                         Paths.get(MFM_Constants.CATVER_FULL_INI_FILENAME)));
-            } else if (playSetDirectories.get(MFM_Constants.FOLDERS) != null &&
+            } else if ((playSetDirectories.get(MFM_Constants.FOLDERS) != null) &&
                     FileUtils.fileExists(playSetDirectories.get(MFM_Constants.FOLDERS),
                             MFM_Constants.CATVER_INI_FILENAME)) {
                 setCatverINI(MFMFileOps.findMAMEfile(Paths.get(playSetDirectories.get(MFM_Constants.FOLDERS)),
@@ -577,7 +577,7 @@ public class MFMSettings {
         }
 
         try {   // Get the nplayers file
-            if (playSetDirectories.get(MFM_Constants.FOLDERS) != null &&
+            if ((playSetDirectories.get(MFM_Constants.FOLDERS) != null) &&
                     FileUtils.fileExists(playSetDirectories.get(MFM_Constants.FOLDERS),
                             MFM_Constants.NPLAYERS_INI_FILENAME)) {
                 setnPlayerINI(MFMFileOps.findMAMEfile(Paths.get(playSetDirectories.get(MFM_Constants.FOLDERS)),
@@ -590,7 +590,7 @@ public class MFMSettings {
         }
 
         try {   // Get the languages file
-            if (playSetDirectories.get(MFM_Constants.FOLDERS) != null &&
+            if ((playSetDirectories.get(MFM_Constants.FOLDERS) != null) &&
                     FileUtils.fileExists(playSetDirectories.get(MFM_Constants.FOLDERS),
                             MFM_Constants.LANGUAGES_INI_FILENAME)) {
                 setLanguageINI(MFMFileOps.findMAMEfile(Paths.get(playSetDirectories.get(MFM_Constants.FOLDERS)),

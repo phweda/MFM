@@ -71,8 +71,8 @@ public final class MFMUI_Setup {
         controller.init();
     }
 
-    public void loadDataSet() {
-        controller.loadDataSet(false);
+    public static void loadDataSet() {
+        MFMController.loadDataSet(false, false);
     }
 
     MFM_Components getMfmComponents() {
@@ -91,7 +91,7 @@ public final class MFMUI_Setup {
         mfmComponents.updateListMenu();
         frame.pack();
         if (!newListName.isEmpty()) {
-            controller.changeList(newListName);
+            MFMController.changeList(newListName);
         }
     }
 

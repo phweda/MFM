@@ -163,7 +163,7 @@ public class MAMEDocType {
     private ArrayList<String> mameArgs(Path file) {
         ArrayList<String> args = new ArrayList<>();
         MAMEexe.setBaseArgs(file.toString());
-        args.add("-listxml");
+        args.add(MAMEexe.LISTXML);
         args.add("0*");
         return args;
     }

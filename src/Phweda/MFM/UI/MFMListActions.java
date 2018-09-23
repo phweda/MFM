@@ -39,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static Phweda.MFM.MFMListBuilder.createPlayList;
+import static Phweda.MFM.MFM_Constants.SPACE_CHAR;
 import static Phweda.utils.FileUtils.stripSuffix;
 
 /**
@@ -56,6 +58,7 @@ import static Phweda.utils.FileUtils.stripSuffix;
  */
 @SuppressWarnings("RedundantThrows")
 final class MFMListActions {
+    private static final Object lock = new Object(); // private final lock object
     private static MFMController controller;
     private static JDialog listbuilderDialog;
     private static final String LBUI_SER = "LBui.ser";
@@ -98,7 +101,7 @@ final class MFMListActions {
         // Hack so we can position Dialog where mouse is. Do not want to subclass JOptionPane
         JFrame frame = new JFrame();
         frame.setSize(0, 0);
-        frame.setLocation(controller.getFrame().getMousePosition());
+        frame.setLocation(MFMController.getFrame().getMousePosition());
         frame.setVisible(true); // frame must be visible
 
         // now prompt for the list
@@ -108,7 +111,7 @@ final class MFMListActions {
         String listName = Objects.requireNonNull(jcb.getSelectedItem()).toString();
         if (listName.equals(MFM_Constants.NEW_LIST)) {
             String newName = JOptionPane.showInputDialog(null, "Enter List Name");
-            if (newName == null || newName.isEmpty()) {
+            if ((newName == null) || newName.isEmpty()) {
                 return;
             }
             MFMPlayLists.getInstance().createPlayList(newName, new String[]{item});
@@ -120,20 +123,20 @@ final class MFMListActions {
 
     static void removefromList(String item, String listName) {
         MFMPlayLists.getInstance().removeMachineFromPlayList(listName, item);
-        int row = controller.getMachineListTable().getSelectedRow();
+        int row = MFMController.getMachineListTable().getSelectedRow();
 
-        MachineListTableModel gltm = (MachineListTableModel) controller.getMachineListTable().getModel();
+        MachineListTableModel gltm = (MachineListTableModel) MFMController.getMachineListTable().getModel();
         gltm.setData(MFMPlayLists.getInstance().getPlayList(listName), listName);
         gltm.fireTableDataChanged();
-        controller.getMachineListTable().getSelectionModel().setSelectionInterval(row, row);
-        controller.showListInfo(listName);
+        MFMController.getMachineListTable().getSelectionModel().setSelectionInterval(row, row);
+        MFMController.showListInfo(listName);
     }
 
     static String removeList() {
         Object[] data = MFMPlayLists.getInstance().myPlayListNames();
 
         @SuppressWarnings("MagicConstant") final String result = (String) JOptionPane.showInputDialog(
-                controller.getFrame(), "Select list to Remove",
+                MFMController.getFrame(), "Select list to Remove",
                 "Remove", JOptionPane.OK_CANCEL_OPTION, null, data, data[0]);
 
         if (result != null) {
@@ -145,10 +148,10 @@ final class MFMListActions {
     }
 
     static void showListEditor() {
-        Dialog listEditorDialog = new JDialog(controller.getFrame(), MFMAction.LIST_EDITOR);
+        Dialog listEditorDialog = new JDialog(MFMController.getFrame(), MFMAction.LIST_EDITOR);
         listEditorDialog.add(ListEditor.getInstance().$$$getRootComponent$$$());
         listEditorDialog.pack();
-        listEditorDialog.setLocationRelativeTo(controller.getFrame());
+        listEditorDialog.setLocationRelativeTo(MFMController.getFrame());
         listEditorDialog.setVisible(true);
     }
 
@@ -157,17 +160,15 @@ final class MFMListActions {
 
         if (listName != null) {
             MFM.getLogger().addToList(listName + " is being saved to file", true);
-            SortedSet<String> ts = MFMPlayLists.getInstance().getPlayList(listName);
-            File listFile = new File(MFM.getMfmListsDir() + listName + " " +
+            SortedSet<String> playList = MFMPlayLists.getInstance().getPlayList(listName);
+            File listFile = new File(MFM.getMfmListsDir() + listName + SPACE_CHAR +
                     MFM_Data.getInstance().getDataVersion() + ".txt");
-            try {
-                PrintWriter pw = new PrintWriter(new FileWriter(listFile));
-                for (String game : ts) {
-                    pw.println(game);
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(listFile),
+                    StandardCharsets.UTF_8))) {
+                for (String machine : playList) {
+                    pw.println(machine);
                 }
-                pw.close();
-
-            } catch (IOException e) {
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
 
@@ -188,7 +189,7 @@ final class MFMListActions {
             try {
                 Datafile datafile = MFM_DATmaker.generateDAT(listName, list);
                 PersistUtils.saveDATtoFile(datafile, MFM.getMfmListsDir() + listName +
-                        "(" + MFM_Data.getInstance().getDataVersion() + ").dat");
+                        '(' + MFM_Data.getInstance().getDataVersion() + ").dat");
             } catch (ParserConfigurationException | TransformerException | JAXBException e) {
                 e.printStackTrace();
             }
@@ -207,7 +208,7 @@ final class MFMListActions {
 
     static File pickValidateDAT() {
         File file = pickDAT();
-        if (file != null && validateDAT(file)) {
+        if ((file != null) && validateDAT(file)) {
             return file;
         }
         return null;
@@ -223,11 +224,11 @@ final class MFMListActions {
     private static boolean validateDAT(File inputFile) {
         String result = new MFM_DATmaker().validateDAT(inputFile);
         if (!result.equalsIgnoreCase(MFM_DATmaker.GOOD)) {
-            JOptionPane.showMessageDialog(controller.getFrame(), "DAT file is invalid\n" + result,
-                    "Invalid DAT File", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(MFMController.getFrame(), "DAT file is invalid" +
+                    FileUtils.NEWLINE + result, "Invalid DAT File", JOptionPane.ERROR_MESSAGE);
             return false;
         } else {
-            JOptionPane.showMessageDialog(controller.getFrame(), inputFile.getName() + " is a valid DAT file.");
+            JOptionPane.showMessageDialog(MFMController.getFrame(), inputFile.getName() + " is a valid DAT file.");
         }
         return true;
     }
@@ -290,16 +291,13 @@ final class MFMListActions {
         File newFile = new File(MFM.getMfmListsDir() + list +
                 MFM_Data.getInstance().getDataVersion() + "_data.csv");
         SortedSet<String> machines = MFMPlayLists.getInstance().getPlayList(list);
-        PrintWriter pw;
-        try {
-            pw = new PrintWriter(newFile);
+        try (PrintWriter pw = new PrintWriter(newFile)) {
             pw.println(Machine.CSV_HEADER);
             for (String machine : machines) {
                 if (MAMEInfo.getMachine(machine) != null) {
                     pw.println(MAMEInfo.getMachine(machine).toString());
                 }
             }
-            pw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -318,7 +316,7 @@ final class MFMListActions {
             e.printStackTrace();
         }
 
-        if (lines == null || lines.isEmpty()) {
+        if ((lines == null) || lines.isEmpty()) {
             MFM.getLogger().out("List to import was empty! File was " + file.getName());
             return null;
         }
@@ -367,11 +365,9 @@ final class MFMListActions {
         File listFile = new File(MFM.getMfmListsDir() + list + " " +
                 MFM_Data.getInstance().getDataVersion() + "_Resources.txt");
         int counter = 1;
-        try {
-
-            final PrintWriter pw = new PrintWriter(new FileWriter(listFile));
+        try (final PrintWriter pw = new PrintWriter(new FileWriter(listFile))) {
             String format = "%,7d: ";
-            Iterable<File> romsList = (TreeSet<File>) files.get(MFM_Constants.ROMS);
+            Iterable<File> romsList = (Iterable<File>) files.get(MFM_Constants.ROMS);
             for (File file : romsList) {
                 String path = file.getAbsolutePath();
                 pw.format(format, counter++);
@@ -435,7 +431,7 @@ final class MFMListActions {
         SwingWorker sw = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
-                synchronized (this) {
+                synchronized (lock) {
                     try {
                         final PrintWriter pw = new PrintWriter(newFile);
                         playList.forEach(machine -> {

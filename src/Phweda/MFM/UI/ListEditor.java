@@ -296,6 +296,7 @@ public class ListEditor implements ActionListener {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPanel.add(nameTextField, gbc);
         createListButton = new JButton();
+        createListButton.setActionCommand("Create List");
         createListButton.setText("Create List");
         gbc = new GridBagConstraints();
         gbc.gridx = 8;

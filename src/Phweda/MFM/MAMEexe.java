@@ -32,6 +32,9 @@ import java.util.List;
  * Time: 1:33 PM
  */
 public class MAMEexe {
+    public static final String LISTXML = "-listxml";
+    public static final String LISTINFO = "-listinfo";
+
     static MAME_Output mameOutput = new MAME_Output();
     private static ArrayList<String> args = new ArrayList<>();
     private static Process process = null;
@@ -131,7 +134,7 @@ public class MAMEexe {
     }
 
     public static Process runListXML(String arg) {
-        setArgs("-listxml");
+        setArgs(LISTXML);
         return run(arg);
     }
 

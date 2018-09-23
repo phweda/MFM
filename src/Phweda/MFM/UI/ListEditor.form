@@ -83,6 +83,7 @@
             </constraints>
             <properties>
               <text value="Create List"/>
+              <actionCommand value="Create List"/>
             </properties>
           </component>
           <component id="bd713" class="javax.swing.JComboBox" binding="listComboBox" custom-create="true">

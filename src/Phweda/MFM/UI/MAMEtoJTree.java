@@ -55,6 +55,7 @@ public class MAMEtoJTree extends JPanel {
     private static final String DEFAULT = "default";
     private static final String VALUE = "value";
     private static final String STATUS = "status";
+    public static final String SOUND_CHANNELS = "sound channels";
     private static final int FRAME_WIDTH = MFMUI.screenSize.width / 5;
     private static final int FRAME_HEIGHT = MFMUI.screenSize.height - 100;
     private JTree jTree;
@@ -98,7 +99,7 @@ public class MAMEtoJTree extends JPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreePath selPath = jTree.getPathForLocation(e.getX(), e.getY());
-                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON3) {
+                if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON3)) {
                     Object obj = selPath.getLastPathComponent();
                     if (obj != null) {
                         copytoClipboard(obj.toString());
@@ -126,7 +127,7 @@ public class MAMEtoJTree extends JPanel {
     }
 
     public static MAMEtoJTree getInstance(boolean refresh) {
-        if (ourInstance == null || refresh) {
+        if ((ourInstance == null) || refresh) {
             root = null; // ensure full refresh of Data
             ourInstance = new MAMEtoJTree(MFMSettings.getInstance().isShowXML());
         }
@@ -165,7 +166,7 @@ public class MAMEtoJTree extends JPanel {
 
         try {
             root = jaxb();
-        } catch (Exception ex) {
+        } catch (RuntimeException | JAXBException ex) {
             JOptionPane.showMessageDialog(frame, ex.getMessage(), "Exception",
                     JOptionPane.WARNING_MESSAGE);
 
@@ -188,7 +189,7 @@ public class MAMEtoJTree extends JPanel {
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             // hard code path to mame exe
             MAMEexe.setBaseArgs("E:\\Test\\mame64.exe"); // Enter path here
-            ArrayList<String> args = new ArrayList<>(Arrays.asList("-listxml", "*"));
+            ArrayList<String> args = new ArrayList<>(Arrays.asList(MAMEexe.LISTXML, "*"));
             Process process = MAMEexe.run(args);
             InputStream inputStream = process.getInputStream();
             mame = (Mame) jaxbUnmarshaller.unmarshal(inputStream);
@@ -206,7 +207,7 @@ public class MAMEtoJTree extends JPanel {
     }
 
     DefaultMutableTreeNode getMachineNode(String machineName) {
-        if (machineName == null || machineName.isEmpty()) {
+        if ((machineName == null) || machineName.isEmpty()) {
             return null;
         }
         // As of 0.9.5 tree may not exist
@@ -275,7 +276,7 @@ public class MAMEtoJTree extends JPanel {
      */
 
     @SuppressWarnings("JavadocReference")
-    void copytoClipboard(String nodeValue) {
+    static void copytoClipboard(String nodeValue) {
         nodeValue = nodeValue.contains(VALUE_DIVIDER) ?
                 nodeValue.split(VALUE_DIVIDER)[1].trim() :
                 nodeValue.split(MACHINE_DIVIDER)[1].trim();
@@ -292,7 +293,7 @@ public class MAMEtoJTree extends JPanel {
      * @param path file location
      */
     @SuppressWarnings("squid:UnusedPrivateMethod")
-    private void dataDump(DefaultMutableTreeNode root, String path) {
+    private static void dataDump(DefaultMutableTreeNode root, String path) {
         try (PrintWriter pw = new PrintWriter(new File(path))) {
 
             Enumeration<DefaultMutableTreeNode> en = root.preorderEnumeration();
@@ -322,17 +323,17 @@ public class MAMEtoJTree extends JPanel {
         dmtNode = new DefaultMutableTreeNode("Mame");
 
         String build = root.getBuild();
-        if (build != null && !build.isEmpty()) {
+        if ((build != null) && !build.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("build" + VALUE_DIVIDER + build));
         }
 
         String mameconfig = root.getMameconfig();
-        if (mameconfig != null && !mameconfig.isEmpty()) {
+        if ((mameconfig != null) && !mameconfig.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("mameconfig" + VALUE_DIVIDER + mameconfig));
         }
 
         String debug = root.getDebug();
-        if (debug != null && !debug.isEmpty()) {
+        if ((debug != null) && !debug.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("debug" + VALUE_DIVIDER + debug));
         }
 
@@ -351,7 +352,7 @@ public class MAMEtoJTree extends JPanel {
      * @param machine Mame machine to display
      * @return machine node
      */
-    private DefaultMutableTreeNode createMachineNode(Machine machine) {
+    private static DefaultMutableTreeNode createMachineNode(Machine machine) {
         DefaultMutableTreeNode dmtNode;
 
         // Name is always required
@@ -360,57 +361,57 @@ public class MAMEtoJTree extends JPanel {
         dmtNode = new DefaultMutableTreeNode("Machine" + MACHINE_DIVIDER + name);
 
         String description = machine.getDescription();
-        if (description != null && !description.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("description" + VALUE_DIVIDER + description));
+        if ((description != null) && !description.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode(Machine.DESCRIPTION + VALUE_DIVIDER + description));
         }
 
         String year = machine.getYear();
-        if (year != null && !year.isEmpty()) {
+        if ((year != null) && !year.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("year" + VALUE_DIVIDER + year));
         }
 
         String manufacturer = machine.getManufacturer();
-        if (manufacturer != null && !manufacturer.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("manufacturer" + VALUE_DIVIDER + manufacturer));
+        if ((manufacturer != null) && !manufacturer.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode(Machine.MANUFACTURER + VALUE_DIVIDER + manufacturer));
         }
 
         String sourcefile = machine.getSourcefile();
-        if (sourcefile != null && !sourcefile.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("sourcefile" + VALUE_DIVIDER + sourcefile));
+        if ((sourcefile != null) && !sourcefile.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode(Machine.SOURCEFILE + VALUE_DIVIDER + sourcefile));
         }
 
         String isbios = machine.getIsbios();
-        if (isbios != null && !isbios.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("isbios" + VALUE_DIVIDER + isbios));
+        if ((isbios != null) && !isbios.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode(Machine.ISBIOS + VALUE_DIVIDER + isbios));
         }
 
         String isdevice = machine.getIsdevice();
-        if (isdevice != null && !isdevice.isEmpty()) {
+        if ((isdevice != null) && !isdevice.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("isdevice" + VALUE_DIVIDER + isdevice));
         }
 
         String ismechanical = machine.getIsmechanical();
-        if (ismechanical != null && !ismechanical.isEmpty()) {
+        if ((ismechanical != null) && !ismechanical.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("ismechanical" + VALUE_DIVIDER + ismechanical));
         }
 
         String runnable = machine.getRunnable();
-        if (runnable != null && !runnable.isEmpty()) {
+        if ((runnable != null) && !runnable.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("runnable" + VALUE_DIVIDER + runnable));
         }
 
         String cloneof = machine.getCloneof();
-        if (cloneof != null && !cloneof.isEmpty()) {
+        if ((cloneof != null) && !cloneof.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("cloneof" + VALUE_DIVIDER + cloneof));
         }
 
         String romof = machine.getRomof();
-        if (romof != null && !romof.isEmpty()) {
+        if ((romof != null) && !romof.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("romof" + VALUE_DIVIDER + romof));
         }
 
         String sampleof = machine.getSampleof();
-        if (sampleof != null && !sampleof.isEmpty()) {
+        if ((sampleof != null) && !sampleof.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("sampleof" + VALUE_DIVIDER + sampleof));
         }
 
@@ -452,7 +453,7 @@ public class MAMEtoJTree extends JPanel {
 
         Sound sound = machine.getSound();
         if (sound != null) {
-            dmtNode.add(new DefaultMutableTreeNode("sound channels" + VALUE_DIVIDER + sound.getChannels()));
+            dmtNode.add(new DefaultMutableTreeNode(SOUND_CHANNELS + VALUE_DIVIDER + sound.getChannels()));
         }
 
         Input input = machine.getInput();
@@ -513,133 +514,133 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createBiossetNode(Biosset bioset) {
+    private static DefaultMutableTreeNode createBiossetNode(Biosset bioset) {
         DefaultMutableTreeNode dmtNode;
 
         String name = bioset.getName();
         dmtNode = new DefaultMutableTreeNode("Biosset" + VALUE_DIVIDER + name);
 
         String description = bioset.getDescription();
-        if (description != null && !description.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("description" + VALUE_DIVIDER + description));
+        if ((description != null) && !description.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode(Machine.DESCRIPTION + VALUE_DIVIDER + description));
         }
 
         String adefault = bioset.getDefault();
-        if (adefault != null && !adefault.isEmpty()) {
+        if ((adefault != null) && !adefault.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(DEFAULT + VALUE_DIVIDER + adefault));
         }
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createRomNode(Rom rom) {
+    private static DefaultMutableTreeNode createRomNode(Rom rom) {
         DefaultMutableTreeNode dmtNode;
 
         String name = rom.getName();
         dmtNode = new DefaultMutableTreeNode("Rom" + VALUE_DIVIDER + name);
 
         String bios = rom.getBios();
-        if (bios != null && !bios.isEmpty()) {
+        if ((bios != null) && !bios.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("bios" + VALUE_DIVIDER + bios));
         }
 
         String size = rom.getSize();
-        if (size != null && !size.isEmpty()) {
+        if ((size != null) && !size.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("size" + VALUE_DIVIDER + size));
         }
 
         String crc = rom.getCrc();
-        if (crc != null && !crc.isEmpty()) {
+        if ((crc != null) && !crc.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("crc" + VALUE_DIVIDER + crc));
         }
 
         String md5 = rom.getMd5();
-        if (md5 != null && !md5.isEmpty()) {
+        if ((md5 != null) && !md5.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("md5" + VALUE_DIVIDER + md5));
         }
 
         String sha1 = rom.getSha1();
-        if (sha1 != null && !sha1.isEmpty()) {
+        if ((sha1 != null) && !sha1.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("sha1" + VALUE_DIVIDER + sha1));
         }
 
         String merge = rom.getMerge();
-        if (merge != null && !merge.isEmpty()) {
+        if ((merge != null) && !merge.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("merge" + VALUE_DIVIDER + merge));
         }
 
         String region = rom.getRegion();
-        if (region != null && !region.isEmpty()) {
+        if ((region != null) && !region.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("region" + VALUE_DIVIDER + region));
         }
 
         String offset = rom.getOffset();
-        if (offset != null && !offset.isEmpty()) {
+        if ((offset != null) && !offset.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("offset" + VALUE_DIVIDER + offset));
         }
 
         String status = rom.getStatus();
-        if (status != null && !status.isEmpty()) {
+        if ((status != null) && !status.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(STATUS + VALUE_DIVIDER + status));
         }
 
         String optional = rom.getOptional();
-        if (optional != null && !optional.isEmpty()) {
+        if ((optional != null) && !optional.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("optional" + VALUE_DIVIDER + optional));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDiskNode(Disk disk) {
+    private static DefaultMutableTreeNode createDiskNode(Disk disk) {
         DefaultMutableTreeNode dmtNode;
 
         String name = disk.getName();
         dmtNode = new DefaultMutableTreeNode("Disk" + VALUE_DIVIDER + name);
 
         String md5 = disk.getMd5();
-        if (md5 != null && !md5.isEmpty()) {
+        if ((md5 != null) && !md5.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("md5" + VALUE_DIVIDER + md5));
         }
 
         String sha1 = disk.getSha1();
-        if (sha1 != null && !sha1.isEmpty()) {
+        if ((sha1 != null) && !sha1.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("sha1" + VALUE_DIVIDER + sha1));
         }
 
         String merge = disk.getMerge();
-        if (merge != null && !merge.isEmpty()) {
+        if ((merge != null) && !merge.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("merge" + VALUE_DIVIDER + merge));
         }
 
         String region = disk.getRegion();
-        if (region != null && !region.isEmpty()) {
+        if ((region != null) && !region.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("region" + VALUE_DIVIDER + region));
         }
 
         String index = disk.getIndex();
-        if (index != null && !index.isEmpty()) {
+        if ((index != null) && !index.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("index" + VALUE_DIVIDER + index));
         }
 
         String writable = disk.getWritable();
-        if (writable != null && !writable.isEmpty()) {
+        if ((writable != null) && !writable.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("writable" + VALUE_DIVIDER + writable));
         }
 
         String status = disk.getStatus();
-        if (status != null && !status.isEmpty()) {
+        if ((status != null) && !status.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(STATUS + VALUE_DIVIDER + status));
         }
 
         String optional = disk.getOptional();
-        if (optional != null && !optional.isEmpty()) {
+        if ((optional != null) && !optional.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("optional" + VALUE_DIVIDER + optional));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDeviceRefNode(DeviceRef deviceRef) {
+    private static DefaultMutableTreeNode createDeviceRefNode(DeviceRef deviceRef) {
         DefaultMutableTreeNode dmtNode;
 
         String name = deviceRef.getName();
@@ -648,140 +649,140 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createSampleNode(Sample sample) {
+    private static DefaultMutableTreeNode createSampleNode(Sample sample) {
         DefaultMutableTreeNode dmtNode;
 
         String name = sample.getName();
-        dmtNode = new DefaultMutableTreeNode("Sample" + VALUE_DIVIDER + name);
+        dmtNode = new DefaultMutableTreeNode(Machine.SAMPLE + VALUE_DIVIDER + name);
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createChipNode(Chip chip) {
+    private static DefaultMutableTreeNode createChipNode(Chip chip) {
         DefaultMutableTreeNode dmtNode;
 
         String name = chip.getName();
         dmtNode = new DefaultMutableTreeNode("Chip" + VALUE_DIVIDER + name);
 
         String tag = chip.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if ((tag != null) && !tag.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("tag" + VALUE_DIVIDER + tag));
         }
 
         String clock = chip.getClock();
-        if (clock != null && !clock.isEmpty()) {
+        if ((clock != null) && !clock.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("clock" + VALUE_DIVIDER + clock));
         }
         String type = chip.getType();
-        if (type != null && !type.isEmpty()) {
+        if ((type != null) && !type.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("type" + VALUE_DIVIDER + type));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDisplayNode(Display display) {
+    private static DefaultMutableTreeNode createDisplayNode(Display display) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Display" + VALUE_DIVIDER + display.getType());
 
         String tag = display.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if ((tag != null) && !tag.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("tag" + VALUE_DIVIDER + tag));
         }
 
         String rotate = display.getRotate();
-        if (rotate != null && !rotate.isEmpty()) {
+        if ((rotate != null) && !rotate.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("rotate" + VALUE_DIVIDER + rotate));
         }
 
         String orientation = display.getOrientation();
-        if (orientation != null && !orientation.isEmpty()) {
+        if ((orientation != null) && !orientation.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("orientation" + VALUE_DIVIDER + orientation));
         }
 
         String flipx = display.getFlipx();
-        if (flipx != null && !flipx.isEmpty()) {
+        if ((flipx != null) && !flipx.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("flipx" + VALUE_DIVIDER + flipx));
         }
 
         String width = display.getWidth();
-        if (width != null && !width.isEmpty()) {
+        if ((width != null) && !width.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("width" + VALUE_DIVIDER + width));
         }
 
         String height = display.getHeight();
-        if (height != null && !height.isEmpty()) {
+        if ((height != null) && !height.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("height" + VALUE_DIVIDER + height));
         }
 
         String refresh = display.getRefresh();
-        if (refresh != null && !refresh.isEmpty()) {
+        if ((refresh != null) && !refresh.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("refresh" + VALUE_DIVIDER + refresh));
         }
 
         String pixclock = display.getPixclock();
-        if (pixclock != null && !pixclock.isEmpty()) {
+        if ((pixclock != null) && !pixclock.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("pixclock" + VALUE_DIVIDER + pixclock));
         }
 
         String htotal = display.getHtotal();
-        if (htotal != null && !htotal.isEmpty()) {
+        if ((htotal != null) && !htotal.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("htotal" + VALUE_DIVIDER + htotal));
         }
 
         String hbend = display.getHbend();
-        if (hbend != null && !hbend.isEmpty()) {
+        if ((hbend != null) && !hbend.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("hbend" + VALUE_DIVIDER + hbend));
         }
 
         String hbstart = display.getHbstart();
-        if (hbstart != null && !hbstart.isEmpty()) {
+        if ((hbstart != null) && !hbstart.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("hbstart" + VALUE_DIVIDER + hbstart));
         }
 
         String vbend = display.getVbend();
-        if (vbend != null && !vbend.isEmpty()) {
+        if ((vbend != null) && !vbend.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("vbend" + VALUE_DIVIDER + vbend));
         }
 
         String vtotal = display.getVtotal();
-        if (vtotal != null && !vtotal.isEmpty()) {
+        if ((vtotal != null) && !vtotal.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("vtotal" + VALUE_DIVIDER + vtotal));
         }
 
         String vbstart = display.getVbstart();
-        if (vbstart != null && !vbstart.isEmpty()) {
+        if ((vbstart != null) && !vbstart.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("vbstart" + VALUE_DIVIDER + vbstart));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createInputNode(Input input) {
+    private static DefaultMutableTreeNode createInputNode(Input input) {
         DefaultMutableTreeNode dmtNode;
         dmtNode = new DefaultMutableTreeNode("Input");
 
         String service = input.getService();
-        if (service != null && !service.isEmpty()) {
+        if ((service != null) && !service.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("service" + VALUE_DIVIDER + service));
         }
 
         String tilt = input.getTilt();
-        if (tilt != null && !tilt.isEmpty()) {
+        if ((tilt != null) && !tilt.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("tilt" + VALUE_DIVIDER + tilt));
         }
 
         String players = input.getPlayers();
-        if (players != null && !players.isEmpty()) {
+        if ((players != null) && !players.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("service" + VALUE_DIVIDER + players));
         }
 
         String buttons = input.getButtons();
-        if (buttons != null && !buttons.isEmpty()) {
+        if ((buttons != null) && !buttons.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("buttons" + VALUE_DIVIDER + buttons));
         }
 
         String coins = input.getCoins();
-        if (coins != null && !coins.isEmpty()) {
+        if ((coins != null) && !coins.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("coins" + VALUE_DIVIDER + coins));
         }
 
@@ -794,83 +795,83 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createControlNode(Control control) {
+    private static DefaultMutableTreeNode createControlNode(Control control) {
         DefaultMutableTreeNode dmtNode;
 
         String type = control.getType();
         dmtNode = new DefaultMutableTreeNode("Control" + VALUE_DIVIDER + type);
 
         String player = control.getPlayer();
-        if (player != null && !player.isEmpty()) {
+        if ((player != null) && !player.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("player" + VALUE_DIVIDER + player));
         }
 
         String buttons = control.getButtons();
-        if (buttons != null && !buttons.isEmpty()) {
+        if ((buttons != null) && !buttons.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("buttons" + VALUE_DIVIDER + buttons));
         }
 
         String reqbuttons = control.getReqbuttons();
-        if (reqbuttons != null && !reqbuttons.isEmpty()) {
+        if ((reqbuttons != null) && !reqbuttons.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("reqbuttons" + VALUE_DIVIDER + reqbuttons));
         }
 
         String minimum = control.getMinimum();
-        if (minimum != null && !minimum.isEmpty()) {
+        if ((minimum != null) && !minimum.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("minimum" + VALUE_DIVIDER + minimum));
         }
 
         String maximum = control.getMaximum();
-        if (maximum != null && !maximum.isEmpty()) {
+        if ((maximum != null) && !maximum.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("maximum" + VALUE_DIVIDER + maximum));
         }
 
         String sensitivity = control.getSensitivity();
-        if (sensitivity != null && !sensitivity.isEmpty()) {
+        if ((sensitivity != null) && !sensitivity.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("sensitivity" + VALUE_DIVIDER + sensitivity));
         }
 
         String keydelta = control.getKeydelta();
-        if (keydelta != null && !keydelta.isEmpty()) {
+        if ((keydelta != null) && !keydelta.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("keydelta" + VALUE_DIVIDER + keydelta));
         }
 
         String reverse = control.getReverse();
-        if (reverse != null && !reverse.isEmpty()) {
+        if ((reverse != null) && !reverse.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("reverse" + VALUE_DIVIDER + reverse));
         }
 
         String ways = control.getWays();
-        if (ways != null && !ways.isEmpty()) {
+        if ((ways != null) && !ways.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("ways" + VALUE_DIVIDER + ways));
         }
 
         String ways2 = control.getWays2();
-        if (ways2 != null && !ways2.isEmpty()) {
+        if ((ways2 != null) && !ways2.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("ways2" + VALUE_DIVIDER + ways2));
         }
 
         String ways3 = control.getWays3();
-        if (ways3 != null && !ways3.isEmpty()) {
+        if ((ways3 != null) && !ways3.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("ways3" + VALUE_DIVIDER + ways3));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDipswitchNode(Dipswitch dipswitch) {
+    private static DefaultMutableTreeNode createDipswitchNode(Dipswitch dipswitch) {
         DefaultMutableTreeNode dmtNode;
 
         String name = dipswitch.getName();
         dmtNode = new DefaultMutableTreeNode("Dipswitch" + VALUE_DIVIDER + name);
 
         String mask = dipswitch.getMask();
-        if (mask != null && !mask.isEmpty()) {
+        if ((mask != null) && !mask.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("mask" + VALUE_DIVIDER + mask));
         }
 
         String tag = dipswitch.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if ((tag != null) && !tag.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("tag" + VALUE_DIVIDER + tag));
         }
 
@@ -887,57 +888,57 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDiplocationNode(Diplocation diplocation) {
+    private static DefaultMutableTreeNode createDiplocationNode(Diplocation diplocation) {
         DefaultMutableTreeNode dmtNode;
 
         String name = diplocation.getName();
         dmtNode = new DefaultMutableTreeNode("Diplocation" + VALUE_DIVIDER + name);
 
         String number = diplocation.getNumber();
-        if (number != null && !number.isEmpty()) {
+        if ((number != null) && !number.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("number" + VALUE_DIVIDER + number));
         }
 
         String inverted = diplocation.getInverted();
-        if (inverted != null && !inverted.isEmpty()) {
+        if ((inverted != null) && !inverted.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("inverted" + VALUE_DIVIDER + inverted));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDipvalueNode(Dipvalue dipvalue) {
+    private static DefaultMutableTreeNode createDipvalueNode(Dipvalue dipvalue) {
         DefaultMutableTreeNode dmtNode;
 
         String name = dipvalue.getName();
         dmtNode = new DefaultMutableTreeNode("Dipvalue" + VALUE_DIVIDER + name);
 
         String value = dipvalue.getValue();
-        if (value != null && !value.isEmpty()) {
+        if ((value != null) && !value.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(VALUE + VALUE_DIVIDER + value));
         }
 
         String aDefault = dipvalue.getDefault();
-        if (aDefault != null && !aDefault.isEmpty()) {
+        if ((aDefault != null) && !aDefault.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(DEFAULT + VALUE_DIVIDER + aDefault));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createConfigurationNode(Configuration configuration) {
+    private static DefaultMutableTreeNode createConfigurationNode(Configuration configuration) {
         DefaultMutableTreeNode dmtNode;
 
         String name = configuration.getName();
         dmtNode = new DefaultMutableTreeNode("Configuration" + VALUE_DIVIDER + name);
 
         String mask = configuration.getMask();
-        if (mask != null && !mask.isEmpty()) {
+        if ((mask != null) && !mask.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("mask" + VALUE_DIVIDER + mask));
         }
 
         String tag = configuration.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if ((tag != null) && !tag.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("tag" + VALUE_DIVIDER + tag));
         }
 
@@ -954,45 +955,45 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createConflocationNode(Conflocation conflocation) {
+    private static DefaultMutableTreeNode createConflocationNode(Conflocation conflocation) {
         DefaultMutableTreeNode dmtNode;
 
         String name = conflocation.getName();
         dmtNode = new DefaultMutableTreeNode("Conflocation" + VALUE_DIVIDER + name);
 
         String number = conflocation.getNumber();
-        if (number != null && !number.isEmpty()) {
+        if ((number != null) && !number.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("number" + VALUE_DIVIDER + number));
         }
 
         String inverted = conflocation.getInverted();
-        if (inverted != null && !inverted.isEmpty()) {
+        if ((inverted != null) && !inverted.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("inverted" + VALUE_DIVIDER + inverted));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createConfsettingNode(Confsetting confsetting) {
+    private static DefaultMutableTreeNode createConfsettingNode(Confsetting confsetting) {
         DefaultMutableTreeNode dmtNode;
 
         String name = confsetting.getName();
         dmtNode = new DefaultMutableTreeNode("Confsetting" + VALUE_DIVIDER + name);
 
         String value = confsetting.getValue();
-        if (value != null && !value.isEmpty()) {
+        if ((value != null) && !value.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(VALUE + VALUE_DIVIDER + value));
         }
 
         String aDefault = confsetting.getDefault();
-        if (aDefault != null && !aDefault.isEmpty()) {
+        if ((aDefault != null) && !aDefault.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(DEFAULT + VALUE_DIVIDER + aDefault));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createPortNode(Port port) {
+    private static DefaultMutableTreeNode createPortNode(Port port) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Port" + VALUE_DIVIDER + port.getTag());
 
         List<Analog> analogs = port.getAnalog();
@@ -1004,101 +1005,101 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createAnalogNode(Analog analog) {
+    private static DefaultMutableTreeNode createAnalogNode(Analog analog) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Analog");
         dmtNode.add(new DefaultMutableTreeNode("mask" + VALUE_DIVIDER + analog.getMask()));
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createAdjusterNode(Adjuster adjuster) {
+    private static DefaultMutableTreeNode createAdjusterNode(Adjuster adjuster) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Adjuster" + VALUE_DIVIDER + adjuster.getName());
 
         String aDefault = adjuster.getDefault();
-        if (aDefault != null && !aDefault.isEmpty()) {
+        if ((aDefault != null) && !aDefault.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(DEFAULT + VALUE_DIVIDER + aDefault));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDriverNode(Driver driver) {
+    private static DefaultMutableTreeNode createDriverNode(Driver driver) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Driver");
 
         String status = driver.getStatus();
-        if (status != null && !status.isEmpty()) {
+        if ((status != null) && !status.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(STATUS + VALUE_DIVIDER + status));
         }
 
         String emulation = driver.getEmulation();
-        if (emulation != null && !emulation.isEmpty()) {
+        if ((emulation != null) && !emulation.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("emulation" + VALUE_DIVIDER + emulation));
         }
 
         String color = driver.getColor();
-        if (color != null && !color.isEmpty()) {
+        if ((color != null) && !color.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("color" + VALUE_DIVIDER + color));
         }
 
         String sound = driver.getSound();
-        if (sound != null && !sound.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("sound channels" + VALUE_DIVIDER + sound));
+        if ((sound != null) && !sound.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode(SOUND_CHANNELS + VALUE_DIVIDER + sound));
         }
 
         String graphic = driver.getGraphic();
-        if (graphic != null && !graphic.isEmpty()) {
+        if ((graphic != null) && !graphic.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("graphic" + VALUE_DIVIDER + graphic));
         }
 
         String cocktail = driver.getCocktail();
-        if (cocktail != null && !cocktail.isEmpty()) {
+        if ((cocktail != null) && !cocktail.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("cocktail" + VALUE_DIVIDER + cocktail));
         }
 
         String protection = driver.getProtection();
-        if (protection != null && !protection.isEmpty()) {
+        if ((protection != null) && !protection.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("protection" + VALUE_DIVIDER + protection));
         }
 
         String savestate = driver.getSavestate();
-        if (savestate != null && !savestate.isEmpty()) {
+        if ((savestate != null) && !savestate.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("savestate" + VALUE_DIVIDER + savestate));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createFeatureNode(Feature feature) {
+    private static DefaultMutableTreeNode createFeatureNode(Feature feature) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Feature" + VALUE_DIVIDER + feature.getType());
 
         String status = feature.getStatus();
-        if (status != null && !status.isEmpty()) {
+        if ((status != null) && !status.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(STATUS + VALUE_DIVIDER + status));
         }
 
         String overall = feature.getOverall();
-        if (overall != null && !overall.isEmpty()) {
+        if ((overall != null) && !overall.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("overall" + VALUE_DIVIDER + overall));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createDeviceNode(Device device) {
-        DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("Device" + VALUE_DIVIDER + device.getType());
+    private static DefaultMutableTreeNode createDeviceNode(Device device) {
+        DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode(Machine.DEVICE + VALUE_DIVIDER + device.getType());
 
         String tag = device.getTag();
-        if (tag != null && !tag.isEmpty()) {
+        if ((tag != null) && !tag.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("tag" + VALUE_DIVIDER + tag));
         }
 
         String mandatory = device.getMandatory();
-        if (mandatory != null && !mandatory.isEmpty()) {
+        if ((mandatory != null) && !mandatory.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("mandatory" + VALUE_DIVIDER + mandatory));
         }
 
         String anInterface = device.getInterface();
-        if (anInterface != null && !anInterface.isEmpty()) {
+        if ((anInterface != null) && !anInterface.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("Interface" + VALUE_DIVIDER + anInterface));
         }
 
@@ -1120,22 +1121,22 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createExtensionNode(Extension extension) {
+    private static DefaultMutableTreeNode createExtensionNode(Extension extension) {
         return new DefaultMutableTreeNode("extension" + VALUE_DIVIDER + extension.getName());
     }
 
-    private DefaultMutableTreeNode createInstanceNode(Instance instance) {
+    private static DefaultMutableTreeNode createInstanceNode(Instance instance) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("instance" + VALUE_DIVIDER + instance.getName());
 
         String briefname = instance.getBriefname();
-        if (briefname != null && !briefname.isEmpty()) {
+        if ((briefname != null) && !briefname.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("briefname" + VALUE_DIVIDER + briefname));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createSlotNode(Slot slot) {
+    private static DefaultMutableTreeNode createSlotNode(Slot slot) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("slot" + VALUE_DIVIDER + slot.getName());
 
         List<Slotoption> slotoptions = slot.getSlotoption();
@@ -1146,48 +1147,48 @@ public class MAMEtoJTree extends JPanel {
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createSlotoptionNode(Slotoption slotoption) {
+    private static DefaultMutableTreeNode createSlotoptionNode(Slotoption slotoption) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("slotoption" + VALUE_DIVIDER + slotoption.getName());
 
         String devname = slotoption.getDevname();
-        if (devname != null && !devname.isEmpty()) {
+        if ((devname != null) && !devname.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("devname" + VALUE_DIVIDER + devname));
         }
 
         String aDefault = slotoption.getDefault();
-        if (aDefault != null && !aDefault.isEmpty()) {
+        if ((aDefault != null) && !aDefault.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(DEFAULT + VALUE_DIVIDER + aDefault));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createSoftwarelistNode(Softwarelist softwarelist) {
+    private static DefaultMutableTreeNode createSoftwarelistNode(Softwarelist softwarelist) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("softwarelist" + VALUE_DIVIDER + softwarelist.getName());
 
         String filter = softwarelist.getFilter();
-        if (filter != null && !filter.isEmpty()) {
+        if ((filter != null) && !filter.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("filter" + VALUE_DIVIDER + filter));
         }
 
         String status = softwarelist.getStatus();
-        if (status != null && !status.isEmpty()) {
+        if ((status != null) && !status.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(STATUS + VALUE_DIVIDER + status));
         }
 
         return dmtNode;
     }
 
-    private DefaultMutableTreeNode createRamoptionNode(Ramoption ramoption) {
+    private static DefaultMutableTreeNode createRamoptionNode(Ramoption ramoption) {
         DefaultMutableTreeNode dmtNode = new DefaultMutableTreeNode("ramoption");
 
         String value = ramoption.getValue();
-        if (value != null && !value.isEmpty()) {
+        if ((value != null) && !value.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(VALUE + VALUE_DIVIDER + value));
         }
 
         String aDefault = ramoption.getDefault();
-        if (aDefault != null && !aDefault.isEmpty()) {
+        if ((aDefault != null) && !aDefault.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode(DEFAULT + VALUE_DIVIDER + aDefault));
         }
 

@@ -21,7 +21,7 @@ package Phweda.MFM;
 import Phweda.MFM.Utils.ParseCommandList;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
-import Phweda.MFM.mame.ParseAllMachinesInfo;
+import Phweda.MFM.mame.ParseMAMElistXML;
 import Phweda.MFM.mame.softwarelist.Software;
 import Phweda.MFM.mame.softwarelist.Softwarelist;
 import Phweda.MFM.mame.softwarelist.Softwarelists;
@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static Phweda.MFM.MFMListBuilder.CATEGORY_LISTS_HASHMAP;
+import static Phweda.utils.FileUtils.COMMA;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,19 +59,19 @@ public class MAMEInfo {
 
     private static int runnable;
     private static HashMap<String, HashMap<String, String>> commands; // From -showusage LEGACY
-    private static ArrayList<String> allCategories;  // From catver.ini
-    private static HashMap<String, ArrayList<String>> categoryMachinesMap; // From catver.ini
-    private static TreeMap<String, ArrayList<String>> categoryHierarchyMap; // MFM generated for root allCategories
+    private static List<String> allCategories;  // From catver.ini
+    private static Map<String, ArrayList<String>> categoryMachinesMap; // From catver.ini
+    private static Map<String, ArrayList<String>> categoryHierarchyMap; // MFM generated for root allCategories
     private static MachineControllers machineControllers;
     // Decided to just pre-populate these should really do a doublecheck
     private static String[] numButtons = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"};
-    private static TreeSet<Integer> numPlayers = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 8));
+    private static Set<Integer> numPlayers = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5, 6, 8));
 
     // inifiles containing: Catver, catlist, custom(GoldenAge), favorites, Genre, Mature, Multimonitor,version
-    private static HashMap<String, Map<String, String>> inifiles = new HashMap<>(); // Parsed from MAME inifiles directory
-    private static TreeSet<String> runnableMachines;
+    private static Map<String, Map<String, String>> inifiles = new HashMap<>(10); // Parsed from MAME inifiles directory
+    private static Set<String> runnableMachines;
 
-    private static HashMap<String, ArrayList<String>> categoryListsMap;
+    private static Map<String, ArrayList<String>> categoryListsMap;
 
     // NOTE with addition of ALL MAME data 10/2016 reverted to XML via JAXB
     private static Mame mame;  // From -listxml now all Machines 10/14/15
@@ -82,10 +83,10 @@ public class MAMEInfo {
     /**
      * Load persisted objects or if not available generate from MAME
      */
-    private MAMEInfo(boolean parse, boolean all) {
+    private MAMEInfo(boolean parse, boolean all, boolean isListInfo) {
         parsing = parse;
         processAll = all;
-        if (MFM.isDebug() && allCategories != null) {
+        if (MFM.isDebug() && (allCategories != null)) {
             MFM.getLogger().addToList("Total categories is : " + allCategories.size());
         }
         try {
@@ -150,9 +151,14 @@ public class MAMEInfo {
             System.out.println("MAMEInfo getInstance " + reset + " : " + parse);
         }
         if ((ourInstance == null) || reset) {
-            ourInstance = new MAMEInfo(parse, all);
+            ourInstance = new MAMEInfo(parse, all, false);
         }
         return ourInstance;
+    }
+
+    public static void parseListInfo() {
+
+
     }
 
     public static boolean isParsing() {
@@ -183,7 +189,7 @@ public class MAMEInfo {
      * @see Phweda.MFM.MAMEexe
      */
     private static Mame generateMame(boolean all) {
-        return ParseAllMachinesInfo.loadAllMachinesInfo(all);
+        return ParseMAMElistXML.loadAllMachinesInfo(all);
     }
 
     private static boolean generateAllMameData() {
@@ -238,14 +244,14 @@ public class MAMEInfo {
      * Extract parsed Runnable list, Categories info, MachineControllers
      */
     private static void getParsedData() {
-        runnableMachines = ParseAllMachinesInfo.getRunnable();
-        allCategories = ParseAllMachinesInfo.getCategoriesList();
+        runnableMachines = ParseMAMElistXML.getRunnable();
+        allCategories = ParseMAMElistXML.getCategoriesList();
         if ((allCategories != null) && !allCategories.isEmpty()) {
             createCatHierarchy(allCategories);
         }
-        categoryMachinesMap = ParseAllMachinesInfo.getCategoryGamesList();
-        machineControllers = ParseAllMachinesInfo.getMachineControllers();
-        softwareLists = ParseAllMachinesInfo.getSoftwarelists();
+        categoryMachinesMap = ParseMAMElistXML.getCategoryGamesList();
+        machineControllers = ParseMAMElistXML.getMachineControllers();
+        softwareLists = ParseMAMElistXML.getSoftwarelists();
     }
 
     /**
@@ -262,7 +268,7 @@ public class MAMEInfo {
         if ((commands == null) || commands.isEmpty()) {
             commands = new HashMap<>(75, 0.5f);
             // Get it
-            List<String> fullListargs = new ArrayList<>();
+            List<String> fullListargs = new ArrayList<>(5);
             fullListargs.add("-showusage");
 
             // TODO in memory only File via Path from Files.createtempfile
@@ -383,8 +389,8 @@ public class MAMEInfo {
         return mame;
     }
 
-    public static SortedSet<String> getRunnableMachines() {
-        return Collections.unmodifiableSortedSet(runnableMachines);
+    public static Set<String> getRunnableMachines() {
+        return Collections.unmodifiableSet(runnableMachines);
     }
 
     public static String getRunnable() {
@@ -395,7 +401,7 @@ public class MAMEInfo {
         runnable = runnableIn;
     }
 
-    static HashMap<String, ArrayList<String>> getCategoryMachinesMap() {
+    static Map<String, ArrayList<String>> getCategoryMachinesMap() {
         return categoryMachinesMap;
     }
 
@@ -403,7 +409,7 @@ public class MAMEInfo {
         return machineControllers;
     }
 
-    static TreeMap<String, ArrayList<String>> getCategoryHierarchyMap() {
+    static Map<String, ArrayList<String>> getCategoryHierarchyMap() {
         return categoryHierarchyMap;
     }
 
@@ -439,7 +445,7 @@ public class MAMEInfo {
         return softwareLists.getSoftwarelistsMap().containsKey(listName);
     }
 
-    public static HashMap<String, Map<String, String>> getInifiles() {
+    public static Map<String, Map<String, String>> getInifiles() {
         return inifiles;
     }
 
@@ -448,7 +454,7 @@ public class MAMEInfo {
     }
 
     // TODO should we replace this with the newer AnalyzeCategories class??
-    private static void createCatHierarchy(ArrayList<String> categories) {
+    private static void createCatHierarchy(List<String> categories) {
         if (MFM.isDebug()) {
             MFM.getLogger().addToList("Categories count is : " + categories.size());
         }
@@ -488,7 +494,7 @@ public class MAMEInfo {
      * User's ini files become UI left hand tree
      */
     public static void loadINIs() {
-        HashSet<File> files;
+        Set<File> files;
         String folderDir = MFMSettings.getInstance().getMAMEFoldersDir();
         if (folderDir != null) {
             File folder = new File(folderDir);
@@ -500,7 +506,7 @@ public class MAMEInfo {
                 }
 
                 if (!files.isEmpty()) {
-                    inifiles = ParseAllMachinesInfo.INIfiles(files);
+                    inifiles = ParseMAMElistXML.iniFiles(files);
                     // Persist it
                     MFM_Data.getInstance().persistUserInis(inifiles);
                 }
@@ -516,15 +522,15 @@ public class MAMEInfo {
         map.values().forEach(machine -> {
             String manufacturer = machine.getManufacturer();
             String driver = machine.getSourcefile(); // Driver file
-            if (manufacturer == null || manufacturer.isEmpty()
-                    || driver == null || driver.isEmpty()) {
+            if ((manufacturer == null) || manufacturer.isEmpty()
+                    || (driver == null) || driver.isEmpty()) {
                 return;
             }
             if (driversToManufacturers.containsKey(driver)) {
                 driversToManufacturers.get(driver).add("\"" + manufacturer + "\"," + machine.getName());
             } else {
                 TreeSet<String> treeSet = new TreeSet<>();
-                treeSet.add(manufacturer + "," + machine.getName());
+                treeSet.add(manufacturer + COMMA + machine.getName());
                 driversToManufacturers.put(driver, treeSet);
             }
         });
@@ -541,7 +547,7 @@ public class MAMEInfo {
         pw.println(header);
         driversToManufacturers.keySet().forEach(driver -> {
             TreeSet<String> manufacturers = driversToManufacturers.get(driver);
-            manufacturers.forEach(manufacturer -> pw.println(driver + "," + manufacturer));
+            manufacturers.forEach(manufacturer -> pw.println(driver + COMMA + manufacturer));
         });
         pw.close();
     }
