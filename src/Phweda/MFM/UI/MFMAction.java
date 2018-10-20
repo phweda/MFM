@@ -21,11 +21,25 @@ package Phweda.MFM.UI;
 import Phweda.MFM.*;
 import Phweda.MFM.Utils.MFM_Clean_Logs;
 import Phweda.utils.FileUtils;
+import Phweda.utils.Pastie;
 import Phweda.utils.SwingUtils;
+import Phweda.utils.ZipUtils;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+
+import static Phweda.MFM.UI.MFMController.mainFrame;
+import static Phweda.utils.FileUtils.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,7 +47,7 @@ import java.nio.file.Paths;
  * Date: 12/19/11
  * Time: 3:28 PM
  */
-public class MFMAction extends AbstractAction {
+public final class MFMAction extends AbstractAction {
     public static final String UPDATE_VERSION = "Update Version";
     static final String ERROR_LOG = "Error Log";
     static final String LOG = "Log";
@@ -63,6 +77,7 @@ public class MFMAction extends AbstractAction {
     static final String SHOW_CONTROLS_DEVICES = "Show Controls & Devices";
     static final String COPY_RESOURCES = "Copy Resources";
     static final String SAVE_RESOURCES_TO_FILE = "Save Resources to File";
+    @SuppressWarnings("WeakerAccess")
     public static final String IMPORT_LIST = "Import List";
     static final String ZIP_LOGS = "Zip Logs";
     static final String POST_ERRORS_TO_PASTIE = "Post Errors to Pastie";
@@ -89,6 +104,8 @@ public class MFMAction extends AbstractAction {
     static final String OPEN_IMAGE = "Open Image";
     static final String OPEN_FILE = "Open File";
     public static final String LOAD_DATA_SET = "Load Data Set";
+    @SuppressWarnings("WeakerAccess")
+    public static final String NEXT_DATA_SET = "Next Data Set";
     static final String PARSE_MAME_ALL = "Parse MAME All";
     static final String PARSE_MAME_RUNNABLE = "Parse MAME Runnable";
     @SuppressWarnings("WeakerAccess")
@@ -131,6 +148,81 @@ public class MFMAction extends AbstractAction {
         MFMListActions.pickValidateDAT();
     }
 
+    static void zipLogs() {
+        ZipUtils zipUtils = new ZipUtils();
+        String sb = MFM.getMfmDir() + DIRECTORY_SEPARATOR + "MFM_Logs_" + MFM.LOG_NUMBER + ".zip";
+        zipUtils.zipIt(sb, new File(MFM.getMfmLogsDir()), MFM.getMfmLogsDir());
+        if (Desktop.isDesktopSupported()) {
+            File dir = new File(MFM.getMfmDir());
+            try {
+                Desktop.getDesktop().open(dir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static void postToPastie() {
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(MFM.getErrorLog().toPath(), Charset.defaultCharset());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (lines == null) {
+            MFM.getLogger().out("No error log entires to post to Pastie.");
+            return;
+        }
+        String[] strings = lines.toArray(new String[0]);
+        String[] strings2 = new String[100];
+        if (strings.length > 100) {
+            System.arraycopy(strings, strings.length - 101, strings2, 0, 100);
+        }
+
+        StringBuilder builder = new StringBuilder(250);
+        for (String s : strings2) {
+            if (s != null) {
+                builder.append(s);
+                builder.append(NEWLINE);
+            }
+        }
+
+        if (builder.length() > 0) {
+            Pastie pastie = new Pastie();
+            //    String result = pastie.postFile(new File(sourceFolder + "\\MFM-logs.zip"));
+            String result = null;
+            try {
+                result = pastie.postText(builder.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if ((result != null) && !result.isEmpty()) {
+                System.out.println(result);
+                Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+                Transferable stringSelection = new StringSelection(result);
+                clpbrd.setContents(stringSelection, null);
+                JOptionPane.showMessageDialog(mainFrame, "Pastie link is in your Clipboard" +
+                        NEWLINE + result);
+            }
+        } else {
+            JOptionPane.showMessageDialog(mainFrame, "Error log is empty");
+        }
+    }
+
+    static void openFile() {
+        JFileChooser fileChooser = new JFileChooser(MFM.getMfmListsDir());
+        int returnValue = fileChooser.showOpenDialog(mainFrame);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            openFileFromOS(fileChooser.getSelectedFile().toPath());
+        }
+    }
+
+    private static void ffmpegSettings() {
+        final FFMPEG_Panel ffmpegPanel = new FFMPEG_Panel();
+        ffmpegPanel.showSettingsPanel(mainFrame);
+    }
+
     /**
      * Scan all resource roots for resources for this list.
      * Log and report results
@@ -169,7 +261,7 @@ public class MFMAction extends AbstractAction {
     }
 
     @SuppressWarnings("squid:S1479")
-    public final void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
         try {
 
             if (MFM.isDebug()) {
@@ -231,7 +323,7 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case FFMPEG:
-                    MFMController.ffmpegSettings();
+                    ffmpegSettings();
                     break;
 
                 case CONVERT_FILES:
@@ -301,11 +393,15 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case OPEN_FILE:
-                    MFMController.openFile();
+                    openFile();
                     break;
 
                 case LOAD_DATA_SET:
-                    MFMController.loadDataSet(true);
+                    MFMController.loadDataSet(true, false);
+                    break;
+
+                case NEXT_DATA_SET:
+                    MFMController.loadDataSet(true, true);
                     break;
 
                 case PARSE_MAME_RUNNABLE:
@@ -427,11 +523,11 @@ public class MFMAction extends AbstractAction {
                     break;
 
                 case ZIP_LOGS:
-                    MFMController.zipLogs();
+                    zipLogs();
                     break;
 
                 case POST_ERRORS_TO_PASTIE:
-                    MFMController.postToPastie();
+                    postToPastie();
                     break;
 
                 case DUMP_WAYS_CONTROLS:
@@ -466,6 +562,11 @@ public class MFMAction extends AbstractAction {
         } catch (RuntimeException exc) {
             exc.printStackTrace();
         }
+    }
+
+    @Override
+    protected MFMAction clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException("MFMAction is NOT cloneable.");
     }
 }
 

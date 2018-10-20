@@ -19,13 +19,14 @@
 package Phweda.MFM.UI;
 
 import Phweda.MFM.*;
-import Phweda.MFM.Utils.AnalyzeCategories;
-import Phweda.MFM.Utils.MFM_DATmaker;
 import Phweda.MFM.mame.Control;
 import Phweda.MFM.mame.Device;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.utils.*;
+import Phweda.utils.ClickListener;
+import Phweda.utils.SwingUtils;
+import Phweda.utils.VideoUtils;
+import Phweda.utils.ZipUtils;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -35,15 +36,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -55,7 +51,6 @@ import java.util.concurrent.TimeUnit;
 import static Phweda.MFM.MFM_Constants.*;
 import static Phweda.MFM.UI.MFMListActions.pickList;
 import static Phweda.MFM.UI.MFMUI_Setup.getInstance;
-import static Phweda.MFM.Utils.AnalyzeCategories.analyzeCategories;
 import static Phweda.utils.FileUtils.*;
 
 /**
@@ -97,6 +92,7 @@ final class MFMController extends ClickListener implements ListSelectionListener
 
     @SuppressWarnings("WeakerAccess")
     static final MFMSettings mfmSettings = MFMSettings.getInstance();
+    private static final MFMKeyActions keyActions = new MFMKeyActions();
 
     static void showListInfo(String listNameIn) {
         SortedSet<String> list = MFMPlayLists.getInstance().getPlayList(listNameIn);
@@ -337,7 +333,7 @@ final class MFMController extends ClickListener implements ListSelectionListener
                 row = machineListTable.convertRowIndexToView(row);
                 machineListTable.getSelectionModel().setSelectionInterval(row, row);
                 machineListTable.scrollRectToVisible(new Rectangle(machineListTable.getCellRect(row, 0, true)));
-                break;
+                return;
             }
             row++;
         }
@@ -639,7 +635,7 @@ final class MFMController extends ClickListener implements ListSelectionListener
         } else if (mfmSettings.getExtrasZipFilesMap().containsKey(folder)) {
             StringBuilder sb = new StringBuilder(MFM.getTempdir());
             sb.append(folder);
-            sb.append('-');
+            sb.append(HYPHEN);
             sb.append(fileName);
             File tempImage = new File(sb.toString()); // temp file name needs to be unique
             // if it doesn't exist try in the Zip
@@ -694,7 +690,7 @@ final class MFMController extends ClickListener implements ListSelectionListener
         } else if (mfmSettings.getExtrasZipFilesMap().containsKey(manualFolder)) {
             StringBuilder sb = new StringBuilder(MFM.getTempdir());
             sb.append(manualFolder);
-            sb.append("-");
+            sb.append(HYPHEN);
             sb.append(selectedItem);
             sb.append(PDF_EXT);
             tempManual = new File(sb.toString()); // temp file name needs to be unique
@@ -732,153 +728,12 @@ final class MFMController extends ClickListener implements ListSelectionListener
 
     @Override
     public void keyTyped(KeyEvent e) {
-//        System.out.println("Typed: " + e.getKeyCode() + "\t" + e.getKeyChar());
-        // If ALT then it is a mnemonic skip
-        if (!e.isAltDown()) {
-            if (e.getKeyChar() == KeyEvent.VK_A) {
-                changeList(MFMListBuilder.ALL);
-            }
-
-            if (e.getKeyChar() == KeyEvent.VK_B) {
-                changeList(MFMListBuilder.BIOS);
-            }
-
-            if (e.getKeyChar() == KeyEvent.VK_C) {
-                changeList(MFMListBuilder.CLONE);
-            }
-
-            if (e.getKeyChar() == KeyEvent.VK_D) {
-                changeList(MFMListBuilder.DEVICES);
-            }
-
-            if (e.getKeyChar() == KeyEvent.VK_H) {
-                changeList(MFMListBuilder.HORIZONTAL);
-            }
-
-            if (e.getKeyChar() == KeyEvent.VK_N) {
-                changeList(MFMListBuilder.NO_CLONE);
-            }
-
-            if ((e.getKeyChar() == KeyEvent.VK_R) && MFM_Data.getInstance().getDataVersion().contains(MFMListBuilder.ALL)) {
-                changeList(MFMListBuilder.RUNNABLE);
-            }
-
-            if (e.getKeyChar() == KeyEvent.VK_S) {
-                changeList(MFMListBuilder.SYSTEMS);
-            }
-
-            if (e.getKeyChar() == KeyEvent.VK_V) {
-                changeList(MFMListBuilder.VERTICAL);
-            }
-        }
-
+        keyActions.keyTyped(e);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-
-        if ((e.getKeyCode() == KeyEvent.VK_A) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
-            changeList(MFMListBuilder.ARCADE);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_K) && e.isControlDown()) {
-            showHelp(HOT_KEYS);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_N) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
-            changeList(MFMListBuilder.NO_IMPERFECT);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_O) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
-            openFile();
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_R) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
-            changeList(MFMListBuilder.RASTER);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_S) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0) && !e.isShiftDown()) {
-            changeList(MFMListBuilder.SIMULTANEOUS);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
-            changeList(MFMListBuilder.VECTOR);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
-            showItemXML();
-        }
-
-        // Overloaded CNTRL Z below in Special Functions
-        if ((e.getKeyCode() == KeyEvent.VK_Z) && e.isControlDown() && !e.isAltDown() && !e.isShiftDown()) {
-            zipLogs();
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & InputEvent.CTRL_MASK) != 0)) {
-            showNextList(true, true);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_LEFT) && e.isControlDown()) {
-            showNextList(true, false);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_RIGHT) && ((e.getModifiers() & InputEvent.ALT_MASK) != 0)) {
-            showNextList(false, true);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_LEFT) && ((e.getModifiers() & InputEvent.ALT_MASK) != 0)) {
-            showNextList(false, false);
-        }
-
-        //================== SPECIAL FUNCTIONS  =================
-
-        if ((e.getKeyCode() == KeyEvent.VK_D) && e.isControlDown() && e.isShiftDown()) {
-            MFM_DATmaker.saveBuiltinListsDATs();
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_J) && e.isControlDown() && e.isShiftDown()) {
-            listMachinesToJSON(false);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_K) && e.isControlDown() && e.isShiftDown()) {
-            listMachinesToJSON(true);
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_M) && e.isControlDown() && e.isShiftDown()) {
-            MAMEInfo.dumpManuDriverList();
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_S) && e.isControlDown() && e.isShiftDown()) {
-            new MAME_Stats().saveStats();
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_T) && e.isControlDown() && e.isShiftDown()) {
-            MFM_Wiki.listtoWikiTable(currentListLabel.getText().substring(0,
-                    currentListLabel.getText().indexOf(SPACE_CHAR)));
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_U) && e.isControlDown() && e.isShiftDown()) {
-            MAME_Stats stats = new MAME_Stats();
-            MFM_Wiki.statstoWikiTable(stats.getStatsArray(), stats.getStatsHeaders());
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_Z) && e.isControlDown() && e.isShiftDown()) {
-            analyzeCategories();
-        }
-
-        if ((e.getKeyCode() == KeyEvent.VK_Z) && e.isControlDown() && e.isAltDown()) {
-            JFileChooser jfc = new JFileChooser(MFM.getMfmCategoryDir());
-            jfc.setFileFilter(csvFileFilter);
-            jfc.showOpenDialog(mainFrame);
-            File file = jfc.getSelectedFile();
-            String fileName = JOptionPane.showInputDialog("Enter new Categories File Name");
-            if (file.exists() && !fileName.isEmpty()) {
-                AnalyzeCategories.enterNewCategories(file, fileName);
-            } else {
-                JOptionPane.showMessageDialog(mainFrame, "Name is empty or File selected does not exist",
-                        "Category input Error", JOptionPane.WARNING_MESSAGE);
-            }
-        }
+        keyActions.keyPressed(e);
     }
 
     @Override
@@ -886,7 +741,7 @@ final class MFMController extends ClickListener implements ListSelectionListener
         // no entries
     }
 
-    private void showNextList(boolean all, boolean next) {
+    static void showNextList(boolean all, boolean next) {
         if (all) {
             changeList(MFMPlayLists.getInstance().getNextListName(currentListLabel.getName(), next));
         } else {
@@ -894,71 +749,8 @@ final class MFMController extends ClickListener implements ListSelectionListener
         }
     }
 
-    static void zipLogs() {
-        ZipUtils zipUtils = new ZipUtils();
-        String sb = MFM.getMfmDir() + DIRECTORY_SEPARATOR + "MFM_Logs_" + MFM.LOG_NUMBER + ".zip";
-        zipUtils.zipIt(sb, new File(MFM.getMfmLogsDir()), MFM.getMfmLogsDir());
-        if (Desktop.isDesktopSupported()) {
-            File dir = new File(MFM.getMfmDir());
-            try {
-                Desktop.getDesktop().open(dir);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    static void postToPastie() {
-        List<String> lines = null;
-        try {
-            lines = Files.readAllLines(MFM.getErrorLog().toPath(), Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (lines == null) {
-            MFM.getLogger().out("No error log entires to post to Pastie.");
-            return;
-        }
-        String[] strings = lines.toArray(new String[0]);
-        String[] strings2 = new String[100];
-        if (strings.length > 100) {
-            System.arraycopy(strings, strings.length - 101, strings2, 0, 100);
-        }
-
-        StringBuilder builder = new StringBuilder(250);
-        for (String s : strings2) {
-            if (s != null) {
-                builder.append(s);
-                builder.append(NEWLINE);
-            }
-        }
-
-        if (builder.length() > 0) {
-            Pastie pastie = new Pastie();
-            //    String result = pastie.postFile(new File(sourceFolder + "\\MFM-logs.zip"));
-            String result = null;
-            try {
-                result = pastie.postText(builder.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if ((result != null) && !result.isEmpty()) {
-                System.out.println(result);
-                Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Transferable stringSelection = new StringSelection(result);
-                clpbrd.setContents(stringSelection, null);
-                JOptionPane.showMessageDialog(mainFrame, "Pastie link is in your Clipboard" +
-                        NEWLINE + result);
-            }
-        } else {
-            JOptionPane.showMessageDialog(mainFrame, "Error log is empty");
-        }
-
-    }
-
     @SuppressWarnings("squid:S2696")
-    final void init() {
+    void init() {
 
         mainFrame = getInstance().getFrame();
         mainFrame.addMouseListener(this);
@@ -1053,14 +845,13 @@ final class MFMController extends ClickListener implements ListSelectionListener
         MFMVideoActions.videoAction(action, infoPanel);
     }
 
-    static void ffmpegSettings() {
-        final FFMPEG_Panel ffmpegPanel = new FFMPEG_Panel();
-        ffmpegPanel.showSettingsPanel(mainFrame);
-    }
-
     static void cropAVI() {
         final String machine = getSelectedItem();
         MFMVideoActions.cropAVI(machine, infoPanel);
+    }
+
+    static String getCurrentListText() {
+        return currentListLabel.getText();
     }
 
     static void refreshVersion() {
@@ -1084,20 +875,6 @@ final class MFMController extends ClickListener implements ListSelectionListener
     static void listMachinesToCSV() {
         MFMListActions.listDataToCSV(pickList(true, "Pick list to export MAME data to CSV"));
         JOptionPane.showMessageDialog(mainFrame, FILES_ARE_IN_THE_MFM_LISTS_FOLDER);
-    }
-
-    private static void listMachinesToJSON(boolean everything) {
-
-        if (everything) {
-            MFMListActions.listDataToJSON(MFMPlayLists.EVERYTHING);
-            return;
-        }
-
-        String list = pickList(true, "Pick list to export MAME data to JSON");
-        if (list != null) {
-            MFMListActions.listDataToJSON(list);
-            JOptionPane.showMessageDialog(mainFrame, FILES_ARE_IN_THE_MFM_LISTS_FOLDER);
-        }
     }
 
     // Todo move the tree display methods out of controller
@@ -1142,7 +919,7 @@ final class MFMController extends ClickListener implements ListSelectionListener
             public void mousePressed(MouseEvent e) {
                 TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
                 if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON3) && (selPath != null)) {
-                    MAMEtoJTree.getInstance(false).copytoClipboard(selPath.getLastPathComponent().toString());
+                    MAMEtoJTree.copytoClipboard(selPath.getLastPathComponent().toString());
                 }
             }
         });
@@ -1155,7 +932,7 @@ final class MFMController extends ClickListener implements ListSelectionListener
                         DefaultMutableTreeNode node
                                 = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
                         String value = node.getUserObject().toString();
-                        MAMEtoJTree.getInstance(false).copytoClipboard(value);
+                        MAMEtoJTree.copytoClipboard(value);
                     }
                 });
         // Expand all if softwarelist -> NOTE my guess that if looking at this XML will be easier if expanded
@@ -1177,40 +954,50 @@ final class MFMController extends ClickListener implements ListSelectionListener
         dialog.setVisible(true);
     }
 
-    static void openFile() {
-        JFileChooser fileChooser = new JFileChooser(MFM.getMfmListsDir());
-        int returnValue = fileChooser.showOpenDialog(mainFrame);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            openFileFromOS(fileChooser.getSelectedFile().toPath());
-        }
-    }
-
-    static void loadDataSet(boolean pickList) {
+    static void loadDataSet(boolean pickList, boolean restart) {
+        System.out.println("Controller Load Data Set #1");
         String dataSet = mfmSettings.getDataVersion();
-        if (pickList || (dataSet == null)) {
+        System.out.println("Controller Load Data Set #2");
+        if (pickList || (dataSet == null) || !MFM_Data.getInstance().hasDataSet(dataSet)) {
+            System.out.println("Controller Load Data Set #3");
             // Special case first run no Data Sets found!
             int dSets = MFM_Data.getInstance().getDataSets().length;
+
+            System.out.println("Controller Load Data Set #3.1 and dSets is " + dSets);
             if (dSets < 1) {
+                System.out.println("Controller Load Data Set #4");
                 if (MFM.isSystemDebug()) {
                     System.out.println("In loadDataSet dSets is : " + dSets);
                 }
-                //    REMOVED FIRST RUN PARSE OPTION Oct 2017
-                showDataSetsURL();
             } else if ((dSets == 1) && (mainFrame != null)) {
+                System.out.println("Controller Load Data Set #5");
                 return; // Already loaded NOTE look for a better way to do this
             } else if (dSets == 1) {
+                System.out.println("Controller Load Data Set #6");
                 dataSet = MFM_Data.getInstance().getDataSets()[0];
             } else {
+                System.out.println("Controller Load Data Set #7");
                 dataSet = mfmSettings.pickVersion();
             }
         }
 
         if ((dataSet != null) && !dataSet.isEmpty() && !"null".equals(dataSet)) {
+            System.out.println("Controller Load Data Set #8");
             mfmSettings.setDataVersion(dataSet);
+            if (restart) {
+                JOptionPane.showMessageDialog(mainFrame, "Run MFM again to load the set.");
+                try {
+                    Thread.sleep(27);
+                } catch (InterruptedException e) {
+                    // ignore
+                } finally {
+                    MFM.exit();
+                }
+            }
         } else {
             return;
         }
-
+        System.out.println("Controller Load Data Set #9");
         if (mainFrame != null) {
             infoPanel.showProgress("Loading Data");
         } else {
