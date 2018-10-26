@@ -21,6 +21,7 @@ package Phweda.MFM;
 import Phweda.MFM.Utils.ParseCommandList;
 import Phweda.MFM.mame.Machine;
 import Phweda.MFM.mame.Mame;
+import Phweda.MFM.mame.ParseMAMElistInfo;
 import Phweda.MFM.mame.ParseMAMElistXML;
 import Phweda.MFM.mame.softwarelist.Software;
 import Phweda.MFM.mame.softwarelist.Softwarelist;
@@ -48,7 +49,7 @@ import static Phweda.utils.FileUtils.COMMA;
  * Date: 11/25/11
  * Time: 2:04 PM
  */
-public class MAMEInfo {
+public final class MAMEInfo {
     private static MAMEInfo ourInstance = null;
 
     private static final String RUNNABLE_MACHINES = "RunnableMachines";
@@ -101,11 +102,11 @@ public class MAMEInfo {
                     MFM.exit(9);
                 }
             }
-            if (parse) {
+            if (parse && !isListInfo) {
                 System.out.println("**** Parsing MAME ****");
                 // With 0.85 Parse MAME if one is set, or Quit
                 MAMEexe.setBaseArgs(MFMSettings.getInstance().fullMAMEexePath());
-                boolean success = generateAllMameData();
+                boolean success = generateAllMameData(isListInfo);
                 if (!success) {
                     JOptionPane.showMessageDialog(null, "MAME Parsing failed check the error log"
                             , "Parsing Failed!!", JOptionPane.ERROR_MESSAGE);
@@ -113,6 +114,9 @@ public class MAMEInfo {
                 }
                 mame = loadMame();
                 softwareLists = loadSoftwareLists();
+            } else if (isListInfo) {
+                System.out.println("**** Parsing MAME listInfo file ****");
+                boolean success = generateAllMameData(isListInfo);
             }
 
             loadCaches();
@@ -157,8 +161,7 @@ public class MAMEInfo {
     }
 
     public static void parseListInfo() {
-
-
+        ourInstance = new MAMEInfo(true, true, true);
     }
 
     public static boolean isParsing() {
@@ -188,11 +191,12 @@ public class MAMEInfo {
      * @return Mame XML
      * @see Phweda.MFM.MAMEexe
      */
-    private static Mame generateMame(boolean all) {
-        return ParseMAMElistXML.loadAllMachinesInfo(all);
+    private static Mame generateMame(boolean all, boolean isListInfo) {
+        // By design listInfo is used for pre 0.70 addition of listXML and is All
+        return isListInfo ? ParseMAMElistInfo.loadAllMAME() : ParseMAMElistXML.loadAllMachinesInfo(all);
     }
 
-    private static boolean generateAllMameData() {
+    private static boolean generateAllMameData(boolean isListInfo) {
         MFMSettings.getInstance();// Ensure it is loaded. ?? TODO needed?
 
         StringBuilder message = new StringBuilder("Parsing MAME: ");
@@ -202,16 +206,16 @@ public class MAMEInfo {
 
         MFM.getLogger().addToList(message.toString(), true);
         if (MFM.isSystemDebug()) {
-            System.out.println(message.toString());
+            System.out.println(message);
         }
 
         loadINIs();
         // NOTE order makes a difference!!
-        mame = generateMame(processAll);
+        mame = generateMame(processAll, isListInfo);
         if (mame == null) {
             return false;
         }
-        getParsedData();
+        getParsedData(isListInfo);
         MFM_Data.getInstance().setSoftwarelists(softwareLists);
 
         if (mame != null) {
@@ -243,15 +247,25 @@ public class MAMEInfo {
     /**
      * Extract parsed Runnable list, Categories info, MachineControllers
      */
-    private static void getParsedData() {
-        runnableMachines = ParseMAMElistXML.getRunnable();
-        allCategories = ParseMAMElistXML.getCategoriesList();
+    private static void getParsedData(boolean isListInfo) {
+        if (isListInfo) {
+            runnableMachines = ParseMAMElistInfo.getRunnable();
+            allCategories = ParseMAMElistInfo.getCategoriesList();
+            categoryMachinesMap = ParseMAMElistInfo.getCategoryMachineListMap();
+            machineControllers = ParseMAMElistInfo.getMachineControllers();
+            // make sure previous set is removed - create empty one for backward compatibility
+            softwareLists = new Softwarelists();
+        } else {
+            runnableMachines = ParseMAMElistXML.getRunnable();
+            allCategories = ParseMAMElistXML.getCategoriesList();
+            categoryMachinesMap = ParseMAMElistXML.getCategoryMachineListMap();
+            machineControllers = ParseMAMElistXML.getMachineControllers();
+            softwareLists = ParseMAMElistXML.getSoftwarelists();
+        }
+
         if ((allCategories != null) && !allCategories.isEmpty()) {
             createCatHierarchy(allCategories);
         }
-        categoryMachinesMap = ParseMAMElistXML.getCategoryGamesList();
-        machineControllers = ParseMAMElistXML.getMachineControllers();
-        softwareLists = ParseMAMElistXML.getSoftwarelists();
     }
 
     /**
@@ -320,15 +334,15 @@ public class MAMEInfo {
 
     @SuppressWarnings("unchecked")
     private static void loadCaches() {
-        inifiles = (HashMap<String, Map<String, String>>) MFM_Data.getInstance().getUserInis();
-        runnableMachines = (TreeSet<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
-        allCategories = (ArrayList<String>) MFM_Data.getInstance().getStaticData(CATEGORIES);
-        categoryMachinesMap = (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().
+        inifiles = (Map<String, Map<String, String>>) MFM_Data.getInstance().getUserInis();
+        runnableMachines = (Set<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
+        allCategories = (List<String>) MFM_Data.getInstance().getStaticData(CATEGORIES);
+        categoryMachinesMap = (Map<String, ArrayList<String>>) MFM_Data.getInstance().
                 getStaticData(CATEGORYMACHINES);
-        categoryHierarchyMap = (TreeMap<String, ArrayList<String>>)
+        categoryHierarchyMap = (Map<String, ArrayList<String>>)
                 MFM_Data.getInstance().getStaticData(CATEGORYHIERARCHY);
         categoryListsMap =
-                (HashMap<String, ArrayList<String>>) MFM_Data.getInstance().getStaticData(CATEGORY_LISTS_HASHMAP);
+                (Map<String, ArrayList<String>>) MFM_Data.getInstance().getStaticData(CATEGORY_LISTS_HASHMAP);
 
         machineControllers = MachineControllers.getInstance();
         MachineControllers.setControlMachinesList((TreeMap<Integer, TreeSet<String>>)
@@ -364,7 +378,7 @@ public class MAMEInfo {
     }
 
     // Future when we read live
-    public static void setNumPlayers(TreeSet<Integer> set) {
+    public static void setNumPlayers(SortedSet<Integer> set) {
         numPlayers = set;
     }
 
@@ -402,7 +416,7 @@ public class MAMEInfo {
     }
 
     static Map<String, ArrayList<String>> getCategoryMachinesMap() {
-        return categoryMachinesMap;
+        return Collections.unmodifiableMap(categoryMachinesMap);
     }
 
     public static MachineControllers getMachineControllers() {
@@ -410,7 +424,7 @@ public class MAMEInfo {
     }
 
     static Map<String, ArrayList<String>> getCategoryHierarchyMap() {
-        return categoryHierarchyMap;
+        return Collections.unmodifiableMap(categoryHierarchyMap);
     }
 
     public static Machine getMachine(String machineName) {
@@ -421,6 +435,9 @@ public class MAMEInfo {
     }
 
     public static Software getSoftware(String softwareName, String softwareListName) {
+        if (softwareLists == null) {
+            return null;
+        }
         if (softwareLists.getSoftwarelistsMap().containsKey(softwareListName)) {
             return getSoftware(softwareLists.getSoftwarelistsMap().get(softwareListName), softwareName);
         }
@@ -442,7 +459,7 @@ public class MAMEInfo {
     }
 
     public static boolean isSoftwareList(String listName) {
-        return softwareLists.getSoftwarelistsMap().containsKey(listName);
+        return softwareLists == null ? false : softwareLists.getSoftwarelistsMap().containsKey(listName);
     }
 
     public static Map<String, Map<String, String>> getInifiles() {

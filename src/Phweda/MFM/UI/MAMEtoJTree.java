@@ -588,6 +588,11 @@ public class MAMEtoJTree extends JPanel {
             dmtNode.add(new DefaultMutableTreeNode("optional" + VALUE_DIVIDER + optional));
         }
 
+        String flags = rom.getFlags();
+        if ((!flags.isEmpty())) {
+            dmtNode.add(new DefaultMutableTreeNode("flags" + VALUE_DIVIDER + flags));
+        }
+
         return dmtNode;
     }
 
@@ -717,6 +722,11 @@ public class MAMEtoJTree extends JPanel {
         String refresh = display.getRefresh();
         if ((refresh != null) && !refresh.isEmpty()) {
             dmtNode.add(new DefaultMutableTreeNode("refresh" + VALUE_DIVIDER + refresh));
+        }
+
+        String colors = display.getColors();
+        if ((colors != null) && !colors.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("colors" + VALUE_DIVIDER + colors));
         }
 
         String pixclock = display.getPixclock();
@@ -883,6 +893,11 @@ public class MAMEtoJTree extends JPanel {
         List<Dipvalue> dipvalues = dipswitch.getDipvalue();
         for (Dipvalue dipvalue : dipvalues) {
             dmtNode.add(createDipvalueNode(dipvalue));
+        }
+
+        List<String> entries = dipswitch.getEntry();
+        for (String entry : entries) {
+            dmtNode.add(new DefaultMutableTreeNode("entry" + VALUE_DIVIDER + entry));
         }
 
         return dmtNode;
@@ -1063,7 +1078,17 @@ public class MAMEtoJTree extends JPanel {
 
         String savestate = driver.getSavestate();
         if ((savestate != null) && !savestate.isEmpty()) {
-            dmtNode.add(new DefaultMutableTreeNode("savestate" + VALUE_DIVIDER + savestate));
+            dmtNode.add(new DefaultMutableTreeNode("hiscore" + VALUE_DIVIDER + savestate));
+        }
+
+        String colordeep = driver.getColordeep();
+        if ((colordeep != null) && !colordeep.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("colordeep" + VALUE_DIVIDER + colordeep));
+        }
+
+        String hiscore = driver.getSavestate();
+        if ((hiscore != null) && !hiscore.isEmpty()) {
+            dmtNode.add(new DefaultMutableTreeNode("hiscore" + VALUE_DIVIDER + hiscore));
         }
 
         return dmtNode;

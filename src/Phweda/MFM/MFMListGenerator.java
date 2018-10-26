@@ -35,7 +35,9 @@ import static Phweda.MFM.MFMListBuilder.*;
  */
 class MFMListGenerator {
 
-    private static final String WE_SHOULDN_T_GET_HERE_LIST_BUILDER_GENERATE_MFMLISTS_CLONEOF = "We shouldn't get here : ListBuilder.generateMFMLists() cloneof";
+    private static final Double DOUBLE_162 = 162.0d;
+    private static final String WE_SHOULDN_T_GET_HERE_LIST_BUILDER_GENERATE_MFMLISTS_CLONEOF =
+            "We shouldn't get here : ListBuilder.generateMFMLists() cloneof";
 
     private MFMListGenerator() {
     }
@@ -74,6 +76,7 @@ class MFMListGenerator {
 
         if (lists == null) {
             lists = new HashMap<>(24);
+            boolean pre162 = isPre162();
             for (Map.Entry<String, Machine> entry : allMachines.entrySet()) {
                 Machine machine = entry.getValue();
                 String machineName = machine.getName();
@@ -100,13 +103,18 @@ class MFMListGenerator {
                 } else if (systemCategories.contains(category)) {
                     systemList.add(machineName);
                 } else {
+                    // Use if parsing pre 0.162 sets assume no category means Arcade
+                    // Renames cause older versions to not match newer catgeory lists
+                    if (pre162) {
+                        arcadeList.add(machineName);
+                    }
                     if (MFM.isDebug()) {
                         MFM.getLogger().addToList(machineName + " category : " + category +
                                 " has no entry in Arcade or System categories lists.");
                     }
                 }
 
-                if (machine.getDisk().isEmpty()) {
+                if (!machine.getDisk().isEmpty()) {
                     chdList.add(machineName);
                 }
 
@@ -254,8 +262,8 @@ class MFMListGenerator {
     static TreeMap<String, SortedSet<String>> getLanguageLists(boolean parsing) {
         TreeMap<String, SortedSet<String>> languagesListMap;
         if (!parsing) {
-            languagesListMap =
-                    (TreeMap<String, SortedSet<String>>) MFM_Data.getInstance().getStaticData(MFM_Constants.LANGUAGESLISTS);
+            languagesListMap = (TreeMap<String, SortedSet<String>>) MFM_Data.getInstance()
+                    .getStaticData(MFM_Constants.LANGUAGESLISTS);
         } else {
             languagesListMap = loadLanguagesINI();
             // Dependency ALL list must already exists
@@ -273,4 +281,12 @@ class MFMListGenerator {
         return list;
     }
 
+    private static boolean isPre162() {
+        String dataVersion = MFMSettings.getInstance().getDataVersion();
+        if (dataVersion.startsWith("A")) {
+            dataVersion = dataVersion.substring(4);
+        }
+        Double dataVersionDouble = Double.valueOf(dataVersion.substring(dataVersion.indexOf('.') + 1));
+        return dataVersionDouble < DOUBLE_162;
+    }
 }
