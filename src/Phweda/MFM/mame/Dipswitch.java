@@ -58,6 +58,7 @@ import java.util.List;
         "condition",
         "diplocation",
         "dipvalue",
+        "entry",
         "unknownElements"
 })
 @XmlRootElement(name = "dipswitch")
@@ -66,6 +67,9 @@ public class Dipswitch {
     protected Condition condition;
     protected List<Diplocation> diplocation;
     protected List<Dipvalue> dipvalue;
+    // Psuedo XML to handle entry in very old MAME versions
+    protected List<String> entry;
+
 
     @XmlAttribute(name = "name", required = true)
     protected String name;
@@ -214,4 +218,32 @@ public class Dipswitch {
         this.mask = value;
     }
 
+    /**
+     * Psuedo XML to handle entry in very old MAME versions
+     * <p>
+     * Gets the value of the entry property.
+     * <p>
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the entry property.
+     * <p>
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getDiplocation().add(newItem);
+     * </pre>
+     * <p>
+     * <p>
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link String }
+     */
+    public List<String> getEntry() {
+        if (entry == null) {
+            entry = new ArrayList<String>();
+        }
+        return this.entry;
+    }
 }

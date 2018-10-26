@@ -127,7 +127,9 @@ import java.util.List;
         "status",
         "emulation",
         "color",
+        "colordeep",
         "sound",
+        "hiscore",
         "graphic",
         "cocktail",
         "protection",
@@ -162,6 +164,16 @@ public class Driver {
     @XmlAttribute(name = "savestate", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String savestate;
+
+    // Psuedo XML to handle entry in very old MAME versions
+    @XmlAttribute(name = "colordeep", required = false)
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    protected String colordeep;
+
+    // Psuedo XML to handle entry in very old MAME versions
+    @XmlAttribute(name = "hiscore", required = false)
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    protected String hiscore;
 
     // Catchall for any unknown Elements. As MAME DTD changes this will allow for
     // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
@@ -327,6 +339,50 @@ public class Driver {
      */
     public void setSavestate(String value) {
         this.savestate = value;
+    }
+
+    // Psuedo XML to handle entry in very old MAME versions
+
+    /**
+     * Gets the value of the colordeep property.
+     *
+     * @return object is
+     * {@link String }
+     */
+    public String getColordeep() {
+        return colordeep;
+    }
+
+    /**
+     * Sets the value of the colordeep property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setColordeep(String value) {
+        this.colordeep = value;
+    }
+
+    // Psuedo XML to handle entry in very old MAME versions
+
+    /**
+     * Gets the value of the hiscore property.
+     *
+     * @return object is
+     * {@link String }
+     */
+    public String getHiscore() {
+        return hiscore;
+    }
+
+    /**
+     * Sets the value of the colordeep property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setHiscore(String value) {
+        this.colordeep = value;
     }
 
 }

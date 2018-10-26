@@ -86,6 +86,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings({"ProtectedField", "WeakerAccess"})
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "display")
@@ -127,6 +128,9 @@ public class Display {
     protected String orientation; // MAME older versions. vertical|horizontal (equivalent of rotate (0|90|180|270))
     @XmlAttribute(name = "screen")
     protected String screen; // MAME older versions. screen == type : raster|vector
+    @XmlAttribute(name = "colors")
+    protected String colors; // MAME older versions. colors 16
+
 
     // Catchall for any unknown Elements. As MAME DTD changes this will allow for
     // continuation of MFM without a code change. BUT IS NOT RECOMMENDED.
@@ -227,6 +231,10 @@ public class Display {
      * {@link String }
      */
     public String getOrientation() {
+        // Null check added for original listinfo in 0.34
+        if (orientation == null) {
+            return "";
+        }
         return orientation;
     }
 
@@ -238,6 +246,26 @@ public class Display {
      */
     public void setOrientation(String value) {
         this.orientation = value;
+    }
+
+    /**
+     * Gets the value of the colors property.
+     *
+     * @return possible object is
+     * {@link String }
+     */
+    public String getColors() {
+        return colors;
+    }
+
+    /**
+     * Sets the value of the colors property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setColors(String value) {
+        this.colors = value;
     }
 
     /**
