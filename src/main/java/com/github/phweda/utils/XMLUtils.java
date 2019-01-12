@@ -18,8 +18,10 @@
 
 package com.github.phweda.utils;
 
+import com.github.phweda.MFM.mame.Mame;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -96,5 +98,10 @@ public class XMLUtils {
             return false;
         }
         return true;
+    }
+
+    public static boolean prettyPrintXML(Mame mame, String outputPath) {
+        //TODO: voji implement this
+        throw new NotImplementedException();
     }
 }

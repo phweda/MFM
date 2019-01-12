@@ -75,7 +75,6 @@ public class MFMUI_Resources {
     private static final String POSITIONAL_CONTROL_IMG = "Positional_control.png";
     private static final String STICK_CONTROL_IMG = "Stick_control.png";
     private static final String TRACKBALL_CONTROL_IMG = "Trackball_control.png";
-    public static final String RESOURCES = "Resources";
     private static final String FLAGS = "flags";
     private static final String PNG_SUFFIX = ".png";
 
@@ -108,7 +107,7 @@ public class MFMUI_Resources {
         MFM.getLogger().addToList("Resources : \n" + testURL, true);
         for (String name : resourceNames) {
             // NOTE works multisystem with slash it is in .jar that way
-            URL url = this.getClass().getResource(RESOURCES + FileUtils.SLASH + name);
+            URL url = this.getClass().getResource(name);
             if (url != null) {
                 if (MFM.isSystemDebug()) {
                     MFM.getLogger().addToList(url.toString(), true);
@@ -130,7 +129,7 @@ public class MFMUI_Resources {
 
     @SuppressWarnings("SameParameterValue")
     ImageIcon getFlagImageIcon(String countryCode) {
-        URL url = this.getClass().getResource(RESOURCES + FileUtils.SLASH +
+        URL url = this.getClass().getResource(
                 FLAGS + FileUtils.SLASH + countryCode + PNG_SUFFIX);
         if (url != null) {
             return new ImageIcon(url);

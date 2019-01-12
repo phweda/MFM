@@ -185,7 +185,7 @@ public class MAMEtoJTree extends JPanel {
     private static Mame jaxb() throws JAXBException {
         Mame mame;
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Phweda.MFM.mame.Mame.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(com.github.phweda.MFM.mame.Mame.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             // hard code path to mame exe
             MAMEexe.setBaseArgs("E:\\Test\\mame64.exe"); // Enter path here

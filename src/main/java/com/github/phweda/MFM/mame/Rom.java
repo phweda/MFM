@@ -94,6 +94,8 @@ public class Rom {
     protected String region;
     @XmlAttribute(name = "offset")
     protected String offset;
+    @XmlAttribute(name = "flags")
+    protected String flags;
     @XmlAttribute(name = "status")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String status;
@@ -286,6 +288,27 @@ public class Rom {
     public void setOffset(String value) {
         this.offset = value;
     }
+
+    /**
+     * Gets the value of the flags property.
+     *
+     * @return possible object is
+     * {@link String }
+     */
+    public String getFlags() {
+        return flags;
+    }
+
+    /**
+     * Sets the value of the flags property.
+     *
+     * @param value allowed object is
+     *              {@link String }
+     */
+    public void setFlags(String value) {
+        this.flags = value;
+    }
+
 
     /**
      * Gets the value of the status property.

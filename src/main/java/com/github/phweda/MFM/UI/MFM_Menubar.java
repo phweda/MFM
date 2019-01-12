@@ -33,7 +33,6 @@ import java.util.SortedSet;
 
 import static com.github.phweda.MFM.MFM_Constants.*;
 import static com.github.phweda.MFM.UI.MFMAction.HELP;
-import static com.github.phweda.MFM.UI.MFMUI_Resources.RESOURCES;
 import static com.github.phweda.MFM.UI.MFM_Components.getResources;
 
 /**
@@ -101,7 +100,7 @@ class MFM_MenuBar {
         Action mameOutput = new MFMAction(MFMAction.MAME_OUTPUT, null);
         Action mfmErrorLog = new MFMAction(MFMAction.ERROR_LOG, null);
         Action mfmGCLog = null;
-        if ((Phweda.MFM.MFM.getGcLog() != null) && com.github.phweda.MFM.MFM.getGcLog().exists()) {
+        if ((com.github.phweda.MFM.MFM.getGcLog() != null) && com.github.phweda.MFM.MFM.getGcLog().exists()) {
             mfmGCLog = new MFMAction(MFMAction.GC_LOG, null);
         }
         Action mfmZipLogs = new MFMAction(MFMAction.ZIP_LOGS, null);
@@ -124,7 +123,7 @@ class MFM_MenuBar {
             item.setMnemonic(KeyEvent.VK_G);
         }
 
-        if (Phweda.MFM.MFM.isDebug() || com.github.phweda.MFM.MFM.isSystemDebug()) {
+        if (com.github.phweda.MFM.MFM.isDebug() || com.github.phweda.MFM.MFM.isSystemDebug()) {
             logsMenu.add(new JSeparator());
             item = logsMenu.add(mfmZipLogs);
             item.setMnemonic(KeyEvent.VK_Z);
@@ -403,7 +402,7 @@ class MFM_MenuBar {
     }
 
     private static JMenu createResourcesmenu() {
-        JMenu resourcesMenu = new JMenu(RESOURCES);
+        JMenu resourcesMenu = new JMenu("Resources");
         Action scan = new MFMAction(MFMAction.SCAN_RESOURCES, null);
         Action copyResources = new MFMAction(MFMAction.COPY_RESOURCES, null);
         Action saveResources = new MFMAction(MFMAction.SAVE_RESOURCES_TO_FILE, null);

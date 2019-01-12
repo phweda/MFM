@@ -298,7 +298,7 @@ public class MFM_Data {
         return folderNamesFile;
     }
 
-    final void persistUserInis(HashMap<String, Map<String, String>> inifiles) {
+    final void persistUserInis(Map<String, Map<String, String>> inifiles) {
         PersistUtils.saveAnObjectXML(inifiles, MFM_USER_INI_FILE);
     }
 
@@ -413,6 +413,11 @@ public class MFM_Data {
             Thread.currentThread().interrupt();
             return "Data Scan failed.";
         }
+    }
+
+    public boolean hasDataSet(String dataSet) {
+        //TODO: voji implement thiss
+        return true;
     }
 
     // Nested classes to just keep all the logic and data related storage in the same place

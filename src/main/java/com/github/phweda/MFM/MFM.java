@@ -253,7 +253,7 @@ public final class MFM {
         // Folder we create on the local file system for Data Sets
         mfmDataDir = mfmDir + MFM_Constants.DATA + FileUtils.DIRECTORY_SEPARATOR;
         // Resources are all within the MFM.jar file
-        mfmResources = FileUtils.DIRECTORY_SEPARATOR + MFMUI_Resources.RESOURCES + FileUtils.DIRECTORY_SEPARATOR;
+        mfmResources = FileUtils.DIRECTORY_SEPARATOR;
         // Added LnF Jars are placed here
         mfmJarsDir = mfmDir + MFM_Constants.JARS + FileUtils.DIRECTORY_SEPARATOR;
         // Lists output files are placed here

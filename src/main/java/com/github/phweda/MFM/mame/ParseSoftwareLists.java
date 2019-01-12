@@ -55,7 +55,7 @@ class ParseSoftwareLists {
                     .forEach((Path file) -> {
                         if (file.toString().endsWith(".xml")) {
                             Softwarelist softwareList =
-                                    (Phweda.MFM.mame.softwarelist.Softwarelist) PersistUtils.retrieveJAXB(
+                                    (com.github.phweda.MFM.mame.softwarelist.Softwarelist) PersistUtils.retrieveJAXB(
                                             file.toAbsolutePath().toString(), com.github.phweda.MFM.mame.softwarelist.Softwarelist.class);
                             set.add(softwareList);
                         }

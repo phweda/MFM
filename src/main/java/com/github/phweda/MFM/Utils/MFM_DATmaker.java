@@ -190,7 +190,7 @@ public class MFM_DATmaker {
                 game.getRom().add(transformRom(rom));
             }
         }
-        for (Phweda.MFM.mame.Disk disk : machine.getDisk()) {
+        for (com.github.phweda.MFM.mame.Disk disk : machine.getDisk()) {
             Disk newDisk = transformDisk(disk);
             // Eliminate nodump
             if (disk.getStatus().equals(NODUMP)) {
@@ -201,7 +201,7 @@ public class MFM_DATmaker {
                 game.getDisk().add(newDisk);
             }
         }
-        for (Phweda.MFM.mame.DeviceRef deviceRef : machine.getDeviceRef()) {
+        for (com.github.phweda.MFM.mame.DeviceRef deviceRef : machine.getDeviceRef()) {
             if (map.containsKey(deviceRef.getName())) {
                 addMachine(map.get(deviceRef.getName()), game);
             }
@@ -224,7 +224,7 @@ public class MFM_DATmaker {
         return rom;
     }
 
-    private static com.github.phweda.MFM.datafile.Disk transformDisk(Phweda.MFM.mame.Disk diskIn) {
+    private static com.github.phweda.MFM.datafile.Disk transformDisk(com.github.phweda.MFM.mame.Disk diskIn) {
         com.github.phweda.MFM.datafile.Disk disk = new com.github.phweda.MFM.datafile.Disk();
         disk.setName(diskIn.getName());
         disk.setSha1(diskIn.getSha1());
