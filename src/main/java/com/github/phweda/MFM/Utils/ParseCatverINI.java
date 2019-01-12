@@ -16,10 +16,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
-import Phweda.MFM.MFM;
-import Phweda.utils.ParseTextFile;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.utils.ParseTextFile;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -16,16 +16,16 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.mame.DeviceRef;
-import Phweda.MFM.mame.Disk;
-import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.Softwarelist;
-import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.utils.FileUtils;
-import Phweda.utils.PersistUtils;
-import Phweda.utils.ZipUtils;
+import com.github.phweda.MFM.mame.DeviceRef;
+import com.github.phweda.MFM.mame.Disk;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.mame.Softwarelist;
+import com.github.phweda.MFM.mame.softwarelist.Software;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.PersistUtils;
+import com.github.phweda.utils.ZipUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +52,7 @@ public class MAME_Resources {
     private static final String EXTRASRESOURCECACHE = "EXTRAS_RESOURCE_CACHE";
     private static final String ZIPEXTRASRESOURCECACHE = "ZIP_EXTRAS_RESOURCE_CACHE";
     private static final Map<String, Machine> machines = MAMEInfo.getMame().getMachineMap();
-    private static final TreeMap<String, Phweda.MFM.mame.softwarelist.Softwarelist> softwarelistsMap =
+    private static final TreeMap<String, com.github.phweda.MFM.mame.softwarelist.Softwarelist> softwarelistsMap =
             MAMEInfo.getSoftwareLists().getSoftwarelistsMap();
     private static final FileUtils.MFMcacheResourceFiles cacheResourceFiles = new FileUtils.MFMcacheResourceFiles();
     private static MAME_Resources ourInstance = new MAME_Resources();

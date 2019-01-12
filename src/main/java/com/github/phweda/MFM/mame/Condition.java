@@ -6,7 +6,7 @@
 //
 
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;

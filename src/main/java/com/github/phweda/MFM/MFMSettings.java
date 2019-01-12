@@ -16,13 +16,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.UI.MFMAction;
-import Phweda.MFM.UI.MFMUI;
-import Phweda.MFM.UI.MFM_Components;
-import Phweda.MFM.Utils.MFMFileOps;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.UI.MFMAction;
+import com.github.phweda.MFM.UI.MFMUI;
+import com.github.phweda.MFM.UI.MFM_Components;
+import com.github.phweda.MFM.Utils.MFMFileOps;
+import com.github.phweda.utils.FileUtils;
 
 import java.awt.event.ActionEvent;
 import java.io.File;

@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,12 +25,12 @@ package Phweda.MFM.UI;
  * Time: 5:30 PM
  */
 
-import Phweda.MFM.FFMPEG;
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMSettings;
-import Phweda.utils.FileUtils;
-import Phweda.utils.VideoUtils;
+import com.github.phweda.MFM.FFMPEG;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.VideoUtils;
 
 import javax.swing.*;
 import java.io.File;

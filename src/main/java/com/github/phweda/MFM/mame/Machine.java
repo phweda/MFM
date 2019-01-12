@@ -24,10 +24,10 @@
 //
 
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFM_Constants;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFM_Constants;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static Phweda.utils.FileUtils.doubleQuoteString;
+import static com.github.phweda.utils.FileUtils.doubleQuoteString;
 
 
 /**

@@ -16,14 +16,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.*;
-import Phweda.MFM.Utils.MFM_Clean_Logs;
-import Phweda.utils.FileUtils;
-import Phweda.utils.Pastie;
-import Phweda.utils.SwingUtils;
-import Phweda.utils.ZipUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.Utils.MFM_Clean_Logs;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.Pastie;
+import com.github.phweda.utils.SwingUtils;
+import com.github.phweda.utils.ZipUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,8 +38,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static Phweda.MFM.UI.MFMController.mainFrame;
-import static Phweda.utils.FileUtils.*;
+import static com.github.phweda.MFM.UI.MFMController.mainFrame;
+import static com.github.phweda.utils.FileUtils.*;
 
 /**
  * Created by IntelliJ IDEA.

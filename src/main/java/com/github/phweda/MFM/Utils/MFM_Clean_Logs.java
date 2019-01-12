@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
-import Phweda.MFM.MFM;
+import com.github.phweda.MFM.MFM;
 
 import java.io.File;
 import java.io.IOException;

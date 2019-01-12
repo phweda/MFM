@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,8 +25,8 @@ package Phweda.MFM.UI;
  * Time: 1:16 PM
  */
 
-import Phweda.MFM.*;
-import Phweda.utils.ClockPanel;
+import com.github.phweda.MFM.*;
+import com.github.phweda.utils.ClockPanel;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import static Phweda.MFM.UI.MFMAction.*;
+import static com.github.phweda.MFM.UI.MFMAction.*;
 
 /**
  * Build UI components

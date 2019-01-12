@@ -16,10 +16,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package com.github.phweda.utils;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFM_Constants;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFM_Constants;
 
 import java.awt.*;
 import java.io.*;

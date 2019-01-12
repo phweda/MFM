@@ -16,17 +16,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MachineControllers;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MachineControllers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static Phweda.MFM.mame.Machine.*;
+import static com.github.phweda.MFM.mame.Machine.*;
 
 /**
  * Add data from MAME external resources

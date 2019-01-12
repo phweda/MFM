@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;/**
+package com.github.phweda.MFM;/**
  * Created by IntelliJ IDEA.
  * User: Phweda
  * Date: 10/11/2015

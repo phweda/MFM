@@ -16,14 +16,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MAMEexe;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFM_Constants;
-import Phweda.utils.ClickListener;
-import Phweda.utils.PersistUtils;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.MAMEexe;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFM_Constants;
+import com.github.phweda.utils.ClickListener;
+import com.github.phweda.utils.PersistUtils;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,8 +37,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
-import static Phweda.MFM.MFM_Constants.NULL_STRING;
-import static Phweda.MFM.MFM_Constants.SPACE_STRING;
+import static com.github.phweda.MFM.MFM_Constants.NULL_STRING;
+import static com.github.phweda.MFM.MFM_Constants.SPACE_STRING;
 
 /**
  * Created by IntelliJ IDEA.

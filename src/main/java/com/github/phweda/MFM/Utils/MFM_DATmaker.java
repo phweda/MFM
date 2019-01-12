@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,14 +25,14 @@ package Phweda.MFM.Utils;
  * Time: 11:47 AM
  */
 
-import Phweda.MFM.*;
-import Phweda.MFM.datafile.Datafile;
-import Phweda.MFM.datafile.Disk;
-import Phweda.MFM.datafile.Game;
-import Phweda.MFM.datafile.Header;
-import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.Rom;
-import Phweda.utils.PersistUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.datafile.Datafile;
+import com.github.phweda.MFM.datafile.Disk;
+import com.github.phweda.MFM.datafile.Game;
+import com.github.phweda.MFM.datafile.Header;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.mame.Rom;
+import com.github.phweda.utils.PersistUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -213,8 +213,8 @@ public class MFM_DATmaker {
     }
 
     // sequence is name, size, crc, md5, sha 1
-    private static Phweda.MFM.datafile.Rom transformRom(Rom romIn) {
-        Phweda.MFM.datafile.Rom rom = new Phweda.MFM.datafile.Rom();
+    private static com.github.phweda.MFM.datafile.Rom transformRom(Rom romIn) {
+        com.github.phweda.MFM.datafile.Rom rom = new com.github.phweda.MFM.datafile.Rom();
         rom.setName(romIn.getName());
         rom.setSize(romIn.getSize());
         rom.setCrc(romIn.getCrc());
@@ -224,8 +224,8 @@ public class MFM_DATmaker {
         return rom;
     }
 
-    private static Phweda.MFM.datafile.Disk transformDisk(Phweda.MFM.mame.Disk diskIn) {
-        Phweda.MFM.datafile.Disk disk = new Phweda.MFM.datafile.Disk();
+    private static com.github.phweda.MFM.datafile.Disk transformDisk(Phweda.MFM.mame.Disk diskIn) {
+        com.github.phweda.MFM.datafile.Disk disk = new com.github.phweda.MFM.datafile.Disk();
         disk.setName(diskIn.getName());
         disk.setSha1(diskIn.getSha1());
         disk.setMd5(diskIn.getMd5());

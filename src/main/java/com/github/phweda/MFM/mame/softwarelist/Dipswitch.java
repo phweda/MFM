@@ -24,7 +24,7 @@
 //
 
 
-package Phweda.MFM.mame.softwarelist;
+package com.github.phweda.MFM.mame.softwarelist;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;

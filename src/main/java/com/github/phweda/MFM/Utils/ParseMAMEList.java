@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
 /**
  * Created by IntelliJ IDEA.

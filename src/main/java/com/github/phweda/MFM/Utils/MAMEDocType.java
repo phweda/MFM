@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
-import Phweda.MFM.MAMEexe;
+import com.github.phweda.MFM.MAMEexe;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.xml.sax.SAXException;

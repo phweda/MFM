@@ -22,7 +22,7 @@
  * Phweda
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
 import javax.swing.*;
 import java.awt.*;

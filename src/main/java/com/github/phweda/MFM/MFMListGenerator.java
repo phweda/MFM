@@ -16,16 +16,16 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.Utils.ParseFolderINIs;
-import Phweda.MFM.datafile.Datafile;
-import Phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.Utils.ParseFolderINIs;
+import com.github.phweda.MFM.datafile.Datafile;
+import com.github.phweda.MFM.mame.Machine;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 
-import static Phweda.MFM.MFMListBuilder.*;
+import static com.github.phweda.MFM.MFMListBuilder.*;
 
 /**
  * Created by IntelliJ IDEA.

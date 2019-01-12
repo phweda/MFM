@@ -22,7 +22,7 @@
  * With edits for MFM
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
 /**
  * original code found here

@@ -16,18 +16,18 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.Utils.ParseCommandList;
-import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.Mame;
-import Phweda.MFM.mame.ParseMAMElistInfo;
-import Phweda.MFM.mame.ParseMAMElistXML;
-import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.MFM.mame.softwarelist.Softwarelist;
-import Phweda.MFM.mame.softwarelist.Softwarelists;
-import Phweda.utils.FileUtils;
-import Phweda.utils.PersistUtils;
+import com.github.phweda.MFM.Utils.ParseCommandList;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.mame.Mame;
+import com.github.phweda.MFM.mame.ParseMAMElistInfo;
+import com.github.phweda.MFM.mame.ParseMAMElistXML;
+import com.github.phweda.MFM.mame.softwarelist.Software;
+import com.github.phweda.MFM.mame.softwarelist.Softwarelist;
+import com.github.phweda.MFM.mame.softwarelist.Softwarelists;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.PersistUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,8 +40,8 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static Phweda.MFM.MFMListBuilder.CATEGORY_LISTS_HASHMAP;
-import static Phweda.utils.FileUtils.COMMA;
+import static com.github.phweda.MFM.MFMListBuilder.CATEGORY_LISTS_HASHMAP;
+import static com.github.phweda.utils.FileUtils.COMMA;
 
 /**
  * Created by IntelliJ IDEA.
@@ -189,7 +189,7 @@ public final class MAMEInfo {
      * Parse the currently set Mame executable
      *
      * @return Mame XML
-     * @see Phweda.MFM.MAMEexe
+     * @see com.github.phweda.MFM.MAMEexe
      */
     private static Mame generateMame(boolean all, boolean isListInfo) {
         // By design listInfo is used for pre 0.70 addition of listXML and is All

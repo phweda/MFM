@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MAMEexe;
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.mame.*;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.MAMEexe;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.MFM.mame.*;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;

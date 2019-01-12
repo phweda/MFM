@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.utils.FileUtils;
+import com.github.phweda.utils.FileUtils;
 
 import java.io.*;
 import java.util.ArrayList;

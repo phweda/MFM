@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package com.github.phweda.utils;
 
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;

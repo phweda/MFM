@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.Utils.*;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.MFM.Utils.*;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;

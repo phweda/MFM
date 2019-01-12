@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.MachineControllers;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.MFM.MachineControllers;
+import com.github.phweda.utils.FileUtils;
 
 import javax.swing.*;
 import java.io.File;
@@ -30,7 +30,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static Phweda.MFM.mame.ParseMAMEexternalData.*;
+import static com.github.phweda.MFM.mame.ParseMAMEexternalData.*;
 
 public final class ParseMAMElistInfo {
     public static final String GAME = "game";

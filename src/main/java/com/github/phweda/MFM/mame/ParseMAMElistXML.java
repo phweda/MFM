@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
-import Phweda.MFM.*;
-import Phweda.MFM.Utils.ParseFolderINIs;
-import Phweda.MFM.mame.softwarelist.Softwarelists;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.Utils.ParseFolderINIs;
+import com.github.phweda.MFM.mame.softwarelist.Softwarelists;
+import com.github.phweda.utils.FileUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -31,8 +31,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
-import static Phweda.MFM.mame.Machine.PRELIMINARY;
-import static Phweda.MFM.mame.ParseMAMEexternalData.*;
+import static com.github.phweda.MFM.mame.Machine.PRELIMINARY;
+import static com.github.phweda.MFM.mame.ParseMAMEexternalData.*;
 
 /**
  * Created by IntelliJ IDEA.

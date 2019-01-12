@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package com.github.phweda.utils;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.UI.ImagesViewer;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.MFM.UI.ImagesViewer;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 

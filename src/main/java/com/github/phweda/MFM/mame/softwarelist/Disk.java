@@ -23,7 +23,7 @@
 // Generated on: 2017.10.24 at 07:54:20 PM EDT 
 //
 
-package Phweda.MFM.mame.softwarelist;
+package com.github.phweda.MFM.mame.softwarelist;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;

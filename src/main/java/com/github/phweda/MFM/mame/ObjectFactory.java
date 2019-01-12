@@ -24,7 +24,7 @@
 //
 
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
@@ -35,7 +35,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each
  * Java content interface and Java element interface
- * generated in the phweda.mfm.mame package.
+ * generated in the com.github.phweda.MFM.mame package.
  * <p>An ObjectFactory allows you to programatically
  * construct new instances of the Java representation
  * for XML content. The Java representation of XML
@@ -53,7 +53,7 @@ public class ObjectFactory {
     private final static QName _Year_QNAME = new QName("http://MFM.Phweda/MAME", "year");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: phweda.mfm.mame
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.github.phweda.MFM.mame
      */
     public ObjectFactory() {
     }

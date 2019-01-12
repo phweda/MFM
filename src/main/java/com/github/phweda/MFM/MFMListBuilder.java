@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
 /*
  * Created by IntelliJ IDEA.
@@ -25,13 +25,13 @@ package Phweda.MFM;
  * Time: 2:47 PM
  */
 
-import Phweda.MFM.UI.MFMUI_Setup;
-import Phweda.MFM.datafile.Datafile;
-import Phweda.MFM.mame.Control;
-import Phweda.MFM.mame.Machine;
-import Phweda.utils.FileUtils;
-import Phweda.utils.QuadState;
-import Phweda.utils.TriState;
+import com.github.phweda.MFM.UI.MFMUI_Setup;
+import com.github.phweda.MFM.datafile.Datafile;
+import com.github.phweda.MFM.mame.Control;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.QuadState;
+import com.github.phweda.utils.TriState;
 
 import java.util.*;
 import java.util.stream.Collectors;

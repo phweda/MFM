@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.mame.softwarelist;
+package com.github.phweda.MFM.mame.softwarelist;
 
 /**
  * Created by IntelliJ IDEA.

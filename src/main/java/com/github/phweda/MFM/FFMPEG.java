@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.UI.MFM_Components;
-import Phweda.MFM.mame.Machine;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.UI.MFM_Components;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.utils.FileUtils;
 
 import java.io.*;
 import java.nio.file.Files;

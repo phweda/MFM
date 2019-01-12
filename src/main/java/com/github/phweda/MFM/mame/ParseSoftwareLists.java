@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.mame.softwarelist.Softwarelist;
-import Phweda.MFM.mame.softwarelist.Softwarelists;
-import Phweda.utils.PersistUtils;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.mame.softwarelist.Softwarelist;
+import com.github.phweda.MFM.mame.softwarelist.Softwarelists;
+import com.github.phweda.utils.PersistUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,7 +56,7 @@ class ParseSoftwareLists {
                         if (file.toString().endsWith(".xml")) {
                             Softwarelist softwareList =
                                     (Phweda.MFM.mame.softwarelist.Softwarelist) PersistUtils.retrieveJAXB(
-                                            file.toAbsolutePath().toString(), Phweda.MFM.mame.softwarelist.Softwarelist.class);
+                                            file.toAbsolutePath().toString(), com.github.phweda.MFM.mame.softwarelist.Softwarelist.class);
                             set.add(softwareList);
                         }
                     });

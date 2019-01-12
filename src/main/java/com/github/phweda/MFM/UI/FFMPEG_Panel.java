@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.MFM_Constants;
-import Phweda.utils.ClickListener;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.MFM.MFM_Constants;
+import com.github.phweda.utils.ClickListener;
+import com.github.phweda.utils.FileUtils;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -31,7 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
-import static Phweda.MFM.MFMSettings.getInstance;
+import static com.github.phweda.MFM.MFMSettings.getInstance;
 
 /**
  * Created by IntelliJ IDEA.

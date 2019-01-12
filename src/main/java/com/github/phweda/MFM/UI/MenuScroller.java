@@ -3,7 +3,7 @@
  */
 // package darrylbu.util;
 // From the internet May 2018 at http://www.camick.com/java/source/MenuScroller.java
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

@@ -16,25 +16,25 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.*;
-import Phweda.MFM.Utils.AnalyzeCategories;
-import Phweda.MFM.Utils.MFM_DATmaker;
-import Phweda.MFM.mame.Mame;
-import Phweda.utils.DirectorytoXML;
-import Phweda.utils.XMLUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.Utils.AnalyzeCategories;
+import com.github.phweda.MFM.Utils.MFM_DATmaker;
+import com.github.phweda.MFM.mame.Mame;
+import com.github.phweda.utils.DirectorytoXML;
+import com.github.phweda.utils.XMLUtils;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-import static Phweda.MFM.MFM_Constants.*;
-import static Phweda.MFM.UI.MFMController.*;
-import static Phweda.MFM.UI.MFMListActions.pickList;
-import static Phweda.MFM.Utils.AnalyzeCategories.analyzeCategories;
-import static Phweda.utils.FileUtils.csvFileFilter;
+import static com.github.phweda.MFM.MFM_Constants.*;
+import static com.github.phweda.MFM.UI.MFMController.*;
+import static com.github.phweda.MFM.UI.MFMListActions.pickList;
+import static com.github.phweda.MFM.Utils.AnalyzeCategories.analyzeCategories;
+import static com.github.phweda.utils.FileUtils.csvFileFilter;
 
 final class MFMKeyActions {
 

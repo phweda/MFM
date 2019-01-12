@@ -16,17 +16,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.*;
-import Phweda.MFM.Utils.MFMFileOps;
-import Phweda.MFM.Utils.MFM_DATmaker;
-import Phweda.MFM.datafile.Datafile;
-import Phweda.MFM.mame.Machine;
-import Phweda.utils.Debug;
-import Phweda.utils.FileUtils;
-import Phweda.utils.PersistUtils;
-import Phweda.utils.XMLUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.Utils.MFMFileOps;
+import com.github.phweda.MFM.Utils.MFM_DATmaker;
+import com.github.phweda.MFM.datafile.Datafile;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.utils.Debug;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.PersistUtils;
+import com.github.phweda.utils.XMLUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,9 +46,9 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static Phweda.MFM.MFMListBuilder.createPlayList;
-import static Phweda.MFM.MFM_Constants.SPACE_CHAR;
-import static Phweda.utils.FileUtils.stripSuffix;
+import static com.github.phweda.MFM.MFMListBuilder.createPlayList;
+import static com.github.phweda.MFM.MFM_Constants.SPACE_CHAR;
+import static com.github.phweda.utils.FileUtils.stripSuffix;
 
 /**
  * Created by IntelliJ IDEA.

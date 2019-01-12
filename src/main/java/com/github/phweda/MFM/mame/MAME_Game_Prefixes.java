@@ -16,10 +16,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
-import Phweda.MFM.MAMEexe;
-import Phweda.MFM.MFM;
+import com.github.phweda.MFM.MAMEexe;
+import com.github.phweda.MFM.MFM;
 
 import java.io.BufferedReader;
 import java.io.IOException;

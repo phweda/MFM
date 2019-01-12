@@ -16,18 +16,18 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MAMEexe;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMSettings;
-import Phweda.MFM.MFM_Constants;
+import com.github.phweda.MFM.MAMEexe;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.MFM.MFM_Constants;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
-import static Phweda.MFM.UI.MFMUI_Resources.MFM_ICON_PNG;
+import static com.github.phweda.MFM.UI.MFMUI_Resources.MFM_ICON_PNG;
 
 /**
  * Created by IntelliJ IDEA.

@@ -16,17 +16,17 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.*;
-import Phweda.MFM.mame.Control;
-import Phweda.MFM.mame.Device;
-import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.utils.ClickListener;
-import Phweda.utils.SwingUtils;
-import Phweda.utils.VideoUtils;
-import Phweda.utils.ZipUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.mame.Control;
+import com.github.phweda.MFM.mame.Device;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.mame.softwarelist.Software;
+import com.github.phweda.utils.ClickListener;
+import com.github.phweda.utils.SwingUtils;
+import com.github.phweda.utils.VideoUtils;
+import com.github.phweda.utils.ZipUtils;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -48,10 +48,10 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
-import static Phweda.MFM.MFM_Constants.*;
-import static Phweda.MFM.UI.MFMListActions.pickList;
-import static Phweda.MFM.UI.MFMUI_Setup.getInstance;
-import static Phweda.utils.FileUtils.*;
+import static com.github.phweda.MFM.MFM_Constants.*;
+import static com.github.phweda.MFM.UI.MFMListActions.pickList;
+import static com.github.phweda.MFM.UI.MFMUI_Setup.getInstance;
+import static com.github.phweda.utils.FileUtils.*;
 
 /**
  * Created by IntelliJ IDEA.

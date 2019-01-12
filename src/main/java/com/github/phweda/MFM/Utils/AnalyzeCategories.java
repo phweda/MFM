@@ -16,15 +16,15 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMListBuilder;
-import Phweda.MFM.MFM_Constants;
-import Phweda.MFM.mame.Machine;
-import Phweda.utils.FileUtils;
-import Phweda.utils.PersistUtils;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFMListBuilder;
+import com.github.phweda.MFM.MFM_Constants;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.PersistUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

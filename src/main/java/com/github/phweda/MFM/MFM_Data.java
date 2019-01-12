@@ -16,14 +16,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.UI.MFMAction;
-import Phweda.MFM.UI.MFMUI;
-import Phweda.MFM.mame.Mame;
-import Phweda.MFM.mame.softwarelist.Softwarelists;
-import Phweda.utils.Hasher;
-import Phweda.utils.PersistUtils;
+import com.github.phweda.MFM.UI.MFMAction;
+import com.github.phweda.MFM.UI.MFMUI;
+import com.github.phweda.MFM.mame.Mame;
+import com.github.phweda.MFM.mame.softwarelist.Softwarelists;
+import com.github.phweda.utils.Hasher;
+import com.github.phweda.utils.PersistUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

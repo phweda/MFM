@@ -16,14 +16,14 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFMPlayLists;
-import Phweda.MFM.MFM_Data;
-import Phweda.MFM.mame.Machine;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFMPlayLists;
+import com.github.phweda.MFM.MFM_Data;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.utils.FileUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

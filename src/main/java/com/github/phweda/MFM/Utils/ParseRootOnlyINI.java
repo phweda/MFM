@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
-import Phweda.utils.ParseTextFile;
+import com.github.phweda.utils.ParseTextFile;
 
 import java.util.Map;
 

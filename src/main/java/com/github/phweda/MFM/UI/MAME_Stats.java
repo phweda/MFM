@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.*;
-import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.Mame;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.mame.Mame;
+import com.github.phweda.utils.FileUtils;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -40,8 +40,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static Phweda.MFM.MFMSettings.PLAYABLE;
-import static Phweda.MFM.MFM_Constants.HYPHEN;
+import static com.github.phweda.MFM.MFMSettings.PLAYABLE;
+import static com.github.phweda.MFM.MFM_Constants.HYPHEN;
 
 /**
  * Created by IntelliJ IDEA.

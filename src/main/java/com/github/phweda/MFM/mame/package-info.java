@@ -25,6 +25,6 @@
 
 // NOTE namespace = "" required here. Need annotation change????
 @javax.xml.bind.annotation.XmlSchema(namespace = "", elementFormDefault = XmlNsForm.UNQUALIFIED)
-package Phweda.MFM.mame;
+package com.github.phweda.MFM.mame;
 
 import javax.xml.bind.annotation.XmlNsForm;

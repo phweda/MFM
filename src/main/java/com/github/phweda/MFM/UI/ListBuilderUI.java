@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.*;
-import Phweda.utils.QuadState;
-import Phweda.utils.SwingUtils;
-import Phweda.utils.TriState;
+import com.github.phweda.MFM.*;
+import com.github.phweda.utils.QuadState;
+import com.github.phweda.utils.SwingUtils;
+import com.github.phweda.utils.TriState;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -34,7 +34,7 @@ import java.awt.event.ItemListener;
 import java.io.Serializable;
 import java.util.*;
 
-import static Phweda.MFM.UI.MFMAction.LIST_EDITOR;
+import static com.github.phweda.MFM.UI.MFMAction.LIST_EDITOR;
 
 /**
  * Created by IntelliJ IDEA.

@@ -16,13 +16,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFM_Constants;
-import Phweda.MFM.mame.Machine;
-import Phweda.MFM.mame.softwarelist.Software;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFM_Constants;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.mame.softwarelist.Software;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;

@@ -16,10 +16,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MFM_Constants;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MFM_Constants;
 import org.jdesktop.swingx.JXBusyLabel;
 import org.jdesktop.swingx.icon.EmptyIcon;
 
@@ -27,7 +27,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
-import static Phweda.MFM.UI.MFMUI_Resources.MFM_ICON_PNG;
+import static com.github.phweda.MFM.UI.MFMUI_Resources.MFM_ICON_PNG;
 
 
 /**

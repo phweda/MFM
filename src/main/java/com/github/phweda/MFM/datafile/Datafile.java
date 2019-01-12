@@ -24,7 +24,7 @@
 //
 
 
-package Phweda.MFM.datafile;
+package com.github.phweda.MFM.datafile;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;

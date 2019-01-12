@@ -16,11 +16,11 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MFM;
-import Phweda.MFM.MachineControllers;
-import Phweda.utils.FileUtils;
+import com.github.phweda.MFM.MFM;
+import com.github.phweda.MFM.MachineControllers;
+import com.github.phweda.utils.FileUtils;
 
 import javax.swing.*;
 import java.net.URL;

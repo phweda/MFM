@@ -16,18 +16,18 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.mame.softwarelist.Software;
-import Phweda.MFM.mame.softwarelist.Softwarelists;
-import Phweda.utils.PersistUtils;
+import com.github.phweda.MFM.mame.softwarelist.Software;
+import com.github.phweda.MFM.mame.softwarelist.Softwarelists;
+import com.github.phweda.utils.PersistUtils;
 
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static Phweda.MFM.MFMListBuilder.*;
+import static com.github.phweda.MFM.MFMListBuilder.*;
 
 /*
  * Created by IntelliJ IDEA.

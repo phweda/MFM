@@ -16,13 +16,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.MFMListBuilder;
-import Phweda.MFM.MFMPlayLists;
-import Phweda.MFM.MFMSettings;
-import Phweda.utils.SwingUtils;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.MFMListBuilder;
+import com.github.phweda.MFM.MFMPlayLists;
+import com.github.phweda.MFM.MFMSettings;
+import com.github.phweda.utils.SwingUtils;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -31,10 +31,10 @@ import java.awt.event.KeyEvent;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import static Phweda.MFM.MFM_Constants.*;
-import static Phweda.MFM.UI.MFMAction.HELP;
-import static Phweda.MFM.UI.MFMUI_Resources.RESOURCES;
-import static Phweda.MFM.UI.MFM_Components.getResources;
+import static com.github.phweda.MFM.MFM_Constants.*;
+import static com.github.phweda.MFM.UI.MFMAction.HELP;
+import static com.github.phweda.MFM.UI.MFMUI_Resources.RESOURCES;
+import static com.github.phweda.MFM.UI.MFM_Components.getResources;
 
 /**
  * Created by IntelliJ IDEA.
@@ -101,7 +101,7 @@ class MFM_MenuBar {
         Action mameOutput = new MFMAction(MFMAction.MAME_OUTPUT, null);
         Action mfmErrorLog = new MFMAction(MFMAction.ERROR_LOG, null);
         Action mfmGCLog = null;
-        if ((Phweda.MFM.MFM.getGcLog() != null) && Phweda.MFM.MFM.getGcLog().exists()) {
+        if ((Phweda.MFM.MFM.getGcLog() != null) && com.github.phweda.MFM.MFM.getGcLog().exists()) {
             mfmGCLog = new MFMAction(MFMAction.GC_LOG, null);
         }
         Action mfmZipLogs = new MFMAction(MFMAction.ZIP_LOGS, null);
@@ -124,7 +124,7 @@ class MFM_MenuBar {
             item.setMnemonic(KeyEvent.VK_G);
         }
 
-        if (Phweda.MFM.MFM.isDebug() || Phweda.MFM.MFM.isSystemDebug()) {
+        if (Phweda.MFM.MFM.isDebug() || com.github.phweda.MFM.MFM.isSystemDebug()) {
             logsMenu.add(new JSeparator());
             item = logsMenu.add(mfmZipLogs);
             item.setMnemonic(KeyEvent.VK_Z);

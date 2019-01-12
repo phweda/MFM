@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.mame.Control;
+import com.github.phweda.MFM.mame.Control;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class MachineControllers implements Serializable {
     public static final String TRIPLEJOY = "triplejoy";
     private static MachineControllers ourInstance;
     private static TreeMap<Integer, TreeSet<String>> controlMachinesList = new TreeMap<>();
-    private static TreeMap<Integer, Phweda.MFM.mame.Control> controls = new TreeMap<>();
+    private static TreeMap<Integer, com.github.phweda.MFM.mame.Control> controls = new TreeMap<>();
 
     private static TreeMap<String, String> controllerMAMEtoLabel = new TreeMap<>();
     private static TreeMap<String, String> controllerLabeltoMAME = new TreeMap<>();
@@ -178,7 +178,7 @@ public class MachineControllers implements Serializable {
 
         pwControls.println("Signature,Type,WAYS,WAYS2,WAYS3,COUNT");
         for (int signature : controls.keySet()) {
-            Phweda.MFM.mame.Control control = controls.get(signature);
+            com.github.phweda.MFM.mame.Control control = controls.get(signature);
             pwControls.println(Integer.toString(signature) + ',' + control.getType() + ',' +
                     control.getWays() + ',' + control.getWays2() + ',' + control.getWays3() + ','
                     + controlMachinesList.get(signature).size());
@@ -187,7 +187,7 @@ public class MachineControllers implements Serializable {
 
         pwcontrolGamesList.println("Signature,FileName,NAME,Manufacturer,Type,WAYS,WAYS2,WAYS3");
         for (int signature : controlMachinesList.keySet()) {
-            Phweda.MFM.mame.Control control = controls.get(signature);
+            com.github.phweda.MFM.mame.Control control = controls.get(signature);
             if (signature == -1771213723 || signature == -1134657068 || signature == -995842198
                     || signature == -865288 || signature == 3083120 || signature == 104086693
                     || signature == 106542458 || signature == 109764752 || signature == 503739367
@@ -230,7 +230,7 @@ public class MachineControllers implements Serializable {
 
 
         if (!controls.containsKey(hash)) {
-            Control control = new Phweda.MFM.mame.Control();
+            Control control = new com.github.phweda.MFM.mame.Control();
             control.setType(args.get(0));
             if (args.size() > 1) {
                 control.setWays(args.get(1));
@@ -267,7 +267,7 @@ public class MachineControllers implements Serializable {
             if (MFM.isDebug()) {
                 MFM.getLogger().addToList('`' + hash + "\tfor " + type);
             }
-            Control control = new Phweda.MFM.mame.Control();
+            Control control = new com.github.phweda.MFM.mame.Control();
             control.setType(type);
             controls.put(hash, control);
         }

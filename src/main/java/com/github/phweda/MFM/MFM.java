@@ -16,15 +16,15 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM;
+package com.github.phweda.MFM;
 
-import Phweda.MFM.UI.MFMUI;
-import Phweda.MFM.UI.MFMUI_Resources;
-import Phweda.MFM.UI.MFMUI_Setup;
-import Phweda.utils.Debug;
-import Phweda.utils.FileUtils;
-import Phweda.utils.MemoryMonitor;
-import Phweda.utils.SwingUtils;
+import com.github.phweda.MFM.UI.MFMUI;
+import com.github.phweda.MFM.UI.MFMUI_Resources;
+import com.github.phweda.MFM.UI.MFMUI_Setup;
+import com.github.phweda.utils.Debug;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.MemoryMonitor;
+import com.github.phweda.utils.SwingUtils;
 
 import javax.swing.*;
 import java.io.*;

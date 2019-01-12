@@ -16,10 +16,10 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.UI;
+package com.github.phweda.MFM.UI;
 
-import Phweda.MFM.MAMEInfo;
-import Phweda.MFM.mame.Machine;
+import com.github.phweda.MFM.MAMEInfo;
+import com.github.phweda.MFM.mame.Machine;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -30,7 +30,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
 
-import static Phweda.MFM.UI.MFMAction.*;
+import static com.github.phweda.MFM.UI.MFMAction.*;
 
 /**
  * Created by IntelliJ IDEA.

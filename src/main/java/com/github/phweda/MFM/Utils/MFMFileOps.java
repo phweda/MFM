@@ -16,12 +16,12 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.MFM.Utils;
+package com.github.phweda.MFM.Utils;
 
-import Phweda.MFM.*;
-import Phweda.MFM.mame.Machine;
-import Phweda.utils.FileUtils;
-import Phweda.utils.ZipUtils;
+import com.github.phweda.MFM.*;
+import com.github.phweda.MFM.mame.Machine;
+import com.github.phweda.utils.FileUtils;
+import com.github.phweda.utils.ZipUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,8 +30,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static Phweda.MFM.MFM_Constants.ROMS;
-import static Phweda.MFM.MFM_Constants.SAMPLES;
+import static com.github.phweda.MFM.MFM_Constants.ROMS;
+import static com.github.phweda.MFM.MFM_Constants.SAMPLES;
 
 /**
  * Created by IntelliJ IDEA.

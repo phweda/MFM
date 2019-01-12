@@ -16,9 +16,9 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package Phweda.utils;
+package com.github.phweda.utils;
 
-import Phweda.MFM.datafile.Datafile;
+import com.github.phweda.MFM.datafile.Datafile;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
