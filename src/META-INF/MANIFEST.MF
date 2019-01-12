@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: Jars/seaglasslookandfeel-0.2.jar Jars/jgoodies-looks-2.6.0
- .jar Jars/jgoodies-common-1.7.0.jar Jars/JTattoo-1.6.10.jar Jars/EaSy
- nthLookAndFeel.jar Jars/LiquidLnF.jar Jars/quaqua.jar Jars/synthetica
- .jar Jars/jmf.jar Jars/swingx-all-1.6.4.jar
-Main-Class: Phweda.MFM.MFM
-
