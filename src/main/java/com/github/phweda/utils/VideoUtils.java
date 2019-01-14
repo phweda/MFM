@@ -18,9 +18,9 @@
 
 package com.github.phweda.utils;
 
-import com.github.phweda.MFM.MFM;
-import com.github.phweda.MFM.MFMSettings;
-import com.github.phweda.MFM.UI.ImagesViewer;
+import com.github.phweda.mfm.MFM;
+import com.github.phweda.mfm.MFMSettings;
+import com.github.phweda.mfm.ui.ImagesViewer;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 

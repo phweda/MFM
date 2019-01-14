@@ -18,8 +18,8 @@
 
 package com.github.phweda.utils;
 
-import com.github.phweda.MFM.MFM;
-import com.github.phweda.MFM.MFM_Constants;
+import com.github.phweda.mfm.MFM;
+import com.github.phweda.mfm.MFM_Constants;
 
 import java.awt.*;
 import java.io.*;

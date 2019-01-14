@@ -29,13 +29,5 @@ dependencies {
     compile group: 'org.swinglabs.swingx', name: 'swingx-painters', version: '1.6.5-1'
     compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
-
-
-
-    compile name: 'EaSynthLookAndFeel'
-    compile name: 'LiquidLnF'
-    compile name: 'quaqua'
-    compile name: 'synthetica'
-
     compile group: 'org.jetbrains', name: 'annotations', version: '16.0.3'
 }

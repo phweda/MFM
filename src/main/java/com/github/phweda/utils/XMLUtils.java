@@ -18,7 +18,7 @@
 
 package com.github.phweda.utils;
 
-import com.github.phweda.MFM.mame.Mame;
+import com.github.phweda.mfm.mame.Mame;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;

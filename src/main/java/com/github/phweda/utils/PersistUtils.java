@@ -18,7 +18,7 @@
 
 package com.github.phweda.utils;
 
-import com.github.phweda.MFM.datafile.Datafile;
+import com.github.phweda.mfm.datafile.Datafile;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;

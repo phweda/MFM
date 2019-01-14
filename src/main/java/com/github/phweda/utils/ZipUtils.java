@@ -18,7 +18,7 @@
 
 package com.github.phweda.utils;
 
-import com.github.phweda.MFM.MFM;
+import com.github.phweda.mfm.MFM;
 
 import java.io.File;
 import java.io.FileInputStream;

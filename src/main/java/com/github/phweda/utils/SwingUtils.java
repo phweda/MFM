@@ -18,7 +18,7 @@
 
 package com.github.phweda.utils;
 
-import com.github.phweda.MFM.MFM;
+import com.github.phweda.mfm.MFM;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
