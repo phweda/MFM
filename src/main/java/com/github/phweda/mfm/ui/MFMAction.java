@@ -114,7 +114,7 @@ public final class MFMAction extends AbstractAction {
     static final String EXIT = "Exit";
     @SuppressWarnings("WeakerAccess")
     public static final String REMOVE_LIST = "Remove List";
-    public static final String SETTINGS = "Settings";
+    public static final String SETTINGS = "settings";
 
     public MFMAction(String text, Icon icon) {
         super(text, icon);

@@ -18,6 +18,10 @@ jar {
 				   'Main-Class': 'com.github.phweda.mfm.MFM'
 				   )
     }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 dependencies {
