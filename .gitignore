@@ -4,20 +4,22 @@
 # MFM
 .~lock*
 bak/
-Data/*
-_Data/*
+data/*
+_data/*
 .idea/*
 .gradle/*
+build/*
+
 Custom.ini
 Genre.ini
 Mature.ini
 Multimonitor.ini
-Lists/*
-!Lists/favs.txt
-Logs
+lists/*
+!lists/favs.txt
+logs
 out/Production/*
-Settings/*
-!Settings/*.ini
+settings/*
+!settings/*.ini
 
 # Windows image file caches
 Thumbs.db
