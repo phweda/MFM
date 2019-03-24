@@ -172,7 +172,7 @@ final class MFM_SettingsPanel extends JPanel {
                 MFM.getLogger().addToList("Extras path: " + mameExtrasPath.getText(), true);
                 MFM.getLogger().addToList("VIDs path: " + mameVidsPath.getText(), true);
 
-                // NOTE maintain order!!! See MFMSettings.MAMEexeDir() first run for create config
+                // NOTE maintain order!!! See MFMSettings.MAMEexeDir() first run for create config.
                 String mameexe = mameExePath.getText();
                 if ((mameRomsPath.getText().isEmpty() && mameCHDsPath.getText().isEmpty() &&
                         softwareListRomsPath.getText().isEmpty() && softwareListCHDsPath.getText().isEmpty())
@@ -191,14 +191,15 @@ final class MFM_SettingsPanel extends JPanel {
 
                 if (!mameexe.isEmpty() && mameexe.length() > 5 && mameexe.contains(FileUtils.DIRECTORY_SEPARATOR)) {
                     mfmSettings.MAMEexeName(mameexe.substring(
-                            mameexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
+                        mameexe.lastIndexOf(FileUtils.DIRECTORY_SEPARATOR) + 1));
                     mfmSettings.MAMEexeDir(mameExePath.getText().substring(0,
-                            mameExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
+                        mameExePath.getText().lastIndexOf(FileUtils.DIRECTORY_SEPARATOR)));
 
                     // NOTE added 9/20/2016 removing MFMSettings call from MAME class and class rename
                     // needed here for a first run
                     MAMEexe.setBaseArgs(mfmSettings.fullMAMEexePath());
                 }
+                mfmSettings.initSettings();
 
                 mfmSettings.RomsFullSetDir(mameRomsPath.getText());
                 mfmSettings.CHDsFullSetDir(mameCHDsPath.getText());
@@ -210,6 +211,12 @@ final class MFM_SettingsPanel extends JPanel {
                 mfmSettings.SoftwareListCHDsFullSetDir(softwareListCHDsPath.getText());
                 mfmSettings.nonMerged(nonmergedCB.isSelected());
 
+                String settingsValid = mfmSettings.settingsValid();
+                if (settingsValid!=null) {
+                    JOptionPane.showMessageDialog(frame,
+                        settingsValid);
+                    return;
+                }
 //*************************************************************************************************
                 frame.setVisible(false);
                 frame.dispose();

@@ -24,6 +24,7 @@ import com.github.phweda.mfm.mame.Mame;
 import com.github.phweda.mfm.mame.softwarelist.Softwarelists;
 import com.github.phweda.utils.Hasher;
 import com.github.phweda.utils.PersistUtils;
+import com.github.phweda.utils.SysUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -51,6 +52,8 @@ import java.util.zip.ZipOutputStream;
  * Manages persistence of all MFM Data
  */
 public class MFM_Data {
+    private static final String MFM_SETTINGS_FILE = "MFM_SETTINGS";
+
     private static MFM_Data ourInstance;
     private static MFM_Data_Sets datasets;
 
@@ -84,7 +87,7 @@ public class MFM_Data {
     private static final String MFM_MAME_XML = MFM_MAME + XML_SUFFIX;
     private static final String MFM_SOFTWARELISTS_XML = MFM_SOFTWARELISTS + XML_SUFFIX;
     private static final String MFM_USER_INI_FILE = MFM.getMfmSettingsDir() + "UserIniData.xml";
-    private static final String MFM_DATA_SETS_FILE = MFM.getMfmSettingsDir() + "DataSets.ser";
+    private static final String MFM_DATA_SETS_FILE =  "DataSets";
 
     private boolean staticChanged = false;
     private static boolean scanningDataSets = false;
@@ -173,11 +176,17 @@ public class MFM_Data {
 
     @SuppressWarnings("unchecked")
     private static void loadSettingsFiles() {
-        // Load files first - required as of 0.85 for first run special case
-        if (new File(MFM.getMfmSettingsDir() + MFM.MFM_SETTINGS_FILE).exists()) {
+        // Load files first - required as of 0.85 for first run special case, and check old settings file
+        String settingsPath = MFM.getMfmSettingsDir() + getMFMSettingsFileName(false);
+        if (!new File(settingsPath).exists()) {
+            settingsPath = MFM.getMfmSettingsDir() + getMFMSettingsFileName(true);
+        }
+
+
+        if (new File(settingsPath).exists()) {
             try {
                 settings = (HashMap<String, Object>)
-                        PersistUtils.loadAnObjectXML(MFM.getMfmSettingsDir() + MFM.MFM_SETTINGS_FILE);
+                        PersistUtils.loadAnObjectXML(settingsPath);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 MFM.exit(11);
@@ -194,9 +203,13 @@ public class MFM_Data {
     }
 
     private static void findDataSets() {
-        if (Paths.get(MFM_DATA_SETS_FILE).toFile().exists()) {
+        String dataSetSetPath = getDataSetsFilePath(false);
+        if (!new File(dataSetSetPath).isFile()) {
+            dataSetSetPath = getDataSetsFilePath(true);
+        }
+        if (new File(dataSetSetPath).exists()) {
             try {
-                datasets = (MFM_Data_Sets) PersistUtils.loadAnObject(MFM_DATA_SETS_FILE);
+                datasets = (MFM_Data_Sets) PersistUtils.loadAnObject(dataSetSetPath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -215,7 +228,7 @@ public class MFM_Data {
                         System.out.println("Scanned for Data Sets and found: " + sets);
                         scanningDataSets = false;
                         if (sets > 0) {
-                            PersistUtils.saveAnObject(datasets, MFM_DATA_SETS_FILE);
+                            PersistUtils.saveAnObject(datasets, getDataSetsFilePath(false));
                         }
                     }
                 }
@@ -263,6 +276,12 @@ public class MFM_Data {
         if (dataSet1 == null) {
             rescanSets();
             while (isScanningDataSets()) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
             }
             final MFM_Data_Sets.Data_Set dataSet2 = datasets.getDataSet(dataSet);
             if (dataSet2 == null) {
@@ -386,7 +405,7 @@ public class MFM_Data {
     }
 
     void persistSettings() {
-        PersistUtils.saveAnObjectXML(settings, MFM.getMfmSettingsDir() + MFM.MFM_SETTINGS_FILE);
+        PersistUtils.saveAnObjectXML(settings, MFM.getMfmSettingsDir() + getMFMSettingsFileName(false));
     }
 
     void reset() {
@@ -402,7 +421,7 @@ public class MFM_Data {
                 @Override
                 protected String doInBackground() throws Exception {
                     datasets.rescanSets();
-                    PersistUtils.saveAnObject(datasets, MFM_DATA_SETS_FILE);
+                    PersistUtils.saveAnObject(datasets, getDataSetsFilePath(false));
                     return "Data Sets scan completed.";
                 }
             };
@@ -470,6 +489,15 @@ public class MFM_Data {
          * @return true if cached sets is not all
          */
         private boolean newSets() {
+            //check persisted dataset entries still exists (program moved case)
+            for (Data_Set dataset : dataSets.values()) {
+                if (!new File(dataset.filePath).isFile()) {
+                    return true;
+                }
+            }
+            if (!dataDirPath.toFile().isDirectory()) {
+                return true;
+            }
             long setsNumber = 0;
             try {
                 setsNumber = Files.find(dataDirPath, 5, (filePath, fileAttr) -> fileAttr.isRegularFile())
@@ -547,6 +575,22 @@ public class MFM_Data {
             public String getFileSHA1() {
                 return fileSHA1;
             }
+        }
+    }
+
+    private static String getMFMSettingsFileName(boolean oldFileName) {
+        if (oldFileName) {
+            return  MFM_SETTINGS_FILE + ".xml";
+        } else {
+            return MFM_SETTINGS_FILE + "_" +SysUtils.getComputerName() + ".xml";
+        }
+    }
+
+    private static String getDataSetsFilePath(boolean oldName) {
+        if (oldName) {
+           return MFM.getMfmSettingsDir() + MFM_DATA_SETS_FILE + ".ser";
+        } else {
+            return MFM.getMfmSettingsDir() + MFM_DATA_SETS_FILE + "_"+ SysUtils.getComputerName() + ".ser";
         }
     }
 }
