@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+}
+
+version = '0.9.6'
+
+repositories {
+    flatDir {
+        dirs './lib'
+    }
+	mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': 'Mame File Manager',
+                   'Implementation-Version': version,
+				   'Main-Class': 'com.github.phweda.mfm.MFM'
+				   )
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies {
+    compile group: 'com.jgoodies', name: 'jgoodies-common', version: '1.7.0'
+    compile group: 'com.jgoodies', name: 'looks', version: '2.2.2'
+    compile group: 'com.jtattoo', name: 'JTattoo', version: '1.6.10'
+    compile group: 'com.seaglasslookandfeel', name: 'seaglasslookandfeel', version: '0.2'
+    compile group: 'javax.media', name: 'jmf', version: '2.1.1e'
+    compile group: 'org.swinglabs.swingx', name: 'swingx-painters', version: '1.6.5-1'
+    compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+    compile group: 'org.jetbrains', name: 'annotations', version: '16.0.3'
+}
