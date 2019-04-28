@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="Phweda.MFM.UI.ListEditor">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.github.phweda.mfm.ui.ListEditor">
   <grid id="27dc6" binding="listEditorPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
       <xy x="20" y="20" width="900" height="900"/>
@@ -82,8 +82,8 @@
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
-              <text value="Create List"/>
               <actionCommand value="Create List"/>
+              <text value="Create List"/>
             </properties>
           </component>
           <component id="bd713" class="javax.swing.JComboBox" binding="listComboBox" custom-create="true">
