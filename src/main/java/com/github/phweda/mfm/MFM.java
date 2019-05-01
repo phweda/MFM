@@ -64,7 +64,7 @@ public final class MFM {
     // Gives us a 6 digit descending, over time, number
     public static final int LOG_NUMBER = (int) System.currentTimeMillis() >> 12;
 
-    static final String MFM_SETTINGS_FILE = "MFM_SETTINGS.xml";
+
     static final String MFM_CATEGORY_DATA_FILE = "CategoryListsMap.xml";
     static final String MAME_RESOURCES_CACHE = "Resources_cache.ser";
     static final String MAME_CONTROLLERS = "MAME_Controllers.ini";
@@ -145,7 +145,7 @@ public final class MFM {
                 MFMUI.getSettings();
             }
             // Wait for user settings input
-            while (!mfmSettings.isLoaded()) {
+            while (!mfmSettings.isLoaded() || MFM_Data.isScanningDataSets()) {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {

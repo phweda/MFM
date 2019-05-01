@@ -335,7 +335,7 @@ public final class MFMListBuilder {
         public static final TriState ControlsFilterType = new TriState(ANY_CONTROLS, ALL_CONTROLS, EXACT_CONTROLS);
 
         private static final Builder builder = new Builder();
-        private static final int MILLION = 1000000;
+        public static final int MILLION = 1000000;
         private static final String DIAL = "dial";
         private static final String DOUBLEJOY = "doublejoy";
         private static final String GAMBLING = "gambling";
@@ -534,18 +534,18 @@ public final class MFMListBuilder {
 
         public static void setWays(String waysIn) {
             Builder.ways = waysIn;
-            if (!waysSelected && !waysIn.equals(ALL)) {
+            if (!waysSelected && !waysIn.equalsIgnoreCase(ALL)) {
                 waysSelected = true;
-            } else if (waysSelected && waysIn.equals(ALL) && ways2.equals(ALL)) {
+            } else if (waysSelected && waysIn.equalsIgnoreCase(ALL) && ways2.equalsIgnoreCase(ALL)) {
                 waysSelected = false;
             }
         }
 
         public static void setWays2(String ways2In) {
             ways2 = ways2In;
-            if (!waysSelected && !ways2In.equals(ALL)) {
+            if (!waysSelected && !ways2In.equalsIgnoreCase(ALL)) {
                 waysSelected = true;
-            } else if (waysSelected && ways.equals(ALL) && ways2In.equals(ALL)) {
+            } else if (waysSelected && ways.equalsIgnoreCase(ALL) && ways2In.equalsIgnoreCase(ALL)) {
                 waysSelected = false;
             }
         }
@@ -714,7 +714,7 @@ public final class MFMListBuilder {
                         Control::getType).collect(Collectors.toList());
 
                 // Is there an All match of Controls
-                if (ControlsFilterType.getState().equals(EXACT_CONTROLS) &&
+                if (ControlsFilterType.getState().equals(ALL_CONTROLS) &&
                         !machineControls.containsAll(this.controls)) {
                     continue;
                 }
@@ -730,6 +730,8 @@ public final class MFMListBuilder {
                         && checkButtonsPlayers(machine.getButtons(),
                         Integer.parseInt(machine.getInput().getPlayers()))) {
                     finalList.add(machineName);
+                } else {
+                    System.out.println("Machie ignored");
                 }
             }
 

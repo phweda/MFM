@@ -156,13 +156,14 @@ public final class MFMUI_Setup {
     private void fullView() {
         JSplitPane mfmGamePane = new JSplitPane();
         mfmGamePane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createRaisedBevelBorder(), null,
-                TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,
-                new Color(MFM_BORDER_COLOR)));
+            TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,
+            new Color(MFM_BORDER_COLOR)));
         mfmGamePane.setOneTouchExpandable(false);
 
-        final JScrollPane scrollPane2 = new JScrollPane();
-        scrollPane2.setViewportView(mfmComponents.getMachineListTable());
-        mfmGamePane.setLeftComponent(scrollPane2);
+        //final JScrollPane scrollPane2 = new JScrollPane();
+        //scrollPane2.setViewportView(mfmComponents.getMachineListTable());
+        //mfmGamePane.setLeftComponent(scrollPane2);
+      mfmGamePane.setLeftComponent(new MachineListForm().getPnlMachineListView());
         mfmGamePane.setRightComponent(mfmComponents.extrasTabbedPane());
         mfmGamePane.setResizeWeight(RESIZE_WEIGHT);
 

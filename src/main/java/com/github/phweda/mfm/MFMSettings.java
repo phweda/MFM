@@ -515,12 +515,42 @@ public final class MFMSettings {
                 setDataVersion(pickVersion());
             }
         } else if (MFM.isDoParse()) {
-            // NOTE maybe not needed
-            if (ourSettings == null) {
+            if (settingsValid()!=null) {
                 // first run must acquire base settings before continuing
                 MFMUI.getSettings();
             }
             MAMEInfo.getInstance(true, true, false);
+        }
+    }
+
+    public String settingsValid() {
+        if (ourSettings == null) {
+            return "Settings not initialized";
+        } else {
+            if (!checkExists(fullMAMEexePath(), false)){
+                return "Unable to find mame executable.";
+            }
+            if (!checkExists(getPlaySetDir(), true)){
+                return "Playset dir not exists.";
+            }
+            boolean hasRomDir = false;
+            hasRomDir |= checkExists(RomsFullSetDir(), true);
+            hasRomDir |= checkExists(CHDsFullSetDir(), true);
+            hasRomDir |= checkExists(SoftwareListRomsFullSetDir(), true);
+            hasRomDir |= checkExists(SoftwareListCHDsFullSetDir(), true);
+            if (!hasRomDir) {
+                return "Rom dir definition required";
+            }
+        }
+        return null;
+    }
+
+    private boolean checkExists(String path, boolean dirMode) {
+        File file = new File(path);
+        if (dirMode) {
+            return file.isDirectory();
+        } else {
+           return file.isFile();
         }
     }
 
@@ -638,5 +668,11 @@ public final class MFMSettings {
         final MFMAction updateVersion = new MFMAction(MFMAction.UPDATE_VERSION, null);
         updateVersion.actionPerformed(
                 new ActionEvent(this, ActionEvent.ACTION_PERFORMED, MFMAction.UPDATE_VERSION));
+    }
+
+    public void initSettings() {
+        if (ourSettings==null) {
+            ourSettings = new HashMap<>();
+        }
     }
 }

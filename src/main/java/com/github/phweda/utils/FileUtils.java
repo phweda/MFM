@@ -52,6 +52,8 @@ public class FileUtils {
     public static final String EMPTY_STRING = "";
 
     public static final String ZIPSUFFIX = ".zip";
+    private static final String FILENAME_CHARS_REGEXP = "[^\\._a-zA-Z0-9-]";
+
 
     /* Used to limit search depth. 20 should be more than sufficient*/
     private static final int MAX_DEPTH = 25;
@@ -632,6 +634,33 @@ public class FileUtils {
             files.clear();
             directories.clear();
             file = null;
+        }
+    }
+
+    /**
+     * convert all not allowed (special) chars to _ in given filename
+     *
+     * @param fileName
+     *        input filename
+     *
+     * @return converted filename
+     */
+    public static String sanitizeFileName(String fileName) {
+        if (fileName != null) {
+            String result = fileName.toLowerCase().trim();
+            if (result.length() > 128) {
+                result = result.substring(0, 128);
+            }
+            //remove unwanted "(" and ")" characters
+            result = result.replaceAll("\\(|\\)", "");
+            //replace " - " to "-" char
+            result = result.replaceAll("\\s+-\\s+", "-");
+            //replace all non standard chars to _
+            result = result.replaceAll(FILENAME_CHARS_REGEXP, "_");
+            result = StringUtils.removeDuplicates(result, '_');
+            return result;
+        } else {
+            return null;
         }
     }
 
