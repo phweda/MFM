@@ -43,7 +43,7 @@ import static com.github.phweda.mfm.ui.MFMAction.LIST_EDITOR;
  * Time: 1:21 PM
  */
 @SuppressWarnings({"squid:S1450", "DuplicateStringLiteralInspection"})
-public final class ListBuilderUI implements ActionListener, ItemListener, Serializable {
+public final class ListBuilderUI implements ActionListener, Serializable {
 
     private static final ListBuilderUI ourInstance = new ListBuilderUI();
 
@@ -168,7 +168,6 @@ public final class ListBuilderUI implements ActionListener, ItemListener, Serial
 
             setLabelsText();
             addActionListeners(listBuilderPanel);
-            addItemListeners();
         }
     }
 
@@ -303,18 +302,6 @@ public final class ListBuilderUI implements ActionListener, ItemListener, Serial
                 MFMController.decimalFormater.format(MFMListBuilder.getSimultaneousList().size()) : "0";
         simultaneousCB.setText(SIMULTANEOUS_COMMAND + " - " + number);
 
-    }
-
-    private void addItemListeners() {
-        gameButtonsNum.addItemListener(this);
-        gamePlayersNum.addItemListener(this);
-
-        joyComboBox.addItemListener(this);
-        doubleJoyComboBox.addItemListener(this);
-
-        yearComboBox.addItemListener(this);
-        baseListComboBox.addItemListener(this);
-        languagesComboBox.addItemListener(this);
     }
 
     /**
@@ -462,69 +449,36 @@ public final class ListBuilderUI implements ActionListener, ItemListener, Serial
             case LIST_EDITOR:
                 MFMController.showListEditor();
                 break;
-
-            case ANY_CONTROLS_COMMAND:
-                MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.ANY_CONTROLS);
-                break;
-
-            case ALL_CONTROLS_COMMAND:
-                MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.ALL_CONTROLS);
-                break;
-
-            case EXACT_CONTROLS_COMMAND:
-                MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.EXACT_CONTROLS);
-                break;
             default:
                 break;
 
         }
     }
 
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (MFM.isDebug()) {
-            if (MFM.isSystemDebug()) {
-                System.out.println("ListBuilderUI itemState is: " + e.paramString());
-            }
-            MFM.getLogger().addToList("ListBuilderUI itemState is: " + e.paramString(), true);
-        }
-
-        if (e.getSource() == languagesComboBox) {
-            MFMListBuilder.Builder.setLanguage((String) languagesComboBox.getSelectedItem());
-        } else if (e.getSource() == joyComboBox) {
-            if (!((String) Objects.requireNonNull(
-                    joyComboBox.getSelectedItem())).equalsIgnoreCase(ALL_ORIENTATIONS_COMMAND)) {
-                ((DynamicCBpanel) controlsCBPanel).getJCheckBoxbyText(
-                        MachineControllers.getMAMEControllerLabelName("joy")).setSelected(true);
-                MFMListBuilder.Builder.setWays((String) joyComboBox.getSelectedItem());
-            }
-        } else if (e.getSource() == doubleJoyComboBox) {
-            if (!((String) Objects.requireNonNull(
-                    doubleJoyComboBox.getSelectedItem())).equalsIgnoreCase(ALL_ORIENTATIONS_COMMAND)) {
-                ((DynamicCBpanel) controlsCBPanel).getJCheckBoxbyText(
-                        MachineControllers.getMAMEControllerLabelName("doublejoy")).setSelected(true);
-                MFMListBuilder.Builder.setWays2((String) doubleJoyComboBox.getSelectedItem());
-            }
-        } else if (e.getSource() == gameButtonsNum) {
-            String selected = (String) gameButtonsNum.getSelectedItem();
-            // if it is 9+
-            assert selected != null;
-            if (selected.contains("+")) {
-                selected = "9";
-            }
-            MFMListBuilder.Builder.setButtons(selected);
-        } else if (e.getSource() == gamePlayersNum) {
-            MFMListBuilder.Builder.setPlayers((int) gamePlayersNum.getSelectedItem());
-        } else if (e.getSource() == yearComboBox) {
-            MFMListBuilder.Builder.setYear((String) yearComboBox.getSelectedItem());
-        } else if (e.getSource() == baseListComboBox) {
-            MFMListBuilder.Builder.setBaseListName((String) baseListComboBox.getSelectedItem());
-        }
-    }
-
     private void createList(String listName) {
         builder.setCategories(((DynamicCBpanel) categoriesCBpanel).getChecked());
         builder.setControls(MachineControllers.getMAMEControllerNames(((DynamicCBpanel) controlsCBPanel).getChecked()));
+        //this is an example of wrong implementation. When ui open, action based values not set at all... so i fix some
+        builder.setNoImperfect(noImperfectCheckBox.isSelected());
+        builder.setNoMature(noMatureCB.isSelected());
+        builder.setNoClones(noClonesCheckBox.isSelected());
+        builder.setNoMechanical(noMechanicalCheckBox.isSelected());
+        MFMListBuilder.Builder.setLanguage((String) languagesComboBox.getSelectedItem());
+        MFMListBuilder.Builder.setWays((String) joyComboBox.getSelectedItem());
+        MFMListBuilder.Builder.setWays2((String) doubleJoyComboBox.getSelectedItem());
+        MFMListBuilder.Builder.setSimultaneousOnly(simultaneousCB.isSelected());
+        if (anyControlsRB.isSelected()) {
+            MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.ANY_CONTROLS);
+        } else if (exactControlsRB.isSelected()) {
+            MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.EXACT_CONTROLS);
+        } else {
+            MFMListBuilder.Builder.ControlsFilterType.setState(MFMListBuilder.ALL_CONTROLS);
+        }
+        String selected = (String) gameButtonsNum.getSelectedItem();
+        MFMListBuilder.Builder.setButtons(selected);
+        MFMListBuilder.Builder.setPlayers((int) gamePlayersNum.getSelectedItem());
+        MFMListBuilder.Builder.setYear((String) yearComboBox.getSelectedItem());
+        MFMListBuilder.Builder.setBaseListName((String) baseListComboBox.getSelectedItem());
 
         SortedSet<String> list = builder.generateList();
         if (list.isEmpty()) {
