@@ -39,25 +39,28 @@ import java.util.*;
 public final class MFMSettings {
     private static MFMSettings ourInstance = null;
 
-    private HashMap<String, String> fullSetExtrasDirectories;
-    private HashMap<String, String> playSetDirectories;
-    private HashMap<String, String> extrasZips;
-    private HashMap<String, File> extrasZipFilesMap;
+    private Map<String, String> fullSetExtrasDirectories;
+    private Map<String, String> playSetDirectories;
+    private Map<String, String> extrasZips;
+    private Map<String, File> extrasZipFilesMap;
 
     private boolean exeChanged = false;
     private boolean loaded = false;
-    // Special case logic
-    private static final double DBL_143 = 143.0d;// removed the decimal for correct comparison e.g. 0.70 is > 0.143
     public static final String ALL_UNDERSCORE = "ALL_";
     public static final String PLAYABLE = "Playable";
     public static final String PLAYABLE_UNDERSCORE = "Playable_";
 
-    // Use this guy to persist
-    private HashMap<String, Object> ourSettings = new HashMap<>(15);
+    // Use this Map to persist
+    private HashMap<String, Object> ourSettings = new HashMap<>(MFM_Constants.INITIAL_CAPACITY_15);
+
+    static {
+        ourInstance = new MFMSettings();
+    }
 
     public static MFMSettings getInstance() {
-        if (ourInstance == null) {
-            ourInstance = new MFMSettings();
+        if (ourInstance.loaded) {
+            return ourInstance;
+        } else {
             ourInstance.loadSettings();
         }
         return ourInstance;
@@ -170,7 +173,7 @@ public final class MFMSettings {
         exeChanged = true;
         // How in the hell did I get null mfmsettings here? Original obj GCed? But Settings Panel has a ref??
         if (ourSettings == null) {
-            ourSettings = new HashMap<>(15);
+            ourSettings = new HashMap<>(MFM_Constants.INITIAL_CAPACITY_15);
         }
         ourSettings.put(MFM_Constants.MAME_EXE_NAME, MAMEexeName);
     }
@@ -259,16 +262,13 @@ public final class MFMSettings {
 
     public void setShowXML(boolean showXML) {
         ourSettings.put(MFM_Constants.SHOW_XML, showXML);
-        if (!showXML) {
-            System.gc(); // Worth a shot here to recover the very large JTree?
-        }
     }
 
     public Map<String, File> getExtrasZipFilesMap() {
         // key == extras folder name, value zip file path
         // Added 9/2016 to handle zipped extras
         if (extrasZipFilesMap == null) {
-            extrasZipFilesMap = new HashMap<>();
+            extrasZipFilesMap = new HashMap<>(MFM_Constants.INITIAL_CAPACITY_50);
             for (Map.Entry<String, String> entry : extrasZips.entrySet()) {
                 extrasZipFilesMap.put(entry.getKey(), new File(entry.getValue()));
             }
@@ -344,13 +344,13 @@ public final class MFMSettings {
 
         for (String folderName : folders) {
             // If it is null create it unless it is ini - that are optional
-            if ((playSetDirectories.get(folderName) == null) || !folderName.equals("ini")) {
-                if (folderName.equals("roms") || folderName.equals("chds") ||
-                        (!folderName.equals("ini") && fullSetExtrasDirectories.containsKey(folderName))) {
+            if ((playSetDirectories.get(folderName) == null) || !"ini".equals(folderName)) {
+                if ("roms".equals(folderName) || "chds".equals(folderName) ||
+                        (!"ini".equals(folderName) && fullSetExtrasDirectories.containsKey(folderName))) {
                     File newDir = new File(getPlaySetDir() + FileUtils.DIRECTORY_SEPARATOR + folderName);
                     if (!newDir.exists()) {
-                        boolean success = newDir.mkdir();
-                        if (!success) {
+                        boolean failed = !newDir.mkdir();
+                        if (failed) {
                             MFM.getLogger().addToList("FAILED to create directory: " + newDir.getAbsolutePath());
                         }
                     }
@@ -400,7 +400,7 @@ public final class MFMSettings {
         ourSettings.put(MFM_Constants.FFMPEG_MOVE_AVI_TO_FOLDER, folder);
     }
 
-    HashMap<String, String> getFullSetExtrasDirectories() {
+    Map<String, String> getFullSetExtrasDirectories() {
         return fullSetExtrasDirectories;
     }
 
@@ -418,7 +418,7 @@ public final class MFMSettings {
      * @param version MAME version
      * @return String version number only
      */
-    private String trimMAMEVersion(String version) {
+    private static String trimMAMEVersion(String version) {
         if (version.contains("M.A.M.E.") || version.contains("MAME")) {
             int start = version.indexOf('v');
             return version.substring(start + 1, start + 6).trim();
@@ -434,15 +434,13 @@ public final class MFMSettings {
         ourSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
     }
 
-    public void generateDataVersion(String dataVersion) {
+    public void generateDataVersion(String dataVersionIn) {
         if (MFM.isSystemDebug()) {
-            System.out.println("MFMSettings.generateDataVersion dataVersion IN is: " + dataVersion);
+            System.out.println("MFMSettings.generateDataVersion dataVersion IN is: " + dataVersionIn);
         }
-        dataVersion = trimMAMEVersion(dataVersion);
-        // strip *. for Double comparison
-        Double dataVersionDouble = Double.valueOf(dataVersion.substring(dataVersion.indexOf('.') + 1));
+        String dataVersion = trimMAMEVersion(dataVersionIn);
 
-        if (!dataVersion.contains(ALL_UNDERSCORE) && (MAMEInfo.isProcessAll() || (dataVersionDouble <= DBL_143))) {
+        if (!dataVersion.contains(ALL_UNDERSCORE) && (MAMEInfo.isProcessAll())) { // removed determination by MAME version
             ourSettings.put(MFM_Constants.DATA_VERSION, ALL_UNDERSCORE + dataVersion);
         } else {
             ourSettings.put(MFM_Constants.DATA_VERSION, dataVersion);
@@ -491,7 +489,7 @@ public final class MFMSettings {
             fullSetExtrasDirectories = (HashMap<String, String>) ourSettings.get(
                     MFM_Constants.FULL_SET_DIRECTORIES_MAP);
             playSetDirectories = (HashMap<String, String>) ourSettings.get(MFM_Constants.PLAY_SET_DIRECTORIES_MAP);
-            extrasZips = (HashMap<String, String>) ourSettings.get(MFM_Constants.EXTRAS_ZIPS);
+            extrasZips = (Map<String, String>) ourSettings.get(MFM_Constants.EXTRAS_ZIPS);
             loaded = true;
         }
 
@@ -524,13 +522,13 @@ public final class MFMSettings {
         }
     }
 
-    public String pickVersion() {
+    public static String pickVersion() {
         return MFM_Components.dataSetPicker();
     }
 
     public void updateDirectoriesResourceFiles() {
 
-        fullSetExtrasDirectories = new HashMap<>();
+        fullSetExtrasDirectories = new HashMap<>(MFM_Constants.INITIAL_CAPACITY_50);
         fullSetExtrasDirectories.putAll(MFMFileOps.findMAMEdirectories(Paths.get(getExtrasFullSetDir()),
                 MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
         // Add it for persistence
@@ -572,7 +570,7 @@ public final class MFMSettings {
             } else {
                 setCatverINI(MFM.getMfmFoldersDir() + MFM_Constants.CATVER_INI_FILENAME);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
 
@@ -585,7 +583,7 @@ public final class MFMSettings {
             } else {
                 setnPlayerINI(MFM.getMfmFoldersDir() + MFM_Constants.NPLAYERS_INI_FILENAME);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
 
@@ -598,7 +596,7 @@ public final class MFMSettings {
             } else {
                 setLanguageINI(MFM.getMfmFoldersDir() + MFM_Constants.LANGUAGES_INI_FILENAME);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
 
@@ -606,11 +604,11 @@ public final class MFMSettings {
         persistMySettings();
     }
 
-    private HashMap<String, String> findExtrasZips() {
-        HashMap<String, String> map = new HashMap<>();
+    private Map<String, String> findExtrasZips() {
+        Map<String, String> map = new HashMap<>(MFM_Constants.INITIAL_CAPACITY_50);
         File extrasDir = new File(this.getExtrasFullSetDir());
         if (extrasDir.exists()) {
-            TreeSet<String> extrasFolderNames =
+            Collection<String> extrasFolderNames =
                     new TreeSet<>(Arrays.asList(MFM_Constants.MAME_FOLDER_NAMES_ARRAY));
             File[] files = extrasDir.listFiles();
             if (files != null) {

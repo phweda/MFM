@@ -92,7 +92,6 @@ final class MFMController extends ClickListener implements ListSelectionListener
 
     @SuppressWarnings("WeakerAccess")
     static final MFMSettings mfmSettings = MFMSettings.getInstance();
-    private static final MFMKeyActions keyActions = new MFMKeyActions();
 
     static void showListInfo(String listNameIn) {
         SortedSet<String> list = MFMPlayLists.getInstance().getPlayList(listNameIn);
@@ -728,12 +727,12 @@ final class MFMController extends ClickListener implements ListSelectionListener
 
     @Override
     public void keyTyped(KeyEvent e) {
-        keyActions.keyTyped(e);
+        MFMKeyActions.keyTyped(e);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        keyActions.keyPressed(e);
+        MFMKeyActions.keyPressed(e);
     }
 
     @Override

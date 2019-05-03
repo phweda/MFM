@@ -18,8 +18,8 @@
 
 package com.github.phweda.mfm;
 
-import com.github.phweda.mfm.ui.MFMAction;
 import com.github.phweda.mfm.mame.Machine;
+import com.github.phweda.mfm.ui.MFMAction;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public final class MFM_Constants {
     public static final String WORKING = "Working";
     public static final String RUNNABLE = "Runnable ";
     public static final String VERSION = "Version";
-    public static final String CREATE_LIST = "Create List"; // Not usable in UI widget bound to xml code
+    public static final String CREATE_LIST = "Create List"; // Not usable in UI widget bound to form xml code
     public static final String CATEGORY = "Category";
     public static final String NULL_STRING = "null";
     public static final String VECTOR = "vector";
@@ -154,6 +154,9 @@ public final class MFM_Constants {
             "icons", "ini", "logo", MANUALS, MANUALS_SL, "marquees",
             "pcb", "roms", SAMPLES, "scores", "select", "snap", SNAP_SL, SNAPS,
             SOFTWARE_LISTS, TITLES, TITLES_SL, "versus", Machine.VIDEO, "videosnaps"));
+    public static final int INITIAL_CAPACITY_50 = 50;
+    public static final int INITIAL_CAPACITY_15 = 15;
+    public static final int INITIAL_CAPACITY_250 = 250;
 
     public static String[] MAME_FOLDER_NAMES_ARRAY; // TODO now this is dynamic should move WHERE?
     public static final String[] yearsList;
