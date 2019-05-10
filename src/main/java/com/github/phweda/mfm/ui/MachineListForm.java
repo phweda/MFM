@@ -6,6 +6,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -35,7 +36,7 @@ public class MachineListForm {
         DefaultRowSorter sorter = (DefaultRowSorter) machineListTable.getRowSorter();
         sorter.setRowFilter(new RowFilter() {
           @Override
-          public boolean include(RowFilter.Entry entry) {
+          public boolean include(Entry entry) {
             String value = (String) entry.getValue(0);
             return value.toLowerCase().contains(txtSearch.getText().toLowerCase());
           }
@@ -51,4 +52,5 @@ public class MachineListForm {
   private void createUIComponents() {
     machineListTable = MachineListTable.getInstance();
   }
+
 }

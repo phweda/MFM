@@ -46,7 +46,7 @@ public class MFMUI {
     private static JFrame settingsFrame;
     private static boolean progressRunning = false;
     private static JDialog busyDialog = new JDialog((Dialog) null,
-            MFM.getMfmTitle().substring(0, MFM.getMfmTitle().lastIndexOf(':')));
+            MFM.getMfmTitle());
     private static Thread busyThread = null;
 
     private MFMUI() { // To cover implicit public constructor.
@@ -126,7 +126,8 @@ public class MFMUI {
     }
 
     public static JFrame getSettings() {
-        MFM_SettingsPanel.showSettingsPanel(getSettingsFrame());
+        //MFM_SettingsPanel.showSettingsPanel(getSettingsFrame());
+        SettingsPanel.showSettingsPanel(getSettingsFrame());
         return settingsFrame;
     }
 

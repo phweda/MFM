@@ -1,14 +1,22 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
-version = '0.9.6'
+def Properties versionProps = new Properties()
+versionProps.load(new FileInputStream("src/main/resources/com/github/phweda/mfm/version.properties"))
+version = versionProps['BUILD_VERSION']
 
 repositories {
     flatDir {
         dirs './lib'
     }
 	mavenCentral()
+}
+
+application {
+    mainClassName = 'com.github.phweda.mfm.MFM'
+    applicationDefaultJvmArgs = ['-XX:+UseG1GC' , '-XX:MaxGCPauseMillis=200', '-Xms1g',  '-Xmx3g' ]
 }
 
 jar {
