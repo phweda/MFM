@@ -149,24 +149,7 @@ public final class ListBuilderUI implements ActionListener, Serializable {
 
   private ListBuilderUI() {
     $$$setupUI$$$();
-    if (listBuilderPanel == null) {
-      bothRadioButton = new JRadioButton();
-      arcadeOnlyRadioButton = new JRadioButton();
-      systemsOnlyRadioButton = new JRadioButton();
-      allRadioButton = new JRadioButton();
-      cocktailRadioButton = new JRadioButton();
-      horizontalRadioButton = new JRadioButton();
-      verticalRadioButton = new JRadioButton();
-      rasterRadioButton = new JRadioButton();
-      lcdRadioButton = new JRadioButton();
-      vectorRadioButton = new JRadioButton();
-      allDisplaysRadioButton = new JRadioButton();
-      anyControlsRB = new JRadioButton();
-      allControlsRB = new JRadioButton();
-      exactControlsRB = new JRadioButton();
-      setLabelsText();
-      addActionListeners(listBuilderPanel);
-    }
+    setLabelsText();
   }
 
   public static ListBuilderUI getInstance() {
@@ -540,6 +523,22 @@ public final class ListBuilderUI implements ActionListener, Serializable {
   private void createUIComponents() {
     listBuilderPanel = new JPanel();
 
+    bothRadioButton = new JRadioButton();
+    arcadeOnlyRadioButton = new JRadioButton();
+    systemsOnlyRadioButton = new JRadioButton();
+    allRadioButton = new JRadioButton();
+    cocktailRadioButton = new JRadioButton();
+    horizontalRadioButton = new JRadioButton();
+    verticalRadioButton = new JRadioButton();
+    rasterRadioButton = new JRadioButton();
+    lcdRadioButton = new JRadioButton();
+    vectorRadioButton = new JRadioButton();
+    allDisplaysRadioButton = new JRadioButton();
+    anyControlsRB = new JRadioButton();
+    allControlsRB = new JRadioButton();
+    exactControlsRB = new JRadioButton();
+
+
     gameButtonsNum = new JComboBox<>(MAMEInfo.getNumButtons());
     gameButtonsNum.setSelectedIndex(4);
     gamePlayersNum = new JComboBox<>(MAMEInfo.getNumPlayers());
@@ -619,6 +618,8 @@ public final class ListBuilderUI implements ActionListener, Serializable {
     yearComboBox.setBorder(new BevelBorder(BevelBorder.RAISED, Color.gray, Color.gray));
 
     baseListComboBox = new JComboBox<>(MFMPlayLists.getInstance().getListBuilderNames());
+
+    addActionListeners(listBuilderPanel);
   }
 
 
@@ -693,7 +694,7 @@ public final class ListBuilderUI implements ActionListener, Serializable {
     gbc.anchor = GridBagConstraints.SOUTH;
     buttonPanel.add(listNameLabel, gbc);
     listNameTF = new JTextField();
-    listNameTF.setMargin(new Insets(3, 6, 3, 6));
+    listNameTF.setMargin(new Insets(2, 5, 2, 5));
     listNameTF.setMaximumSize(new Dimension(255, 33));
     listNameTF.setMinimumSize(new Dimension(255, 33));
     listNameTF.setOpaque(true);
@@ -1247,4 +1248,5 @@ public final class ListBuilderUI implements ActionListener, Serializable {
   public JComponent $$$getRootComponent$$$() {
     return listBuilderPanel;
   }
+
 }
