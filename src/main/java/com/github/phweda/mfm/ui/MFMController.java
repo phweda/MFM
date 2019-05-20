@@ -429,7 +429,8 @@ final class MFMController extends ClickListener implements ListSelectionListener
                         "Created December 2011" + NEWLINE +
                                 "Coded by phweda" + NEWLINE +
                                 "phweda1@yahoo.com" + NEWLINE +
-                                MFM.getVERSION() + TAB + MFM.getReleaseDate());
+                                "version: "+ MFM.getVERSION() + NEWLINE +
+                                "released: " + MFM.getReleaseDate());
                 break;
             case MFM_USER_GUIDE:
                 openFileFromOS(Paths.get(MFM.getMfmDir() + MFM.getMFMUserGuide()));

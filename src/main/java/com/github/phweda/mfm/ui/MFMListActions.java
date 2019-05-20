@@ -149,7 +149,7 @@ final class MFMListActions {
 
     static void showListEditor() {
         Dialog listEditorDialog = new JDialog(MFMController.getFrame(), MFMAction.LIST_EDITOR);
-        listEditorDialog.add(ListEditor.getInstance().$$$getRootComponent$$$());
+        listEditorDialog.add(ListEditor.getInstance().getListEditorPanel());
         listEditorDialog.pack();
         listEditorDialog.setLocationRelativeTo(MFMController.getFrame());
         listEditorDialog.setVisible(true);

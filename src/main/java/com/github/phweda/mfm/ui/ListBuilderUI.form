@@ -76,7 +76,7 @@
               <gridbag top="5" left="0" bottom="5" right="0" weightx="0.4" weighty="1.0"/>
             </constraints>
             <properties>
-              <margin top="3" left="6" bottom="3" right="6"/>
+              <margin top="2" left="5" bottom="2" right="5"/>
               <maximumSize width="255" height="33"/>
               <minimumSize width="255" height="33"/>
               <opaque value="true"/>

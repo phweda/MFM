@@ -257,7 +257,8 @@ public final class MFMAction extends AbstractAction {
     }
 
     private static void showSettings() {
-        MFM_SettingsPanel.showSettingsPanel(MFMUI.getSettings());
+        //MFM_SettingsPanel.showSettingsPanel(MFMUI.getSettings());
+        MFMUI.getSettings();
     }
 
     @SuppressWarnings("squid:S1479")

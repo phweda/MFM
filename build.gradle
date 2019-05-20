@@ -1,14 +1,22 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
-version = '0.9.6'
+Properties versionProps = new Properties()
+versionProps.load(new FileInputStream("src/main/resources/com/github/phweda/mfm/version.properties"))
+version = versionProps['BUILD_VERSION']
 
 repositories {
     flatDir {
         dirs './lib'
     }
 	mavenCentral()
+}
+
+application {
+    mainClassName = 'com.github.phweda.mfm.MFM'
+    applicationDefaultJvmArgs = ['-XX:+UseG1GC' , '-XX:MaxGCPauseMillis=200', '-Xms1g',  '-Xmx3g' ]
 }
 
 jar {
@@ -34,4 +42,6 @@ dependencies {
     compile group: 'org.swinglabs.swingx', name: 'swingx-core', version: '1.6.5-1'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     compile group: 'org.jetbrains', name: 'annotations', version: '16.0.3'
+    compile group: 'com.intellij', name: 'forms_rt', version: '7.0.3'
+
 }

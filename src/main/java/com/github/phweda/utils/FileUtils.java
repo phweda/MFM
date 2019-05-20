@@ -664,4 +664,79 @@ public class FileUtils {
         }
     }
 
+    /**
+     * convert \\ or / slashes to / slashes, and remove duplicate slashes
+     *
+     * @param path
+     *        file/dir path (example: c://tree\\\\apple.txt)
+     *
+     * @return
+     *         String - converted string (on linux: c:/tree/apple.txt)
+     */
+    public static String standardizeSlashes(String path) {
+        StringBuilder sb = new StringBuilder(path.length());
+        // init last char
+        boolean lastCharIsDupChar = false;
+        for (int i = 0; i < path.length(); i++) {
+            char ch = path.charAt(i);
+            // convert slashes
+            if (ch == '\\') {
+                ch = '/';
+            }
+            if (ch != '/') {
+                lastCharIsDupChar = false;
+                sb.append(ch);
+            } else {
+                // append only if last char is not dup char
+                if (!lastCharIsDupChar) {
+                    sb.append(ch);
+                }
+                lastCharIsDupChar = true;
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * convert slashes on given string to platform specific ones
+     *
+     * @param path
+     *        file/dir path (example: c:\tree\apple.txt)
+     *
+     * @return
+     *         String - converted string (on linux: c:/tree/apple.txt)
+     */
+    public static String convertSlashes(String path) {
+        if (File.separatorChar != '/') {
+            path = path.replace("/", "\\");
+        } else {
+            path = path.replace("\\", "/");
+        }
+        return path;
+    }
+
+    /**
+     * construct full file path from given dir and filename.
+     * All slashes converted to platform specific ones
+     *
+     * @param dir
+     *        file directory (example: c:/test
+     *
+     * @param fileName
+     *        file name (example: apple.txt)
+     *
+     * @return
+     *         consturcted path (example: c:/test/apple.txt)
+     */
+    public static String constructFilePath(String dir, String fileName) {
+        String result = dir;
+        result = standardizeSlashes(result);
+        if (!dir.endsWith("/") && !dir.endsWith("\\")) {
+            result += File.separatorChar;
+        }
+        result += fileName;
+        result = convertSlashes(result);
+        return result;
+    }
+
 }

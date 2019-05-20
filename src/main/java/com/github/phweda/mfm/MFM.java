@@ -53,11 +53,7 @@ public final class MFM {
     private static String mfmCategoryDir;
     private static final String MFM_USER_GUIDE = "MAME File Manager User Guide.pdf";
     // Update these with each release
-    private static final String VERSION = "Version 0.9.6";
-    private static final String BUILD = "BUILD 0.9.600";
-    private static final String RELEASE_DATE = "Released : Sept 2018";
     private static final String LOCAL_COUNTRY = Locale.getDefault().getCountry();
-    private static final String MFM_TITLE = MAME_FILE_MANAGER + "  :  " + VERSION;
 
     public static final char COLON = ':';
 
@@ -92,7 +88,24 @@ public final class MFM {
     private static boolean systemoutDebug = false;
     private static boolean doParse = false;
 
+
+    private static String buildVersion;
+    private static String releaseVersion;
+    private static String releaseDate;
+
     static {
+        String resourceName = "com/github/phweda/mfm/version.properties";
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Properties props = new Properties();
+        try(InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
+            props.load(resourceStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        buildVersion = props.getProperty("BUILD_VERSION");
+        releaseVersion = props.getProperty("RELEASE_VERSION");
+        releaseDate = props.getProperty("RELEASE_DATE");
+
         File dir = new File(".");
         String path = null;
         try {
@@ -108,7 +121,7 @@ public final class MFM {
 
         try {
             logger.addToList("MFM is running in : " + path, true);
-            logger.addToList("MFM " + MFM.VERSION + "  :  " + MFM.BUILD, true);
+            logger.addToList("MFM " + MFM.buildVersion + "  :  " + MFM.releaseDate, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -387,19 +400,15 @@ public final class MFM {
     }
 
     public static String getVERSION() {
-        return VERSION;
-    }
-
-    public static String getBUILD() {
-        return BUILD;
+        return buildVersion;
     }
 
     public static String getReleaseDate() {
-        return RELEASE_DATE;
+        return releaseDate;
     }
 
     public static String getMfmTitle() {
-        return MFM_TITLE;
+        return MAME_FILE_MANAGER + " v" + buildVersion;
     }
 
     public static String getLocalCountry() {
