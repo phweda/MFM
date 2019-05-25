@@ -71,6 +71,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "rom")
@@ -126,7 +127,7 @@ public class Rom {
      *              {@link String }
      */
     public void setName(String value) {
-        this.name = value;
+        name = value;
     }
 
     /**
@@ -146,7 +147,7 @@ public class Rom {
      *              {@link String }
      */
     public void setBios(String value) {
-        this.bios = value;
+        bios = value;
     }
 
     /**
@@ -166,7 +167,7 @@ public class Rom {
      *              {@link String }
      */
     public void setSize(String value) {
-        this.size = value;
+        size = value;
     }
 
     /**
@@ -186,7 +187,7 @@ public class Rom {
      *              {@link String }
      */
     public void setCrc(String value) {
-        this.crc = value;
+        crc = value;
     }
 
     /**
@@ -206,7 +207,7 @@ public class Rom {
      *              {@link String }
      */
     public void setMds(String value) {
-        this.md5 = value;
+        md5 = value;
     }
 
     /**
@@ -226,7 +227,7 @@ public class Rom {
      *              {@link String }
      */
     public void setSha1(String value) {
-        this.sha1 = value;
+        sha1 = value;
     }
 
     /**
@@ -246,7 +247,7 @@ public class Rom {
      *              {@link String }
      */
     public void setMerge(String value) {
-        this.merge = value;
+        merge = value;
     }
 
     /**
@@ -266,7 +267,7 @@ public class Rom {
      *              {@link String }
      */
     public void setRegion(String value) {
-        this.region = value;
+        region = value;
     }
 
     /**
@@ -286,7 +287,7 @@ public class Rom {
      *              {@link String }
      */
     public void setOffset(String value) {
-        this.offset = value;
+        offset = value;
     }
 
     /**
@@ -296,7 +297,7 @@ public class Rom {
      * {@link String }
      */
     public String getFlags() {
-        return flags;
+        return (flags != null) ? flags : "";
     }
 
     /**
@@ -306,7 +307,7 @@ public class Rom {
      *              {@link String }
      */
     public void setFlags(String value) {
-        this.flags = value;
+        flags = value;
     }
 
 
@@ -317,11 +318,7 @@ public class Rom {
      * {@link String }
      */
     public String getStatus() {
-        if (status == null) {
-            return "good";
-        } else {
-            return status;
-        }
+        return (status == null) ? "good" : status;
     }
 
     /**
@@ -331,7 +328,7 @@ public class Rom {
      *              {@link String }
      */
     public void setStatus(String value) {
-        this.status = value;
+        status = value;
     }
 
     /**
@@ -341,11 +338,7 @@ public class Rom {
      * {@link String }
      */
     public String getOptional() {
-        if (optional == null) {
-            return "no";
-        } else {
-            return optional;
-        }
+        return optional == null ? "no" : optional;
     }
 
     /**
@@ -355,7 +348,7 @@ public class Rom {
      *              {@link String }
      */
     public void setOptional(String value) {
-        this.optional = value;
+        optional = value;
     }
 
 }
