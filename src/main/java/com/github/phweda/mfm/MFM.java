@@ -465,7 +465,7 @@ public final class MFM {
      */
     @SuppressWarnings("StatementWithEmptyBody")
     public static void exit(int status) {
-        MFM_Data.getInstance().persistSettings(); // Capture and persist any user driven settings: UI & Current List
+        MFM_Data.persistSettings(); // Capture and persist any user driven settings: UI & Current List
         // Wait for final exit if a Data Set is writing to disk
         while (MFM_Data.getInstance().isPersisting()) {
         }

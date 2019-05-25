@@ -18,7 +18,6 @@
 
 package com.github.phweda.mfm;
 
-import com.github.phweda.mfm.utils.ParseCommandList;
 import com.github.phweda.mfm.mame.Machine;
 import com.github.phweda.mfm.mame.Mame;
 import com.github.phweda.mfm.mame.ParseMAMElistInfo;
@@ -26,6 +25,7 @@ import com.github.phweda.mfm.mame.ParseMAMElistXML;
 import com.github.phweda.mfm.mame.softwarelist.Software;
 import com.github.phweda.mfm.mame.softwarelist.Softwarelist;
 import com.github.phweda.mfm.mame.softwarelist.Softwarelists;
+import com.github.phweda.mfm.utils.ParseCommandList;
 import com.github.phweda.utils.FileUtils;
 import com.github.phweda.utils.PersistUtils;
 
@@ -36,8 +36,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.phweda.mfm.MFMListBuilder.CATEGORY_LISTS_HASHMAP;
@@ -49,6 +49,7 @@ import static com.github.phweda.utils.FileUtils.COMMA;
  * Date: 11/25/11
  * Time: 2:04 PM
  */
+@SuppressWarnings({"ClassWithTooManyFields", "ClassWithTooManyMethods", "OverlyComplexClass"})
 public final class MAMEInfo {
     private static MAMEInfo ourInstance = null;
 
@@ -334,7 +335,7 @@ public final class MAMEInfo {
 
     @SuppressWarnings("unchecked")
     private static void loadCaches() {
-        inifiles = (Map<String, Map<String, String>>) MFM_Data.getInstance().getUserInis();
+        inifiles = (Map<String, Map<String, String>>) MFM_Data.getUserInis();
         runnableMachines = (Set<String>) MFM_Data.getInstance().getStaticData(RUNNABLE_MACHINES);
         allCategories = (List<String>) MFM_Data.getInstance().getStaticData(CATEGORIES);
         categoryMachinesMap = (Map<String, ArrayList<String>>) MFM_Data.getInstance().
