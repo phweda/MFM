@@ -20,6 +20,7 @@ logs
 out/Production/*
 settings/*
 !settings/*.ini
+!settings/datafile2018.xsd
 
 # Windows image file caches
 Thumbs.db
