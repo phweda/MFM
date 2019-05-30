@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2019.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,14 +18,19 @@
 
 package com.github.phweda.mfm.ui;
 
-import com.github.phweda.mfm.*;
+import com.github.phweda.mfm.MAMEInfo;
+import com.github.phweda.mfm.MFM;
+import com.github.phweda.mfm.MFMListBuilder;
+import com.github.phweda.mfm.MFMPlayLists;
+import com.github.phweda.mfm.MFM_Data;
+import com.github.phweda.mfm.mame.Mame;
 import com.github.phweda.mfm.utils.AnalyzeCategories;
 import com.github.phweda.mfm.utils.MFM_DATmaker;
-import com.github.phweda.mfm.mame.Mame;
 import com.github.phweda.utils.DirectorytoXML;
 import com.github.phweda.utils.XMLUtils;
 
 import javax.swing.*;
+import javax.xml.bind.JAXBException;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -175,15 +180,18 @@ final class MFMKeyActions {
         if ((e.getKeyCode() == KeyEvent.VK_F1) && e.isControlDown() && e.isShiftDown()) {
             Mame mame = MFM_Data.getInstance().getMame();
             String outputPath = MFM.getMfmDataDir() + mame.getBuild() + ".xml";
-            boolean result = XMLUtils.prettyPrintXML(mame, outputPath);
-            if (result) {
-
+            try {
+                XMLUtils.prettyPrintXML(mame, Mame.class, outputPath);
+            } catch (JAXBException ex) {
+                ex.printStackTrace();
+                // Output to user?
             }
+            // Output to user?
         }
 
-        // Save current DataSets info to XML
+        // Save selected Folder to XML
         if ((e.getKeyCode() == KeyEvent.VK_F5) && e.isControlDown() && e.isShiftDown()) {
-            saveDataSetstoXML();
+            savDirectoryInfotoXML();
         }
 
         if ((e.getKeyCode() == KeyEvent.VK_Z) && e.isControlDown() && e.isShiftDown()) {
@@ -205,7 +213,10 @@ final class MFMKeyActions {
         }
     }
 
-    private static void saveDataSetstoXML() {
+    /**
+     * Save selected Directory to XML
+     */
+    private static void savDirectoryInfotoXML() {
         DirectorytoXML dirtoXML = new DirectorytoXML();
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

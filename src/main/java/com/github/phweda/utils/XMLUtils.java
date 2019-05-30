@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2019.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,12 @@
 
 package com.github.phweda.utils;
 
-import com.github.phweda.mfm.mame.Mame;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -100,8 +101,17 @@ public class XMLUtils {
         return true;
     }
 
-    public static boolean prettyPrintXML(Mame mame, String outputPath) {
-        //TODO: voji implement this
-        throw new NotImplementedException();
+    /**
+     * @param object     Object to transform to XML and save
+     * @param _class     Object's class
+     * @param outputPath Path to output file
+     * @throws JAXBException
+     */
+    public static void prettyPrintXML(Object object, Class _class, String outputPath) throws JAXBException {
+        JAXBContext jc = JAXBContext.newInstance(_class);
+        Marshaller marshaller = jc.createMarshaller();
+        // output pretty printed
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.marshal(object, new File(outputPath));
     }
 }
