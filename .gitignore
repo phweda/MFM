@@ -12,6 +12,7 @@ build/*
 
 Custom.ini
 Genre.ini
+Images/*
 Mature.ini
 Multimonitor.ini
 lists/*
