@@ -1,6 +1,6 @@
 /*
  * MAME FILE MANAGER - MAME resources management tool
- * Copyright (c) 2011 - 2018.  Author phweda : phweda1@yahoo.com
+ * Copyright (c) 2011 - 2019.  Author phweda : phweda1@yahoo.com
  *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,11 +21,10 @@ package com.github.phweda.utils;
 import com.github.phweda.mfm.MFM;
 import com.github.phweda.mfm.MFMSettings;
 import com.github.phweda.mfm.ui.ImagesViewer;
-import com.sun.imageio.plugins.gif.GIFImageReader;
-import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.image.BufferedImage;
@@ -33,17 +32,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-// import javax.media.format.VideoFormat;
-
 /**
  * Created by IntelliJ IDEA.
  * User: phweda
  * Date: 3/30/2015
  * Time: 9:41 PM
  */
-public class VideoUtils {
+public final class VideoUtils {
 
-    private static MFMSettings mfmSettings = MFMSettings.getInstance();
+    private static final MFMSettings mfmSettings = MFMSettings.getInstance();
 
     private VideoUtils() {
     }
@@ -75,7 +72,7 @@ public class VideoUtils {
     public static void showGIFimages(File file) {
         if (file.exists()) {
             try {
-                final ImagesViewer imagesViewer = new ImagesViewer(getFrames(file), file);
+                new ImagesViewer(getFrames(file), file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -84,14 +81,16 @@ public class VideoUtils {
 
 
     private static ArrayList<BufferedImage> getFrames(File gif) throws IOException {
-        ArrayList<BufferedImage> frames = new ArrayList<>();
-        ImageReader ir = new GIFImageReader(new GIFImageReaderSpi());
-        ir.setInput(ImageIO.createImageInputStream(gif));
-        for (int i = 0; i < ir.getNumImages(true); i++) {
-            frames.add(ir.read(i));
+        ArrayList<BufferedImage> frames = new ArrayList<>(300);
+        ImageReader imageReader = ImageIO.getImageReadersByFormatName("gif").next();
+        ImageInputStream stream = ImageIO.createImageInputStream(gif);
+        imageReader.setInput(stream);
+
+        for (int i = 0; i < imageReader.getNumImages(true); i++) {
+            frames.add(imageReader.read(i));
         }
         // Release resources for Garbage Collection
-        ir.dispose();
+        imageReader.dispose();
         return frames;
     }
 
@@ -104,25 +103,26 @@ public class VideoUtils {
             VideoSource vs = new VideoSource(urlpath);
             vs.initialize();
             ArrayList<BufferedImage> frames = null;
+            String lineSeprator = System.lineSeparator();
             try {
                 frames = vs.getFrames();
-            } catch (Exception exc) {
+            } catch (RuntimeException exc) {
                 exc.printStackTrace();
                 if (exc.getMessage().contains("OutOfMemoryError")) {
-                    JOptionPane.showMessageDialog(null, "Not enough Memory!\n"
-                            + "Try a smaller file or increase the heap size,\n" +
+                    JOptionPane.showMessageDialog(null, "Not enough Memory!" + lineSeprator
+                            + "Try a smaller file or increase the heap size," + lineSeprator +
                             "-Xmx256m to -Xmx2048m, in your mfm.bat file?");
                 }
             }
-            if (frames == null || frames.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "AVI failed to load try again.\n"
-                        + "Try a smaller file and did you increase the heap size,\n" +
+            if ((frames == null) || frames.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "AVI failed to load try again." + lineSeprator
+                        + "Try a smaller file and did you increase the heap size," + lineSeprator +
                         "-Xmx256m to -Xmx2048m (or more), in your mfm.bat file?");
                 return;
             }
             frames.trimToSize();
             if (!frames.isEmpty()) {
-                final ImagesViewer imagesViewer = new ImagesViewer(frames, file);
+                new ImagesViewer(frames, file);
             }
             // Release for Garbage Collection
             // NOTE should we add a dispose method to VideoSource?
@@ -131,7 +131,7 @@ public class VideoUtils {
     }
 
     public static void runVirtualDub(String filePath) {
-        if (mfmSettings.VDubexe() == null || mfmSettings.VDubexe().equals("")) {
+        if ((mfmSettings.VDubexe() == null) || mfmSettings.VDubexe().isEmpty()) {
             // JOptionPane.showMessageDialog(null, "mfm needs your VirtualDub executable");
 
             JFileChooser fc = new JFileChooser();
