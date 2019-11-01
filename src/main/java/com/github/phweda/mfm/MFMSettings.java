@@ -257,7 +257,7 @@ public final class MFMSettings {
 
     public boolean isShowXML() {
         return (ourSettings.get(MFM_Constants.SHOW_XML) != null) &&
-                Boolean.valueOf(ourSettings.get(MFM_Constants.SHOW_XML).toString());
+                Boolean.parseBoolean(ourSettings.get(MFM_Constants.SHOW_XML).toString());
     }
 
     public void setShowXML(boolean showXML) {
@@ -463,7 +463,7 @@ public final class MFMSettings {
             setMAMEexeVersion();
             exeChanged = false;
         }
-        MFM_Data.getInstance().setObject(MFM_Constants.MFM_SETTINGS, ourSettings);
+        MFM_Data.setObject(MFM_Constants.MFM_SETTINGS, ourSettings);
     }
 
     public boolean isLoaded() {
@@ -473,8 +473,7 @@ public final class MFMSettings {
     @SuppressWarnings("unchecked")
     private void loadSettings() {
         MFM_Data data = MFM_Data.getInstance();
-        ourSettings = (HashMap<String, Object>) data.getObject(MFM_Constants.MFM_SETTINGS);
-        //
+        ourSettings = (HashMap<String, Object>) MFM_Data.getObject(MFM_Constants.MFM_SETTINGS);
         if ((ourSettings == null) || (ourSettings.size() <= 2)) {
             MFM.getLogger().separateLine();
             MFM.getLogger().addToList("NO SETTINGS FOUND", true);
@@ -507,13 +506,13 @@ public final class MFMSettings {
             }
             // 0 is an error unless bootstrap parse is set
             // 1 is a special cases handled by MFMController
-            if (MFM_Data.getInstance().getDataSets().length == 0) {
+            if (MFM_Data.getDataSets().length == 0) {
                 System.out.println("NO DATA SETS");
-            } else if (MFM_Data.getInstance().getDataSets().length > 1) {
+            } else if (MFM_Data.getDataSets().length > 1) {
                 setDataVersion(pickVersion());
             }
         } else if (MFM.isDoParse()) {
-            if (settingsValid()!=null) {
+            if (settingsValid() != null) {
                 // first run must acquire base settings before continuing
                 MFMUI.getSettings();
             }
@@ -525,10 +524,10 @@ public final class MFMSettings {
         if (ourSettings == null) {
             return "Settings not initialized";
         } else {
-            if (!checkExists(fullMAMEexePath(), false)){
+            if (!checkExists(fullMAMEexePath(), false)) {
                 return "Unable to find mame executable.";
             }
-            if (!checkExists(getPlaySetDir(), true)){
+            if (!checkExists(getPlaySetDir(), true)) {
                 return "Playset dir not exists.";
             }
             boolean hasRomDir = false;
@@ -669,7 +668,7 @@ public final class MFMSettings {
     }
 
     public void initSettings() {
-        if (ourSettings==null) {
+        if (ourSettings == null) {
             ourSettings = new HashMap<>();
         }
     }
