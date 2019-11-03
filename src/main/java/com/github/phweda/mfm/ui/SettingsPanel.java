@@ -146,11 +146,11 @@ public class SettingsPanel {
 
       frame.setVisible(false);
       frame.dispose();
+      mfmSettings.isLoaded(true);
       if (mfmSettings.PlaySetDirectories() == null) {
         MFM.getMFMSettings().updateDirectoriesResourceFiles();
       }
 
-      mfmSettings.isLoaded(true);
       mfmSettings.updateDirectoriesResourceFiles();
       if (!MFM.isFirstRun()) {
         MAMEInfo.loadINIs();
@@ -175,6 +175,7 @@ public class SettingsPanel {
       } else {
         cbMameRomType.setSelectedIndex(0);
       }
+      fsOutput.setPath(mfmSettings.getPlaySetDir());
     }
 
     btnCancel.addActionListener(e -> cancelSettingsDialog());
