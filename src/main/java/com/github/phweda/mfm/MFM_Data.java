@@ -63,7 +63,7 @@ public final class MFM_Data {
     private static final String SCANNED_FOR_DATA_SETS_AND_FOUND = "Scanned for Data Sets and found: ";
     private static MFM_Data_Sets datasets;
 
-    private static Map<String, Object> settings;
+    private static Map<String, Object> settings = new HashMap<String, Object>();
     // Provides common name mapping for MachineControllers
     private static File controllersLabelsFile;
     // Contains list of Mame folders
